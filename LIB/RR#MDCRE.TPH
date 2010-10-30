@@ -1,0 +1,244 @@
+// Creature modification function
+// Useful for situations where you don't want to lower a pre-existing value in case it's higher than the one you define
+// However, it is possible to enforce the values on CREs that are marked using the enfcXX string variables
+
+DEFINE_PATCH_FUNCTION ~RR#MDCRE~
+
+INT_VAR                                                                            // initialize starting variables
+"enforce"  = "0"                                                                   // values are not enforced by defauls
+"newxpv"   = "0"                                                                   // new XP value
+"newhp"    = "0"                                                                   // new hit point value
+"newac"    = "10"                                                                  // new Armor Class value
+"newth"    = "20"                                                                  // new THAC0 value
+"newapr"   = "99"                                                                  // new number of attacks per round
+"newsvd"   = "20"                                                                  // new Save vs. Death
+"newsvw"   = "20"                                                                  // new Save vs. Wand
+"newsvp"   = "20"                                                                  // new Save vs. Polymorph
+"newsvb"   = "20"                                                                  // new Save vs. Breath
+"newsvs"   = "20"                                                                  // new Save vs. Spell
+"newmr"    = "0"                                                                   // new Magic Resistance value
+"newlvl1"  = "0"                                                                   // new level (first class)
+ newlvl2   =  0                                                                    // new level (second)
+ newlvl3   =  0                                                                    // new level (third)
+"newfr"    = "0"                                                                   // new Resist Fire value
+"newcr"    = "0"                                                                   // new Resist Cold value
+"newer"    = "0"                                                                   // new Resist Electricity value
+"newar"    = "0"                                                                   // new Resist Acid value
+ newrs     =  0                                                                    // new Resist Slashing
+ newrc     =  0                                                                    // new Resist Crushing
+ newrp     =  0                                                                    // new Resist Piercing
+ newrm     =  0                                                                    // new Resist Missiles
+"newstr"   = "0"                                                                   // new Strength value
+"newstrx"  = "0"                                                                   // new Exceptional Strength value
+"newint"   = "0"                                                                   // new Intelligence value
+"newwis"   = "0"                                                                   // new Wisdom value
+"newdex"   = "0"                                                                   // new Dexterity value
+"newcon"   = "0"                                                                   // new Constitution value
+"newchr"   = "0"                                                                   // new Charisma value
+"newmor"   = "0"                                                                   // new morale value
+"newmorb"  = "99"                                                                  // new morale break value
+"newmorr"  = "99"                                                                  // new morale recovery value
+ newgen    =  999
+"newrace"  = "999"                                                                 // new race
+"newclass" = "999"                                                                 // new class
+"newgendr" = "999"                                                                 // new gender
+"newalign" = "99"                                                                  // new alignment
+"newhide"  = "999"                                                                 // new Hide in Shadows value
+"newmsil"  = "999"                                                                 // new Move Silently value
+
+
+STR_VAR                                                                            // initialize strings
+"enfc01"   = "RR#NOENF"                                                            // enforced creature 1
+"enfc02"   = "RR#NOENF"                                                            // enforced creature 2
+"enfc03"   = "RR#NOENF"                                                            // enforced creature 3
+"enfc04"   = "RR#NOENF"                                                            // enforced creature 4
+"enfc05"   = "RR#NOENF"                                                            // enforced creature 5
+"enfc06"   = "RR#NOENF"                                                            // enforced creature 6
+"enfc07"   = "RR#NOENF"                                                            // enforced creature 7
+"enfc08"   = "RR#NOENF"                                                            // enforced creature 8
+"enfc09"   = "RR#NOENF"                                                            // enforced creature 9
+"enfc10"   = "RR#NOENF"                                                            // enforced creature 10
+
+
+
+BEGIN                                                                              // Start FUNCTION
+
+READ_LONG  0x14  "oldxpv"                                                          // XP value
+READ_SHORT 0x24  "curhp"                                                           // current hit points
+READ_SHORT 0x26  "maxhp"                                                           // maximum hit points
+READ_SHORT 0x46  "natac"                                                           // natural Armor Class
+READ_SHORT 0x48  "effac"                                                           // effective Armor Class
+READ_BYTE  0x52  "oldth"                                                           // THAC0 value
+READ_BYTE  0x53  "oldapr"                                                          // number of attacks per round
+READ_BYTE  0x54  "oldsvd"                                                          // Save vs. Death
+READ_BYTE  0x55  "oldsvw"                                                          // Save vs. Wand
+READ_BYTE  0x56  "oldsvp"                                                          // Save vs. Polymorph
+READ_BYTE  0x57  "oldsvb"                                                          // Save vs. Breath
+READ_BYTE  0x58  "oldsvs"                                                          // Save vs. Spell
+READ_BYTE  0x59  "oldfr"                                                           // Resist Fire value
+READ_BYTE  0x5a  "oldcr"                                                           // Resist Cold value
+READ_BYTE  0x5b  "older"                                                           // Resist Electricity value
+READ_BYTE  0x5c  "oldar"                                                           // Resist Acid value
+READ_BYTE  0x5d  "oldmr"
+READ_BYTE  0x60   oldrs
+READ_BYTE  0x61   oldrc
+READ_BYTE  0x62   oldrp
+READ_BYTE  0x63   oldrm                                                            // Magic Resistance value
+READ_BYTE  0x234 "oldlvl1"
+READ_BYTE  0x235  oldlvl2
+READ_BYTE  0x236  oldlvl3                                                          // level (first class)
+READ_BYTE  0x238 "oldstr"                                                          // Strength
+READ_BYTE  0x239 "oldstrx"                                                         // Exceptional Strength
+READ_BYTE  0x23a "oldint"                                                          // Inteligence
+READ_BYTE  0x23b "oldwis"                                                          // Wisdom
+READ_BYTE  0x23c "olddex"                                                          // Dexterity
+READ_BYTE  0x23d "oldcon"                                                          // Constitution
+READ_BYTE  0x23e "oldchr"                                                          // Charisma
+READ_BYTE  0x23f "oldmor"                                                          // morale
+READ_BYTE  0x240 "oldmorb"                                                         // morale break
+READ_BYTE  0x242 "oldmorr"                                                         // morale recovery
+READ_BYTE  0x271  oldgen                                                           // general
+READ_BYTE  0x272 "oldrace"                                                         // race
+READ_BYTE  0x273 "oldclass"                                                        // class
+READ_BYTE  0x275 "oldgendr"                                                        // gender
+READ_BYTE  0x27b "oldalign"                                                        // alignment
+READ_BYTE  0x45  "oldhide"                                                         // Hide in Shadows
+READ_BYTE  0x68  "oldmsil"                                                         // Move Silently
+
+PATCH_FOR_EACH ~enfcre~ IN ~%enfc01%~ ~%enfc02%~ ~%enfc03%~ ~%enfc04%~ ~%enfc05%~ ~%enfc06%~ ~%enfc07%~ ~%enfc08%~ ~%enfc09%~ ~%enfc10%~ BEGIN // checks for enforced creatures
+  PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE "%enfcre%") BEGIN             
+    SET "enforce" = "1"                                                           // mark creature as enforced (will always use specified values, even if the existing ones are better)
+  END
+END
+
+PATCH_IF ("%oldxpv%" < "%newxpv%") OR (("%enforce%" = "1") AND ("%newxpv%" != "0")) BEGIN
+  WRITE_LONG 0x14 "%newxpv%"                                                       // set new XP value
+END
+PATCH_IF ("%curhp%" < "%newhp%") OR (("%enforce%" = "1") AND ("%newhp%" != "0")) BEGIN
+  WRITE_SHORT 0x24 "%newhp%"                                                       // set current hit points
+END
+PATCH_IF ("%maxhp%" < "%newhp%") OR (("%enforce%" = "1") AND ("%newhp%" != "0")) BEGIN
+  WRITE_SHORT 0x26 "%newhp%"                                                       // set maximum hit points
+END
+PATCH_IF ("%natac%" > "%newac%") OR (("%enforce%" = "1") AND ("%newac%" != "10")) BEGIN
+  WRITE_SHORT 0x46 "%newac%"                                                       // set natural Armor Class
+END
+PATCH_IF ("%effac%" > "%newac%") OR (("%enforce%" = "1") AND ("%newac%" != "10")) BEGIN
+  WRITE_SHORT 0x48 "%newac%"                                                       // set effective Armor Class
+END
+PATCH_IF ("%oldth%" > "%newth%") OR (("%enforce%" = "1") AND ("%newth%" != "20")) BEGIN
+  WRITE_BYTE 0x52 "%newth%"                                                        // set new THAC0 value
+END
+PATCH_IF (("%oldapr%" < "%newapr%") AND ("newapr" != "99")) OR (("%enforce%" = "1") AND ("%newapr%" != "99")) BEGIN
+  WRITE_BYTE 0x53 "%newapr%"                                                       // set new number of attacks per round
+END
+PATCH_IF ("%oldsvd%" > "%newsvd%") OR (("%enforce%" = "1") AND ("%newsvd%" != "20")) BEGIN
+  WRITE_BYTE 0x54 "%newsvd%"                                                       // set the Save vs. Death value
+END
+PATCH_IF ("%oldsvw%" > "%newsvw%") OR (("%enforce%" = "1") AND ("%newsvw%" != "20")) BEGIN
+  WRITE_BYTE 0x55 "%newsvw%"                                                       // set the Save vs. Wand value
+END
+PATCH_IF ("%oldsvp%" > "%newsvp%") OR (("%enforce%" = "1") AND ("%newsvp%" != "20")) BEGIN
+  WRITE_BYTE 0x56 "%newsvp%"                                                       // set the Save vs. Polymorph value
+END
+PATCH_IF ("%oldsvb%" > "%newsvb%") OR (("%enforce%" = "1") AND ("%newsvb%" != "20")) BEGIN
+  WRITE_BYTE 0x57 "%newsvb%"                                                       // set the Save vs. Breath value
+END
+PATCH_IF ("%oldsvs%" > "%newsvs%") OR (("%enforce%" = "1") AND ("%newsvs%" != "20")) BEGIN
+  WRITE_BYTE 0x58 "%newsvs%"                                                       // set the Save vs. Spell value
+END
+PATCH_IF ("%oldfr%" < "%newfr%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x59 "%newfr%"                                                        // set new Resist Fire value
+  WRITE_BYTE 0x5e "%newfr%"                                                        // set new Resist Magic Fire value
+END
+PATCH_IF ("%oldcr%" < "%newcr%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x5a "%newcr%"                                                        // set new Resist Cold value
+  WRITE_BYTE 0x5f "%newcr%"                                                        // set new Resist Magic Cold value
+END
+PATCH_IF ("%older%" < "%newer%") OR ("%enforce%" = "1") BEGIN                                             
+  WRITE_BYTE 0x5b "%newer%"                                                        // set new Resist Electricity value
+END
+PATCH_IF ("%older%" < "%newer%") OR ("%enforce%" = "1") BEGIN                                             
+  WRITE_BYTE 0x5b "%newer%"                                                        // set new Resist Electricity value
+END
+PATCH_IF ("%oldar%" < "%newar%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x5c "%newar%"                                                        // set new Resist Acid value
+END
+PATCH_IF ("%oldmr%" < "%newmr%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x5d "%newmr%"                                                        // set new Magic Resistance value
+END
+PATCH_IF   (oldrs   <   newrs)   OR    enforce   =  1   BEGIN
+  WRITE_BYTE 0x60   newrs
+END
+PATCH_IF   (oldrc   <   newrc)   OR    enforce   =  1   BEGIN
+  WRITE_BYTE 0x61   newrc
+END
+PATCH_IF   (oldrp   <   newrp)   OR    enforce   =  1   BEGIN
+  WRITE_BYTE 0x62   newrp
+END
+PATCH_IF   (oldrm   <   newrm)   OR    enforce   =  1   BEGIN
+  WRITE_BYTE 0x63   newrm
+END
+PATCH_IF ("%oldlvl1%" < "%newlvl1%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x234 "%newlvl1%"                                                     // set new level (first class) value
+END
+PATCH_IF   (oldlvl2   <   newlvl2)   OR    enforce   =  1   BEGIN
+  WRITE_BYTE 0x235   newlvl2
+END
+PATCH_IF   (oldlvl3   <   newlvl3)   OR    enforce   =  1   BEGIN
+  WRITE_BYTE 0x236   newlvl3
+END
+PATCH_IF ("%oldstr%" < "%newstr%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x238 "%newstr%"                                                      // set new Strength value
+END
+PATCH_IF ("%oldstrx%" < "%newstrx%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x239 "%newstrx%"                                                     // set new Exceptional Strength value
+END
+PATCH_IF ("%oldint%" < "%newint%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x23a "%newint%"                                                      // set new Intelligence value
+END
+PATCH_IF ("%oldwis%" < "%newwis%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x23b "%newwis%"                                                      // set new Wisdom value
+END
+PATCH_IF ("%olddex%" < "%newdex%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x23c "%newdex%"                                                      // set new Dexterity value
+END
+PATCH_IF ("%oldcon%" < "%newcon%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x23d "%newcon%"                                                      // set new Constitution value
+END
+PATCH_IF ("%oldchr%" < "%newchr%") OR ("%enforce%" = "1") BEGIN
+  WRITE_BYTE 0x23e "%newchr%"                                                      // set new Charisma value
+END
+PATCH_IF ("%oldmor%" < "%newmor%") OR (("%enforce%" = "1") AND ("%newmor%" != "99")) BEGIN
+  WRITE_BYTE 0x23f "%newmor%"                                                      // set new morale value
+END
+PATCH_IF (("%oldmorb%" > "%newmorb%") AND ("newmorb" != "99")) OR (("%enforce%" = "1") AND ("%newmorb%" != "99")) BEGIN
+  WRITE_BYTE 0x240 "%newmorb%"                                                     // set new morale break value
+END
+PATCH_IF (("%oldmorr%" > "%newmorr%") AND ("newmorr" != "99")) OR (("%enforce%" = "1") AND ("%newmorr%" != "99")) BEGIN
+  WRITE_BYTE 0x242 "%newmorr%"                                                     // set new morale recovery value
+END
+PATCH_IF newgen != 999 BEGIN
+  WRITE_BYTE 0x271   newgen
+END
+PATCH_IF (("%oldrace%" != "newrace") AND ("newrace" != "999")) OR (("%enforce%" = "1") AND ("%newrace%" != "999")) BEGIN
+  WRITE_BYTE 0x272 "%newrace%"                                                     // set new race value
+END
+PATCH_IF (("%oldclass%" != "newclass") AND ("newclass" != "999")) OR (("%enforce%" = "1") AND ("%newclass%" != "999")) BEGIN
+  WRITE_BYTE 0x273 "%newclass%"                                                    // set new class value
+END
+PATCH_IF (("%oldgendr%" != "newgendr") AND ("newgendr" != "999")) OR (("%enforce%" = "1") AND ("%newgendr%" != "999")) BEGIN
+  WRITE_BYTE 0x275 "%newgendr%"                                                    // set new class value
+END
+PATCH_IF (("%oldalign%" != "newalign") AND ("newalign" != "99")) OR (("%enforce%" = "1") AND ("%newalign%" != "99")) BEGIN
+  WRITE_BYTE 0x27b "%newalign%"                                                    // set new alignment value
+END
+PATCH_IF (("%oldhide%" < "%newhide%") AND ("newhide" != "999")) OR (("%enforce%" = "1") AND ("%newhide%" != "999")) BEGIN
+  WRITE_BYTE 0x45 "%newhide%"                                                     // set new Hide in Shadows value
+END
+PATCH_IF (("%oldmsil%" < "%newmsil%") AND ("newmsil" != "999")) OR (("%enforce%" = "1") AND ("%newmsil%" != "999")) BEGIN
+  WRITE_BYTE 0x68 "%newhide%"                                                     // set new Hide in Shadows value
+END
+
+
+END                                                                                // End FUNCTION

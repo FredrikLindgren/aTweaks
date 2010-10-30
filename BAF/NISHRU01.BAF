@@ -1,0 +1,42 @@
+IF
+	Die()
+        Global("RR#EACheck","LOCALS",1) // creature was summoned by an enemy
+        CheckStatLT(Myself,10,LEVEL) // hit dice below 10, probably a Nishruu
+        Global("RR#XP","LOCALS",0)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#XP","LOCALS",1)
+                AddexperienceParty(1000) // Nishruu XP value
+                Continue()
+END
+
+IF
+	Die()
+        Global("RR#EACheck","LOCALS",1) // creature was summoned by an enemy
+        CheckStatGT(Myself,11,LEVEL) // hit dice above 11, probably a Hakeashar
+        Global("RR#XP","LOCALS",0)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#XP","LOCALS",1)
+                AddexperienceParty(6000) // Hakeashar XP value
+                Continue()
+END
+
+IF
+        Global("RR#EACheck","LOCALS",0)
+	OR(2)
+	  Allegiance(LastSummonerOf(Myself),EVILCUTOFF)
+          !Exists(LastSummonerOf(Myself))
+THEN
+	RESPONSE #100
+                SetGlobal("RR#EACheck","LOCALS",1)
+		Continue()
+END
+
+IF
+	CheckStatLT(Myself,20,DETECTILLUSIONS)
+        !StateCheck(Myself,STATE_DEAD)
+THEN
+	RESPONSE #100
+		Kill(Myself)
+END

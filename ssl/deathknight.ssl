@@ -1,0 +1,520 @@
+INCLUDE FILE(definitions.ssl)
+
+BEGIN_ACTION_DEFINITION
+  Name(SpellNoDecPW)
+  TRIGGER
+    !GlobalTimerNotExpired("cast","LOCALS")
+    !GlobalTimerNotExpired("turn","LOCALS")
+    !AreaCheck("ar3004")
+    !AreaCheck("ar3005")
+    !AreaCheck("ar3008")
+    !AreaCheck("ar3009")
+    GlobalLT("flPowerWord","LOCALS",1)
+  ACTION
+    RESPONSE #scsprob1
+      SetGlobalTimer("cast","LOCALS",6)
+      IncrementGlobal("flPowerWord","LOCALS",1)
+      SpellNoDec(scstarget,scsargument1)
+END
+
+IF
+  RequireBlock(IsDurlagKnight)
+  Die()
+THEN
+  RESPONSE #100
+%TutuJournal%
+END
+//IF
+//  Die()
+//THEN
+//  RESPONSE #100
+//    EraseJournalEntry(84201) // A tour of Durlag's Tower  Someone named Ike is giving tours of Durlag's Tower.  I would assume that they only take people through rooms that have been cleared of traps, but perhaps I should ask someone who has taken the tour.  There is a man named Fenrus who has done so.  I can find him near the docks.
+//    EraseJournalEntry(84195) // Durlag's Tower  Fenrus Boulon has told us that Durlag's Tower was built by a famous dwarven hero name Durlag Trollkiller.  The wealth that he amassed was coveted by a group of mindflayers, who used doppelgangers to kill and replace Durlag's family.  The hero killed the beasts but was driven mad in the process.  He entrapped the Tower and disappeared within its depths.
+//    EraseJournalEntry(83499) // A tour of Durlag's Tower  I met a blustering lout offering tours of Durlag's Tower.  It seems he aims to make a tourist attraction out of the deathtrap.  I decided not to take him up on his offer, but he will be available if I change my mind.
+//    EraseJournalEntry(83502) // A tour of Durlag's Tower  I met a huckster by the name of Ike who was offering tours of Durlag's Tower.  It seems the venerable deathtrap has become a bit of a tourist attraction.  I agreed to the tour, so I should meet Ike by the tower as soon as possible.  I'm sure it will be safe... they wouldn't walk people through if there was still a danger.
+//    EraseJournalEntry(83506) // Durlag's Tower  The tower and the labyrinth below were built ages ago by the dwarven hero Durlag "Thunderaxe," for no less worthy a purpose than to be a home for him and his kin.  His enormous fortune occupied entire rooms, and was rumored to be waist-deep on a man.  The wealth Durlag accumulated was to be the backbone of his clan.
+//    EraseJournalEntry(83508) // Durlag's Tower  The stories of Durlag's opulence spread across the land, and the most unsavory of creatures sought to make the tower theirs.  All of Durlag's kin and friends were replaced by doppelgangers, and thus Durlag found himself killing likenesses of those that he cared for the most, just to save himself.  In the end, he succeeded in driving the invaders from his home, and vowed that none would infiltrate his tower again!
+//    EraseJournalEntry(83510) // Durlag's Tower  Durlag installed magical locks on the entrances to his inner sanctum, locks which required ward tokens to pass.  Evidently some of these tokens still exist, but are likely expensive and rare.
+//    EraseJournalEntry(83512) // Durlag's Tower  Those who passed the wards were confronted with the fruits of the paranoia which consumed Durlag.  He had traps crafted for every inch of floor and wall, and nary a step could be taken without triggering some horrendous effect.
+//    EraseJournalEntry(83522) // Durlag's Tower  I have agreed to try to use Ike's ward token in order to explore some of the lower rooms of Durlag's Tower.  He seems to think that I am up to the challenge, and I agree.
+//    EraseJournalEntry(83710) // Durlag's Tower  I had just begun exploring Durlag's Tower when I met a man by the name of Bayard.  He seemed calm, though this place had frightened him and he was choosing to leave.  Apparently his party are still within, having decided to go on without him.  He wished them well, but would not follow.  The traps and 'tests' left by Durlag are beyond his ability, or so he seemed to think.  Some of the traps are extremely lethal, offering no second chance to a trespasser; this place is not meant to hinder, but to kill.  He is also afraid of the creature that has taken up residence here.  It is apparently a 'Demon Knight,' some type of fell servant from the lower planes that is supposedly extremely powerful.  Bayard feels that attacking such a creature directly is tantamount to suicide.  Perhaps his fear will serve him well, but I must go onward.  I shall keep an eye out for these 'ward stones' that he mentioned as well.  They must be keys of a sort.
+//    EraseJournalEntry(83561) // Durlag's Tower  Some hellish creature has apparently taken control of Durlag's Tower!  It was a skeletal figure in armor, and it cast fireballs as though they were second nature.  It was very powerful, whatever it was.
+//    EraseJournalEntry(83738) // Durlag's Tower  It seems that by causing the sword to glow I have completed some sort of task.
+//    EraseJournalEntry(83894) // Durlag's Tower  I met some waif cowering in the depths of Durlag's Tower.  She was a member of another party of adventurers, but they were apparently wiped out by whatever is down here.  I have heard the term "Demonknight" bandied about, but if such a creature exists, I am sure I will dispatch it without too much difficulty.
+//    EraseJournalEntry(83899) // Durlag's Tower  I met a woman in the lower portion of Durlag's Tower.  She was apparently part of another group of adventurers that was wiped out.  She says it was a Demonknight, a hellishly powerful form of undead, that killed them.  She also said it employed a strange magic to defeat her friends, something involving a "Mirror of Opposition," or a related type of device.  Evidently it created duplicates of each of the members of their party, forcing them to kill likenesses of themselves.  That is appropriate, I suppose, considering the way Durlag's Tower originally fell.  She suggested that I try to turn the mirror on the Demonknight itself, though this would assuredly expose the rest of the room as well.  Since the creature may be too powerful to assault directly, I will give this much thought.
+//    EraseJournalEntry(83905) // Durlag's Tower  I met a woman in the lower portion of Durlag's Tower.  She was apparently part of another group of adventurers that was wiped out.  She says it was a Demonknight, a hellishly powerful form of undead, that killed them.  She also said it employed a strange magic to defeat her friends, something involving a "Mirror of Opposition," or a related type of device.  Evidently it created duplicates of each of the members of their party, forcing them to kill likenesses of themselves.  That is appropriate, I suppose, considering the way Durlag's Tower originally fell.  She suggested that I try to turn the mirror on the Demonknight itself, though this would assuredly expose the rest of the room as well.  I think I will fare better with a direct assault.  She seemed to think otherwise.
+//    EraseJournalEntry(83989) // Durlag's Tower  I have encountered a phantom, presumably of Durlag himself.  It said that the true spirit of Durlag passed long ago, but his hatred and fear, which built the tower, still maintain it.  It said I must understand two of the 'paths' that led to this place.  After that, 'the way' will become clear.  It seems to want something as well.  It said there was a new evil here, something not a part of the tower, that must be expelled.  I don't fancy being this creature's lackey, but I may have no choice... unless I just leave.
+//    EraseJournalEntry(83993) // Durlag's Tower  I must seek direction and understand the three paths in order to 'return' and progress.
+//    EraseJournalEntry(83995) // Durlag's Tower  The phantom of Durlag says I have not yet understood all the paths I need to understand.
+//END
+
+//Death Knight in Durlag's Tower has attracted minions
+IF
+  RequireBlock(IsDurlagKnight)
+  Global("flSpawnMinions","%DurlagArea%",0)
+THEN
+  RESPONSE #100
+    SetGlobal("flSpawnMinions","%DurlagArea%",1)
+    //CreateCreature("%TUTU_VAR%skelwa",[720.570],10)
+    CreateCreature("%GGhoul%,[800.660],9)
+    CreateCreature("%GGhoul%,[120.625],11)
+    CreateCreature("%TUTU_VAR%skelwa",[980.220],8)
+    CreateCreature("%SkeletC%",[860.170],6)
+    CreateCreature("%SkeletC%",[500.630),3)
+    CreateCreature("%SkeletC%",[800.660],5)
+END
+
+/////////////////////////////////////////////////
+//Vanilla stuff for Death Knight in Durlag's Tower
+IF
+  RequireBlock(IsDurlagKnight)
+  Detect([PC])
+  NumTimesTalkedTo(0)
+THEN
+  RESPONSE #100
+    StartDialogueNoSet(LastSeenBy(Myself))
+END
+
+IF
+  RequireBlock(IsDurlagKnight)
+  Detect([PC])
+  OpenState("Mirror",FALSE)
+  NumTimesTalkedTo(1)
+THEN
+  RESPONSE #100
+    StartDialogueNoSet(LastSeenBy(Myself))
+END
+/////////////////////////////////////////////////
+
+//Zero variables once per day (technically once every 8 hours)
+IF
+  !GlobalTimerNotExpired("flRest","LOCALS")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flRest","LOCALS",2400)
+    SetGlobal("flDispel","LOCALS",0)
+    SetGlobal("flSymbol","LOCALS",0)
+    SetGlobal("flPowerWord","LOCALS",0)
+    SetGlobal("flUsedSword","LOCALS",0)
+    Rest()
+END
+
+IF
+  IgnoreBlock(IsDurlagKnight)
+  Global("flWarning","LOCALS",0)
+  Global("rr#active","LOCALS",0)
+  Allegiance(Myself,ENEMY)
+  See([GOODCUTOFF])
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flWarningTimer","LOCALS",2)
+    SetGlobal("flWarning","LOCALS",1)
+    DisplayStringHead(Myself,@1021)
+  RESPONSE #100
+    SetGlobalTimer("flWarningTimer","LOCALS",2)
+    SetGlobal("flWarning","LOCALS",1)
+    DisplayStringHead(Myself,@1022)
+END
+
+IF
+  Global("flWhipUpSword","LOCALS",0)
+THEN
+  RESPONSE #20
+    SetGlobal("flWhipUpSword","LOCALS",1)
+  RESPONSE #80
+    ReallyForceSpellRES("FL#DKSW",Myself)
+    SetGlobal("flWhipUpSword","LOCALS",1)
+    Rest()
+END
+
+IF
+  Global("RR#Active","LOCALS",0)
+  HitBy([GOODCUTOFF],0)
+THEN
+  RESPONSE #100
+    SetGlobal("RR#Active","LOCALS",1)
+    Enemy()
+    Continue()
+END
+
+IF
+  Global("RR#Active","LOCALS",0)
+  Allegiance(Myself,EVILCUTOFF)
+  See([GOODCUTOFF])
+THEN
+  RESPONSE #100
+    SetGlobal("RR#Active","LOCALS",1)
+    Continue()
+END
+
+IF
+  StateCheck(Myself,STATE_REALLY_DEAD)
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+//Fear aura every round
+IF
+  !StateCheck(Myself,STATE_REALLY_DEAD)
+  !GlobalTimerNotExpired("flFearAura","LOCALS")
+  //Detect(NearestEnemyOf(Myself))
+  //Range(LastSeenBy(Myself),5)
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flFearAura","LOCALS",6)
+    ForceSpellRES("FLDKAURA",Myself)
+    Continue()
+END
+
+BEGIN LOOP(loopvar||1;2;3;4;5;6)
+IF
+  See(Playerloopvar)
+  !GlobalTimerNotExpired("flChasePlayerloopvar","LOCALS")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flChasePlayerloopvar","LOCALS",6)
+    Continue()
+END
+END LOOP
+
+/////////////////////////////////////////////////
+//Detect Invisibility at will
+IF
+  !See([PC])
+  Detect([PC])
+  CheckStatLT(LastHeardBy(Myself),40,STEALTH)
+  !StateCheck(LastHeardBy(Myself),STATE_SILENCED)
+  !GlobalTimerNotExpired("cast","LOCALS")
+  !AreaCheck("ar3004")
+  !AreaCheck("ar3005")
+  !AreaCheck("ar3008")
+  !AreaCheck("ar3009")
+  Allegiance(Myself,ENEMY)
+  CheckStatLT(Myself,100,SPELLFAILUREMAGE)
+  !CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+  !StateCheck(Myself,STATE_SILENCED)
+THEN 
+  RESPONSE #100
+    SetGlobalTimer("cast","LOCALS",6)
+    SpellNoDec(Myself,WIZARD_DETECT_INVISIBILITY)
+  RESPONSE #100
+    Continue()
+END
+
+//This hopefully means someone tried going invisible within sight, in which case we try to flush them back out, provided there are no other players around
+BEGIN LOOP(loopvar||1;2;3;4;5;6)
+IF
+  !See([PC])
+  Detect(Playerloopvar)
+  GlobalTimerNotExpired("flChasePlayerloopvar","LOCALS")
+  StateCheck(Playerloopvar,STATE_INVISIBLE)
+  !GlobalTimerNotExpired("cast","LOCALS")
+  //SpellCast?
+  !AreaCheck("ar3004")
+  !AreaCheck("ar3005")
+  !AreaCheck("ar3008")
+  !AreaCheck("ar3009")
+  Allegiance(Myself,ENEMY)
+  CheckStatLT(Myself,100,SPELLFAILUREMAGE)
+  !CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+  !StateCheck(Myself,STATE_SILENCED)
+THEN
+  RESPONSE #100
+    SetGlobalTimer("cast","LOCALS",6)
+    SetGlobalTimer("flChasePlayerloopvar","LOCALS",0)
+    SpellNoDec(Myself,WIZARD_DETECT_INVISIBILITY)
+END
+END LOOP
+
+INCLUDE FILE(mill.ssl)
+
+IF
+  See([PC])
+  !CheckStat(LastSeenBy(Myself),3,WIZARD_SPELL_IMMUNITY)
+  StateCheck(LastSeenBy(Myself),STATE_IMPROVEDINVISIBILITY)
+  !GlobalTimerNotExpired("cast","LOCALS")
+  Allegiance(Myself,ENEMY)
+  !Allegiance(LastSeenBy(Myself),ENEMY)
+  CheckStatLT(Myself,100,SPELLFAILUREMAGE)
+  !CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+  !StateCheck(Myself,STATE_SILENCED)
+THEN
+  RESPONSE #200
+    SetGlobalTimer("cast","LOCALS",6)
+    SpellNoDec(Myself,WIZARD_DETECT_INVISIBILITY)
+  RESPONSE #50
+    Continue()
+END
+/////////////////////////////////////////////////
+
+//If the timer's been set and is still running and there hasn't been any sneak attacks
+IF
+  GlobalTimerNotExpired("flWarningTimer","LOCALS")
+  !GlobalTimerNotExpired("whatthe","LOCALS")
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+IF
+  Global("RR#Active","LOCALS",0)
+  !Allegiance(Myself,ENEMY)
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+//Dispel twice per day, also make sure we do not cast once, start over and cast this again
+IF TRIGGER
+  TargetBlock(PlayersRandomOrder)
+  TriggerBlock(SIAbj|Enemy|CanCast)
+  OR(8)
+    CheckStatGT(scstarget,0,STONESKINS)
+    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+    StateCheck(scstarget,STATE_MIRRORIMAGE)
+    CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
+    CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+    CheckStatGT(scstarget,49,RESISTFIRE)
+    CheckStatGT(scstarget,0,SCRIPTINGSTATE2) //Death Ward, I presume
+    StateCheck(scstarget,STATE_HASTED)
+  GlobalLT("flDispel","LOCALS",2)
+  BEGIN LOOP(sslvar||1;2;3;4;5;6)
+    !StateCheck(Playersslvar,STATE_DISABLED)
+    !CheckStatGT(Playersslvar,0,CLERIC_INSECT_PLAGUE)
+    !Allegiance(Playersslvar,ENEMY)
+  END LOOP
+  !GlobalTimerNotExpired("flDispelTimer","LOCALS")
+THEN DO
+    Action(SpellNoDec,2326|100|100)
+    SetGlobalTimer("flDispelTimer","LOCALS",18)
+    IncrementGlobal("flDispel","LOCALS",1)
+END
+
+//20-dice Fireball once per day
+IF TRIGGER
+  TargetBlock(PlayersReverse)
+  TriggerBlock(FireRes|MR50|SIEvo|MinorGlobe|Enemy|CanCast)
+  !HasItem("clck26",scstarget)
+  GlobalLT("flFireball","LOCALS",1)
+THEN DO
+    Combine()
+    IncrementGlobal("flFireball","LOCALS",1)
+    Action(SpellNoDec,DEATHKNIGHT_FIREBALL|100|100)
+END
+
+//Zap any juicy targets
+IF TRIGGER
+  TargetBlock(PlayersReverse)
+  TriggerBlock(MR75|SICon|SpellTurning|Slayable|Enemy|CanCast)
+  OR(4)
+    HPPercentLT(scstarget,41)
+    Class(scstarget,MAGE)
+    Class(scstarget,MAGE_THIEF)
+    Class(scstarget,CLERIC_MAGE)
+THEN DO
+  Combine()
+  Action(SpellNoDecPW,WIZARD_POWER_WORD_KILL|200|100)
+END
+
+IF TRIGGER
+  TargetBlock(PlayersRandomOrder)
+  TriggerBlock(MR75|SICon|SpellTurning|Enemy|CanCast|Stun)
+  OR(4)
+    HPPercentLT(scstarget,51)
+    Class(scstarget,MAGE)
+    Class(scstarget,MAGE_THIEF)
+    Class(scstarget,CLERIC_MAGE)
+THEN DO
+  Combine()
+  Action(SpellNoDecPW,WIZARD_POWER_WORD_STUN|100|200)
+END
+  
+IF TRIGGER
+  TargetBlock(PlayersRandomOrder)
+  TriggerBlock(MR75|SICon|SpellTurning|Enemy|CanCast|Blindness)
+THEN DO
+  Combine()
+  Action(SpellNoDecPW,WIZARD_POWER_WORD_BLIND|100|200)
+END
+
+IF TRIGGER
+  TargetBlock(PlayersRandomOrder)
+  TriggerBlock(MR50|SICon|Fear|Enemy|CanCast)
+  RandomNum(2,1)
+  //NumInPartyAliveGT(2)
+  GlobalLT("flSymbol","LOCALS",1)
+THEN DO
+  Combine()
+  IncrementGlobal("flSymbol","LOCALS",1)
+  Action(SpellNoDec,WIZARD_SYMBOL_FEAR|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(PlayersRandomOrder)
+  TriggerBlock(MR50|SICon|Enemy|CanCast)
+  RandomNum(2,2)
+  //NumInPartyAliveLT(3)
+  GlobalLT("flSymbol","LOCALS",1)
+THEN DO
+  Combine()
+  IncrementGlobal("flSymbol","LOCALS",1)
+  Action(SpellNoDecRES,"RR#SPAIN"|100|100)
+END
+
+IF
+  HasItem("fl#dksw5",Myself)
+  Global("flUsedSword","LOCALS",0)
+THEN
+  RESPONSE #100
+    UseItem("fl#dksw5",Myself)
+    SetGlobal("flUsedSword","LOCALS",1)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesReverseFar)
+  TriggerBlock(MR50|ColdRes|SIEvo|Enemy|CanCast)
+  CheckStatGT(Myself,30,RESISTMAGIC)
+  !Range(scstarget,15)
+THEN DO
+  Combine()
+  Action(SpellNoDecRES,"FLDKICEW"|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesReverseClose)
+  TriggerBlock(MR50|ColdRes|SIEvo|Enemy|CanCast)
+  CheckStatGT(Myself,60,RESISTMAGIC)
+  HPPercentGT(Myself,30)
+THEN DO
+  Combine()
+  Action(SpellNoDecRES,"FLDKICEW"|100|100)
+END
+
+//Go after the wounded and weak
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(OKForMelee|OKForSlash|Stoneskin|MirrorImage|Disabled|Enemy)
+  !HPPercentGT(scstarget,25)
+  Range(scstarget,10)
+THEN DO
+  Action(Attack)
+END
+
+//Go after the slightly less wounded but equally weak
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(OKForMelee|OKForSlash|Stoneskin|MirrorImage|Disabled|Enemy)
+  !HPPercentGT(scstarget,50)
+  Range(scstarget,10)
+THEN DO
+  Action(Attack)
+END
+
+//Look for wounded and weak and walk to them
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(OKForMelee|OKForSlash|Stoneskin|MirrorImage|Disabled|Enemy)
+  !HPPercentGT(scstarget,50)
+THEN DO
+  Action(MoveIfEmpty)
+END
+
+//Go after the weak and unprotected
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(OKForMelee|OKForSlash|Stoneskin|MirrorImage|Disabled|Enemy)
+  Range(scstarget,10)
+THEN DO
+  Action(Attack)
+END
+
+//Time to turn any undead, but don't do it too often
+IF
+  See([GOODCUTOFF.UNDEAD])
+  Allegiance(Myself,ENEMY)
+  Range(LastSeenBy(Myself),8)
+  LevelLT(LastSeenBy(Myself),6)
+  !GlobalTimerNotExpired("turn","LOCALS")
+  !GlobalTimerNotExpired("cast","LOCALS")
+  !GlobalTimerNotExpired("flTurnAgain","LOCALS")
+THEN
+  RESPONSE #100
+    DisplayStringHead(Myself,@1023)
+    SetGlobalTimer("turn","LOCALS",6)
+    SetGlobalTimer("flTurnAgain","LOCALS",18)
+    Turn()
+END
+
+//Lay into nearby enemies
+IF TRIGGER
+  //TargetBlock(PCsPreferringWeak)
+  TargetBlock(CloseEnemies)
+  TriggerBlock(OKForMelee|OKForSlash|Stoneskin|MirrorImage|Disabled|Enemy)
+  Range(scstarget,10)
+THEN DO
+  Action(Attack)
+END
+
+//Do not deprioritise disabled
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TargetBlock(CloseEnemies)
+  TriggerBlock(OKForMelee|OKForSlash|Stoneskin|MirrorImage|Enemy)
+  Range(scstarget,10)
+THEN DO
+  Action(Attack)
+END
+
+//Look for anyone unprotected and walk to them
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(OKForMelee|OKForSlash|Stoneskin|MirrorImage|Enemy)
+THEN DO
+  Action(MoveIfEmpty)
+END
+
+//Start hacking away at protections
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TargetBlock(CloseEnemies)
+  TriggerBlock(OKForMelee|OKForSlash|Enemy)
+  Range(scstarget,10)
+THEN DO
+  Action(Attack)
+END
+
+//Pursue
+BEGIN LOOP (loopvar||1;2;3;4;5;6)
+IF
+  !See([GOODCUTOFF])
+  GlobalTimerNotExpired("flChasePlayerloopvar","LOCALS")
+THEN
+  RESPONSE #100
+    MoveToObject(Playerloopvar)
+END
+END LOOP
+
+//Just keep busy
+IF TRIGGER
+  ActionListEmpty()
+  Target(NearestEnemyOf(Myself))
+  TriggerBlock(Enemy)
+THEN DO
+  Action(Attack)
+END
+
+IF TRIGGER
+  !Allegiance(Myself,ENEMY)
+  Target(NearestEnemyOf(Myself))
+THEN DO
+  Action(Attack)
+END
+
+IF TRIGGER
+  !Allegiance(Myself,ENEMY)
+  AttackedBy([ANYONE],DEFAULT)
+  Target(LastAttackerOf(Myself))
+THEN DO
+  Action(Attack)
+END

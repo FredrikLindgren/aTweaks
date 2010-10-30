@@ -1,0 +1,190 @@
+TRIGGER=MagicSafeArea
+ !AreaCheck("ar3004")
+ !AreaCheck("ar3005")
+ !AreaCheck("ar3008")
+ !AreaCheck("ar3009")
+
+TRIGGER=FireRes
+ !CheckStatGT(scstarget,50,RESISTFIRE)
+ 
+TRIGGER=ColdRes
+ !CheckStatGT(scstarget,50,RESISTCOLD)
+
+TRIGGER=MR50
+ !CheckStatGT(scstarget,50,RESISTMAGIC)
+
+TRIGGER=MR75
+ !CheckStatGT(scstarget,75,RESISTMAGIC)
+
+TRIGGER=SIAbj
+ !CheckStat(scstarget,1,WIZARD_SPELL_IMMUNITY)
+
+TRIGGER=SICon
+ !CheckStat(scstarget,2,WIZARD_SPELL_IMMUNITY)
+
+TRIGGER=SIDiv
+ !CheckStat(scstarget,3,WIZARD_SPELL_IMMUNITY)
+
+TRIGGER=SIEnc
+ !CheckStat(scstarget,4,WIZARD_SPELL_IMMUNITY)
+
+TRIGGER=SIIll
+ !CheckStat(scstarget,5,WIZARD_SPELL_IMMUNITY)
+
+TRIGGER=SIEvo
+ !CheckStat(scstarget,6,WIZARD_SPELL_IMMUNITY)
+
+TRIGGER=SINec
+ !CheckStat(scstarget,7,WIZARD_SPELL_IMMUNITY)
+
+TRIGGER=SIAlt
+ !CheckStat(scstarget,8,WIZARD_SPELL_IMMUNITY)
+
+TRIGGER=MinorGlobe
+ !CheckStatGT(scstarget,0,MINORGLOBE)
+
+TRIGGER=SpellTurning
+ !CheckStatGT(scstarget,0,WIZARD_SPELL_DEFLECTION)
+ !CheckStatGT(scstarget,0,WIZARD_SPELL_TURNING)
+ !CheckStatGT(scstarget,0,WIZARD_SPELL_TRAP)
+ !CheckStat(scstarget,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+ 
+TRIGGER=Slayable
+ !CheckStatGT(scstarget,0,SCRIPTINGSTATE2)
+ !HasItemEquiped("clck26",scstarget)
+ !HasItemEquiped("sw1h71",scstarget)
+ 
+TRIGGER=Fear
+ !CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
+ !Kit(scstarget,CAVALIER)
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,GOLEM)
+ !HasItemEquiped("CLCK30",scstarget) // Cloak of Bravery
+ !HasItemEquipedReal("SW1H32",scstarget) // Dragonslayer
+ !HasItemEquipedReal("MISCBC",scstarget) // Blackrazor
+ !HasItemEquiped("RR#HELMD",scstarget) // Dead Man's Face (RR)
+ CheckStatGT(scstarget,0,SAVEVSSPELL)
+
+TRIGGER=Blindness
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,DEMONIC)
+ CheckStatGT(scstarget,0,SAVEVSSPELL)
+ !HasItemEquiped("NPMISC1",scstarget) // Jansen Spectroscopes
+ !HasItemEquiped("RR#HEL02",scstarget) // Cowl of Acuity 
+ 
+TRIGGER=Stun
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,DEMONIC)
+ !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+
+TRIGGER=Stoneskin
+ !CheckStatGT(scstarget,0,STONESKINS)
+
+TRIGGER=MirrorImage
+ !StateCheck(scstarget,STATE_MIRRORIMAGE)
+
+TRIGGER=OKForMelee
+ OR(2)
+   CheckStatGT(Myself,0,CLERIC_HALLOW)
+   CheckStat(scstarget,0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+ OR(2)
+   CheckStat(Myself,0,CLERIC_HALLOW)
+   !CheckStat(scstarget,4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+ OR(2)
+   CheckStatGT(Myself,2,CLERIC_HALLOW)
+   !CheckStat(scstarget,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+ OR(2)
+   CheckStatGT(Myself,3,CLERIC_HALLOW)
+   !CheckStat(scstarget,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+ OR(2)
+   CheckStatGT(Myself,4,CLERIC_HALLOW)
+   !CheckStat(scstarget,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+ !HasItem("MORSWORD",scstarget)
+
+TRIGGER=OKForSlash
+ !CheckStatGT(scstarget,99,RESISTSLASHING)
+ 
+TRIGGER=CrushRes
+ !CheckStatGT(scstarget,99,RESISTCRUSHING)
+ 
+TRIGGER=Disabled
+ !StateCheck(scstarget,STATE_DISABLED)
+ !CheckStatGT(scstarget,0,HELD)
+ 
+TRIGGER=Enemy
+ Allegiance(Myself,ENEMY)
+ !Allegiance(scstarget,ENEMY)
+ 
+TRIGGER=CanCast
+  CheckStatLT(Myself,50,SPELLFAILUREMAGE)
+  !CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+  !StateCheck(Myself,STATE_SILENCED)
+ 
+TARGET=PlayersReverse
+ Player6
+ Player5
+ Player4
+ Player3
+ Player2
+ Player1
+ 
+TARGET=PlayersInOrder
+ Player1
+ Player2
+ Player3
+ Player4
+ Player5
+ Player6
+ 
+TARGET=PlayersRandomOrder
+ Player3
+ Player5
+ Player2
+ Player6
+ Player4
+ Player1
+
+TARGET=PCsPreferringWeak
+ [PC.0.0.MAGE]
+ [PC.0.0.MAGE_THIEF]
+ [PC.0.0.MAGE_ALL]
+ [PC.0.0.THIEF]
+ [PC.0.0.BARD]
+ [PC.0.0.THIEF_ALL]
+ [PC.0.0.CLERIC]
+ [PC]
+ SecondNearest([PC])
+ ThirdNearest([PC])
+ 
+TARGET=Squishy
+ [PC.0.0.MAGE]
+ [PC.0.0.MAGE_THIEF]
+ [PC.0.0.THIEF]
+ [PC.0.0.BARD]
+
+ 
+TARGET=CloseEnemies
+ NearestEnemyOf(Myself)
+ SecondNearestEnemyOf(Myself)
+ ThirdNearestEnemyOf(Myself)
+
+TARGET=EnemiesReverseFar
+ SixthNearestEnemyOf(Myself)
+ FifthNearestEnemyOf(Myself)
+ FourthNearestEnemyOf(Myself)
+
+TARGET=EnemiesReverseClose
+ ThirdNearestEnemyOf(Myself)
+ SecondNearestEnemyOf(Myself)
+ NearestEnemyOf(Myself)
+
+TARGET=EnemiesInOrder
+ NearestEnemyOf(Myself)
+ SecondNearestEnemyOf(Myself)
+ ThirdNearestEnemyOf(Myself)
+ FourthNearestEnemyOf(Myself)
+ FifthNearestEnemyOf(Myself)
+ SixthNearestEnemyOf(Myself)

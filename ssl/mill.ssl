@@ -1,0 +1,41 @@
+//Mill around, borrowed from SCSII (borrowed from Tactics), slightly modified
+IF
+  OR(13)
+    HitBy([GOODCUTOFF],0)
+    AttackedBy([GOODCUTOFF.0.0.0.0.SUMMONED],DEFAULT)
+    AttackedBy([PC],DEFAULT)
+    AttackedBy([FAMILIAR],DEFAULT)
+    AttackedBy([ALLY],DEFAULT)
+    AttackedBy([CONTROLLED],DEFAULT)
+    AttackedBy([CHARMED],DEFAULT)
+    SpellCastOnMe([GOODCUTOFF.0.0.0.0.SUMMONED],0)
+    SpellCastOnMe([PC],0)
+    SpellCastOnMe([FAMILIAR],0)
+    SpellCastOnMe([ALLY],0)
+    SpellCastOnMe([CONTROLLED],0)
+    SpellCastOnMe([CHARMED],0)
+  !GlobalTimerNotExpired("whatthe","LOCALS")
+  !See([PC])
+THEN
+  RESPONSE #100
+    Enemy()
+    SetGlobalTimer("whatthe","LOCALS",12)
+    Continue()
+END
+
+IF
+  !See([GOODCUTOFF])
+  GlobalTimerNotExpired("whatthe","LOCALS")
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF 
+  See([GOODCUTOFF])
+  GlobalTimerNotExpired("whatthe","LOCALS")
+THEN 
+  RESPONSE #100
+    ClearActions(Myself)
+    SetGlobalTimer("whatthe","LOCALS",0)
+END
