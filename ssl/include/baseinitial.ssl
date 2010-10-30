@@ -1,0 +1,76 @@
+
+INCLUDE FILE(include/rest.ssl)
+
+IF
+  Global("flActive","LOCALS",0)
+  HitBy([GOODCUTOFF],0)
+  !Allegiance(Myself,GOODCUTOFF)
+THEN
+  RESPONSE #100
+    SetGlobal("flActive","LOCALS",1)
+    Enemy()
+    Continue()
+END
+
+IF
+  Global("flActive","LOCALS",0)
+  Allegiance(Myself,EVILCUTOFF)
+  See([GOODCUTOFF])
+THEN
+  RESPONSE #100
+    SetGlobal("flActive","LOCALS",1)
+    Continue()
+END
+
+INCLUDE FILE(include/mill.ssl)
+
+IF
+  Global("flActive","LOCALS",0)
+  !Detect(NearestEnemyOf(Myself))
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+//Fear
+IF
+  StateCheck(Myself,STATE_PANIC)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+//Charmed
+IF
+  StateCheck(Myself,STATE_CHARMED)
+  See(NearestEnemyOf(Myself))
+  ActionListEmpty()
+  !Range(LastSeenBy(Myself),5)
+THEN
+  RESPONSE #100
+    EquipRanged()
+    Attack(LastSeenBy(Myself))
+END
+
+IF
+  StateCheck(Myself,STATE_CHARMED)
+  See(NearestEnemyOf(Myself))
+  ActionListEmpty()
+  Range(LastSeenBy(Myself),5)
+THEN
+  RESPONSE #100
+    EquipMostDamagingMelee()
+    Attack(LastSeenBy(Myself))
+END
+
+BEGIN LOOP(loopvar||1;2;3;4;5;6)
+IF
+  See(Playerloopvar)
+  Allegiance(Myself,EVILCUTOFF)
+  !GlobalTimerNotExpired("flChasePlayerloopvar","LOCALS")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flChasePlayerloopvar","LOCALS",6)
+    Continue()
+END
+END LOOP

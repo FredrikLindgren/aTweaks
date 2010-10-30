@@ -1,0 +1,115 @@
+// Title: Simple Bard script
+// Date Created: September 24, 2002
+// Created by: aVENGER
+// Note: doesn't require Detectable Spells
+
+
+// Switch between constantly singing and singing only during combat (the "D" key toggles between modes)
+
+IF
+	Global("RR#BRDS","LOCALS",0)
+	HotKey(D)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#BRDS","LOCALS",1)
+		DisplayStringHead(Myself,@233) // Singing constantly if idle
+END
+
+IF
+	Global("RR#BRDS","LOCALS",1)
+	HotKey(D)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#BRDS","LOCALS",0)
+		DisplayStringHead(Myself,@234) // Singing only during combat
+END
+
+
+// Switch between attacking enemies and not attacking (the "V" key toggles between modes)
+
+IF
+	Global("RR#BRDA","LOCALS",0)
+	HotKey(V)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#BRDA","LOCALS",1)
+		DisplayStringHead(Myself,@235) // Attacking enemies
+END
+
+IF
+	Global("RR#BRDA","LOCALS",1)
+	HotKey(V)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#BRDA","LOCALS",0)
+		DisplayStringHead(Myself,@236) // Not attacking enemies
+END
+
+
+// Sing Battlesong whenever the character is idle but not while invisible if Jester (doesn't interrupt player input)
+
+IF
+	Global("RR#BRDA","LOCALS",0)
+	Global("RR#BRDS","LOCALS",1)
+	ActionListEmpty()
+	Class(Myself,BARD_ALL)
+	!ModalState(BATTLESONG)
+	OR(2)
+	  !StateCheck(Myself,STATE_INVISIBLE)
+	  !Kit(Myself,JESTER)
+THEN
+	RESPONSE #100
+		BattleSong()
+END
+
+
+// Sing Battlesong during combat and when enemies are nearby, but only if idle and not invisible if Jester (doesn't interrupt player input)
+
+IF
+	Global("RR#BRDA","LOCALS",0)
+	Global("RR#BRDS","LOCALS",0)
+	ActionListEmpty()
+	Class(Myself,BARD_ALL)
+	!ModalState(BATTLESONG)
+	OR(2)
+	  !StateCheck(Myself,STATE_INVISIBLE)
+	  !Kit(Myself,JESTER)
+	OR(2)
+	  See([EVILCUTOFF])
+	  CombatCounterGT(0)
+THEN
+	RESPONSE #100
+		BattleSong()
+END
+
+
+// Stop singing if there was no combat activity for at least 30 seconds and no enemies are nearby, but only if idle (doesn't interrupt player input)
+
+IF
+	Global("RR#BRDA","LOCALS",0)
+	Global("RR#BRDS","LOCALS",0)
+	ActionListEmpty()
+	Class(Myself,BARD_ALL)
+	ModalState(BATTLESONG)
+	!See([EVILCUTOFF])
+	CombatCounter(0)
+	Delay(30)
+THEN
+	RESPONSE #100
+		ClearActions(Myself)
+END
+
+// Attack the nearest enemy but not while under the effects of Invisibility and/or Sanctuary
+
+IF
+	Global("RR#BRDA","LOCALS",1)
+	ActionListEmpty()
+	Class(Myself,BARD_ALL)
+	!StateCheck(Myself,STATE_INVISIBLE)
+	CheckStatLT(Myself,1,SANCTUARY)
+	See([EVILCUTOFF])
+	!InParty([EVILCUTOFF])
+THEN
+	RESPONSE #100
+		AttackReevaluate([EVILCUTOFF],30)
+END

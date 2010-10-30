@@ -1,0 +1,646 @@
+// This macro contains the shared resources used by the two Fiend related aTweaks components
+// Used for better compatibility with other mods that also modify the Fiends' AI and/or abilities
+
+
+DEFINE_ACTION_MACRO ~RR#FIEND~ BEGIN
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DPITF.ITM~ THEN BEGIN                                    // only install the shared Fiend macro
+
+
+
+INCLUDE "atweaks/lib/dsandstuff.tpa"
+
+// Add new secondary types
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#EVAL.2DA~ THEN BEGIN                         // only copy the evaluation file once
+  COPY ~aTweaks/LIB/RR#EVAL.2DA~ ~override~
+END                                                                                // ends ACTION_IF block
+
+COPY_EXISTING ~msectype.2da~ ~override~                                            // add a new secondary type for Etherealness removal
+  COUNT_2DA_ROWS 2 "rows"
+  INSERT_2DA_ROW "%rows%" 2 ~RR#ETHER RR#ETHEREALNESS~                             // assign secondary type and accompanying string
+  REPLACE ~RR#ETHEREALNESS~ @707                                                   // Etherealness removal feedback string
+  SET "RR#SECTYPE" = ("%rows%" - 2)
+BUT_ONLY_IF_IT_CHANGES
+APPEND ~RR#EVAL.2DA~ ~RR#ETHER %RR#SECTYPE%~ UNLESS ~RR#ETHER~                        // write the numeric ID to the 2DA
+
+
+// Assign the Enchantment school to enchantment based spell-like abilities and make them turn the caster visible
+
+COPY_EXISTING ~SPWI929.SPL~                ~override~                              // Succubus Charm Female
+              ~SPWI930.SPL~                ~override~                              // Succubus Charm Male
+WRITE_ASCII 0x10 "CAS_M05" #8                                                      // casting sound: CAS_M05.WAV
+WRITE_SHORT 0x25 "4"                                                               // spell school: 4 (Enchantment)
+WRITE_SHORT 0x22 "11"                                                              // casting graphics: 11 (Enchantment)
+WRITE_LONG  0x34 "1"                                                               // spell level: 1
+LAUNCH_PATCH_FUNCTION ~RR#AGLEF~                                                   // Start FUNCTION call (my custom "Add Global Effect" function)
+INT_VAR                                                                            // initialize variables
+  "rr#opcode" = "136"                                                              // effect: #136 (force visible)
+  "rr#target" = "1"                                                                // target: 1 (self)
+  "rr#timing" = "1"                                                                // timing mode: 1 (permanent)
+  "rr#prob1" = "100"                                                               // probability1: 100%
+ END                                                                               // end FUNCTION call
+PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                                 // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
+BUT_ONLY_IF_IT_CHANGES
+
+
+
+// New spells
+
+COPY ~aTweaks/SPL/RR#DLDRN.SPL~ ~override~                                         // Drain Life (Alu-Fiend)
+  SAY NAME1 @709 SAY NAME2 @709
+COPY ~aTweaks/SPL/RR#CURSE.SPL~ ~override~                                         // Curse (Marilith)
+  SAY NAME1 @689 SAY NAME2 @689
+COPY ~aTweaks/VVC/RR#CURSE.VVC~ ~override~                                         // Curse VVC animation
+COPY ~aTweaks/BAM/RR#CURSE.BAM~ ~override~                                         // Curse BAM graphics
+COPY ~aTweaks/SPL/RR#DDETI.SPL~ ~override~                                         // Detect Illusion (Marilith)
+COPY ~aTweaks/SPL/RR#SKISS.SPL~ ~override~                                         // Kiss (Succubus)
+  SAY NAME1 @685 SAY NAME2 @685
+COPY ~aTweaks/VVC/RR#SKISS.VVC~ ~override~                                         // Kiss VVC animation
+COPY ~aTweaks/BAM/RR#SKISS.BAM~ ~override~                                         // Kiss BAM graphics
+COPY ~aTweaks/VVC/RR#PSHFT.VVC~ ~override~                                         // Plane Shift/Etherealness VVC animation
+COPY ~aTweaks/BAM/RR#PSHFT.BAM~ ~override~                                         // Plane Shift/Etherealness BAM graphics
+COPY ~aTweaks/WAV/RR#PSHFT.WAV~ ~override~                                         // Plane Shift/Etherealness sound
+
+COPY_EXISTING ~RR#EVAL.2DA~ ~override~
+COUNT_2DA_ROWS ~2~ "rows"
+FOR ( index = 0 ; index < rows ; index = index + 1 ) BEGIN
+  READ_2DA_ENTRY "index" 0 2 "2datmp"
+   PATCH_IF ("%2datmp%" STRING_EQUAL_CASE ~RR#ETHER~) BEGIN                        // Find the Etherealness entry
+     READ_2DA_ENTRY "index" 1 2 "RR#2DAID"                                         // Get the numeric ID
+   END
+END
+BUT_ONLY_IF_IT_CHANGES
+
+COPY ~aTweaks/SPL/RR#ETHER.SPL~ ~override~                                         // Etherealness (Succubus)
+  SAY NAME1 @671 SAY NAME2 @671
+  WRITE_BYTE 0x27 ("%RR#2DAID%" + 1)                                               // assign new secondary type
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+     READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
+     READ_LONG  ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "param1"
+      PATCH_IF (("%opcode%" = 139) AND ("%param1%" = "23359")) BEGIN               // display string: "Ethereal"
+       SAY ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) @707      // Leaving the Ethereal Plane
+      END
+    END
+  END
+
+COPY ~aTweaks/EFF/RR#PFECU.EFF~ ~override~                                         // Etherealness protection from EVILCUTOFF effect
+COPY ~aTweaks/EFF/RR#PFGCU.EFF~ ~override~                                         // Etherealness protection from GOODCUTOFF effect
+
+COPY    ~aTweaks/SPL/RR#UNETH.SPL~ ~override~                                      // Etherealness removal spell
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN                    // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
+       PATCH_IF ("%opcode%" = 221) BEGIN                             // effect #221: remove secondary type
+        WRITE_LONG  ("%fx_off%" + 0x08 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) ("%RR#2DAID%" + 1)  // set the designated secondary type
+       END
+    END
+  END
+
+
+COPY_EXISTING ~RR#ETHER.SPL~ ~override/RR#DNETH.SPL~                               // Etherealness + increased regeneration rate (Nabassu)
+LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                           // Start FUCNTION call (add Spell Effect)
+INT_VAR                                                                            // initialize variables
+"opcode" = "98"                                                                    // effect: #98 (regeneration)
+"target" = "1"                                                                     // target: 1 (self)
+"parameter1" = "3"                                                                 // param1: 3 (regeneration amount)
+"parameter2" = "2"                                                                 // param2: 2 (type: restore x HP every second)
+"duration" = "600"                                                                 // duration: 600
+"probability1" = "100"                                                             // probability1: 100%
+END                                                                                // end FUNCTION call
+LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                           // Start FUCNTION call (add Spell Effect)
+INT_VAR                                                                            // initialize variables
+"opcode" = "139"                                                                   // effect: #139 (Text: Display String)
+"target" = "1"                                                                     // target: 1 (self)
+"timing" = "1"                                                                     // timing mode: 1 (permanent)
+"parameter1" = "8313"                                                              // param1: strref (Regenerating)
+"probability1" = "100"                                                             // probability1: 100%
+END                                                                                // end FUNCTION call
+PATCH_FOR_EACH ~delay~ IN                                                          // for each of the following opcodes
+                  ~12~                                                             // 2 rounds
+                  ~24~                                                             // 4 rounds
+                  ~36~                                                             // 6 rounds
+                  ~48~                                                             // 8 rounds
+                  ~60~                                                             // 10 rounds
+BEGIN
+LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                           // add new equipping effect
+INT_VAR                                                                            // initialize variables
+"opcode" = "139"                                                                   // effect: #139 (Text: Display String)
+"target" = "1"                                                                     // target: 1 (self)
+"timing" = "4"                                                                     // timing mode: 4 (delayed)
+"parameter1" = "8313"                                                              // param1: strref (Regenerating)
+"duration" = EVALUATE_BUFFER "%delay%"                                             // duration: delayed by the specifed amount
+"probability1" = "100"                                                             // probability1: 100%
+END                                                                                // ends FUNCTION
+END                                                                                // ends PATCH_FOR_EACH block
+
+
+COPY_EXISTING ~RR#ETHER.SPL~ ~override/RR#PSHFT.SPL~                               // Plane Shift - Ethereal Plane (Glabrezu)
+  SAY NAME1 @678 SAY NAME2 @678
+
+COPY ~aTweaks/SPL/RR#DPARL.SPL~ ~override~                                         // Paralysis Aura (Nabassu)
+  SAY NAME1 @677 SAY NAME2 @677
+COPY ~aTweaks/EFF/RR#DPARL.EFF~ ~override~                                         // Paralysis Aura immunity effect (for Constructs, Undead, Trolls... etc.)
+COPY ~aTweaks/SPL/RR#DGAZE.SPL~ ~override~                                         // Death Gaze (Nabassu)
+COPY ~aTweaks/EFF/RR#DGZ01.EFF~ ~override~                                         // Death Gaze display Dying Icon
+COPY ~aTweaks/EFF/RR#DGZ02.EFF~ ~override~                                         // Death Gaze display Cursed Icon
+COPY ~aTweaks/EFF/RR#DGZ03.EFF~ ~override~                                         // Death Gaze transform into Ghast
+COPY ~aTweaks/SPL/RR#DGZRM.SPL~ ~override~                                         // Death Gaze removal (curse is lifted after the creature dies)
+COPY ~aTweaks/SPL/RR#DFA1.SPL~ ~override~                                          // Fear Aura (Cornugon and Gelugon)
+  SAY NAME1 @672 SAY NAME2 @672
+COPY ~aTweaks/SPL/RR#DFA2.SPL~ ~override~                                          // Fear Aura (Pit Fiend)
+  SAY NAME1 @672 SAY NAME2 @672
+COPY ~aTweaks/EFF/RR#DFA1.EFF~ ~override~                                          // Cornugon/Gelugon Fear Aura immunity effect (for Constructs, Undead, Trolls... etc.)
+COPY ~aTweaks/EFF/RR#DFA2.EFF~ ~override~                                          // Pit Fiend Fear Aura immunity effect (for Constructs, Undead, Trolls... etc.)
+COPY ~aTweaks/SPL/RR#DCSW.SPL~  ~override~                                         // Cause Serious Wounds (spell-like ability)
+COPY ~aTweaks/SPL/RR#PFLAM.SPL~ ~override~                                         // Produce Flame (spell-like ability)
+  SAY NAME1 @673 SAY NAME2 @673
+COPY ~aTweaks/SPL/RR#FEAR.SPL~  ~override~                                         // Custom fear spell, used for neutral NPCs and also by RR's Revised Thievery for scaring Familiars
+COPY ~aTweaks/SPL/RR#BLEED.SPL~ ~override~                                         // Bleeding Wound ability (Cornugon)
+COPY ~aTweaks/EFF/RR#BLEED.EFF~ ~override~                                         // Bleeding Wound immunity (for Constructs, Undead, Elementals...)
+COPY ~aTweaks/SPL/RR#DCORN.SPL~ ~override~                                         // Barbed Whip Stun ability (Cornugon)
+COPY ~aTweaks/EFF/RR#DCORN.EFF~ ~override~                                         // Barbed Whip Stun immunity (for Constructs, Undead, Elementals...)
+COPY ~aTweaks/SPL/RR#WISH.SPL~  ~override~                                         // Custom Wish spell (Pit Fiend)
+COPY ~aTweaks/SPL/RR#CNSTR.SPL~ ~override~                                         // Constrict ability (Pit Fiend)
+  SAY NAME1 @674 SAY NAME2 @674                                                    
+COPY ~aTweaks/EFF/RR#CNSTR.EFF~ ~override~                                         // Constrict ability immunity (for large and incorporeal creatures)
+COPY ~aTweaks/VVC/RR#CNSTR.VVC~ ~override~                                         // Constrict/Grab/Flaming Whip ability VVC animation
+COPY ~aTweaks/BAM/RR#CNSTR.BAM~ ~override~                                         // Constrict/Grab/Flaming Whip ability BAM graphics
+COPY ~aTweaks/SPL/RR#DPDIS.SPL~ ~override~                                         // Pit Fiend disease (-4 to STR, non-cumulative)
+COPY ~aTweaks/EFF/RR#DPDIS.EFF~ ~override~                                         // Pit Fiend disease immunity effect
+  SAY 0x1C @676                                                                    // Unaffected by Disease
+COPY ~aTweaks/SPL/RR#DBFLW.SPL~ ~override~                                         // Flaming Whip (Balor)
+  SAY NAME1 @679 SAY NAME2 @679
+COPY ~aTweaks/SPL/RR#DBFLA.SPL~ ~override~                                         // Body Flames (Balor)
+  SAY NAME1 @682 SAY NAME2 @682
+COPY ~aTweaks/SPL/RR#DBFLE.SPL~ ~override~                                         // Death Throes (Balor)
+  SAY NAME1 @683 SAY NAME2 @683
+COPY ~aTweaks/EFF/RR#DBFLW.EFF~ ~override~                                         // Flaming Whip ability immunity (for large and incorporeal creatures)
+COPY ~aTweaks/SPL/RR#CNSTR.SPL~ ~override/RR#DGRAB.SPL~                            // Grab ability (Glabrezu)
+SAY NAME1 @684 SAY NAME2 @684                                                    
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  SET "fx_delta" = 0
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN                     // cycle through abilities
+   READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+   READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+   SET "abil_fx_idx" = ("%abil_fx_idx%" + "%fx_delta%")
+   WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "opcode"
+      PATCH_IF (("%opcode%" = "177") OR ("%opcode%" = "206")) BEGIN  // effects #177 and #206: Use EFF File and Protection from Spell
+       WRITE_ASCII  ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "RR#DGRAB" #8 // resref: RR#DGRAB
+      END
+      PATCH_IF ("%opcode%" = "12")  BEGIN  // effect #12: HP Damage
+        DELETE_BYTES ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) 0x30 // delete effect
+        SET "fx_delta" = "%fx_delta%" - 1
+        SET "index2" = "%index2%" - 1
+        SET "abil_fx_num" = "%abil_fx_num%" - 1
+      END
+     WRITE_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%")
+    END
+  END
+COPY ~aTweaks/EFF/RR#CNSTR.EFF~ ~override/RR#DGRAB.EFF~                            // Grab ability immunity (for large and incorporeal creatures)
+  WRITE_ASCII 0x30 ~RR#DGRAB~ #8                                                   // resref: RR#DGRAB
+
+COPY ~aTweaks/SPL/RR#CNSTR.SPL~ ~override/RR#DMCNS.SPL~                            // Constrict ability (Marilith)
+  SAY NAME1 @674 SAY NAME2 @674                                                    
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN                     // cycle through abilities
+   READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+   READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "opcode"
+      PATCH_IF (("%opcode%" = "177") OR ("%opcode%" = "206")) BEGIN  // effects #177 and #206: Use EFF File and Protection from Spell
+       WRITE_ASCII  ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "RR#DMCNS" #8 // resref: RR#DMCNS
+      END
+      PATCH_IF ("%opcode%" = "12")  BEGIN  // effect #12: HP Damage
+       WRITE_LONG  ("%fx_off%" + 0x1c + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "4" // dice rolls: 4
+       WRITE_LONG  ("%fx_off%" + 0x20 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "6" // dice size: 6
+      END
+    END
+  END
+COPY ~aTweaks/EFF/RR#CNSTR.EFF~ ~override/RR#DMCNS.EFF~                            // Grab ability immunity (for large and incorporeal creatures)
+  WRITE_ASCII 0x30 ~RR#DMCNS~ #8                                                   // resref: RR#DMCNS
+
+
+COPY ~aTweaks/SPL/RR#DPARL.SPL~ ~override/RR#DPTOU.SPL~                            // Paralytic Touch (Maurezhi)
+SAY NAME1 @688 SAY NAME2 @688
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  SET "fx_delta" = 0
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN                     // cycle through abilities
+   READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+   READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+   SET "abil_fx_idx" = ("%abil_fx_idx%" + "%fx_delta%")
+   WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "opcode"
+      PATCH_IF (("%opcode%" = "177") OR ("%opcode%" = "206")) BEGIN  // effects #177 and #206: Use EFF File and Protection from Spell
+       WRITE_ASCII  ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "RR#DPTOU" #8 // resref: RR#DPTOU
+      END
+      PATCH_IF ("%opcode%" = "215")  BEGIN  // effect #215: Play 3D Effect
+        DELETE_BYTES ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) 0x30 // delete effect
+        SET "fx_delta" = "%fx_delta%" - 1
+        SET "index2" = "%index2%" - 1
+        SET "abil_fx_num" = "%abil_fx_num%" - 1
+      END
+     WRITE_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%")
+    END
+  WRITE_SHORT  ("%abil_off%" + 0x0e + (0x28 * "%index%")) "1"                      // range: 1
+  WRITE_SHORT  ("%abil_off%" + 0x26 + (0x28 * "%index%")) "1"                      // projectile: 1 (None)
+  END
+COPY ~aTweaks/EFF/RR#DPARL.EFF~ ~override/RR#DPTOU.EFF~                            // Paralytic Touch immunity effect (for Constructs, Undead, Trolls...etc)
+  WRITE_ASCII 0x30 ~RR#DPTOU~ #8                                                   // resref: RR#DPTOU
+COPY ~aTweaks/SPL/RR#DENTG.SPL~ ~override~                                         // Rope of Entanglement ability (Erinyes)
+SAY NAME1 @687 SAY NAME2 @687                                                    
+COPY ~aTweaks/EFF/RR#CNSTR.EFF~ ~override/RR#DENTG.EFF~                            // Rope fo Entanglement immunity (for large and incorporeal creatures)
+  WRITE_ASCII 0x30 ~RR#DENTG~ #8                                                   // resref: RR#DENTG
+COPY ~aTweaks/SPL/RR#TELWE.SPL~ ~override~                                         // Teleport Without Error
+COPY ~aTweaks/SPL/RR#TELAW.SPL~ ~override~                                         // Teleport Away (Noble Djinn)
+COPY ~aTweaks/SPL/RR#TELAW.SPL~ ~override/RR#PSTHA.SPL~                            // Plane Shift - The Abyss (Glabrezu)
+READ_LONG  0x64 "abil_off"
+READ_SHORT 0x68 "abil_num"
+READ_LONG  0x6a "fx_off"
+SAY NAME1 @714 SAY NAME2 @714
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
+      READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "resref"
+      PATCH_IF (("%opcode%" = "215") AND ("%resref%" STRING_EQUAL_CASE ~RR#DDOOR~)) BEGIN  // effect #215: Play 3D Effect
+       WRITE_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "RR#PSHFT" #8 // use the Plane Shift animation
+      END
+    END
+  END
+
+COPY ~aTweaks/SPL/RR#TGAZE.SPL~ ~override~                                         // Terrifying Gaze (Erinyes)
+  SAY NAME1 @686 SAY NAME2 @686
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DDOOR.BAM~ THEN BEGIN                        // Checks for the Icewind Dale's Dimension Door animation component
+  COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override/RR#DDOOR.BAM~                     // IWD1's Dimension Door animation (custom file name)
+  COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override/RR#DDOOR.WAV~                     // IWD1's Dimension Door sound effect (custom file name)
+  COPY    ~aTweaks/VVC/RR#DDOOR.VVC~   ~override~                                  // Custom Dimension Door VVC
+END                                                                                // ends ACTION_IF block
+
+ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                          // New projectile for Symbol Pain (party friendly)
+COPY ~aTweaks/SPL/RR#SPAIN.SPL~ ~override~                                         // Pit Fiend Symbol Pain
+     //~atweaks/spl/fldkpain.spl~ override                                           //Death Knight spell, different from Pit Fiend spell somehow, or maybe not
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                    // use new projectile (party friendly)
+  END 
+
+COPY_EXISTING ~SPIN558.SPL~  ~override~                                            // Erinyes Charm
+  WRITE_ASCII 0x10 "CAS_M05" #8                                                    // casting sound: CAS_M05.WAV
+  WRITE_SHORT 0x25 "4"                                                             // spell school: 4 (Enchantment)
+  WRITE_SHORT 0x22 "11"                                                            // casting graphics: 11 (Enchantment)
+  WRITE_LONG  0x34 "1"                                                             // spell level: 1
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN                     // cycle through abilities
+   READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+   READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+     WRITE_BYTE  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "-5" // save bonus: -5
+    END
+  END
+LAUNCH_PATCH_FUNCTION ~RR#AGLEF~                                                   // Start FUNCTION call (my custom "Add Global Effect" function)
+INT_VAR                                                                            // initialize variables
+  "rr#opcode" = "136"                                                              // effect: #136 (force visible)
+  "rr#target" = "1"                                                                // target: 1 (self)
+  "rr#timing" = "1"                                                                // timing mode: 1 (permanent)
+  "rr#prob1" = "100"                                                               // probability1: 100%
+ END                                                                               // end FUNCTION call
+PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                                 // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
+
+COPY_EXISTING ~SPWISH38.SPL~  ~override/RR#WSH38.SPL~                              // Wish: Breach on all enemies in the area
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN                     // cycle through abilities
+   READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+   READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+     WRITE_BYTE  ("%fx_off%" + 0x02 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "2" // target: 2 (preset target)
+    END
+  WRITE_SHORT  ("%abil_off%" + 0x26 + (0x28 * "%index%")) "254"                    // projectile: 254 (BIGNAREA)
+  END
+
+COPY_EXISTING ~SPWI104.SPL~  ~override/RR#DSUGG.SPL~                               // Change Charm Person into Suggestion (used by Imp)
+  SAY NAME1 @708 SAY NAME2 @708                                                    // Suggestion
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+BUT_ONLY_IF_IT_CHANGES
+
+COPY_EXISTING ~SPWI205.SPL~  ~override/RR#DCFEA.SPL~                               // Change Spook into Cause Fear (used by Cambion)
+  SAY NAME1 @710 SAY NAME2 @710                                                    // Cause Fear
+WRITE_ASCII 0x10 "CAS_M01" #8                                                      // casting sound: CAS_M01.WAV
+WRITE_SHORT 0x25 "5"                                                               // spell school: 5 (Illusion)
+WRITE_SHORT 0x22 "13"                                                              // casting graphics: 13 (Illusion)
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN                     // cycle through abilities
+   WRITE_SHORT  ("%abil_off%" + 0x0c + (0x28 * "%index%")) "1"                     // target: 1 (creature)
+   WRITE_SHORT  ("%abil_off%" + 0x26 + (0x28 * "%index%")) "235"                   // projectile: 235 (PSKULLT)
+   READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+   READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+     WRITE_BYTE  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "0" // save bonus: 0
+    END
+  END
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI205.SPL~  ~override/RR#DSCAR.SPL~                               // Change Horror into Scare (used by Abishai)
+  SAY NAME1 @706 SAY NAME2 @706                                                    // Scare
+WRITE_ASCII 0x10 "CAS_M05" #8                                                      // casting sound: CAS_M05.WAV
+WRITE_SHORT 0x25 "4"                                                               // spell school: 4 (Enchantment)
+WRITE_SHORT 0x22 "11"                                                              // casting graphics: 11 (Enchantment)
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN                     // cycle through abilities
+   READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+   READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+     WRITE_LONG  ("%fx_off%" + 0x1c + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "5" // dice rolls: 5 (maximum level affected)
+    END
+  END
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI205.SPL~  ~override/RR#DMFEA.SPL~                               // Change Horror into Fear (used by Maurezhi)
+  SAY NAME1 #2619 SAY NAME2 #2619                                                  // Fear
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN                     // cycle through abilities
+   READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+   READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+     WRITE_BYTE  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "0" // save bonus: 0
+    END
+  END
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI104.SPL~  ~override/RR#DCHRM.SPL~                               // Change Charm Person into a Glabrezu specific ability (used only on neutral bystanders)
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN                     // cycle through abilities
+   READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+   READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_LONG  ("%fx_off%" + 0x0e + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "RR#DURATION"
+      PATCH_IF ("%RR#DURATION%" > 20) BEGIN
+        WRITE_LONG  ("%fx_off%" + 0x0e + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "120" // duration: 120 (Glabrezu charisma bonus)
+      END
+     WRITE_BYTE  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "0" // save bonus: 0 (Glabrezu charisma bonus)
+    END
+  END
+
+
+// Detect Invisibility is stopped by magic resistance, all other invisibility removal spells aren't. Fix the inconsistency
+
+COPY_EXISTING ~spwi203.spl~ ~override~ // Detect Invisibility
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_BYTE  ("%fx_off%" + 0x0d + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "RR#dispel"
+      PATCH_IF ("%RR#dispel%" != 0) BEGIN
+        WRITE_BYTE ("%fx_off%" + 0x0d + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "0" // resist/dispel: 0
+      END
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Clone spells into innate abilities
+
+COPY_EXISTING ~SPWI103.SPL~  ~override/RR#WI103.SPL~                               // Clone Burning Hands into an innate ability (used by Glabrezu)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI201.SPL~  ~override/RR#WI201.SPL~                               // Clone Blur into an innate ability (used by Maurezhi)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI203.SPL~  ~override/RR#WI203.SPL~                               // Clone Detect Invisibility into an innate ability (used by Pit Fiend)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI206.SPL~  ~override/RR#WI206.SPL~                               // Clone Invisibility into an innate ability (used by Erinyes)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI212.SPL~  ~override/RR#WI212.SPL~                               // Clone Mirror Image into an innate ability (used by Glabrezu)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI304.SPL~  ~override/RR#WI304.SPL~                               // Clone Fireball into an innate ability (used by Pit Fiend)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI306.SPL~  ~override/RR#WI306.SPL~                               // Clone Hold Person into an innate ability (used by Pit Fiend)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI308.SPL~  ~override/RR#WI308.SPL~                               // Clone Lightning Bolt into an innate ability (used by Cornugon)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI314.SPL~  ~override/RR#WI314.SPL~                               // Clone Vampiric Touch into an innate ability (used by Nabassu)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI326.SPL~  ~override/RR#WI326.SPL~                               // Clone Dispel Magic into an innate ability (used by Glabrezu and Balor)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI401.SPL~  ~override/RR#WI401.SPL~                               // Clone Confusion into an innate ability (used by Glabrezu)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI404.SPL~  ~override/RR#WI404.SPL~                               // Clone Ice Storm into an innate ability (used by Gelugon)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI405.SPL~  ~override/RR#WI405.SPL~                               // Clone Improved Invisibility into an innate ability (used by Pit Fiend)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI502.SPL~  ~override/RR#WI502.SPL~                               // Clone Cloudkill into an innate ability (used by Marilith)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPPR211.SPL~  ~override/RR#PR211.SPL~                               // Clone Silence 15' Radius into an innate ability (used by Nabassu)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI811.SPL~  ~override/RR#WI811.SPL~                               // Clone Symbol, Fear into an innate ability (used by Balor)
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                    // use new projectile (party friendly)
+  END 
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI816.SPL~  ~override/RR#WI816.SPL~                               // Clone Symbol, Stun into an innate ability (used by Balor)
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                    // use new projectile (party friendly)
+  END 
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI817.SPL~  ~override/RR#WI817.SPL~                               // Clone Symbol, Death into an innate ability (used by Balor)
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                    // use new projectile (party friendly)
+  END 
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+
+
+// New items
+
+COPY ~aTweaks/ITM/RR#GHAST.ITM~ ~override~                                         // spawned Ghast melee attack
+COPY ~aTweaks/ITM/RR#DQUAS.ITM~ ~override~                                         // Quasit melee attack
+COPY ~aTweaks/ITM/RR#DNABA.ITM~ ~override~                                         // Nabassu melee attack
+COPY ~aTweaks/ITM/RR#DGLAB.ITM~ ~override~                                         // Glabrezu melee attack
+COPY ~aTweaks/ITM/RR#DMARI.ITM~ ~override~                                         // Marilith melee attack
+COPY ~aTweaks/ITM/RR#DBALR.ITM~ ~override~                                         // Balor melee attack
+COPY ~aTweaks/ITM/RR#DIMP.ITM~  ~override~                                         // Imp melee attack
+COPY ~aTweaks/ITM/RR#DFCAT.ITM~ ~override~                                         // Fell Cat melee attack
+COPY ~aTweaks/ITM/RR#DABIS.ITM~ ~override~                                         // Abishai melee attack
+COPY ~aTweaks/ITM/RR#DBFND.ITM~ ~override~                                         // Bone Fiend melee attack
+COPY ~aTweaks/ITM/RR#DCORN.ITM~ ~override~                                         // Cornugon melee attack
+COPY ~aTweaks/ITM/RR#DGELU.ITM~ ~override~                                         // Gelugon melee attack
+COPY ~aTweaks/ITM/RR#DPITF.ITM~ ~override~                                         // Pit Fiend melee attack
+COPY_EXISTING ~DEMSUC01.ITM~  ~override~                                           // Succubus melee attack
+LAUNCH_PATCH_FUNCTION ~DELETE_ITEM_EFFECT~                                         // add new equipping effect
+INT_VAR                                                                            // initialize variables
+"opcode_to_delete" = "-1"                                                          // effect: -1 (all effects)
+END
+BUT_ONLY_IF_IT_CHANGES
+
+COPY_EXISTING ~MAUREZHI.ITM~  ~override~                                           // Maurezhi melee attack
+READ_LONG 0x64 abil_off
+READ_SHORT 0x68 abil_num
+READ_LONG 0x6a fx_off
+WRITE_LONG 0x60 "2"                                                                // enchantment level: 2
+  FOR (i = 0; i < "%abil_num%"; i += 1) BEGIN                                      // parse each ability
+  READ_BYTE (%abil_off% + %i% * 0x38) abil_type                                    // read ability type
+    PATCH_IF (%abil_type% = 1) BEGIN                                               // only patch the melee ability header
+      WRITE_SHORT ("%abil_off%" + 0x14) "0"                                        // THAC0 bonus
+      WRITE_SHORT ("%abil_off%" + 0x1a) "4"                                        // damage bonus
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+COPY_EXISTING ~RINGDEMN.ITM~  ~override~                                           // Fiend immunity ring
+LAUNCH_PATCH_FUNCTION ~DELETE_ITEM_EQEFFECT~                                       // remove equipping effect
+INT_VAR                                                                            // initialize variables
+"opcode_to_delete" = "101"                                                         // effect: #101 (Protection from Opcode)
+END                                                                                // ends FUNCTION
+PATCH_FOR_EACH ~effect~ IN                                                         // for each of the following opcodes
+                   ~5~                                                             // Charm
+                  ~24~                                                             // Horror
+                  ~25~                                                             // Poison
+                  ~39~                                                             // Unconsciousness
+                  ~45~                                                             // Stun
+                 ~106~                                                             // Morale Break
+                 ~128~                                                             // Confusion
+                 ~210~                                                             // Stun 90 HP
+BEGIN
+LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                          // add new equipping effect
+INT_VAR                                                                            // initialize variables
+"opcode" = "101"                                                                   // effect: #101 (Protection from Opcode)
+"target" = "1"                                                                     // target: 1 (self)
+"timing" = "2"                                                                     // timing mode: 2 (while equipped)
+"duration" = "0"                                                                   // duration: 0
+"parameter2" = EVALUATE_BUFFER "%effect%"                                          // param2: effect to be protected from
+"probability1" = "100"                                                             // probability1: 100%
+END                                                                                // ends FUNCTION
+END                                                                                // ends PATCH_FOR_EACH block
+PATCH_FOR_EACH ~string~ IN                                                         // for each of the following strings
+                 ~1280~                                                            // Stunned
+                ~14043~                                                            // Stun
+BEGIN
+LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                          // add new equipping effect
+INT_VAR                                                                            // initialize variables
+"opcode" = "267"                                                                   // effect: #267 (Protection from Display Specific String)
+"target" = "1"                                                                     // target: 1 (self)
+"timing" = "2"                                                                     // timing mode: 2 (while equipped)
+"duration" = "0"                                                                   // duration: 0
+"parameter1" = EVALUATE_BUFFER "%string%"                                          // param1: string reference
+"probability1" = "100"                                                             // probability1: 100%
+END                                                                                // ends FUNCTION
+END                                                                                // ends PATCH_FOR_EACH block
+PATCH_FOR_EACH ~icon~ IN                                                           // for each of the following icons
+                 ~14~                                                              // Sleep
+                 ~55~                                                              // Stun
+                ~130~                                                              // Unconscious
+BEGIN
+LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                          // add new equipping effect
+INT_VAR                                                                            // initialize variables
+"opcode" = "169"                                                                   // effect: #169 (Immunity to Special Effect Icon)
+"target" = "1"                                                                     // target: 1 (self)
+"timing" = "2"                                                                     // timing mode: 2 (while equipped)
+"duration" = "0"                                                                   // duration: 0
+"parameter2" = EVALUATE_BUFFER "%icon%"                                            // param2: icon which should not display
+"probability1" = "100"                                                             // probability1: 100%
+END                                                                                // ends FUNCTION
+END                                                                                // ends PATCH_FOR_EACH block
+PATCH_FOR_EACH ~spell~ IN                                                          // for each of the following spells
+            ~SPPR103~                                                              // Cure Light Wounds
+            ~SPPR215~                                                              // Cure Medium Wounds
+            ~SPPR315~                                                              // Cure Medium Wounds
+            ~SPPR401~                                                              // Cure Serious Wounds
+            ~SPPR404~                                                              // Neutralize Poison
+            ~SPPR502~                                                              // Cure Critical Wounds
+            ~SPPR514~                                                              // Mass Cure
+            ~SPPR514~                                                              // Mass Cure
+            ~SPPR607~                                                              // Heal
+            ~SPIN101~                                                              // Cure Light Wounds (Bhaalpower)
+            ~SPIN551~                                                              // Cause Serious Wounds (Hive Mother)
+            ~SPIN986~                                                              // Cause Serious Wounds (Beholder)
+            ~SPCL211~                                                              // Paladin Lay On Hands
+BEGIN                                                                              // execute the following
+LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                          // add new equipping effect
+INT_VAR                                                                            // initialize variables
+"opcode" = "206"                                                                   // effect: #206 (Protection from Spell)
+"target" = "1"                                                                     // target: 1 (self)
+"timing" = "2"                                                                     // timing mode: 2 (while equipped)
+"duration" = "0"                                                                   // duration: 0
+"parameter1" = "4742"                                                              // param1: string (Spell Ineffective)
+"probability1" = "100"                                                             // probability1: 100%
+STR_VAR                                                                            // initialize strings
+"resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
+END                                                                                // ends FUNCTION
+END                                                                                // ends PATCH_FOR_EACH block
+BUT_ONLY_IF_IT_CHANGES                                                   
+
+
+
+// New Creatures
+
+COPY ~aTweaks/CRE/RR#WISH.CRE~ ~override~                                          // Noble Djinn (Pit Fiend Wish)
+COPY ~aTweaks/CRE/RR#GHAST.CRE~ ~override~                                         // Ghast (spawned by a Nabassu's Death Gaze)
+
+
+
+
+// New AI Scripts
+
+COMPILE ~aTweaks/BAF/RR#WISH.BAF~                                                  // Noble Djinn Wish script
+COMPILE ~aTweaks/BAF/RR#GHAST.BAF~                                                 // Spawned Ghast AI script
+
+
+END  // ends RR#FIEND main ACTION_IF block
+END  // ends macro

@@ -1,0 +1,546 @@
+
+INCLUDE "atweaks/lib/dsandstuff.tpa"
+INCLUDE "atweaks/lib/lib.tpa"
+
+COPY_EXISTING msectype.2da override
+  COUNT_2DA_ROWS 2 num_row
+  INSERT_2DA_ROW num_row 2 ~GauthParalyze fl#replace~
+  REPLACE "fl#replace" @1025
+  GauthParalyzeSecType = num_row - 1
+
+
+//Gauth's Lightning Bolt
+COPY_EXISTING spwi308.spl "override/fl#bhblt.spl"
+  LPF prep_spell END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target = 2 timing = 1 power = 3 parameter2 = 262144 resist_dispel = 1 dicenumber = 4 dicesize = 4 END
+
+//Charm Monster
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhchr.spl"
+  SAY 0x8 @1403
+  WRITE_SHORT 0x25 4 //Enchantment
+  WRITE_BYTE 0x27 11 //disabling
+  PATCH_FOR_EACH race IN 2 3 BEGIN
+    PATCH_FOR_EACH eff IN cdelfcm0 cdelfcm1 cdelfcm2 cdelfcm3 cdelfcm4 cdelfcm5 cdelfcm6 BEGIN
+      LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter1 = race parameter2 = 4 probability1 = race = 2 ? 90 : 30 STR_VAR resource = EVAL "%eff%" END
+    END
+  END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 5   target = 2 power = 4                       parameter2 = 1                   resist_dispel = 1 duration = 100 savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 50  target = 2 power = 4 parameter1 = 0x9390ff parameter2 = 0x1e0000            resist_dispel = 1 duration = 1   savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target = 2 power = 4                       parameter2 = 8        timing = 1 resist_dispel = 1                savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 2 power = 4                                                        resist_dispel = 1 duration = 100 savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target = 2 power = 4                                             timing = 3 resist_dispel = 1 duration = 100 savingthrow = 1 STR_VAR resource = eff_e07 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target = 2 power = 4                       parameter2 = 1                   resist_dispel = 1 duration = 3   savingthrow = 1 STR_VAR resource = spnwchrm END
+
+//Gauth's Cone of Cold
+COPY_EXISTING spwi503.spl "override/fl#bhcne.spl"
+  LPF prep_spell END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target = 2 timing = 1 power = 5 parameter2 = 131072 resist_dispel = 1 dicenumber = 3 dicesize = 4 END
+
+//Dweomer Drain
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhdrn.spl"
+  SAY 0x8 @1400
+  c = 0
+  PATCH_FOR_EACH school IN 1 2 3 4 5 6 7 8 BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 220 target = 2 timing = 1 power = 4 parameter1 = 9 parameter2 = school probability1 = c * 3 + 2 probability2 = c * 3 END
+    ++c
+  END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target = 2 timing = 1 power = 4 parameter2 = 14 probability1 = c * 3 + 2 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target = 2 timing = 1 power = 4                 probability1 = c * 3 + 2 STR_VAR resource = eff_m02 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 timing = 1 power = 4                 probability1 = c * 3 + 2 END
+  FOR (i=LONG_AT 0x6a;i<SOURCE_SIZE;i+=0x30) BEGIN
+    READ_SHORT i type
+    PATCH_IF type = 139 BEGIN
+      SAY i + 0x4 @1401
+    END
+  END
+
+//Enervation
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhenr.spl"
+  SAY 0x8 @1405
+  WRITE_SHORT 0x25 7 //Necromancy
+  WRITE_BYTE 0x27 11 //disabling
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 233 target = 2 power = 4 parameter1 = 1        parameter2 = 134      timing = 1 resist_dispel = 1              savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 216 target = 2 power = 4 parameter1 = 3                              timing = 1 resist_dispel = 1              savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target = 2 power = 4                                             timing = 1 resist_dispel = 1              savingthrow = 1 STR_VAR resource = eff_m07 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target = 2 power = 4                       parameter2 = 2        timing = 1 resist_dispel = 1              savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 50  target = 2 power = 4 parameter1 = 0x206700 parameter2 = 0x18f830            resist_dispel = 1 duration = 1 savingthrow = 1 END
+
+//Hold Monster
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhhld.spl"
+  SAY 0x8 #22616
+  WRITE_SHORT 0x25 4 //Enchantment
+  WRITE_BYTE 0x27 11 //disabling
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 175 target = 2 power = 5                       parameter2 = 2                   resist_dispel = 1 duration = 24 savingthrow = 1 savingbonus = "-3" END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target = 2 power = 5                       parameter2 = 9        timing = 1 resist_dispel = 1               savingthrow = 1 savingbonus = "-3" END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target = 2 power = 5                                                        resist_dispel = 1               savingthrow = 1 savingbonus = "-3" STR_VAR resource = eff_m15 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target = 2 power = 5                                             timing = 4 resist_dispel = 1 duration = 24 savingthrow = 1 savingbonus = "-3" STR_VAR resource = eff_e08 END
+
+//Spectator's Paralysis
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhpar.spl"
+  SAY 0x8 #10856
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 175 target = 2 power = 7 parameter1 = 0 parameter2 = 2 resist_dispel = 1 duration = 96 savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target = 2 power = 7                               resist_dispel = 1               savingthrow = 1 STR_VAR resource = eff_m26 END
+
+//Beholder's Sleep
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhsl.spl"
+  SAY 0x8 #12047
+  WRITE_SHORT 0x25 4 //Enchantment
+  WRITE_BYTE 0x27 11 //disabling
+  PATCH_FOR_EACH race IN 2 3 BEGIN
+    PATCH_FOR_EACH eff IN cdelfsl0 cdelfsl1 cdelfsl2 cdelfsl3 cdelfsl4 BEGIN
+      LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter1 = race parameter2 = 4 probability1 = race = 2 ? 90 : 30 STR_VAR resource = EVAL "%eff%" END
+    END
+  END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 39  target = 2 power = 1                                               resist_dispel = 1 duration = 300 dicenumber = 4 savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 power = 1 parameter1 = 14001                 timing = 1 resist_dispel = 1                dicenumber = 4 savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 2 power = 1                    parameter2 = 14            resist_dispel = 1 duration = 300 dicenumber = 4 savingthrow = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target = 2 power = 1                                    timing = 4 resist_dispel = 1 duration = 300 dicenumber = 4 savingthrow = 1 STR_VAR resource = eff_m05 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target = 2 power = 1                    parameter2 = 1             resist_dispel = 1 duration = 1   dicenumber = 4 savingthrow = 1 STR_VAR resource = spnwchrm END
+
+//Telekinesis and Repulsion
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhtk.spl"
+     "atweaks/spl/fl#bhray.spl" "override/fl#bhrep.spl"
+  PATCH_IF "%DEST_RES%" STRING_EQUAL_CASE "fl#bhtk" BEGIN
+    SAY 0x8 @1402
+  END ELSE BEGIN
+    SAY 0x8 @1404
+  END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 235 target = 2 power = 5 parameter1 = 30    parameter2 = 2             resist_dispel = 1 duration = 2 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 12  target = 2 power = 5 parameter1 = 12                    timing = 1 resist_dispel = 1                dicenumber = 1 dicesize = 8 END
+
+//Spectator's CSW
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhwnd.spl"
+  SAY 0x8 #2624
+  WRITE_SHORT 0x25 7 //Necromancy
+  WRITE_BYTE 0x27 10 //offensive damage
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 12  target = 2 power = 4 parameter1 = 19       parameter2 = 0x400000 timing = 1 resist_dispel = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 50  target = 2 power = 4 parameter1 = 0xf3933c parameter2 = 0x1e0000            resist_dispel = 1 duration = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target = 2 power = 4                       parameter2 = 2        timing = 1 resist_dispel = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target = 2 power = 4                                             timing = 1 STR_VAR resource = eff_p06 END
+
+
+
+
+COPY "atweaks/spl/fl#bhbrn.spl" override //Director's Burning Hands
+     "atweaks/spl/fl#gauth.spl" override //Gauth's light spell
+     "atweaks/spl/fl#bhxpl.spl" override //Gauth's explode spell
+     "atweaks/spl/fl#bhdir.spl" override //spell to remove Directors' eye bonuses when the central eye is destroyed
+     "atweaks/spl/fl#bhmm.spl"  override //Director's Magic Missile
+     "atweaks/spl/fl#heal1.spl" override //Heal: 1 HP
+     "atweaks/spl/fl#heal6.spl" override //Heal: 6 HP
+     "atweaks/spl/fl#h10.spl"   override //Heal: 10 HP
+     "atweaks/spl/fl#h25.spl"   override //heal: 25 HP
+
+ACTION_IF !FILE_EXISTS_IN_GAME "fl#icew.spl" BEGIN
+  ADD_PROJECTILE ~atweaks/pro/fl#icew.pro~                                          //Single-round Ice Storm (cue imagination stretch)
+  COPY ~atweaks/spl/fl#icew.spl~ override                                           //Death Knight's Wall of Ice (sheet of falling ice)
+    SAY 0x8 @1024
+    FOR(i=0;i<SHORT_AT 0x68;++i) BEGIN
+      WRITE_SHORT LONG_AT 0x64+i*0x28+0x26 fl#icew
+    END
+END
+
+//Spell that removes Gauth paralyzation
+COPY "atweaks/spl/fl#bhrhl.spl" override
+  FOR (i=LONG_AT 0x6a;i<SOURCE_SIZE;i+=0x30) BEGIN
+    READ_SHORT i type
+    PATCH_IF type = 221 BEGIN
+      WRITE_LONG i + 0x8 GauthParalyzeSecType
+    END
+  END
+
+/////////////////////////////////////////////////////////////
+//Creatures
+/////////////////////////////////////////////////////////////
+
+//Death Tyrants
+
+ACTION_FOR_EACH file IN
+               behund01
+               melsum03
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 13000
+            newhp = 50
+            newac = 0
+            newth = 5
+            newapr = 1
+            newsvd = 4
+            newsvw = 6
+            newsvp = 5
+            newsvd = 4
+            newsvs = 7
+            newlvl1 = 14
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 0
+            newfr = 0
+            newcr = 0
+            newer = 0
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 11
+            newdex = 9
+            newcon = 13
+            newint = 14
+            newwis = 9
+            newchr = 9
+            newmor = 18
+            newalign = 19
+            
+            enforce = 1
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#bhund
+            script01 = behund01
+            script02 = wtasight
+            script03 = dw#melee
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+//Fix targetting angles, use percentages for non-standard beholders
+//Fix RR#MDCSC so it first tries to overwrite the first script[0-9]+ and removes the rest, then tries to add it to the first available slot from the bottom up
+
+//Directors
+
+ACTION_FOR_EACH file IN
+                behdir01
+                firmon03
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 10000
+            newhp = 64
+            newac = 2
+            newth = 9
+            newapr = 1
+            newsvd = 3
+            newsvw = 5
+            newsvp = 4
+            newsvd = 3
+            newsvs = 6
+            newlvl1 = 8
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 20
+            newfr = 0
+            newcr = 0
+            newer = 0
+            newar = 0
+            newrs = 50
+            newrc = 50
+            newrp = 50
+            newrm = 50
+            newstr = 16
+            newdex = 14
+            newcon = 14
+            newint = 10
+            newwis = 9
+            newchr = 9
+            newmor = 18
+            newalign = 19
+            
+            enforce = 1
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#bhdir
+            script01 = behdir01
+            script02 = wtasight
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+
+
+//Beholders
+
+ACTION_FOR_EACH file IN
+                behold01
+                cultbh3
+                udbeho01
+                udbeho02
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 14000
+            newhp = 50
+            newac = 0
+            newth = 5
+            newapr = 1
+            newsvd = 4
+            newsvw = 6
+            newsvp = 5
+            newsvd = 4
+            newsvs = 7
+            newlvl1 = 14
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 0
+            newfr = 0
+            newcr = 0
+            newer = 0
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 11
+            newdex = 15
+            newcon = 13
+            newint = 16
+            newwis = 9
+            newchr = 9
+            newmor = 18
+            newalign = 19
+            
+            enforce = 1
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#behol
+            script01 = behold01
+            script02 = wtasight
+            script03 = gauth01
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+
+
+//Gauths
+
+ACTION_FOR_EACH file IN
+                bazgau01
+                behgau01
+                cultbh1
+                cultbh2
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 9000
+            newhp = 81
+            newac = 0
+            newth = 11
+            newapr = 1
+            newsvd = 4
+            newsvw = 6
+            newsvp = 5
+            newsvd = 4
+            newsvs = 7
+            newlvl1 = 9
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 0
+            newfr = 0
+            newcr = 0
+            newer = 0
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 11
+            newdex = 15
+            newcon = 13
+            newint = 16
+            newwis = 9
+            newchr = 9
+            newmor = 18
+            newalign = 35 //NE
+            
+            enforce = 1
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#gauth
+            script01 = gauth01
+            script02 = wtasight
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+
+
+//Hive Mothers
+
+ACTION_FOR_EACH file IN
+                behhiv01
+                gorwom05
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 24000
+            newhp = 160
+            newac = 0
+            newth = 5
+            newapr = 1
+            newsvd = 4
+            newsvw = 6
+            newsvp = 5
+            newsvd = 4
+            newsvs = 7
+            newlvl1 = 20
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 5
+            newfr = 0
+            newcr = 0
+            newer = 0
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 18
+            newdex = 18
+            newcon = 16
+            newint = 18
+            newwis = 16
+            newchr = 14
+            newmor = 18
+            newalign = 19 //NE
+          STR_VAR
+            enfc01 = behhiv01
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#bhhiv
+            script01 = behhiv01
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+
+
+//Spectators
+
+ACTION_FOR_EACH file IN
+                sahbeh01
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 4000
+            newhp = 36
+            newac = 4
+            newth = 15
+            newapr = 1
+            newsvd = 8
+            newsvw = 10
+            newsvp = 9
+            newsvd = 9
+            newsvs = 11
+            newlvl1 = 4
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 5
+            newfr = 0
+            newcr = 0
+            newer = 0
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 11
+            newdex = 15
+            newcon = 13
+            newint = 14
+            newwis = 9
+            newchr = 9
+            newmor = 14
+            newalign = 18 //LN
+            
+            enforce = 1
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#bhspe
+            script01 = behspe01
+            script02 = wtrunwat
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+COMPILE "atweaks/baf/fl#behol.baf"
+        "atweaks/baf/fl#bhund.baf"
+        "atweaks/baf/fl#bhhiv.baf"
+        "atweaks/baf/fl#gauth.baf"
+        "atweaks/baf/fl#bhspe.baf"
+        "atweaks/baf/fl#bhdir.baf"
+
+
+  
+
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+

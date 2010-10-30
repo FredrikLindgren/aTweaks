@@ -1,0 +1,1912 @@
+
+// Iron Golem
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~GOLIRO01~                                                             // Iron Golem
+            ~GORGRD01~                                                             // Guardian (Iron) Golem (Watcher's Keep)
+            ~GORGRD02~                                                             // Guardian (Iron) Golem (Watcher's Keep)
+             ~KPGOL04~                                                             // Iron Golem (d'Arnise Keep)
+              ~SHIRON~                                                             // Iron Golem (Shapechange spell)
+              ~garsaph1~                                                           //who knows? Ask Miloch :P
+              ~garsaph2~ 
+              ~gholim~ 
+              ~godgol1~ 
+              ~godgol2~ 
+              ~golada01~ 
+              ~golkill2~ 
+              ~golsaph1~ 
+              ~golsaph2~ 
+              ~golsaph3~ 
+              ~gordeckb~ 
+              ~ritgol0~ 
+              ~ritgol1~ 
+              ~ritgol2~ 
+              ~z#gadama~
+              ~giaearth.cre~
+              ~cbgorgrd~ 
+              ~cbgorgre~ 
+              ~gartopz1~ 
+              ~gartopz2~ 
+              ~godgol3~ 
+              ~godgol4~ 
+              ~godgol5~ 
+              ~godgol6~ 
+              ~godruby~ 
+              ~golruby1~ 
+              ~gorsta08~ 
+              ~irontomb~ 
+              ~kpgol07~ 
+              ~tomegol4~ 
+              ~yacasas~
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "-1261572608"                                                     // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "23"                                                              // major color (Light Copper)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Stone Golem
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~GOLSTO01~                                                           // Stone Golem
+               ~DSTONE1~                                                           // Stone Golem (Rayic Gethras' home)
+               ~KPGOL03~                                                           // Stone Golem (d'Arnise Keep)
+               ~KPGOL05~                                                           // Stone Golem (d'Arnise Keep)
+               ~STGOL01~                                                           // Stone Golem (Planar Prison)
+              ~TOMEGOL3~                                                           // Stone Golem (Golem Manual)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "117900288"                                                       // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "5"                                                               // major color (Light Silver)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Flesh Golem
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~GOLFLE01~                                                           // Flesh Golem
+               ~KPGOL01~                                                           // Flesh Golem (d'Arnise Keep)
+               ~KPGOL06~                                                           // Flesh Golem (d'Arnise Keep)
+              ~TOMEGOL1~                                                           // Flesh Golem (Golem Manual)
+                ~XGOLEM~                                                           // Flesh Golem (Xzar's quest)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "84215808"                                                        // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "4"                                                               // major color (Auburn)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Sand Golem
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~GOLSAN01~                                                           // Sand Golem
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "67569408"                                                        // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "37"                                                              // major color (Dark Dirty Yellow)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Juggernaut Golem
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~GOLJUG01~                                                           // Juggernaut Golem
+              ~JUGJUG01~                                                           // Juggernaut Golem (Jermien's quest, Umar Hills)
+              ~JUGJUG02~                                                           // Juggernaut Golem (Jermien's quest, Umar Hills)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "201984000"                                                       // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "10"                                                              // major color (Light Pure Gold)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Ice Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPICE01~                                                           // Ice Mephit
+              ~MEPICE02~                                                           // Ice Mephit
+              ~OBSICE02~                                                           // Ice Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "420087552"                                                       // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "71"                                                              // major color (Frost Blue)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Radiant Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPRAD01~                                                           // Radiant Mephit
+              ~MEPRAD02~                                                           // Radiant Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "168299008"                                                       // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "74"                                                              // major color (Solid White)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Fire Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPFIR01~                                                           // Fire Mephit
+              ~ELEMEP04~                                                           // Fire Mephit
+              ~OBSFIR02~                                                           // Fire Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "529408"                                                          // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "67"                                                              // major color (Shiny Gold)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Lightning Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPLIG01~                                                           // Lightning Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "67174656"                                                        // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "60"                                                              // major color (Dark Purple)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Mineral Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPMIN01~                                                           // Mineral Mephit
+              ~ELEMEP07~                                                           // Mineral Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "67305984"                                                        // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "27"                                                              // major color (Gray)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Magma Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPMAG01~                                                           // Magma Mephit
+              ~MEPMAG02~                                                           // Magma Mephit
+              ~ELEMEP05~                                                           // Magma Mephit
+              ~OBSFIR03~                                                           // Magma Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "577106432"                                                       // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "46"                                                              // major color (Red)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Mist Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPMIS01~                                                           // Mist Mephit
+               ~AR18FAM~                                                           // Mist Mephit
+                ~GPFAM1~                                                           // Pitch
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "16973824"                                                        // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "32"                                                              // major color (Dark Sea Green)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Steam Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPSTE01~                                                           // Steam Mephit
+              ~ELEMEP02~                                                           // Steam Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "33555456"                                                        // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "61"                                                              // major color (Lavender)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Air Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPAIR01~                                                           // Air Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "84215040"                                                        // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "63"                                                              // major color (Light Gray)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Salt Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPSAL01~                                                           // Salt Mephit
+              ~ELEMEP03~                                                           // Salt Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "168232448"                                                       // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "79"                                                              // major color (Light Silver)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Dust Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPDUS01~                                                           // Dust Mephit
+              ~ELEMEP08~                                                           // Dust Mephit
+                ~MDDUST~                                                           // Dust Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "1684300800"                                                      // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "66"                                                              // major color (Faded Black)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Ooze Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPOOZ01~                                                           // Ooze Mephit
+              ~ELEMEP01~                                                           // Ooze Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "16711680"                                                        // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "69"                                                              // major color (Shiny Green)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Earth Mephit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MEPEAR01~                                                           // Earth Mephit
+              ~ELEMEP06~                                                           // Earth Mephit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "322527232"                                                       // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "41"                                                              // major color (Dark Brown)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Quasit
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~FAMQUAS~                                                            // Quasit (familiar SoA)
+             ~FAMQUA25~                                                            // Quasit (familiar ToB)
+             ~DEADDEM2~                                                            // Quasit
+              ~DQUAS01~                                                            // Quasit
+              ~GORTAN5~                                                            // Quasit
+             ~IMPQUA01~                                                            // Quasit
+              ~TELQUA1~                                                            // Quasit
+              ~TELQUA2~                                                            // Quasit
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "459520"                                                          // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "52"                                                              // major color (light green)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Imp
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~FAMIMP~                                                             // Imp (familiar SoA)
+            ~FAMIMP25~                                                             // Imp (familiar ToB)
+              ~DIMP01~                                                             // Imp
+              ~FSRIDD~                                                             // Imp
+             ~GORBAT4~                                                             // Imp
+            ~GORIMP01~                                                             // Imp
+               ~IMP01~                                                             // Imp
+            ~MEKIMP01~                                                             // Imp
+             ~RUMAR03~                                                             // Imp
+            ~SAHIMP01~                                                             // Imp
+            ~SAHIMP02~                                                             // Imp
+             ~TELIMP1~                                                             // Imp
+               ~UDIMP~                                                             // Imp
+            ~SEVPAT03~                                                             // Pooky
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "65280"                                                           // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "47"                                                              // major color (dark red)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Giant Troll
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~TROLGI01~                                                           // Giant Troll
+              ~TROLGI02~                                                           // Giant Troll
+              ~TROLLENS~                                                           // Giant Troll
+              ~CHALTROL~                                                           // Giant Troll
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "2024125440"                                                      // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "40"                                                              // major color (Dark Dirty Copper)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Snow Troll
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~OBSICE01~                                                           // Snow Troll
+              ~dw#trlbl~ 
+              ~dw#trlsn~
+              ~obsice11~ 
+              ~trolic03~ 
+              ~trolic04~ 
+              ~trolsn01~ 
+              ~trolsn02~
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "285540352"                                                       // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "68"                                                              // major color (Shiny Blue)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Greater Mummy
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~MUMGRE01~                                                           // Greater Mummy
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "16909568"                                                        // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "67"                                                              // major color (Shiny Gold)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Nishruu
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~NISHRUSU~                                                           // Nishruu
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "51" END                                                // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode (remove any existent tint)
+INT_VAR opcode_to_delete = "52" END                                                // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+SET opcode = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "9"                                                                   // timing mode: 9 (permanent after death)
+SET parameter1 = "64000"                                                           // param1: (color designation)
+SET parameter2 = "2"                                                               // param2: 2 (location - major color)
+SET parameter3 = "0"                                                               // param3: 0
+SET parameter4 = "0"                                                               // param4: 0
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SET school = "0"                                                                   // school: 0 (schoolless)
+SET lowestafflvl = "0"                                                             // lowest level affected: 0
+SET highestafflvl = "0"                                                            // highest level affected: 0
+SET casterx = "0"                                                                  // casterx: 0
+SET castery = "0"                                                                  // castery: 0
+SET targetx = "0"                                                                  // targetx: 0
+SET targety = "0"                                                                  // targety: 0
+SET casterlvl  = "0"                                                               // caster level: 0
+SET sectype = "0"                                                                  // secondary type: 0
+SPRINT ~resource~ ~~                                                               // resref: none
+SPRINT ~resource2~ ~~                                                              // resref2: none
+SPRINT ~resource3~ ~~                                                              // resref3: none
+SPRINT ~vvcresource~ ~~                                                            // vvcresref: none
+SPRINT ~effsource~ ~~                                                              // effsource: none
+SPRINT ~effvar~ ~~                                                                 // effvar: none
+LAUNCH_PATCH_MACRO ~ADD_CRE_EFFECT~                                                // add new creature effect
+WRITE_BYTE  0x2E "46"                                                              // major color (red)
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Nabassu
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~DEMNAB01~                                                           // Nabassu
+              ~DEMNAB02~                                                           // Nabassu
+              ~DEMNABSU~                                                           // Nabassu (summoned)
+              ~ENDDEM04~                                                           // Nabassu
+              ~ENDDEM05~                                                           // Nabassu
+              ~OBSDEM05~                                                           // Nabassu
+               ~PPNAB01~                                                           // Nabassu
+               ~PPNAB02~                                                           // Nabassu
+               ~PPNAB03~                                                           // Nabassu
+               ~PMASTER~                                                           // Master of Thralls (named Nabassu within the Planar Prison)
+               ~RUMAR02~                                                           // Nabassu
+                ~UDNABA~                                                           // Nabassu
+              ~ABYDEM01~                                                           // Tanar'ri (Nabassu within the Planar Sphere)
+              ~TANARI01~                                                           // Tanar'ri (Nabassu within the Planar Sphere)
+                 ~TANAR~                                                           // Aec'Letec (BGT)
+                ~_TANAR~                                                           // Aec'Letec (Tutu)
+              ~OBSDEM01~                                                           // Lea'liyl (named Nabassu within the Planar Sphere)
+              ~barbe2~ 
+              ~barbe3~ 
+              ~caddem13~ 
+              ~caddem5~
+              ~demnabr1~ 
+              ~demnabr2~
+              ~dw#nabsu~ 
+              ~enddem04~ 
+              ~enddem05~ 
+              ~esp04~ 
+              ~f_demdrg~ 
+              ~finnabas~
+              ~rumar02~ 
+              ~tg#dem2~ 
+              ~z#gnab01~ 
+              ~z#gnabas~
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+  WRITE_SHORT 0x28 "4352"                                                          // Sets avatar to TANARRI (winged demon)
+  WRITE_BYTE  0x2E "34"                                                            // major color (Light Green/Dark Blue)
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "-168490496"                                                      // param1: (color designation)
+  "parameter2" = "2"                                                               // param2: 2 (location - major color)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+  END                                                                              // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Pit Fiend
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+                ~DEMPIT~                                                           // Pit Fiend
+              ~DEMPIT01~                                                           // Pit Fiend
+              ~DEMPITSU~                                                           // Pit Fiend (summoned)
+               ~TELPIT1~                                                           // Pit Fiend
+               ~TELPIT2~                                                           // Pit Fiend
+               ~GORBAT1~                                                           // Ka'rashur (Watcher's Keep Baatezu leader)
+               ~caddem11~ 
+               ~caddem18~ 
+               ~caddem25~ 
+               ~caddem3~
+               ~dempitr1~ 
+               ~dempitr2~
+               ~dubnd11~
+               ~dw#bazpf~
+               ~dw#pitsu~ 
+               ~heldem3~ 
+               ~heldem4~ 
+               ~heldem5~ 
+               ~psbaatl~ 
+               ~rempitsu~ 
+               ~tg#dem1~ 
+               ~z#gpit01~ 
+               ~z#gpitfd~ 
+               ~z_whel1~ 
+               ~z_whel2~ 
+               ~z_whel3~ 
+               ~z_whel4~
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+  WRITE_SHORT 0x28 "4352"                                                          // Sets avatar to TANARRI (winged demon)
+  WRITE_BYTE  0x2E "47"                                                            // major color (dark red)
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "61440"                                                           // param1: (color designation)
+  "parameter2" = "2"                                                               // param2: 2 (location - major color)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+  END                                                                              // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Balor
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+               ~BALOR01~                                                           // Balor
+              ~DEMBAL01~                                                           // Balor
+              ~DEMBAL02~                                                           // Balor
+              ~DEMOSUM2~                                                           // Balor
+              ~ENDDEM03~                                                           // Balor
+                ~GORDEM~                                                           // Balor (mismatched animation fixed)
+              ~GORDEMC1~                                                           // Balor
+              ~JONDEM02~                                                           // Balor (mismatched animation fixed)
+              ~JONDEM04~                                                           // Balor (mismatched animation fixed)
+              ~M05DEMON~                                                           // Balor
+              ~MELSUM04~                                                           // Balor
+               ~SUDEMON~                                                           // Balor
+              ~SUDEMON2~                                                           // Balor
+              ~SUDEMDE1~                                                           // Balor
+              ~SUDEMDE2~                                                           // Balor
+               ~SUDEMW1~                                                           // Balor
+               ~TELBAL1~                                                           // Balor
+               ~TELBAL2~                                                           // Balor
+               ~UDBALOR~                                                           // Balor
+               ~GORTAN1~                                                           // Tahazzar (Watcher's Keep Tanar'ri leader)
+               ~acq50002~ 
+               ~actanar~ 
+               ~asham~ 
+               ~balorsu~ 
+               ~bw05jere~ 
+               ~caddem1~ 
+               ~caddem12~ 
+               ~caddem16~ 
+               ~caddem17~ 
+               ~caddem18~ 
+               ~caddem21~ 
+               ~caddem24~ 
+               ~caddem25~ 
+               ~caddem4~ 
+               ~caddem8~ 
+               ~caddem9~ 
+               ~cbmalrdm~ 
+               ~cbtanasu~ 
+               ~cratzyl~ 
+               ~decre#09~ 
+               ~delord~ 
+               ~dembalr1~ 
+               ~dembalsu~ 
+               ~dpdem01~ 
+               ~dsroach~ 
+               ~dubnd10~ 
+               ~dw#grbal~ 
+               ~eastdem2~ 
+               ~eastdem4~ 
+               ~eastdem7~ 
+               ~eastdem9~ 
+               ~endragor~ 
+               ~errtu~ 
+               ~errtu01~ 
+               ~errtu02~ 
+               ~errtu03~ 
+               ~f_demdrg~ 
+               ~f_errtu~ 
+               ~f_tanari~ 
+               ~f_tansum~ 
+               ~finbalor~ 
+               ~garg~ 
+               ~glourkis~ 
+               ~godmari4~ 
+               ~gordemc1~
+               ~heldem5~ 
+               ~hellfear~ 
+               ~hellgree~ 
+               ~hellprid~ 
+               ~hellself~ 
+               ~holytana~ 
+               ~jc_dem02~ 
+               ~m#ydemon~ 
+               ~ntdemon~ 
+               ~orcus~ 
+               ~ppdemon~ 
+               ~psdem01~ 
+               ~psdem02~ 
+               ~psdem03~ 
+               ~pstana01~ 
+               ~pstanal~ 
+               ~r#demon~ 
+               ~riattan1~ 
+               ~riattan2~ 
+               ~riattan3~ 
+               ~riftcr04~ 
+               ~rr#sbalr~ 
+               ~sudemde1~ 
+               ~sumtan01~ 
+               ~sumtan02~ 
+               ~tanarix1~ 
+               ~tanarixa~ 
+               ~tanarixb~ 
+               ~tannar~ 
+               ~tannar2~ 
+               ~tannar3~ 
+               ~tartar01~ 
+               ~tartarus~ 
+               ~tg#did3~ 
+               ~tg#did4~ 
+               ~va#balor~ 
+               ~w_rune~ 
+               ~yoshimoa~ 
+               ~z#gbalor~ 
+               ~z_2balor~ 
+               ~z_bered~ 
+               ~z_torta~ 
+               ~zy18bala~ 
+               ~zy18balb~ 
+               ~zy18balc~ 
+               ~zy18bald~ 
+               ~zy18bale~ 
+               ~zy18balf~ 
+               ~zy18balg~ 
+               ~zy18balh~ 
+               ~zy18bali~ 
+               ~zy18balj~ 
+               ~zy18balk~ 
+               ~zy18ball~ 
+               ~zy18balm~
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+  WRITE_SHORT 0x28 "4352"                                                          // Sets avatar to TANARRI (winged demon)
+  WRITE_BYTE  0x2E "35"                                                            // major color (orange)
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "16909824"                                                        // param1: (color designation)
+  "parameter2" = "2"                                                               // param2: 2 (location - major color)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+  END                                                                              // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+// Maurezhi
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+             ~DEMMAU01~                                                            // Maurezhi
+              ~GORTAN6~                                                            // Maurezhi
+             ~OBSDEM04~                                                            // Maurezhi
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+  WRITE_BYTE  0x2E "20"                                                            // major color (dark moldy green)
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "-1765239296"                                                     // param1: (color designation)
+  "parameter2" = "2"                                                               // param2: 2 (location - major color)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+  END                                                                              // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Bone Fiend
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~DBONEF01~                                                           // Bone Fiend
+               ~GORBAT5~                                                           // Bone Fiend
+              ~MELSUM02~                                                           // Bone Fiend
+              ~dw#vibon~
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+  WRITE_BYTE  0x2E "36"                                                            // major color (light dirty yellow)
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "2112284160"                                                      // param1: (color designation)
+  "parameter2" = "2"                                                               // param2: 2 (location - major color)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+  END                                                                              // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Abishai (Red)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~ABISRED1~                                                           // Abishai
+              ~DEMABI01~                                                           // Abishai
+              ~abishai1~ 
+              ~godabis1~ 
+              ~godabis2~ 
+              ~nsabish~ 
+              ~psbaat02~
+              ~psbaat2a~ 
+              ~rabi~ 
+              ~redabi01~ 
+              ~remorle~
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+  WRITE_BYTE  0x2E "46"                                                            // major color (red)
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "61440"                                                           // param1: (color designation)
+  "parameter2" = "2"                                                               // param2: 2 (location - major color)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+  END                                                                              // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Hellcat
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~GORCAMB6~                                                           // Hellcat
+              ~GORCAMB7~                                                           // Hellcat
+               ~HGFEL01~                                                           // Hellcat
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+WRITE_BYTE  0x2E "5"                                                               // major color (light silver)
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "1684300800"                                                      // param1: (color designation)
+  "parameter2" = "2"                                                               // param2: 2 (location - major color)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+  END                                                                              // ends FUNCTION call
+  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "65"                                                                  // effect: #65 (Blur)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "0"                                                               // param1: 0
+  "parameter2" = "0"                                                               // param2: 0
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+  END                                                                              // ends FUNCTION call
+  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "66"                                                                  // effect: #66 (Transparency Fade)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "240"                                                             // param1: (fade amount)
+  "parameter2" = "0"                                                               // param2: 0
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+  END                                                                              // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block

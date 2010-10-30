@@ -1,0 +1,287 @@
+
+INCLUDE FILE(include/definitions_beholder.ssl)
+
+INCLUDE FILE(include/baseinitial.ssl)
+//1 Magic Missile (2 missiles)
+//2 Burning Hands (8th level)
+//3 Wall of Ice
+//4 Slow
+//5 Enervation
+//6 Central eye (powers of deflection)
+
+//Improved Phantasmal Force
+
+IF
+  HitBy([ANYONE],0)
+  DamageTakenGT(10)
+  RandomNum(6,1)
+  Global("flDisabled1","LOCALS",0)
+THEN
+  RESPONSE #15
+    SetGlobal("flDisabled1","LOCALS",1)
+    DisplayStringHead(Myself,@1336)
+    ReallyForceSpellRES("fl#h10",Myself)
+  RESPONSE #85
+    Continue()
+END
+
+IF
+  HitBy([ANYONE],0)
+  DamageTakenGT(10)
+  RandomNum(6,2)
+  Global("flDisabled2","LOCALS",0)
+THEN
+  RESPONSE #15
+    SetGlobal("flDisabled2","LOCALS",1)
+    DisplayStringHead(Myself,@1337)
+    ReallyForceSpellRES("fl#h10",Myself)
+  RESPONSE #85
+    Continue()
+END
+
+IF
+  HitBy([ANYONE],0)
+  DamageTakenGT(10)
+  RandomNum(6,3)
+  Global("flDisabled3","LOCALS",0)
+THEN
+  RESPONSE #15
+    SetGlobal("flDisabled3","LOCALS",1)
+    DisplayStringHead(Myself,@1338)
+    ReallyForceSpellRES("fl#h10",Myself)
+  RESPONSE #85
+    Continue()
+END
+
+IF
+  HitBy([ANYONE],0)
+  DamageTakenGT(10)
+  RandomNum(6,4)
+  Global("flDisabled4","LOCALS",0)
+THEN
+  RESPONSE #15
+    SetGlobal("flDisabled4","LOCALS",1)
+    DisplayStringHead(Myself,@1327)
+    ReallyForceSpellRES("fl#h10",Myself)
+  RESPONSE #85
+    Continue()
+END
+
+IF
+  HitBy([ANYONE],0)
+  DamageTakenGT(10)
+  RandomNum(6,5)
+  Global("flDisabled5","LOCALS",0)
+THEN
+  RESPONSE #15
+    SetGlobal("flDisabled5","LOCALS",1)
+    DisplayStringHead(Myself,@1339)
+    ReallyForceSpellRES("fl#h10",Myself)
+  RESPONSE #85
+    Continue()
+END
+
+IF
+  HitBy([ANYONE],0)
+  DamageTakenGT(15)
+  RandomNum(6,6)
+  Global("flDisabled6","LOCALS",0)
+THEN
+  RESPONSE #15
+    SetGlobal("flDisabled6","LOCALS",1)
+    DisplayStringHead(Myself,@1330)
+    ReallyForceSpellRES("fl#bhdir",Myself)
+    ReallyForceSpellRES("fl#h25",Myself)
+  RESPONSE #85
+    Continue()
+END
+
+IF
+  !GlobalTimerNotExpired("flRound","LOCALS")
+THEN
+  RESPONSE #100
+    BEGIN LOOP(loopvar||1;2;3;4;5)
+      SetGlobal("flUseEyeloopvar","LOCALS",1)
+    END LOOP
+    SetGlobalTimer("flRound","LOCALS",6)
+END
+
+//1 Magic Missile (2 missiles)
+//2 Burning Hands (8th level)
+//3 Wall of Ice
+//4 Slow
+//5 Enervation
+
+///////////////////////////////
+//Enervation
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled5","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TriggerBlock(Disabled|Enemy|LevelDrain|SINec)
+  CheckStatGT(scstarget,0,EXTRAPROFICIENCY20)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhenr",flUseEye5|100|50)
+END
+
+IF TRIGGER
+  Global("flDisabled5","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TriggerBlock(Disabled|Enemy|LevelDrain|SINec)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhenr",flUseEye5|100|50)
+END
+
+///////////////////////////////
+//Slow
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled4","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TriggerBlock(Disabled|Enemy|SIAlt|Slow)
+  !StateCheck(scstarget,STATE_SLOWED)
+THEN DO
+  Combine()
+  Action(BeholderRay,BEHOLDER_SLOW,flUseEye4|100|50)
+END
+
+///////////////////////////////
+//Wall of Ice
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled3","LOCALS",0)
+  TargetBlock(EnemiesReverse)
+  TriggerBlock(Disabled|Enemy|ColdRes75|SIEvo)
+  !Range(scstarget,15)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Action(BeholderRayRES,"fl#icew",flUseEye3|100|100)
+END
+
+///////////////////////////////
+//Magic Missile
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled1","LOCALS",0)
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(Disabled|Enemy|SIEvo)
+  !HPPercentGT(scstarget,25)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhmm",flUseEye1|100|50)
+END
+
+IF TRIGGER
+  Global("flDisabled1","LOCALS",0)
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(Disabled|Enemy|SIEvo)
+  !HPPercentGT(scstarget,50)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhmm",flUseEye1|100|50)
+END
+
+IF TRIGGER
+  Global("flDisabled1","LOCALS",0)
+  TargetBlock(PCsPreferringWeak)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|SIEvo)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhmm",flUseEye1|100|50)
+END
+
+///////////////////////////////
+//Burning Hands
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled2","LOCALS",0)
+  TargetBlock(PlayersInOrder)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|SIEvo|FireRes75)
+  Range(scstarget,5)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhbrn",flUseEye2|100|100)
+END
+
+//Go after disabhled
+
+///////////////////////////////
+//Enervation
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled5","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TriggerBlock(Enemy|LevelDrain|SINec)
+  CheckStatGT(scstarget,0,EXTRAPROFICIENCY20)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhenr",flUseEye5|100|50)
+END
+
+///////////////////////////////
+//Enervation
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled5","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TriggerBlock(Enemy|LevelDrain|SINec)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhenr",flUseEye5|100|50)
+END
+
+///////////////////////////////
+//Wall of Ice
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled3","LOCALS",0)
+  TargetBlock(EnemiesReverse)
+  TriggerBlock(Enemy|ColdRes75|SIEvo)
+  !Range(scstarget,15)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Action(BeholderRayRES,"fl#icew",flUseEye3|100|100)
+END
+
+///////////////////////////////
+//Magic Missile
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled1","LOCALS",0)
+  TargetBlock(PCsPreferringWeak)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Enemy|SIEvo)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhmm",flUseEye1|100|50)
+END
+
+///////////////////////////////
+//Burning Hands
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled2","LOCALS",0)
+  TargetBlock(PlayersInOrder)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Enemy|SIEvo|FireRes75)
+  Range(scstarget,5)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhbrn",flUseEye2|100|100)
+END
+
+INCLUDE FILE(beholder/attack.ssl)
+
+INCLUDE FILE(include/baseend.ssl)
+
+

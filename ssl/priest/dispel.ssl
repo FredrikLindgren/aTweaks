@@ -1,0 +1,23 @@
+IF TRIGGER
+  TargetBlock(EnemiesReverse)
+  TriggerBlock(Enemy|SIAbj|CanCastPriest)
+  OR(9)
+    CheckStatGT(scstarget,0,STONESKINS)
+    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+    StateCheck(scstarget,STATE_MIRRORIMAGE)
+    CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
+    CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+    CheckStatGT(scstarget,0,SCRIPTINGSTATE2) //Death Ward, I presume
+    CheckStatGT(scstarget,0,SCRIPTINGSTATE6)
+    StateCheck(scstarget,STATE_HASTED)
+    Gender(scstarget,ILLUSIONARY)
+  BEGIN LOOP(sslvar||1;2;3;4;5;6)
+    !StateCheck(Playersslvar,STATE_DISABLED)
+    !StateCheck(Playersslvar,STATE_SILENCED)
+    !CheckStatGT(Playersslvar,0,CLERIC_INSECT_PLAGUE)
+    !Allegiance(Playersslvar,ENEMY)
+  END LOOP
+  !Range(scstarget,20)
+THEN DO
+  Action(Spell,CLERIC_DISPEL_MAGIC|100|100)
+END

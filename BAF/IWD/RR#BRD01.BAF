@@ -1,0 +1,223 @@
+// Title: Simple Bard script
+// Date Created: September 24, 2002
+// Created by: aVENGER
+// Note: doesn't require Detectable Spells
+// IWD-adapted by Wisp
+
+
+// Switch between constantly singing and singing only during combat (the "D" key toggles between modes)
+
+IF
+	Global("RR#BRDS","LOCALS",0)
+	HotKey(D)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#BRDS","LOCALS",1)
+		FloatMessage(Myself,@233) // Singing constantly if idle
+END
+
+IF
+	Global("RR#BRDS","LOCALS",1)
+	HotKey(D)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#BRDS","LOCALS",2)
+		FloatMessage(Myself,@234) // Singing only during combat
+END
+
+IF
+  Global("rr#brds","LOCALS",2)
+  HotKey(D)
+THEN
+  RESPONSE #100
+    SetGlobal("rr#brds","LOCALS",0)
+    FloatMessage(Myself,@237) //Singing only when not in combat
+END
+
+
+
+// Switch between attacking enemies and not attacking (the "V" key toggles between modes)
+
+IF
+	Global("RR#BRDA","LOCALS",0)
+	HotKey(V)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#BRDA","LOCALS",1)
+		FloatMessage(Myself,@235) // Attacking enemies
+END
+
+IF
+	Global("RR#BRDA","LOCALS",1)
+	HotKey(V)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#BRDA","LOCALS",0)
+		FloatMessage(Myself,@236) // Not attacking enemies
+END
+
+IF 
+  !GlobalTimerNotExpired("flInCombat","LOCALS")
+  OR(7)
+    See([EVILCUTOFF]%SeeDead%)
+    HitBy(Player1,0)
+    HitBy(Player2,0)
+    HitBy(Player3,0)
+    HitBy(Player4,0)
+    HitBy(Player5,0)
+    HitBy(Player6,0)
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flInCombat","LOCALS",6)
+END
+
+IF
+  Global("RR#BRDA","LOCALS",0)
+  !Global("rr#brds","LOCALS",0)
+  OR(2)
+    See([EVILCUTOFF]%SeeDead%)
+    GlobalTimerNotExpired("flInCombat","LOCALS")
+  ActionListEmpty()
+  ClassEx(Myself,BARD)
+  CheckStatGT(Myself,2,%LevelBard%)
+  OR(6)
+    StateCheck(Player1,STATE_PANIC)
+    StateCheck(Player2,STATE_PANIC)
+    StateCheck(Player3,STATE_PANIC)
+    StateCheck(Player4,STATE_PANIC)
+    StateCheck(Player5,STATE_PANIC)
+    StateCheck(Player6,STATE_PANIC)
+  !ModalState(Myself,BATTLESONG)
+THEN
+  RESPONSE #100
+    PlayBardSong(THE_TALE_OF_CURRAN_STRONGHEART)
+END
+
+IF
+  Global("RR#BRDA","LOCALS",0)
+  !Global("RR#BRDS","LOCALS",2)
+  OR(2)
+    !See([EVILCUTOFF]%SeeDead%)
+    !GlobalTimerNotExpired("flInCombat","LOCALS")
+  ActionListEmpty()
+  ClassEx(Myself,BARD)
+  CheckStatGT(Myself,2,%LevelBard%)
+  OR(6)
+    StateCheck(Player1,STATE_PANIC)
+    StateCheck(Player2,STATE_PANIC)
+    StateCheck(Player3,STATE_PANIC)
+    StateCheck(Player4,STATE_PANIC)
+    StateCheck(Player5,STATE_PANIC)
+    StateCheck(Player6,STATE_PANIC)
+  !ModalState(Myself,BATTLESONG)
+THEN
+  RESPONSE #100
+    PlayBardSong(THE_TALE_OF_CURRAN_STRONGHEART)
+END
+
+IF
+  ActionListEmpty()
+  ClassEx(Myself,BARD)
+  CheckStatGT(Myself,4,%LevelBard%)
+  OR(2)
+    !See([EVILCUTOFF]%SeeDead%)
+    !GlobalTimerNotExpired("flInCombat","LOCALS")
+  !Global("rr#brds","LOCALS",2)
+  !ModalState(Myself,BATTLESONG)
+THEN
+  RESPONSE #100
+    PlayBardSong(TYMORAS_MELODY)
+END
+
+IF
+  Global("RR#BRDA","LOCALS",0)
+  ActionListEmpty()
+  ClassEx(Myself,BARD)
+  CheckStatLT(Myself,11,%LevelBard%)
+  OR(2)
+    See([EVILCUTOFF]%SeeDead%)
+    GlobalTimerNotExpired("flInCombat","LOCALS")
+  !Global("rr#brds","LOCALS",0)
+  !ModalState(Myself,BATTLESONG)
+THEN
+  RESPONSE #100
+    PlayBardSong(THE_BALLAD_OF_THE_THREE_HEROES)
+END
+
+IF
+  Global("RR#BRDA","LOCALS",0)
+  ActionListEmpty()
+  ClassEx(Myself,BARD)
+  CheckStatGT(Myself,10,%LevelBard%)
+  OR(2)
+    See([EVILCUTOFF]%SeeDead%)
+    GlobalTimerNotExpired("flInCombat","LOCALS")
+  !Global("rr#brds","LOCALS",0)
+  !ModalState(Myself,BATTLESONG)
+THEN
+  RESPONSE #100
+    PlayBardSong(THE_WAR_CHANT_OF_SITH)
+END
+
+/*
+// Sing Battlesong whenever the character is idle (doesn't interrupt player input)
+
+IF
+	Global("RR#BRDA","LOCALS",0)
+	Global("RR#BRDS","LOCALS",1)
+	ActionListEmpty()
+	Class(Myself,BARD_ALL)
+	!ModalState(Myself,BATTLESONG)
+THEN
+	RESPONSE #100
+		BattleSong()
+END
+
+
+// Sing Battlesong during combat and when enemies are nearby, but only if idle (doesn't interrupt player input)
+
+IF
+	Global("RR#BRDA","LOCALS",0)
+	Global("RR#BRDS","LOCALS",0)
+	ActionListEmpty()
+	Class(Myself,BARD_ALL)
+	!ModalState(Myself,BATTLESONG)
+	OR(2)
+	  See([EVILCUTOFF])
+	  CombatCounterGT(0)
+THEN
+	RESPONSE #100
+		BattleSong()
+END
+*/
+
+// Stop singing if there was no combat activity for at least 30 seconds and no enemies are nearby, but only if idle (doesn't interrupt player input)
+
+IF
+	Global("RR#BRDA","LOCALS",0)
+	Global("RR#BRDS","LOCALS",2)
+	ActionListEmpty()
+	ClassEx(Myself,BARD)
+	ModalState(Myself,BATTLESONG)
+	!See([EVILCUTOFF]%SeeDead%)
+	!GlobalTimerNotExpired("flInCombat","LOCALS")
+	Delay(30)
+THEN
+	RESPONSE #100
+		ClearActions(Myself)
+END
+
+// Attack the nearest enemy but not while under the effects of Invisibility and/or Sanctuary
+
+IF
+	Global("RR#BRDA","LOCALS",1)
+	ActionListEmpty()
+	ClassEx(Myself,BARD)
+	!StateCheck(Myself,STATE_INVISIBLE)
+	CheckStatLT(Myself,1,SANCTUARY)
+	See([EVILCUTOFF]%SeeDead%)
+	!InParty([EVILCUTOFF])
+THEN
+	RESPONSE #100
+		AttackReevaluate([EVILCUTOFF],30)
+END

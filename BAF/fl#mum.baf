@@ -1,0 +1,1564 @@
+IF
+!StateCheck(Myself,STATE_REALLY_DEAD)
+!GlobalTimerNotExpired("flFearAura","LOCALS")
+Detect(NearestEnemyOf(Myself))
+THEN
+RESPONSE #100
+SetGlobalTimer("flFearAura","LOCALS",30)
+ForceSpellRES("fl#mumfa",Myself)
+Continue()
+END
+
+IF
+!Detect(NearestEnemyOf(Myself))
+Global("flRest","LOCALS",1)
+!GlobalTimerNotExpired("flRestTimer","LOCALS")
+THEN
+RESPONSE #100
+SetGlobal("flRest","LOCALS",0)
+ApplySpell(Myself,RESTORE_FULL_HEALTH)
+Rest()
+END
+
+IF
+!GlobalTimerNotExpired("flRestTimer","LOCALS")
+Detect(NearestEnemyOf(Myself))
+Global("flRest","LOCALS",0)
+THEN
+RESPONSE #100
+SetGlobalTimer("flRestTimer","LOCALS",2400)
+SetGlobal("flRest","LOCALS",1)
+END
+
+IF
+Global("flActive","LOCALS",0)
+HitBy([GOODCUTOFF],0)
+!Allegiance(Myself,GOODCUTOFF)
+THEN
+RESPONSE #100
+SetGlobal("flActive","LOCALS",1)
+Enemy()
+Continue()
+END
+
+IF
+Global("flActive","LOCALS",0)
+Allegiance(Myself,EVILCUTOFF)
+See([GOODCUTOFF])
+THEN
+RESPONSE #100
+SetGlobal("flActive","LOCALS",1)
+Continue()
+END
+
+IF
+OR(13)
+HitBy([GOODCUTOFF],0)
+AttackedBy([GOODCUTOFF.0.0.0.0.SUMMONED],DEFAULT)
+AttackedBy([PC],DEFAULT)
+AttackedBy([FAMILIAR],DEFAULT)
+AttackedBy([ALLY],DEFAULT)
+AttackedBy([CONTROLLED],DEFAULT)
+AttackedBy([CHARMED],DEFAULT)
+SpellCastOnMe([GOODCUTOFF.0.0.0.0.SUMMONED],0)
+SpellCastOnMe([PC],0)
+SpellCastOnMe([FAMILIAR],0)
+SpellCastOnMe([ALLY],0)
+SpellCastOnMe([CONTROLLED],0)
+SpellCastOnMe([CHARMED],0)
+!GlobalTimerNotExpired("whatthe","LOCALS")
+!See([GOODCUTOFF])
+THEN
+RESPONSE #100
+Enemy()
+SetGlobalTimer("whatthe","LOCALS",12)
+Continue()
+END
+
+IF
+!See([GOODCUTOFF])
+GlobalTimerNotExpired("whatthe","LOCALS")
+THEN
+RESPONSE #100
+RandomWalkContinuous()
+END
+
+IF
+See([GOODCUTOFF])
+GlobalTimerNotExpired("whatthe","LOCALS")
+THEN
+RESPONSE #100
+ClearActions(Myself)
+SetGlobalTimer("whatthe","LOCALS",0)
+END
+
+IF
+Global("flActive","LOCALS",0)
+!Detect(NearestEnemyOf(Myself))
+THEN
+RESPONSE #100
+NoAction()
+END
+
+IF
+StateCheck(Myself,STATE_PANIC)
+THEN
+RESPONSE #100
+RandomWalkContinuous()
+END
+
+IF
+StateCheck(Myself,STATE_CHARMED)
+See(NearestEnemyOf(Myself))
+ActionListEmpty()
+!Range(LastSeenBy(Myself),5)
+THEN
+RESPONSE #100
+EquipRanged()
+Attack(LastSeenBy(Myself))
+END
+
+IF
+StateCheck(Myself,STATE_CHARMED)
+See(NearestEnemyOf(Myself))
+ActionListEmpty()
+Range(LastSeenBy(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+Attack(LastSeenBy(Myself))
+END
+
+IF
+See(Player1)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer1","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer1","LOCALS",6)
+Continue()
+END
+
+IF
+See(Player2)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer2","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer2","LOCALS",6)
+Continue()
+END
+
+IF
+See(Player3)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer3","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer3","LOCALS",6)
+Continue()
+END
+
+IF
+See(Player4)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer4","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer4","LOCALS",6)
+Continue()
+END
+
+IF
+See(Player5)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer5","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer5","LOCALS",6)
+Continue()
+END
+
+IF
+See(Player6)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer6","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer6","LOCALS",6)
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE])
+CheckStatLT([PC.0.0.MAGE],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE],0,HELD)
+!StateCheck([PC.0.0.MAGE],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE],ENEMY)
+Range([PC.0.0.MAGE],5)
+HPPercentLT([PC.0.0.MAGE],25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.SORCERER])
+CheckStatLT([PC.0.0.SORCERER],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.SORCERER],0,STONESKINS)
+!StateCheck([PC.0.0.SORCERER],STATE_DISABLED)
+!CheckStatGT([PC.0.0.SORCERER],0,HELD)
+!StateCheck([PC.0.0.SORCERER],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.SORCERER],ENEMY)
+Range([PC.0.0.SORCERER],5)
+HPPercentLT([PC.0.0.SORCERER],25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.SORCERER])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE_THIEF])
+CheckStatLT([PC.0.0.MAGE_THIEF],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,HELD)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_THIEF],ENEMY)
+Range([PC.0.0.MAGE_THIEF],5)
+HPPercentLT([PC.0.0.MAGE_THIEF],25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE_THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.THIEF])
+CheckStatLT([PC.0.0.THIEF],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.THIEF],0,HELD)
+!StateCheck([PC.0.0.THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF],ENEMY)
+Range([PC.0.0.THIEF],5)
+HPPercentLT([PC.0.0.THIEF],25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.BARD])
+CheckStatLT([PC.0.0.BARD],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.BARD],0,STONESKINS)
+!StateCheck([PC.0.0.BARD],STATE_DISABLED)
+!CheckStatGT([PC.0.0.BARD],0,HELD)
+!StateCheck([PC.0.0.BARD],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.BARD],ENEMY)
+Range([PC.0.0.BARD],5)
+HPPercentLT([PC.0.0.BARD],25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.BARD])
+RESPONSE #100
+Continue()
+END
+
+IF
+See(NearestEnemyOf(Myself))
+CheckStatLT(NearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(NearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOf(Myself),0,HELD)
+!StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(NearestEnemyOf(Myself),ENEMY)
+Range(NearestEnemyOf(Myself),5)
+HPPercentLT(NearestEnemyOf(Myself),25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(NearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SecondNearestEnemyOf(Myself))
+CheckStatLT(SecondNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearestEnemyOf(Myself),ENEMY)
+Range(SecondNearestEnemyOf(Myself),5)
+HPPercentLT(SecondNearestEnemyOf(Myself),25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SecondNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(ThirdNearestEnemyOf(Myself))
+CheckStatLT(ThirdNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearestEnemyOf(Myself),ENEMY)
+Range(ThirdNearestEnemyOf(Myself),5)
+HPPercentLT(ThirdNearestEnemyOf(Myself),25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(ThirdNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FourthNearestEnemyOf(Myself))
+CheckStatLT(FourthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearestEnemyOf(Myself),ENEMY)
+Range(FourthNearestEnemyOf(Myself),5)
+HPPercentLT(FourthNearestEnemyOf(Myself),25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FourthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FifthNearestEnemyOf(Myself))
+CheckStatLT(FifthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearestEnemyOf(Myself),ENEMY)
+Range(FifthNearestEnemyOf(Myself),5)
+HPPercentLT(FifthNearestEnemyOf(Myself),25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FifthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SixthNearestEnemyOf(Myself))
+CheckStatLT(SixthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearestEnemyOf(Myself),ENEMY)
+Range(SixthNearestEnemyOf(Myself),5)
+HPPercentLT(SixthNearestEnemyOf(Myself),25)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SixthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE])
+CheckStatLT([PC.0.0.MAGE],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE],0,HELD)
+!StateCheck([PC.0.0.MAGE],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE],ENEMY)
+Range([PC.0.0.MAGE],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.SORCERER])
+CheckStatLT([PC.0.0.SORCERER],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.SORCERER],0,STONESKINS)
+!StateCheck([PC.0.0.SORCERER],STATE_DISABLED)
+!CheckStatGT([PC.0.0.SORCERER],0,HELD)
+!StateCheck([PC.0.0.SORCERER],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.SORCERER],ENEMY)
+Range([PC.0.0.SORCERER],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.SORCERER])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE_THIEF])
+CheckStatLT([PC.0.0.MAGE_THIEF],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,HELD)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_THIEF],ENEMY)
+Range([PC.0.0.MAGE_THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE_THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.THIEF])
+CheckStatLT([PC.0.0.THIEF],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.THIEF],0,HELD)
+!StateCheck([PC.0.0.THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF],ENEMY)
+Range([PC.0.0.THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.BARD])
+CheckStatLT([PC.0.0.BARD],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.BARD],0,STONESKINS)
+!StateCheck([PC.0.0.BARD],STATE_DISABLED)
+!CheckStatGT([PC.0.0.BARD],0,HELD)
+!StateCheck([PC.0.0.BARD],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.BARD],ENEMY)
+Range([PC.0.0.BARD],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.BARD])
+RESPONSE #100
+Continue()
+END
+
+IF
+See(NearestEnemyOf(Myself))
+CheckStatLT(NearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(NearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOf(Myself),0,HELD)
+!StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(NearestEnemyOf(Myself),ENEMY)
+Range(NearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(NearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SecondNearestEnemyOf(Myself))
+CheckStatLT(SecondNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearestEnemyOf(Myself),ENEMY)
+Range(SecondNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SecondNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(ThirdNearestEnemyOf(Myself))
+CheckStatLT(ThirdNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearestEnemyOf(Myself),ENEMY)
+Range(ThirdNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(ThirdNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FourthNearestEnemyOf(Myself))
+CheckStatLT(FourthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearestEnemyOf(Myself),ENEMY)
+Range(FourthNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FourthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FifthNearestEnemyOf(Myself))
+CheckStatLT(FifthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearestEnemyOf(Myself),ENEMY)
+Range(FifthNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FifthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SixthNearestEnemyOf(Myself))
+CheckStatLT(SixthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearestEnemyOf(Myself),ENEMY)
+Range(SixthNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SixthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE])
+CheckStatLT([PC.0.0.MAGE],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE],0,HELD)
+!StateCheck([PC.0.0.MAGE],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE],ENEMY)
+Range([PC.0.0.MAGE],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.SORCERER])
+CheckStatLT([PC.0.0.SORCERER],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.SORCERER],0,STONESKINS)
+!StateCheck([PC.0.0.SORCERER],STATE_DISABLED)
+!CheckStatGT([PC.0.0.SORCERER],0,HELD)
+!StateCheck([PC.0.0.SORCERER],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.SORCERER],ENEMY)
+Range([PC.0.0.SORCERER],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.SORCERER])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE_THIEF])
+CheckStatLT([PC.0.0.MAGE_THIEF],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,HELD)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_THIEF],ENEMY)
+Range([PC.0.0.MAGE_THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE_THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.THIEF])
+CheckStatLT([PC.0.0.THIEF],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.THIEF],0,HELD)
+!StateCheck([PC.0.0.THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF],ENEMY)
+Range([PC.0.0.THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.BARD])
+CheckStatLT([PC.0.0.BARD],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.BARD],0,STONESKINS)
+!StateCheck([PC.0.0.BARD],STATE_DISABLED)
+!CheckStatGT([PC.0.0.BARD],0,HELD)
+!StateCheck([PC.0.0.BARD],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.BARD],ENEMY)
+Range([PC.0.0.BARD],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.BARD])
+RESPONSE #100
+Continue()
+END
+
+IF
+See(NearestEnemyOf(Myself))
+CheckStatLT(NearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(NearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOf(Myself),0,HELD)
+!StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(NearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(NearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SecondNearestEnemyOf(Myself))
+CheckStatLT(SecondNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SecondNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(ThirdNearestEnemyOf(Myself))
+CheckStatLT(ThirdNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(ThirdNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FourthNearestEnemyOf(Myself))
+CheckStatLT(FourthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FourthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FifthNearestEnemyOf(Myself))
+CheckStatLT(FifthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FifthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SixthNearestEnemyOf(Myself))
+CheckStatLT(SixthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SixthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE])
+!CheckStatGT([PC.0.0.MAGE],75,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE],0,HELD)
+!StateCheck([PC.0.0.MAGE],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE],ENEMY)
+Range([PC.0.0.MAGE],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.SORCERER])
+!CheckStatGT([PC.0.0.SORCERER],75,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.SORCERER],0,STONESKINS)
+!StateCheck([PC.0.0.SORCERER],STATE_DISABLED)
+!CheckStatGT([PC.0.0.SORCERER],0,HELD)
+!StateCheck([PC.0.0.SORCERER],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.SORCERER],ENEMY)
+Range([PC.0.0.SORCERER],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.SORCERER])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE_THIEF])
+!CheckStatGT([PC.0.0.MAGE_THIEF],75,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,HELD)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_THIEF],ENEMY)
+Range([PC.0.0.MAGE_THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE_THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.THIEF])
+!CheckStatGT([PC.0.0.THIEF],75,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.THIEF],0,HELD)
+!StateCheck([PC.0.0.THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF],ENEMY)
+Range([PC.0.0.THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.BARD])
+!CheckStatGT([PC.0.0.BARD],75,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.BARD],0,STONESKINS)
+!StateCheck([PC.0.0.BARD],STATE_DISABLED)
+!CheckStatGT([PC.0.0.BARD],0,HELD)
+!StateCheck([PC.0.0.BARD],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.BARD],ENEMY)
+Range([PC.0.0.BARD],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.BARD])
+RESPONSE #100
+Continue()
+END
+
+IF
+See(NearestEnemyOf(Myself))
+!CheckStatGT(NearestEnemyOf(Myself),75,RESISTCRUSHING)
+!CheckStatGT(NearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOf(Myself),0,HELD)
+!StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(NearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(NearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SecondNearestEnemyOf(Myself))
+!CheckStatGT(SecondNearestEnemyOf(Myself),75,RESISTCRUSHING)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SecondNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(ThirdNearestEnemyOf(Myself))
+!CheckStatGT(ThirdNearestEnemyOf(Myself),75,RESISTCRUSHING)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(ThirdNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FourthNearestEnemyOf(Myself))
+!CheckStatGT(FourthNearestEnemyOf(Myself),75,RESISTCRUSHING)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FourthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FifthNearestEnemyOf(Myself))
+!CheckStatGT(FifthNearestEnemyOf(Myself),75,RESISTCRUSHING)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FifthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SixthNearestEnemyOf(Myself))
+!CheckStatGT(SixthNearestEnemyOf(Myself),75,RESISTCRUSHING)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SixthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE])
+!CheckStatGT([PC.0.0.MAGE],75,RESISTCRUSHING)
+!StateCheck([PC.0.0.MAGE],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE],0,HELD)
+!StateCheck([PC.0.0.MAGE],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE],ENEMY)
+Range([PC.0.0.MAGE],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.SORCERER])
+!CheckStatGT([PC.0.0.SORCERER],75,RESISTCRUSHING)
+!StateCheck([PC.0.0.SORCERER],STATE_DISABLED)
+!CheckStatGT([PC.0.0.SORCERER],0,HELD)
+!StateCheck([PC.0.0.SORCERER],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.SORCERER],ENEMY)
+Range([PC.0.0.SORCERER],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.SORCERER])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE_THIEF])
+!CheckStatGT([PC.0.0.MAGE_THIEF],75,RESISTCRUSHING)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,HELD)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_THIEF],ENEMY)
+Range([PC.0.0.MAGE_THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE_THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.THIEF])
+!CheckStatGT([PC.0.0.THIEF],75,RESISTCRUSHING)
+!StateCheck([PC.0.0.THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.THIEF],0,HELD)
+!StateCheck([PC.0.0.THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF],ENEMY)
+Range([PC.0.0.THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.BARD])
+!CheckStatGT([PC.0.0.BARD],75,RESISTCRUSHING)
+!StateCheck([PC.0.0.BARD],STATE_DISABLED)
+!CheckStatGT([PC.0.0.BARD],0,HELD)
+!StateCheck([PC.0.0.BARD],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.BARD],ENEMY)
+Range([PC.0.0.BARD],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.BARD])
+RESPONSE #100
+Continue()
+END
+
+IF
+See(NearestEnemyOf(Myself))
+!CheckStatGT(NearestEnemyOf(Myself),75,RESISTCRUSHING)
+!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOf(Myself),0,HELD)
+!StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(NearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(NearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SecondNearestEnemyOf(Myself))
+!CheckStatGT(SecondNearestEnemyOf(Myself),75,RESISTCRUSHING)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SecondNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(ThirdNearestEnemyOf(Myself))
+!CheckStatGT(ThirdNearestEnemyOf(Myself),75,RESISTCRUSHING)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(ThirdNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FourthNearestEnemyOf(Myself))
+!CheckStatGT(FourthNearestEnemyOf(Myself),75,RESISTCRUSHING)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FourthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FifthNearestEnemyOf(Myself))
+!CheckStatGT(FifthNearestEnemyOf(Myself),75,RESISTCRUSHING)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FifthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SixthNearestEnemyOf(Myself))
+!CheckStatGT(SixthNearestEnemyOf(Myself),75,RESISTCRUSHING)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SixthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE])
+!CheckStatGT([PC.0.0.MAGE],99,RESISTCRUSHING)
+!StateCheck([PC.0.0.MAGE],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE],0,HELD)
+!StateCheck([PC.0.0.MAGE],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE],ENEMY)
+Range([PC.0.0.MAGE],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.SORCERER])
+!CheckStatGT([PC.0.0.SORCERER],99,RESISTCRUSHING)
+!StateCheck([PC.0.0.SORCERER],STATE_DISABLED)
+!CheckStatGT([PC.0.0.SORCERER],0,HELD)
+!StateCheck([PC.0.0.SORCERER],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.SORCERER],ENEMY)
+Range([PC.0.0.SORCERER],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.SORCERER])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE_THIEF])
+!CheckStatGT([PC.0.0.MAGE_THIEF],99,RESISTCRUSHING)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,HELD)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_THIEF],ENEMY)
+Range([PC.0.0.MAGE_THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE_THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.THIEF])
+!CheckStatGT([PC.0.0.THIEF],99,RESISTCRUSHING)
+!StateCheck([PC.0.0.THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.THIEF],0,HELD)
+!StateCheck([PC.0.0.THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF],ENEMY)
+Range([PC.0.0.THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.BARD])
+!CheckStatGT([PC.0.0.BARD],99,RESISTCRUSHING)
+!StateCheck([PC.0.0.BARD],STATE_DISABLED)
+!CheckStatGT([PC.0.0.BARD],0,HELD)
+!StateCheck([PC.0.0.BARD],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.BARD],ENEMY)
+Range([PC.0.0.BARD],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.BARD])
+RESPONSE #100
+Continue()
+END
+
+IF
+See(NearestEnemyOf(Myself))
+!CheckStatGT(NearestEnemyOf(Myself),99,RESISTCRUSHING)
+!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOf(Myself),0,HELD)
+!StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(NearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(NearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SecondNearestEnemyOf(Myself))
+!CheckStatGT(SecondNearestEnemyOf(Myself),99,RESISTCRUSHING)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SecondNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(ThirdNearestEnemyOf(Myself))
+!CheckStatGT(ThirdNearestEnemyOf(Myself),99,RESISTCRUSHING)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(ThirdNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FourthNearestEnemyOf(Myself))
+!CheckStatGT(FourthNearestEnemyOf(Myself),99,RESISTCRUSHING)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FourthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FifthNearestEnemyOf(Myself))
+!CheckStatGT(FifthNearestEnemyOf(Myself),99,RESISTCRUSHING)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FifthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SixthNearestEnemyOf(Myself))
+!CheckStatGT(SixthNearestEnemyOf(Myself),99,RESISTCRUSHING)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SixthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE])
+!CheckStatGT([PC.0.0.MAGE],99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE],ENEMY)
+Range([PC.0.0.MAGE],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.SORCERER])
+!CheckStatGT([PC.0.0.SORCERER],99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.SORCERER],ENEMY)
+Range([PC.0.0.SORCERER],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.SORCERER])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.MAGE_THIEF])
+!CheckStatGT([PC.0.0.MAGE_THIEF],99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_THIEF],ENEMY)
+Range([PC.0.0.MAGE_THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.MAGE_THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.THIEF])
+!CheckStatGT([PC.0.0.THIEF],99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF],ENEMY)
+Range([PC.0.0.THIEF],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+See([PC.0.0.BARD])
+!CheckStatGT([PC.0.0.BARD],99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.BARD],ENEMY)
+Range([PC.0.0.BARD],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound([PC.0.0.BARD])
+RESPONSE #100
+Continue()
+END
+
+IF
+See(NearestEnemyOf(Myself))
+!CheckStatGT(NearestEnemyOf(Myself),99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(NearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(NearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SecondNearestEnemyOf(Myself))
+!CheckStatGT(SecondNearestEnemyOf(Myself),99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SecondNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(ThirdNearestEnemyOf(Myself))
+!CheckStatGT(ThirdNearestEnemyOf(Myself),99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(ThirdNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FourthNearestEnemyOf(Myself))
+!CheckStatGT(FourthNearestEnemyOf(Myself),99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FourthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(FifthNearestEnemyOf(Myself))
+!CheckStatGT(FifthNearestEnemyOf(Myself),99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(FifthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+See(SixthNearestEnemyOf(Myself))
+!CheckStatGT(SixthNearestEnemyOf(Myself),99,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearestEnemyOf(Myself),ENEMY)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackOneRound(SixthNearestEnemyOf(Myself))
+RESPONSE #100
+Continue()
+END
+
+IF
+!See([GOODCUTOFF])
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer1","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player1)
+END
+
+IF
+!See([GOODCUTOFF])
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer2","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player2)
+END
+
+IF
+!See([GOODCUTOFF])
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer3","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player3)
+END
+
+IF
+!See([GOODCUTOFF])
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer4","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player4)
+END
+
+IF
+!See([GOODCUTOFF])
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer5","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player5)
+END
+
+IF
+!See([GOODCUTOFF])
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer6","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player6)
+END
+
+IF
+ActionListEmpty()
+See(NearestEnemyOf(Myself))
+THEN
+RESPONSE #100
+AttackOneRound(LastSeenBy(Myself))
+END
+
+IF
+ActionListEmpty()
+!Allegiance(Myself,ENEMY)
+AttackedBy([ANYONE],DEFAULT)
+See(LastAttackerOf(Myself))
+THEN
+RESPONSE #100
+AttackOneRound(LastAttackerOf(Myself))
+END
+

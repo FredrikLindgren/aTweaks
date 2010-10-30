@@ -1,0 +1,120 @@
+
+COPY    ~aTweaks/EFF/RR#IDIM1.EFF~ ~override~                                      // effect file which grants immunity to the inteligence drain opcode
+COPY    ~aTweaks/EFF/RR#IDIM2.EFF~ ~override~                                      // effect file which prevents the inteligence drained icon from showing
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~RING95~                                                             // ring which provides undead traits for most undead creatures in the game
+              ~RING99~                                                             // ring which provides undead traits for summoned skeletons
+             ~_RING95~                                                             // ring which provides undead traits for most undead creatures in the game (Tutu)
+             ~_RING99~                                                             // ring which provides undead traits for summoned skeletons (Tutu)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN                                   // if the designated file with an ITM extension exists
+COPY_EXISTING ~%file%.itm~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+// =============================================================================== // the actual work starts from here
+SET opcode = "177"                                                                 // effect: #177 (use EFF file)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "2"                                                                   // timing mode: 2 (while equipped)
+SET parameter1 = "115"                                                             // param1: 115 (IDS Entry - Skeleton)
+SET parameter2 = "4"                                                               // param2: 4 (IDS File - RACE.IDS)
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SPRINT ~resource~ ~RR#IDIM1~                                                       // resref: RR#IDIM1.EFF (immunity to the inteligence drain opcode)
+LAUNCH_PATCH_MACRO ~ADD_ITEM_EQEFFECT~                                             // add new equipping effect
+
+SET opcode = "177"                                                                 // effect: #177 (use EFF file)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "2"                                                                   // timing mode: 2 (while equipped)
+SET parameter1 = "115"                                                             // param1: 115 (IDS Entry - Skeleton)
+SET parameter2 = "4"                                                               // param2: 4 (IDS File - RACE.IDS)
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SPRINT ~resource~ ~RR#IDIM2~                                                       // resref: RR#IDIM2.EFF (prevents the inteligence drained icon)
+LAUNCH_PATCH_MACRO ~ADD_ITEM_EQEFFECT~                                             // add new equipping effect
+
+SET opcode = "177"                                                                 // effect: #177 (use EFF file)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "2"                                                                   // timing mode: 2 (while equipped)
+SET parameter1 = "135"                                                             // param1: 135 (IDS Entry - Skeleton Warrior)
+SET parameter2 = "5"                                                               // param2: 5 (IDS File - CLASS.IDS)
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SPRINT ~resource~ ~RR#IDIM1~                                                       // resref: RR#IDIM1.EFF (immunity to the inteligence drain opcode)
+LAUNCH_PATCH_MACRO ~ADD_ITEM_EQEFFECT~                                             // add new equipping effect
+
+SET opcode = "177"                                                                 // effect: #177 (use EFF file)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "2"                                                                   // timing mode: 2 (while equipped)
+SET parameter1 = "134"                                                             // param1: 134 (IDS Entry - Skeleton)
+SET parameter2 = "5"                                                               // param2: 5 (IDS File - CLASS.IDS)
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SPRINT ~resource~ ~RR#IDIM2~                                                       // resref: RR#IDIM2.EFF (prevents the inteligence drained icon)
+LAUNCH_PATCH_MACRO ~ADD_ITEM_EQEFFECT~                                             // add new equipping effect
+
+SET opcode = "177"                                                                 // effect: #177 (use EFF file)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "2"                                                                   // timing mode: 2 (while equipped)
+SET parameter1 = "134"                                                             // param1: 134 (IDS Entry - Skeleton)
+SET parameter2 = "5"                                                               // param2: 5 (IDS File - CLASS.IDS)
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SPRINT ~resource~ ~RR#IDIM1~                                                       // resref: RR#IDIM1.EFF (immunity to the inteligence drain opcode)
+LAUNCH_PATCH_MACRO ~ADD_ITEM_EQEFFECT~                                             // add new equipping effect
+
+SET opcode = "177"                                                                 // effect: #177 (use EFF file)
+SET target = "1"                                                                   // target: 1 (self)
+SET timing = "2"                                                                   // timing mode: 2 (while equipped)
+SET parameter1 = "135"                                                             // param1: 135 (IDS Entry - Skeleton Warrior)
+SET parameter2 = "5"                                                               // param2: 5 (IDS File - CLASS.IDS)
+SET power = "0"                                                                    // power: 0
+SET resist_dispel = "0"                                                            // dispel/resistance: 0 (non-magical)
+SET duration = "0"                                                                 // duration: 0
+SET probability1 = "100"                                                           // probability1: 100%
+SET probability2 = "0"                                                             // probability2: 0%
+SET dicenumber = "0"                                                               // dicenumber: 0
+SET dicesize = "0"                                                                 // dicesize: 0
+SET savingthrow = "0"                                                              // saving throw type: 0 (none)
+SET savebonus = "0"                                                                // save bonus: 0
+SPRINT ~resource~ ~RR#IDIM2~                                                       // resref: RR#IDIM2.EFF (prevents the inteligence drained icon)
+LAUNCH_PATCH_MACRO ~ADD_ITEM_EQEFFECT~                                             // add new equipping effect
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block

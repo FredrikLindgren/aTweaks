@@ -1,0 +1,35 @@
+
+INCLUDE FILE(include/definitions.ssl)
+
+IF
+  !StateCheck(Myself,STATE_REALLY_DEAD)
+  !GlobalTimerNotExpired("flAura","LOCALS")
+  Detect(NearestEnemyOf(Myself))
+THEN
+  RESPONSE #100
+    ForceSpellRES("fl#skelw",Myself)
+    SetGlobalTimer("flAura","LOCALS",6)
+    Continue()
+END
+
+IF
+  OR(2)
+    Gender(Myself,SUMMONED)
+    Gender(Myself,20)
+  AreaCheck("AR2300")
+  Allegiance(Myself,EVILCUTOFF)
+  !StateCheck(Myself,STATE_CHARMED)
+  OR(2)
+    GlobalGT("villynatyjob","GLOBAL",0)
+    Dead("sahpr2")
+THEN
+  RESPONSE #100
+    EscapeArea()
+END
+
+INCLUDE FILE(include/baseinitial.ssl)
+
+VARIABLE(AttackType=Attack)
+INCLUDE FILE(general/melee_high.ssl)
+
+INCLUDE FILE(include/baseend.ssl)
