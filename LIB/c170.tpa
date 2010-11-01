@@ -1,0 +1,137 @@
+
+DEFINE_PATCH_FUNCTION alter_saves INT_VAR kahplah = 0 header = 99 RET kahplah BEGIN
+  READ_LONG  0x64 ao
+  READ_LONG  0x6a eo
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    READ_BYTE  ao + 0x38*i type ELSE 99
+    PATCH_IF (type = header OR header = 99) AND header != 98 BEGIN
+      READ_SHORT ao + 0x38*i + 0x1e ei ELSE 0
+      READ_SHORT ao + 0x38*i + 0x20 ne ELSE 0
+      FOR (j=0;j<ne;++j) BEGIN
+        READ_LONG eo + 0x30*(ei + j) + 0x24 save ELSE 99
+        PATCH_IF save = old_save BEGIN
+          WRITE_LONG eo + 0x30*(ei + j) + 0x24 new_save
+          kahplah = 1
+        END
+      END
+    END
+  END
+END
+
+OUTER_SPRINT savespells   ~save vs. spells~
+OUTER_SPRINT savespell    ~save vs. spell~
+OUTER_SPRINT savingspells ~saving throw vs. spells~
+OUTER_SPRINT savingspell  ~saving throw vs. spell~
+
+OUTER_SPRINT saverod      ~save vs. rod~
+OUTER_SPRINT savingrod    ~saving throw vs. rod~
+
+OUTER_SPRINT savewand     ~save vs. wand~
+OUTER_SPRINT savingwand   ~saving throw vs. wand~
+
+OUTER_SPRINT savestaff    ~save vs. staff~
+OUTER_SPRINT savingstaff  ~saving throw vs. staff~
+
+OUTER_SPRINT savedeath    ~save vs. death~
+OUTER_SPRINT savingdeath  ~saving throw vs. death~
+
+OUTER_SPRINT savepoison   ~save vs. poison~
+OUTER_SPRINT savingpoison ~saving throw vs. poison~
+
+OUTER_SPRINT saveparalyze ~save vs. paralyzation~
+OUTER_SPRINT savingparalyze ~saving throw vs. paralyzation~
+
+OUTER_SPRINT savepolymorph ~save vs. polymorph~
+OUTER_SPRINT savingpolymorph ~saving throw vs. polymorph~
+
+OUTER_SPRINT savepetrify  ~save vs. petrification~
+OUTER_SPRINT savingpetrify ~saving throw vs. petrification~
+
+OUTER_SPRINT savebreath   ~save vs. breath~
+OUTER_SPRINT savingbreath ~saving throw vs. breath~
+
+
+
+
+//Rod/Staff/Wand
+
+OUTER_SET $old_save(rodmace) = 1
+//OUTER_SET $old_save(rods02) = 1 //needs special treatment
+OUTER_SET $old_save(rods05) = 1
+OUTER_SET $old_save(rodspear) = 1
+OUTER_SET $old_save(rodsword) = 1
+OUTER_SET $old_save(staf13) = 1
+OUTER_SET $old_save(staf15) = 1
+OUTER_SET $old_save(staf16) = 1
+OUTER_SET $old_save(staf17) = 1
+OUTER_SET $old_save(wand02) = 1
+OUTER_SET $old_save(wand19) = 1
+
+OUTER_SET $header(rods02) = 98
+OUTER_SET $header(wand02) = 3
+OUTER_SET $header(wand19) = 3
+
+OUTER_SPRINT $newsave_text(rodmace)  rod
+//OUTER_SPRINT $newsave_text(rods02)   rod
+OUTER_SPRINT $newsave_text(rods05)   rod
+OUTER_SPRINT $newsave_text(rodspear) rod
+OUTER_SPRINT $newsave_text(rodsword) rod
+OUTER_SPRINT $newsave_text(staf13)   staff
+OUTER_SPRINT $newsave_text(staf15)   staff
+OUTER_SPRINT $newsave_text(staf16)   staff
+OUTER_SPRINT $newsave_text(staf17)   staff
+OUTER_SPRINT $newsave_text(wand02)   wand
+OUTER_SPRINT $newsave_text(wand19)   wand
+
+ACTION_FOR_EACH file IN rodmace rods02 rods05 rodspear rodsword staf13 staf15 staf16 staf17 wand02 wand19 BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.itm" BEGIN
+    COPY_EXISTING "%file%.itm" override
+      PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+        TO_LOWER file
+        header = 1
+        PATCH_IF VARIABLE_IS_SET $header("%file%") BEGIN
+          header = $header("%file%")
+        END
+        LPF alter_saves INT_VAR old_save = $old_save("%file%") new_save = 8 header RET kahplah END
+        PATCH_IF kahplah AND LONG_AT 0x54 > 0 BEGIN
+          READ_STRREF 0x54 desc
+          INNER_PATCH_SAVE desc "%desc%" BEGIN
+            PATCH_IF $old_save("%file%") = 1 BEGIN
+              PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE rod BEGIN
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%saverod%~
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%saverod%~
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingrod%~
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingrod%~
+              END
+              PATCH_IF $newsave_text("%file%" STRING_EQUAL_CASE staff BEGIN
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%savestaff%~
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%savestaff%~
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingstaff%~
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingstaff%~
+              END
+              PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE wand BEGIN
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%savewand%~
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%savewand%~
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingwand%~
+                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingwand%~
+              END
+            END
+          END
+          SAY_EVALUATED 0x54 "%desc%"
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+
+//Rod/Staff/Wand special treatment
+
+OUTER_SET $old_save(wand12) =
+
+wand12
+
+
+OUTER_SET $old_save(wand15) =
+
+wand15
