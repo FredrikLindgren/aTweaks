@@ -5,12 +5,12 @@ DEFINE_PATCH_FUNCTION alter_saves INT_VAR kahplah = 0 header = 99 RET kahplah BE
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     READ_BYTE  ao + 0x38*i type ELSE 99
     PATCH_IF (type = header OR header = 99) AND header != 98 BEGIN
-      READ_SHORT ao + 0x38*i + 0x1e ei ELSE 0
-      READ_SHORT ao + 0x38*i + 0x20 ne ELSE 0
+      READ_SHORT ao + 0x38*i + 0x1e ne ELSE 0
+      READ_SHORT ao + 0x38*i + 0x20 ei ELSE 0
       FOR (j=0;j<ne;++j) BEGIN
-        READ_LONG eo + 0x30*(ei + j) + 0x24 save ELSE 99
+        READ_BYTE eo + 0x30*(ei + j) + 0x24 save ELSE 99
         PATCH_IF save = old_save BEGIN
-          WRITE_LONG eo + 0x30*(ei + j) + 0x24 new_save
+          WRITE_BYTE eo + 0x30*(ei + j) + 0x24 new_save
           kahplah = 1
         END
       END
@@ -76,14 +76,14 @@ OUTER_SPRINT $newsave_text(rodmace)  rod
 OUTER_SPRINT $newsave_text(rods05)   rod
 OUTER_SPRINT $newsave_text(rodspear) rod
 OUTER_SPRINT $newsave_text(rodsword) rod
-OUTER_SPRINT $newsave_text(staf13)   staff
+OUTER_SPRINT $newsave_text(staf13)   staff //yeah, this probably won't cause any problems at all
 OUTER_SPRINT $newsave_text(staf15)   staff
 OUTER_SPRINT $newsave_text(staf16)   staff
 OUTER_SPRINT $newsave_text(staf17)   staff
 OUTER_SPRINT $newsave_text(wand02)   wand
 OUTER_SPRINT $newsave_text(wand19)   wand
 
-ACTION_FOR_EACH file IN rodmace rods02 rods05 rodspear rodsword staf13 staf15 staf16 staf17 wand02 wand19 BEGIN
+ACTION_FOR_EACH file IN rodmace rods05 rodspear rodsword staf13 staf15 staf16 staf17 wand02 wand19 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.itm" BEGIN
     COPY_EXISTING "%file%.itm" override
       PATCH_IF SOURCE_SIZE > 0x71 BEGIN
@@ -92,7 +92,7 @@ ACTION_FOR_EACH file IN rodmace rods02 rods05 rodspear rodsword staf13 staf15 st
         PATCH_IF VARIABLE_IS_SET $header("%file%") BEGIN
           header = $header("%file%")
         END
-        LPF alter_saves INT_VAR old_save = $old_save("%file%") new_save = 8 header RET kahplah END
+        LPF alter_saves INT_VAR old_save = $old_save("%file%") new_save = 8 header RET kahplah = kahplah END
         PATCH_IF kahplah AND LONG_AT 0x54 > 0 BEGIN
           READ_STRREF 0x54 desc
           INNER_PATCH_SAVE desc "%desc%" BEGIN
@@ -103,7 +103,7 @@ ACTION_FOR_EACH file IN rodmace rods02 rods05 rodspear rodsword staf13 staf15 st
                 REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingrod%~
                 REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingrod%~
               END
-              PATCH_IF $newsave_text("%file%" STRING_EQUAL_CASE staff BEGIN
+              PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE staff BEGIN
                 REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%savestaff%~
                 REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%savestaff%~
                 REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingstaff%~
@@ -124,14 +124,48 @@ ACTION_FOR_EACH file IN rodmace rods02 rods05 rodspear rodsword staf13 staf15 st
   END
 END
 
-
 //Rod/Staff/Wand special treatment
 
-OUTER_SET $old_save(wand12) =
+COPY_EXISTING rods02.itm override
+  PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+    READ_STRREF 0x54 desc
+    INNER_PATCH_SAVE desc "%desc%" BEGIN
+      REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%saverod%~
+      REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%saverod%~
+      REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingrod%~
+      REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingrod%~
+    END
+    SAY_EVALUATED 0x54 "%desc%"
+  END
+BUT_ONLY
 
-wand12
+OUTER_SPRINT $short(wand12) ww
+OUTER_SPRINT $short(wand15) wa
+
+COPY_EXISTING wand12.itm override
+              wand15.itm override
+  PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+    c = 0
+    size = SOURCE_SIZE
+    SPRINT short $short("%SOURCE_RES%")
+    FOR (i=LONG_AT 0x6a;i<size;i+=0x30) BEGIN
+      READ_SHORT i fx ELSE 999
+      PATCH_IF fx = 146 BEGIN
+        READ_ASCII i + 0x14 resref ELSE blank
+        PATCH_IF FILE_EXISTS_IN_GAME "%resref%.spl" BEGIN
+          INNER_ACTION BEGIN
+            COPY_EXISTING "%resref%.spl" "override/fl#%short%s%c%.spl"
+              FOR (j=LONG_AT 0x6a;j<SOURCE_SIZE;j+=0x30) BEGIN
+                WRITE_BYTE j + 0x24 THIS = 1 ? 8 : THIS
+              END
+          END
+          WRITE_ASCIIE i + 0x14 "fl#%short%s%c%" #8
+          ++c
+        END
+      END
+    END
+  END
+BUT_ONLY
 
 
-OUTER_SET $old_save(wand15) =
 
-wand15
