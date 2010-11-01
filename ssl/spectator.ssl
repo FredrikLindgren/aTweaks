@@ -7,48 +7,7 @@ INCLUDE FILE(include/baseinitial.ssl)
 //2 Paralyze
 //3 Central eye (spell reflection)
 
-IF
-  HitBy([ANYONE],0)
-  DamageTakenGT(0)
-  RandomNum(3,1)
-  Global("flDisabled1","LOCALS",0)
-THEN
-  RESPONSE #20
-    SetGlobal("flDisabled1","LOCALS",1)
-    DisplayStringHead(Myself,@1328)
-    ReallyForceSpellRES("fl#heal1",Myself)
-  RESPONSE #80
-    Continue()
-END
-
-IF
-  HitBy([ANYONE],0)
-  DamageTakenGT(0)
-  RandomNum(3,2)
-  Global("flDisabled2","LOCALS",0)
-THEN
-  RESPONSE #20
-    SetGlobal("flDisabled2","LOCALS",1)
-    DisplayStringHead(Myself,@1334)
-    ReallyForceSpellRES("fl#heal1",Myself)
-  RESPONSE #80
-    Continue()
-END
-
-IF
-  HitBy([ANYONE],0)
-  DamageTakenGT(0)
-  RandomNum(3,3)
-  Global("flDisabled3","LOCALS",0)
-THEN
-  RESPONSE #10
-    SetGlobal("flDisabled3","LOCALS",1)
-    DisplayStringHead(Myself,@1330)
-    FakeEffectExpiryCheck(Myself,1500)
-    ReallyForceSpellRES("fl#heal1",Myself)
-  RESPONSE #90
-    Continue()
-END
+INCLUDE FILE(beholder/spectator.ssl)
 
 IF
   !GlobalTimerNotExpired("flRound","LOCALS")
