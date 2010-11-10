@@ -1,12 +1,15 @@
 
 DEFINE_PATCH_FUNCTION alter_saves INT_VAR kahplah = 0 header = 99 RET kahplah BEGIN
+  READ_ASCII 0 sig (4)
+  al = "%sig%" STRING_EQUAL_CASE itm ? 0x38 : 0x28
+
   READ_LONG  0x64 ao
   READ_LONG  0x6a eo
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
-    READ_BYTE  ao + 0x38*i type ELSE 99
+    READ_BYTE  ao + al*i type ELSE 99
     PATCH_IF (type = header OR header = 99) AND header != 98 BEGIN
-      READ_SHORT ao + 0x38*i + 0x1e ne ELSE 0
-      READ_SHORT ao + 0x38*i + 0x20 ei ELSE 0
+      READ_SHORT ao + al*i + 0x1e ne ELSE 0
+      READ_SHORT ao + al*i + 0x20 ei ELSE 0
       FOR (j=0;j<ne;++j) BEGIN
         READ_BYTE eo + 0x30*(ei + j) + 0x24 save ELSE 99
         PATCH_IF save = old_save BEGIN
@@ -16,6 +19,93 @@ DEFINE_PATCH_FUNCTION alter_saves INT_VAR kahplah = 0 header = 99 RET kahplah BE
       END
     END
   END
+END
+
+DEFINE_PATCH_FUNCTION alter_desc BEGIN
+  READ_ASCII 0 sig (4)
+  do = "%sig%" STRING_EQUAL_CASE itm ? 0x54 : 0x50
+
+  READ_STRREF do desc
+  INNER_PATCH_SAVE desc "%desc%" BEGIN
+    PATCH_IF $old_save("%file%") = 1 BEGIN
+      PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE rod BEGIN
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%saverod%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%saverod%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingrod%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingrod%~
+      END
+      PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE staff BEGIN
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%savestaff%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%savestaff%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingstaff%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingstaff%~
+      END
+      PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE wand BEGIN
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%savewand%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%savewand%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingwand%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingwand%~
+      END
+      PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE breath BEGIN
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%savebreath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%savebreath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingbreath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingbreath%~
+      END
+      PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE death BEGIN
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%savedeath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%savedeath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingdeath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingdeath%~
+      END
+      PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE petrify BEGIN
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%savepetrify%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%savepetrify%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingpetrify%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingpetrify%~
+      END
+    END
+    PATCH_IF $old_save("%file%") = 2 BEGIN
+    
+    END
+    PATCH_IF $old_save("%file%") = 4 BEGIN
+      PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE breath BEGIN
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savedeath%~ ~%savebreath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savepoison%~ ~%savebreath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%saveparalyze%~ ~%savebreath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingdeath%~ ~%savingbreath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingpoison%~ ~%savingbreath%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingparalyze%~ ~%savingbreath%~
+      END
+      PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE poison BEGIN
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savedeath%~ ~%savepoison%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%saveparalyze%~ ~%savepoison%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingdeath%~ ~%savingpoison%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingparalyze%~ ~%savingpoison%~
+      END
+      PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE paralyze BEGIN
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savedeath%~ ~%saveparalyze%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savepoison%~ ~%saveparalyze%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingdeath%~ ~%savingparalyze%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingpoison%~ ~%savingparalyze%~
+      END
+      PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE petrify BEGIN
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savedeath%~ ~%savepetrify%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savepoison%~ ~%savepetrify%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%saveparalyze%~ ~%savepetrify%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingdeath%~ ~%savingpetrify%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingpoison%~ ~%savingpetrify%~
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingparalyze%~ ~%savingpetrify%~
+      END
+    END
+    PATCH_IF $old_save("%file%") = 8 BEGIN
+    
+    END
+    PATCH_IF $old_save("%file%") = 16 BEGIN
+    
+    END
+  END
+  SAY_EVALUATED do "%desc%"
 END
 
 OUTER_SPRINT savespells   ~save vs. spells~
@@ -50,6 +140,50 @@ OUTER_SPRINT savingpetrify ~saving throw vs. petrification~
 OUTER_SPRINT savebreath   ~save vs. breath~
 OUTER_SPRINT savingbreath ~saving throw vs. breath~
 
+
+
+
+//Death/Poison/Paralyzation
+
+OUTER_SET $old_save(arow05) = 4
+OUTER_SET $old_save(arow12) = 4
+OUTER_SET $old_save(dagg17) = 4
+
+OUTER_SPRINT $newsave_text(arow05) poison
+OUTER_SPRINT $newsave_text(arow12) poison
+OUTER_SPRINT $newsave_text(dagg17) paralyze
+
+ACTION_FOR_EACH file IN arow05
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.itm" BEGIN
+    COPY_EXISTING "%file%.itm" override
+      PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+        TO_LOWER file
+        LPF alter_saves INT_VAR old_save = $old_save("%file%") new_save = 4 RET kahplah = kahplah END
+        PATCH_IF kahplah AND LONG_AT 0x54 > 0 BEGIN
+          LPF alter_desc END
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+OUTER_SET $old_save(sppr511) = 1
+
+OUTER_SPRINT $newsave_text(sppr511) death
+
+ACTION_FOR_EACH file IN sppr511 BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.spl" BEGIN
+    COPY_EXISTING "%file%.spl" override
+      PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+        TO_LOWER file
+        LPF alter_saves INT_VAR old_save = $old_save("%file%") new_save = 4 RET kahplah = kahplah END
+        PATCH_IF kahplah AS LONG_AT 0x50 > 0 BEGIN
+          LPF alter_desc END
+        END
+      END
+    BUT_ONLY
+  END
+END
 
 
 
@@ -94,37 +228,12 @@ ACTION_FOR_EACH file IN rodmace rods05 rodspear rodsword staf13 staf15 staf16 st
         END
         LPF alter_saves INT_VAR old_save = $old_save("%file%") new_save = 8 header RET kahplah = kahplah END
         PATCH_IF kahplah AND LONG_AT 0x54 > 0 BEGIN
-          READ_STRREF 0x54 desc
-          INNER_PATCH_SAVE desc "%desc%" BEGIN
-            PATCH_IF $old_save("%file%") = 1 BEGIN
-              PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE rod BEGIN
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%saverod%~
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%saverod%~
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingrod%~
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingrod%~
-              END
-              PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE staff BEGIN
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%savestaff%~
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%savestaff%~
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingstaff%~
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingstaff%~
-              END
-              PATCH_IF $newsave_text("%file%") STRING_EQUAL_CASE wand BEGIN
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespells%~ ~%savewand%~
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savespell%~ ~%savewand%~
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspells%~ ~%savingwand%~
-                REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~%savingspell%~ ~%savingwand%~
-              END
-            END
-          END
-          SAY_EVALUATED 0x54 "%desc%"
+          LPF alter_desc END
         END
       END
     BUT_ONLY
   END
 END
-
-//Rod/Staff/Wand special treatment
 
 COPY_EXISTING rods02.itm override
   PATCH_IF SOURCE_SIZE > 0x71 BEGIN
@@ -166,6 +275,45 @@ COPY_EXISTING wand12.itm override
     END
   END
 BUT_ONLY
+
+
+
+//Petrification/Polymorph
+
+OUTER_SET $old_save (scrl16) = 4
+OUTER_SET $old_save (sw2h07) = 1
+
+OUTER_SPRINT $newsave_text(scrl16) petrify
+OUTER_SPRINT $newsave_text(sw2h07) petrify
+
+ACTION_FOR_EACH file IN scrl16 sw2h07
+
+
+
+//Breath
+
+OUTER_SET $old_save(arow06) = 1
+OUTER_SET $old_save(arow08) = 1
+OUTER_SET $old_save(arow10) = 4
+OUTER_SET $old_save(bolt07) = 1
+OUTER_SET $old_save(potn26) = 1
+
+ACTION_FOR_EACH file IN arow06 arow08 arow10 bolt07 potn26 BEGIN
+  OUTER_SPRINT $newsave_text("%file%") breath
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.itm" BEGIN
+    COPY_EXISTING "%file%.itm" override
+      PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+        TO_LOWER file
+        LPF alter_saves INT_VAR old_save = $old_save("%file%") new_save = 2 RET kahplah = kahplah END
+        PATCH_IF kahplah AND LONG_AT 0x54 > 0 BEGIN
+          LPF alter_desc END
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+
 
 
 

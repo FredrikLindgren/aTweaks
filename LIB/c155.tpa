@@ -1,4 +1,39 @@
 
+//Account for Spell Revisions being incompatible with aTweaks
+ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
+  COPY_EXISTING spcl213.spl override
+                spcl233.spl override
+                sppr107.spl override
+                sppr408.spl override
+                spwi113.spl override
+    PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+      READ_LONG  0x64 ao
+      READ_LONG  0x6a eo
+      READ_SHORT 0x70 ei
+      FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+        WRITE_SHORT ao + 0x28*i + 0x20 ei
+        READ_SHORT  ao + 0x28*i + 0x1e ne
+        FOR (j=0;j<ne;++j) BEGIN
+          READ_SHORT eo + 0x30*(ei + j) type
+          PATCH_IF type = 219 BEGIN
+            READ_ASCII     eo + 0x30*(ei + j)       copy (0x30)
+            INSERT_BYTES   eo + 0x30*(ei + j)       0x30
+              WRITE_ASCIIE eo + 0x30*(ei + j)       "%copy%"
+              WRITE_SHORT  eo + 0x30*(ei + j)       100
+              WRITE_LONG   eo + 0x30*(ei + j) + 0x4 9
+              WRITE_LONG   eo + 0x30*(ei + j) + 0x8 7
+            ++ne
+            j=ne
+          END
+        END
+        WRITE_SHORT ao + 0x28*i + 0x1e ne
+        ei += ne
+      END
+    END
+  BUT_ONLY
+END
+
+
 // Creature changes
 
 COPY ~aTweaks/CRE/RR#SCORN.CRE~ ~override~                                         // Summoned Cornugon (for Cacofiend)
