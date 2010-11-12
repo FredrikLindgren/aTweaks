@@ -1067,17 +1067,17 @@ END
 
 
 //////////////////////////////////////////////////////
-//Improved XP rewards from locks, traps and scrolls
+//Altered XP rewards from locks, traps and scrolls
 //////////////////////////////////////////////////////
 
-BEGIN @260 DESIGNATED 260                                                         //Improved XP rewards from locks, traps and scrolls
+BEGIN @261 SUBCOMPONENT @260 DESIGNATED 261                                        //Improved XP rewards from locks, traps and scrolls
 GROUP @2 //Gameplay tweaks
 REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
 
 ACTION_DEFINE_ARRAY xpbonus_locks BEGIN 0 20  20  50  50  50  100  100  100  200  200  300  300  400  400  400  500 END
 ACTION_DEFINE_ARRAY xpbonus_traps BEGIN 0 50  50  100 100 100 200  200  200  400  400  600  600  800  800  800  1000 END
 ACTION_DEFINE_ARRAY xpbonus_scrolls BEGIN 0 50 100 200 500 1000 3000 5000 7000 9000 END
-ACTION_DEFINE_ARRAY xpbonus_master BEGIN null xpbonus_locks xpbonus_traps xpbonus_scrolls END
+ACTION_DEFINE_ARRAY xpbonus_master BEGIN nil xpbonus_locks xpbonus_traps xpbonus_scrolls END
 
 COPY_EXISTING xpbonus.2da override
   COUNT_2DA_COLS num_col
@@ -1090,6 +1090,22 @@ COPY_EXISTING xpbonus.2da override
       END ELSE PATCH_IF i < 3 BEGIN
         SET_2DA_ENTRY_LATER s2el_xpbonus i j $EVAL "%array%"("%k%")
       END
+    END
+  END
+  SET_2DA_ENTRIES_NOW s2el_xpbonus num_col - 1
+  PRETTY_PRINT_2DA
+BUT_ONLY
+
+
+BEGIN @262 SUBCOMPONENT @260 DESIGNATED 262                                        //No XP rewards from locks, traps and scrolls
+GROUP @2 //Gameplay tweaks
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+
+COPY_EXISTING xpbonus.2da override
+  COUNT_2DA_COLS num_col
+  FOR (i=1;i<4;++i) BEGIN
+    FOR (j=1;j<num_col;++j) BEGIN
+      SET_2DA_ENTRY_LATER s2el_xpbonus i j 0
     END
   END
   SET_2DA_ENTRIES_NOW s2el_xpbonus num_col - 1
