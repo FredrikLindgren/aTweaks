@@ -517,10 +517,80 @@ COMPILE "atweaks/baf/fl#behol.baf"
         "atweaks/baf/fl#bhspe.baf"
         "atweaks/baf/fl#bhdir.baf"
 
+ACTION_FOR_EACH file IN spblun29
+                        spcl412b
+                        spcl414b 
+                        spcl910b 
+                        spcl911b 
+                        spcl722 
+                        spdr301 
+                        spdr601 
+                        sppr302 
+                        sppr304 
+                        sppr313 
+                        sppr314 
+                        sppr503 
+                        sppr705 
+                        sppr707 
+                        sppr720
+                        spwi103 
+                        spwi304 
+                        spwi308 
+                        spwi313 
+                        spwi404
+                        spwi502 
+                        spwi503 
+                        spwi523 
+                        spwi614
+                        spwi615 
+                        spwi712 
+                        spwi714 
+                        spwi810
+                        spwi812 
+                        spwi911 
+                        spwish24
+                        spwish32
+                        spwm188
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.spl" BEGIN
+    COPY_EXISTING "%file%.spl" override
+      PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+        PATCH_FOR_EACH resource IN fl#h5 fl#h10 fl#h15 fl#h20 fl#h25 fl#h30 BEGIN
+          LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 duration = 1 STR_VAR resource END
+        END
+      END
+    BUT_ONLY
+  END
+END
 
-  
+OUTER_SET
 
-  
+ACTION_FOR_EACH file IN amul01
+                        arow06
+                        misc3h
+                        potn13
+                        potn26
+                        potn27
+                        ring27 //header 1 and 2
+//Fire Seeds            ring33
+                        staf13 //header 2
+                        wand05 //header 0
+                        wand06
+                        wand07
+                        wand11
+                        wand12
+                        wand13
+                        wand15
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.itm" BEGIN
+    COPY_EXISTING "%file%.itm" override
+      PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+        //check if there's cast spell (at point) on the header
+        
+
+        //else:
+        PATCH_FOR_EACH resource IN fl#h5 fl#h10 fl#h15 fl#h20 fl#h25 fl#h30 BEGIN
+          LPF ADD_ITEM_EFFECT INT_VAR
 
   
   

@@ -106,7 +106,6 @@ END ELSE BEGIN
   END
 END
 off_0 += 0x110
-PATCH_PRINT "off_0=%off_0%"
 WRITE_LONG 0x2b0 off_0
 PATCH_IF ~%ms%~ STR_CMP fail && ~%sm%~ STR_CMP fail && smc = 0x11 BEGIN
   INSERT_BYTES off_0 0xc * msc
