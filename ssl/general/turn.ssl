@@ -1,32 +1,24 @@
 
-IF
+IF TRIGGER
   RequireBlock(TurnUndead)
-  See([GOODCUTOFF.UNDEAD])
+  TargetBlock(GoodUndeadInOrder)
   Allegiance(Myself,ENEMY)
-  !Class(LastSeenBy(Myself,SKELTON_WARRIOR)
-  Range(LastSeenBy(Myself),7)
+  !Class(LastSeenBy(Myself),SKELETON_WARRIOR)
   LevelLT(LastSeenBy(Myself),TurnLevel)
   !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-  !GlobalTimerNotExpired("turn","LOCALS")
-  !GlobalTimerNotExpired("cast","LOCALS")
-  !GlobalTimerNotExpired("flTurnAgain","LOCALS")
-THEN
-  RESPONSE #100
-    DisplayStringHead(Myself,@1023)
-    SetGlobalTimer("turn","LOCALS",6)
-    SetGlobalTimer("flTurnAgain","LOCALS",18)
-    Turn()
-  RESPONSE #50
-    Continue()
+THEN DO
+  DisplayStringHead(Myself,@1023)
+  Action(Turn|100|50)
 END
 
 IF TRIGGER
   RequireBlock(TurnUndead)
-  Target([GOODCUTOFF.0.0.PALADIN])
+  TargetBlock(GoodPaladinsInOrder)
   TriggerBlock(Disabled|Fear)
   Allegiance(Myself,ENEMY)
   Alignment(Myself,MASK_EVIL)
   LevelLT(scstarget,TurnLevel)
+  !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 THEN DO
   Action(Turn|100|50)
 END

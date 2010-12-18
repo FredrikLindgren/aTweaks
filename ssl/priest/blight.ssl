@@ -1,8 +1,10 @@
 IF TRIGGER
   TargetBlock(PlayersReverse)
-  TriggerBlock(Enemy|Disabled|MR50|SiNec|CanCastPriest|MinorGlobe)
+  TriggerBlock(Enemy|MR50|SiNec|CanCastPriest|MinorGlobe)
   Alignment(scstarget,MASK_GOOD)
-  //something about not fouling up charms
+  BEGIN LOOP(loopvar||1;2;3;4;5;6)
+   !StateCheck(Playerloopvar,STATE_CHARMED)
+  END LOOP
 THEN DO
   Action(Spell,CLERIC_UNHOLY_BLIGHT|100|100)
 END

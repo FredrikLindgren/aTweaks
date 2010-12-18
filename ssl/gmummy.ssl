@@ -34,23 +34,8 @@ THEN
 END
 
 //Time to turn any undead, but don't do it too often
-IF
-  See([GOODCUTOFF.UNDEAD])
-  Allegiance(Myself,ENEMY)
-  Range(LastSeenBy(Myself),10)
-  LevelLT(LastSeenBy(Myself),17)
-  !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-  !GlobalTimerNotExpired("turn","LOCALS")
-  !GlobalTimerNotExpired("cast","LOCALS")
-  !GlobalTimerNotExpired("flTurnAgain","LOCALS")
-THEN
-  RESPONSE #100
-    DisplayStringHead(Myself,@1023)
-    SetGlobalTimer("turn","LOCALS",6)
-    SetGlobalTimer("flTurnAgain","LOCALS",18)
-    Turn()
-END
-
+VARIABLE(TurnUndead=True&TurnLevel=17)
+INCLUDE FILE(general/turn.ssl)
 
 //Summons
 IF TRIGGER
