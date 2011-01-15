@@ -1,0 +1,47 @@
+IF
+	!GlobalTimerNotExpired("Prep","LOCALS")
+	NumInPartyGT(5)
+	GlobalLT("XPGiven","GLOBAL",500000)
+	LevelPartyGT(16)
+	See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetGlobalTimer("Prep","LOCALS",1000)
+		SetGlobalTimer("moreglabrezu","LOCALS",10)
+		SetGlobalTimer("moremaurezhi","LOCALS",10)
+		CreateVisualEffect("SPUNHOLY",[488.410])
+		CreateCreature("GORTAN6",[488.410],0) // Maurezhi
+		CreateVisualEffect("SPUNHOLY",[335.516])
+		CreateCreature("GORTAN6",[335.516],13) // Maurezhi
+		Continue()
+END
+
+IF
+	NumCreatureLT("GORTAN4",3)
+	RandomNum(2,1)
+	LevelPartyGT(18)
+	!DifficultyLT(NORMAL)
+	!GlobalTimerNotExpired("moreglabrezu","LOCALS")
+	See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetGlobalTimer("moreglabrezu","LOCALS",10)
+		CreateVisualEffectObject("SPUNHOLY",Myself)
+		CreateCreatureObject("GORTAN4",NearestEnemyOf(Myself),0,0,0) // Glabrezu
+		Continue()
+END
+
+IF
+	NumCreatureLT("GORTAN6",2)
+	RandomNum(2,1)
+	LevelPartyGT(18)
+	!Difficulty(EASIEST)
+	!GlobalTimerNotExpired("moremaurezhi","LOCALS")
+	See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetGlobalTimer("moremaurezhi","LOCALS",12)
+		CreateVisualEffectObject("SPUNHOLY",Myself)
+		CreateCreatureObject("GORTAN6",Myself,0,0,0) // Maurezhi
+		Continue()
+END
