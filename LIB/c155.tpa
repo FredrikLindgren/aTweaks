@@ -33,10 +33,53 @@ ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
   BUT_ONLY
 END
 
-
 // Creature changes
 
+ACTION_IF !FILE_EXISTS_IN_GAME "rr#hgelu.cre" BEGIN
+  COPY ~RR#SGELU.CRE~ ~override/RR#HGEL.CRE~                                      // Gelugon (hostile)
+    PATCH_IF MOD_IS_INSTALLED atweaks.tp2 153 OR FiendScript BEGIN                //If we are using existing values for stats, copy HP from Glabrezus 
+      INNER_ACTION BEGIN
+        COPY_EXISTING demglasu.cre override
+          READ_SHORT 0x26 newhp
+        BUT_ONLY
+      END
+      LPF RR#MDCRE
+        INT_VAR
+          newhp
+      END
+    END 
+END
+
+OUTER_SPRINT $sscript(demnabsu)   "rr#snaba"
+OUTER_SPRINT $sscript("rr#scorn") "rr#scorn"
+OUTER_SPRINT $sscript(demglasu)   "rr#sglab"
+OUTER_SPRINT $sscript("rr#sgelu") "rr#sgelu"
+OUTER_SPRINT $sscript(dempitsu)   "rr#spitf"
+OUTER_SPRINT $sscript("rr#sbalr") "rr#sbalr"
+
+COPY_EXISTING demnabsu.cre  override
+              telcor1.cre  "override/rr#scorn.cre"
+              demglasu.cre  override
+              rr#hgelu.cre "override/rr#sgelu.cre"
+              dempitsu.cre  override
+              telbal1.cre  "override/rr#sbalr.cre"
+  WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
+  WRITE_LONG 0x14 0                                                                //XP is handled by script
+  WRITE_ASCIIE 0x248 $sscript("%DEST_RES%") #8                                     // summoned script
+  WRITE_ASCII  0x250 ~~ #8                                                         // disable class AI script
+  WRITE_ASCII  0x258 ~~ #8                                                         // disable race AI script
+  WRITE_ASCII  0x260 ~~ #8                                                         // disable general AI script
+  WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
+  WRITE_BYTE   0x270 128                                                           //Initially neutral                                                                         
+  WRITE_BYTE   0x275 9                                                             //SUMMONED_DEMON 
+  WRITE_ASCII  0x280 ~~ #32                                                        //no script name 
+  PATCH_IF FILE_EXISTS_IN_GAME dw#sumfi.itm AND !FILE_CONTAINS ("%DEST_FILE%" "dw#sumfi") BEGIN
+    ADD_CRE_ITEM "dw#sumfi" #0 #0 #0 none boots
+  END
+
+/*
 COPY ~aTweaks/CRE/RR#SCORN.CRE~ ~override~                                         // Summoned Cornugon (for Cacofiend)
+
 COPY ~aTweaks/CRE/RR#SGELU.CRE~ ~override~                                         // Summoned Gelugon (for Summon Fiend)
   SAY NAME1 @670 SAY NAME2 @670                                                    // Gelugon
 COPY ~aTweaks/CRE/RR#SBALR.CRE~ ~override~                                         // Summoned Balor (for Gate)
@@ -318,7 +361,7 @@ STR_VAR                                                                         
 END                                                                                // ends FUNCTION
 END                                                                                // ends PATCH_FOR_EACH block
 BUT_ONLY_IF_IT_CHANGES
-
+*/
 
 
 // Spell changes
@@ -501,19 +544,19 @@ BUT_ONLY_IF_IT_CHANGES
 
 // New AI scripts
 
-COMPILE ~aTweaks/BAF/RR#SNABA.BAF~                                                 // Summoned Nabassu AI script
-COMPILE ~aTweaks/BAF/RR#SCORN.BAF~                                                 // Summoned Cornugon AI script
-COMPILE ~aTweaks/BAF/RR#TEMPT.BAF~                                                 // Summoned Glabrezu script for tempting mortals
-COMPILE ~aTweaks/BAF/RR#SGLAB.BAF~                                                 // Summoned Glabrezu AI script
-COMPILE ~aTweaks/BAF/RR#SGELU.BAF~                                                 // Summoned Gelugon AI script
-COMPILE ~aTweaks/BAF/RR#SPITF.BAF~                                                 // Summoned Pit Fiend AI script
-COMPILE ~aTweaks/BAF/RR#SBALR.BAF~                                                 // Summoned Balor AI script
+COMPILE ~aTweaks/BAF/fiend/RR#SNABA.BAF~                                                 // Summoned Nabassu AI script
+COMPILE ~aTweaks/BAF/fiend/RR#SCORN.BAF~                                                 // Summoned Cornugon AI script
+COMPILE ~aTweaks/BAF/fiend/RR#TEMPT.BAF~                                                 // Summoned Glabrezu script for tempting mortals
+COMPILE ~aTweaks/BAF/fiend/RR#SGLAB.BAF~                                                 // Summoned Glabrezu AI script
+COMPILE ~aTweaks/BAF/fiend/RR#SGELU.BAF~                                                 // Summoned Gelugon AI script
+COMPILE ~aTweaks/BAF/fiend/RR#SPITF.BAF~                                                 // Summoned Pit Fiend AI script
+COMPILE ~aTweaks/BAF/fiend/RR#SBALR.BAF~                                                 // Summoned Balor AI script
 COPY_EXISTING ~RUNENEMY.BCS~  ~override~                                           // innocent bystander run away script
   DECOMPILE_BCS_TO_BAF                                                             // replace RunAwayFrom() with RandomWalkContinuous()
     REPLACE_TEXTUALLY ~RunAwayFrom(LastSeenBy(Myself),30)~ ~RandomWalkContinuous()~
   COMPILE_BAF_TO_BCS                                                               // reasoning: RunAwayFrom() often tends to slow down the game
 BUT_ONLY_IF_IT_CHANGES
-EXTEND_TOP ~RUNENEMY.BCS~ ~aTweaks/BAF/RUNENEMY.BAF~                               // Make innocent bystanders run away from summoned Fiends
+EXTEND_TOP ~RUNENEMY.BCS~ ~aTweaks/BAF/fiend/RUNENEMY.BAF~                               // Make innocent bystanders run away from summoned Fiends
 
 
 COPY_EXISTING ~MAGE20B.BCS~ ~override~                                             // high level mage script
@@ -533,6 +576,14 @@ ACTION_IF MOD_IS_INSTALLED SPELL_REV.TP2 0 THEN BEGIN                           
 
 COPY_EXISTING ~SPCACO.EFF~ ~override~                                              // Summon Cacofiend effect file
   WRITE_ASCII 0x30 ~DEMNABSU~ #8                                                   // resref: SPCACO (Nabassu) i.e. revert from Death Knight
+
+ACTION_IF FILE_EXISTS_IN_GAME fl#atfiends1.mrk AND FILE_EXISTS_IN_GAME dw#cacof.spl BEGIN //Revert "Summong Death Knight" to Cacofiend
+    COPY_EXISTING dw#cacof.eff override
+      WRITE_ASCII 0x30 fl#nabsu
+    COPY_EXISTING dw#bonef.eff override
+      WRITE_ASCII ox30 fl#corsu
+  END
+END
 
 COPY_EXISTING ~SPPR703.SPL~  ~override~                                            // Revert CLERIC_GATE to its original state
   SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @754 SAY UNIDENTIFIED_DESC @754      // retain old name but set new description (divine)
