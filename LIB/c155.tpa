@@ -35,26 +35,6 @@ END
 
 // Creature changes
 
-ACTION_IF !FILE_EXISTS_IN_GAME "rr#hgel.cre" BEGIN
-  COPY ~atweaks/cre/RR#SGELU.CRE~ ~override/RR#HGEL.CRE~                                      // Gelugon (hostile)
-    SAY NAME1 @670 SAY NAME2 @670
-    WRITE_LONG  0x14 "19000"                                                         // XP value
-    WRITE_ASCII 0x248 ~RR#HGELU~ #8                                                  // override AI script
-    WRITE_BYTE  0x270 "255"                                                          // set initial allegiance to ENEMY
-    WRITE_ASCII 0x280 ~RR#HGELU~ #32                                                 // assign new death variable
-    PATCH_IF MOD_IS_INSTALLED atweaks.tp2 153 BEGIN                                  //If we are using existing values for stats, copy HP from Glabrezus
-      INNER_ACTION BEGIN
-        COPY_EXISTING demglasu.cre override
-          READ_SHORT 0x26 newhp
-        BUT_ONLY
-      END
-      LPF RR#MDCRE
-        INT_VAR
-          newhp
-      END
-    END 
-END
-
 OUTER_SPRINT $sscript(demnabsu)   "rr#snaba"
 OUTER_SPRINT $sscript("rr#scorn") "rr#scorn"
 OUTER_SPRINT $sscript(demglasu)   "rr#sglab"
@@ -584,7 +564,7 @@ COPY_EXISTING ~SPCACO.EFF~ ~override~                                           
 
 ACTION_IF FILE_EXISTS_IN_GAME fl#atfiends1.mrk 
       AND FILE_EXISTS_IN_GAME dw#cacof.spl 
-      AND !MOD_IS_INSTALLED atweaks.tp2 150) BEGIN //Revert "Summon Death Knight" to Cacofiend
+      AND !FiendsOriginal) BEGIN //Revert enemies' "Summon Death Knight" to Cacofiend
   COPY_EXISTING dw#cacof.eff override
     WRITE_ASCII 0x30 fl#nabsu
   COPY_EXISTING dw#bonef.eff override
