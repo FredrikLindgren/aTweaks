@@ -42,7 +42,7 @@ ACTION_IF !FILE_EXISTS_IN_GAME "rr#hgel.cre" BEGIN
     WRITE_ASCII 0x248 ~RR#HGELU~ #8                                                  // override AI script
     WRITE_BYTE  0x270 "255"                                                          // set initial allegiance to ENEMY
     WRITE_ASCII 0x280 ~RR#HGELU~ #32                                                 // assign new death variable
-    PATCH_IF MOD_IS_INSTALLED atweaks.tp2 153 OR FiendsScripts BEGIN                //If we are using existing values for stats, copy HP from Glabrezus
+    PATCH_IF MOD_IS_INSTALLED atweaks.tp2 153 BEGIN                                  //If we are using existing values for stats, copy HP from Glabrezus
       INNER_ACTION BEGIN
         COPY_EXISTING demglasu.cre override
           READ_SHORT 0x26 newhp
@@ -582,7 +582,9 @@ ACTION_IF MOD_IS_INSTALLED SPELL_REV.TP2 0 THEN BEGIN                           
 COPY_EXISTING ~SPCACO.EFF~ ~override~                                              // Summon Cacofiend effect file
   WRITE_ASCII 0x30 ~DEMNABSU~ #8                                                   // resref: SPCACO (Nabassu) i.e. revert from Death Knight
 
-ACTION_IF FILE_EXISTS_IN_GAME fl#atfiends1.mrk AND FILE_EXISTS_IN_GAME dw#cacof.spl BEGIN //Revert "Summong Death Knight" to Cacofiend
+ACTION_IF FILE_EXISTS_IN_GAME fl#atfiends1.mrk 
+      AND FILE_EXISTS_IN_GAME dw#cacof.spl 
+      AND !MOD_IS_INSTALLED atweaks.tp2 150) BEGIN //Revert "Summon Death Knight" to Cacofiend
   COPY_EXISTING dw#cacof.eff override
     WRITE_ASCII 0x30 fl#nabsu
   COPY_EXISTING dw#bonef.eff override
