@@ -565,15 +565,6 @@ ACTION_IF MOD_IS_INSTALLED SPELL_REV.TP2 0 THEN BEGIN                           
 COPY_EXISTING ~SPCACO.EFF~ ~override~                                              // Summon Cacofiend effect file
   WRITE_ASCII 0x30 ~DEMNABSU~ #8                                                   // resref: SPCACO (Nabassu) i.e. revert from Death Knight
 
-ACTION_IF FILE_EXISTS_IN_GAME fl#atfiends1.mrk 
-      AND FILE_EXISTS_IN_GAME dw#cacof.spl 
-      AND !FiendsOriginal BEGIN //Revert enemies' "Summon Death Knight" to Cacofiend
-  COPY_EXISTING dw#cacof.eff override
-    WRITE_ASCII 0x30 fl#nabsu
-  COPY_EXISTING dw#bonef.eff override
-    WRITE_ASCII ox30 fl#corsu
-END
-
 COPY_EXISTING ~SPPR703.SPL~  ~override~                                            // Revert CLERIC_GATE to its original state
   SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @754 SAY UNIDENTIFIED_DESC @754      // retain old name but set new description (divine)
 WRITE_ASCII 0x3a "SPPR703C" #8                                                     // spell icon: SPPR703C
