@@ -353,6 +353,9 @@ BUT_ONLY_IF_IT_CHANGES
 
 COPY_EXISTING ~SPWI707.SPL~  ~override~                                            // Cacofiend
 SAY NAME1 #17320 SAY NAME2 #17320  SAY DESC @751 SAY UNIDENTIFIED_DESC @751        // retain old name but set new description
+  WRITE_SHORT 0x1e BIT8                                                            //Exclude diviners
+  WRITE_SHORT 0x22 14                                                              //Casting animation: conj
+  WRITE_SHORT 0x25 2                                                               //School: conj
   READ_LONG  0x64 "abil_off" ELSE 0
   READ_SHORT 0x68 "abil_num" ELSE 0
   READ_LONG  0x6a "fx_off"   ELSE 0
@@ -564,7 +567,7 @@ COPY_EXISTING ~SPCACO.EFF~ ~override~                                           
 
 ACTION_IF FILE_EXISTS_IN_GAME fl#atfiends1.mrk 
       AND FILE_EXISTS_IN_GAME dw#cacof.spl 
-      AND !FiendsOriginal) BEGIN //Revert enemies' "Summon Death Knight" to Cacofiend
+      AND !FiendsOriginal BEGIN //Revert enemies' "Summon Death Knight" to Cacofiend
   COPY_EXISTING dw#cacof.eff override
     WRITE_ASCII 0x30 fl#nabsu
   COPY_EXISTING dw#bonef.eff override
