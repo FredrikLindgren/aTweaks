@@ -14,11 +14,11 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REPLACE_CRE_ITEM ~RR#DIMP~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                  // replace default weapon with a more PnP accurate weapon
+REMOVE_CRE_ITEM ~RINGDEMN~                                                         // removes RINGDEMN.ITM (Imps are not actual Fiends in 2E)
+REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (regeneration now handled via equipped weapon)
 WRITE_LONG 0x14 1400                                                               //XP
 PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  REPLACE_CRE_ITEM ~RR#DIMP~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                  // replace default weapon with a more PnP accurate weapon
-  REMOVE_CRE_ITEM ~RINGDEMN~                                                         // removes RINGDEMN.ITM (Imps are not actual Fiends in 2E)
-  REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (regeneration now handled via equipped weapon)
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "18"                                                                  // new hit point value
@@ -94,9 +94,9 @@ PATCH_IF valid BEGIN
 // =============================================================================== // the actual work starts from here
 SAY NAME1 @732 SAY NAME2 @732                                                      // Hellcat
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REPLACE_CRE_ITEM ~RR#DFCAT~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
 WRITE_LONG 0x14 3000
 PATCH_IF FiendsScripts = 0 BEGIN
-  REPLACE_CRE_ITEM ~RR#DFCAT~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "51"                                                                  // new hit point value
@@ -270,12 +270,12 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REPLACE_CRE_ITEM ~RR#DBFND~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
+REPLACE_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNDROPPABLE~ ~RRING~                         // replace undead immunities with fiend immunities 
+REMOVE_CRE_ITEM ~IMMUNE2~                                                          // removes IMMUNE2.ITM (no immunity to +1 weapons in PnP)
+REMOVE_CRE_ITEM ~REGHP2R~                                                          // removes REGHP2R.ITM (no regeneration in PnP)
 WRITE_LONG 0x14 7000                                                               //XP
 PATCH_IF FiendsScripts = 0 BEGIN
-  REPLACE_CRE_ITEM ~RR#DBFND~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-  REPLACE_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNDROPPABLE~ ~RRING~                         // replace undead immunities with fiend immunities 
-  REMOVE_CRE_ITEM ~IMMUNE2~                                                          // removes IMMUNE2.ITM (no immunity to +1 weapons in PnP)
-  REMOVE_CRE_ITEM ~REGHP2R~                                                          // removes REGHP2R.ITM (no regeneration in PnP)
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "40"                                                                  // new hit point value
@@ -361,10 +361,10 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
+REPLACE_CRE_ITEM ~RR#DABIS~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
 WRITE_LONG 0x14 9000                                                               //XP
 PATCH_IF FiendsScripts = 0 BEGIN
-  REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
-  REPLACE_CRE_ITEM ~RR#DABIS~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "51"                                                                  // new hit point value
@@ -445,9 +445,9 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REPLACE_CRE_ITEM ~RR#DCORN~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
 WRITE_LONG 0x14 10000
 PATCH_IF FiendsScripts = 0 BEGIN
-  REPLACE_CRE_ITEM ~RR#DCORN~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "80"                                                                  // new hit point value
@@ -549,9 +549,9 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REPLACE_CRE_ITEM ~RR#DPITF~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace generic attack with a Pit Fiend specific attack
 WRITE_LONG 0x14 21000
 PATCH_IF FiendsScripts = 0 BEGIN
-  REPLACE_CRE_ITEM ~RR#DPITF~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace generic attack with a Pit Fiend specific attack
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "104"                                                                 // new hit point value
@@ -680,11 +680,11 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REPLACE_CRE_ITEM ~RR#DQUAS~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+REMOVE_CRE_ITEM ~RINGDEMN~                                                         // removes RINGDEMN.ITM (Imps are not actual Fiends in 2E)
+REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (regeneration now handled via equipped weapon)
 WRITE_LONG 0x14 1400
 PATCH_IF FiendsScripts = 0 BEGIN
-  REPLACE_CRE_ITEM ~RR#DQUAS~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
-  REMOVE_CRE_ITEM ~RINGDEMN~                                                         // removes RINGDEMN.ITM (Imps are not actual Fiends in 2E)
-  REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (regeneration now handled via equipped weapon)
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "24"                                                                  // new hit point value
@@ -771,11 +771,11 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REMOVE_CRE_ITEM ~SEEINVIS~                                                         // removes SEEINVIS.ITM (no detect invisibility in PnP)
+REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
+ADD_CRE_ITEM ~DWDUST~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~ARMOR~                   // unequipp armor in order to enable arcane spellcasting
 WRITE_LONG 0x14 6000
 PATCH_IF FiendsScripts = 0 BEGIN
-  REMOVE_CRE_ITEM ~SEEINVIS~                                                         // removes SEEINVIS.ITM (no detect invisibility in PnP)
-  REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
-  ADD_CRE_ITEM ~DWDUST~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~ARMOR~                   // unequipp armor in order to enable arcane spellcasting
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "48"                                                                  // new hit point value
@@ -886,10 +886,10 @@ PATCH_IF valid BEGIN
 // =============================================================================== // the actual work starts from here
 WRITE_SHORT 0x28 "25104"                                                           // Sets avatar to MAGE_FEMALE_HUMAN
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
+ADD_CRE_ITEM ~CLCK14~ #0 #0 #0 ~UNSTEALABLE~ ~ARMOR~                               // replace armor with a robe to enable arcane spellcasting
 WRITE_LONG 0x14 6000
 PATCH_IF FiendsScripts = 0 BEGIN
-  REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
-  ADD_CRE_ITEM ~CLCK14~ #0 #0 #0 ~UNSTEALABLE~ ~ARMOR~                               // replace armor with a robe to enable arcane spellcasting
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "48"                                                                  // new hit point value
@@ -1007,12 +1007,12 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REMOVE_CRE_ITEM ~SEEINVIS~                                                         // removes SEEINVIS.ITM (no detect invisibility in PnP)
+REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
+REPLACE_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace undead immunities with fiend immunities 
+REPLACE_CRE_ITEM ~MAUREZHI~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
 WRITE_LONG 0x14 6000                                                               //XP
 PATCH_IF FiendsScripts = 0 BEGIN
-  REMOVE_CRE_ITEM ~SEEINVIS~                                                         // removes SEEINVIS.ITM (no detect invisibility in PnP)
-  REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
-  REPLACE_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace undead immunities with fiend immunities 
-  REPLACE_CRE_ITEM ~MAUREZHI~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "45"                                                                  // new hit point value
@@ -1202,9 +1202,9 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REPLACE_CRE_ITEM ~RR#DNABA~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
 WRITE_LONG 0x14 16000                                                              //XP
 PATCH_IF FiendsScripts = 0 BEGIN
-  REPLACE_CRE_ITEM ~RR#DNABA~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "76"                                                                  // new hit point value
@@ -1349,9 +1349,9 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REPLACE_CRE_ITEM ~RR#DGLAB~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
 WRITE_LONG 0x14 12000                                                              //XP
 PATCH_IF FiendsScripts = 0 BEGIN
-  REPLACE_CRE_ITEM ~RR#DGLAB~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "80"                                                                  // new hit point value
@@ -1482,10 +1482,10 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REPLACE_CRE_ITEM ~RR#DMARI~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
+ADD_CRE_ITEM ~IPSION~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                              // add protection from all mind-affecting spells
 WRITE_LONG 0x14 23000                                                              //XP
 PATCH_IF FiendsScripts = 0 BEGIN
-  REPLACE_CRE_ITEM ~RR#DMARI~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-  ADD_CRE_ITEM ~IPSION~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                              // add protection from all mind-affecting spells
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "96"                                                                  // new hit point value
@@ -1602,9 +1602,9 @@ PATCH_IF valid BEGIN
   PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
 REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
+REPLACE_CRE_ITEM ~RR#DBALR~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
 WRITE_LONG 0x14 26000                                                              //XP
 PATCH_IF FiendsScripts = 0 BEGIN
-  REPLACE_CRE_ITEM ~RR#DBALR~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
   LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
     INT_VAR                                                                            // Initialize variables
       "newhp"    = "104"                                                                 // new hit point value
@@ -1748,7 +1748,7 @@ ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.spl AND !FiendsOriginal BEGIN
     WRITE_ASCII  0x258 ~~ #8                                                         // disable race AI script
     WRITE_ASCII  0x260 ~~ #8                                                         // disable general AI script
     WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
-    WRITE_BYTE   0x270 255                                                           //Enemy                                                                         
+    WRITE_BYTE   0x270 255                                                           //Enemy                                                                                                                                  
     WRITE_BYTE   0x275 1                                                             //Male 
     WRITE_ASCII  0x280 ~~ #32                                                        //no script name 
     PATCH_IF FILE_EXISTS_IN_GAME dw#sumfi.itm AND !FILE_CONTAINS_EVALUATED ("%SOURCE_FILE%" "dw#sumfi") BEGIN
