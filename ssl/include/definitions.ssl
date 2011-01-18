@@ -98,6 +98,23 @@ BEGIN_ACTION_DEFINITION
 END
 
 BEGIN_ACTION_DEFINITION
+  Name(SpellReplace)
+  TRIGGER
+    !GlobalTimerNotExpired("cast","LOCALS")
+    !GlobalTimerNotExpired("turn","LOCALS")
+    HaveSpell(scsargument1)
+    !AreaCheck("ar3004")
+    !AreaCheck("ar3005")
+    !AreaCheck("ar3008")
+    !AreaCheck("ar3009")
+  ACTION
+    RESPONSE #scsprob1
+      SetGlpbalTimer("cast","LOCALS",6)
+      Spell(scstarget,scsargument2)
+      RemoveSpell(scsargument1)
+END
+
+BEGIN_ACTION_DEFINITION
   Name(AttackRanged)
   TRIGGER
   ACTION

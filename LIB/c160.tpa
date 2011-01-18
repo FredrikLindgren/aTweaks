@@ -75,8 +75,6 @@ BEGIN
   END
 END
 
-COMPILE "atweaks/baf/fl#bansh.baf"
-
 COPY "atweaks/spl/fl#banwa.spl" override                                           //Banshee's wail
   FOR(i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64+i*0x28+0x26 fl#sight
@@ -730,23 +728,23 @@ BEGIN
         REPLACE_CRE_ITEM fl#gmum #0 #0 #0 none weapon1 EQUIP
         REPLACE_TEXTUALLY CASE_INSENSITIVE immune3 immune2
         LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 0 END
-        ADD_MEMORIZED_SPELL sppr101 #0 priest (1) //Bless
-        ADD_MEMORIZED_SPELL sppr102 #0 priest (2) //Command
+        ADD_MEMORIZED_SPELL sppr101 #0 priest (1) //Bless //done
+        ADD_MEMORIZED_SPELL sppr102 #0 priest (2) //Command //done
         ADD_MEMORIZED_SPELL sppr107 #0 priest (1) //Protection from Evil
-        ADD_MEMORIZED_SPELL sppr109 #0 priest (1) //Sanctuary
+        ADD_MEMORIZED_SPELL sppr109 #0 priest (1) //Sanctuary //done
         ADD_MEMORIZED_SPELL sppr111 #0 priest (2) //Armor of Faith
-        ADD_MEMORIZED_SPELL sppr113 #0 priest (5) //Doom
+        ADD_MEMORIZED_SPELL sppr113 #0 priest (5) //Doom //done
         ADD_MEMORIZED_SPELL sppr201 #1 priest (1) //Aid
-        ADD_MEMORIZED_SPELL sppr203 #1 priest (1) //Chant
+        ADD_MEMORIZED_SPELL sppr203 #1 priest (1) //Chant //done
         ADD_MEMORIZED_SPELL sppr208 #1 priest (5) //Hold Person
-        ADD_MEMORIZED_SPELL sppr211 #1 priest (3) //Silence 15' Radius
+        ADD_MEMORIZED_SPELL sppr211 #1 priest (3) //Silence 15' Radius //done
         ADD_MEMORIZED_SPELL sppr214 #1 priest (2) //DUHM
-        ADD_MEMORIZED_SPELL sppr301 #2 priest (4) //Animate Dead
-        ADD_MEMORIZED_SPELL sppr303 #2 priest (2) //Dispel Magic
+        ADD_MEMORIZED_SPELL sppr301 #2 priest (4) //Animate Dead //done
+        ADD_MEMORIZED_SPELL sppr303 #2 priest (2) //Dispel Magic //done
         ADD_MEMORIZED_SPELL sppr304 #2 priest (1) //Glyph of Warding
-        ADD_MEMORIZED_SPELL sppr314 #2 priest (4) //Unholy Blight
-        ADD_MEMORIZED_SPELL sppr405 #3 priest (2) //Mental Domination
-        ADD_MEMORIZED_SPELL sppr407 #3 priest (1) //Protection from Lightning
+        ADD_MEMORIZED_SPELL sppr314 #2 priest (4) //Unholy Blight //done
+        ADD_MEMORIZED_SPELL sppr405 #3 priest (2) //Mental Domination //done
+        ADD_MEMORIZED_SPELL sppr407 #3 priest (1) //Protection from Lightning //done
         ADD_MEMORIZED_SPELL sppr408 #3 priest (1) //Protection from Evil 10' Radius
         ADD_MEMORIZED_SPELL sppr411 #3 priest (1) //Poison
         ADD_MEMORIZED_SPELL sppr412 #3 priest (3) //Holy Power
@@ -1045,29 +1043,31 @@ END ELSE ACTION_IF GAME_IS bgt BEGIN
 END
 
 ACTION_IF BG1 BEGIN
-  COPY - "atweaks/baf/killgood.baf" "...atweaks/fl-inlined/%killgood%.baf"
-         "atweaks/baf/gooddeat.baf" "...atweaks/fl-inlined/%gooddeat%.baf"
-  COMPILE ~atweaks/baf/fl#bg1kn.baf~ "...atweaks/fl-inlined/%killgood%.baf" "...atweaks/fl-inlined/%gooddeat%.baf" EVAL
+  COPY - "atweaks/baf/undead/killgood.baf" "...atweaks/fl-inlined/%killgood%.baf"
+         "atweaks/baf/undead/gooddeat.baf" "...atweaks/fl-inlined/%gooddeat%.baf"
+  COMPILE ~atweaks/baf/undead/fl#bg1kn.baf~ "...atweaks/fl-inlined/%killgood%.baf" "...atweaks/fl-inlined/%gooddeat%.baf" EVAL
 END 
 
-COMPILE ~atweaks/baf/fl#death.baf~
-        ~atweaks/baf/fl#mum.baf~
-        ~atweaks/baf/fl#ghoul.baf~
-        ~atweaks/baf/fl#ghast.baf~
-        "atweaks/baf/fl#dksw5.baf"
-        "atweaks/baf/fl#glord.baf"
-        "atweaks/baf/fl#sklwm.baf"
-        "atweaks/baf/fl#sklwr.baf"
+COMPILE ~atweaks/baf/undead/fl#death.baf~
+        ~atweaks/baf/undead/fl#mum.baf~
+        ~atweaks/baf/undead/fl#ghoul.baf~
+        ~atweaks/baf/undead/fl#ghast.baf~
+        "atweaks/baf/undead/fl#dksw5.baf"
+        "atweaks/baf/undead/fl#glord.baf"
+        "atweaks/baf/undead/fl#sklwm.baf"
+        "atweaks/baf/undead/fl#sklwr.baf"
+        "atweaks/baf/undead/fl#bansh.baf"
 
 
 
-
+//Write the queued up values
 ACTION_PHP_EACH AddSecType AS file => SecTypeToAdd BEGIN
   COPY_EXISTING "%file%" override
     WRITE_BYTE 0x27 SecTypeToAdd
   BUT_ONLY
 END
-        
+
+//Add the SecTypes to items and spells that should grant immunity or be able to remove them        
 COPY_EXISTING_REGEXP GLOB ~.+\.\(spl\|itm\)$~ override
   PATCH_IF SOURCE_SIZE > 0x71 BEGIN
     READ_LONG  0x64 ao
@@ -1080,7 +1080,7 @@ COPY_EXISTING_REGEXP GLOB ~.+\.\(spl\|itm\)$~ override
       READ_SHORT eo + 0x30*(ei1 + i)       type ELSE 999
       READ_LONG  eo + 0x30*(ei1 + i) + 0x8 p2   ELSE 999
 
-
+      //Fear, on-equip immunity
       PATCH_IF type = 101 AND p2 = 24 BEGIN
         PHP_EACH AddSecType AS file => SecTypeToAdd BEGIN
           PATCH_IF "%SOURCE_EXT%" STRING_EQUAL_CASE itm AND "%file%" STRING_MATCHES_REGEXP ".*\.spl$" = 0 AND SecTypeToAdd = FearSecType BEGIN
@@ -1094,7 +1094,7 @@ COPY_EXISTING_REGEXP GLOB ~.+\.\(spl\|itm\)$~ override
         END
       END
 
-
+      //Disease, on-equip immunity
       PATCH_IF type = 101 AND p2 = 78 BEGIN
         PHP_EACH AddSecType AS file => SecTypeToAdd BEGIN
           PATCH_IF "%SOURCE_EXT%" STRING_EQUAL_CASE itm AND "%file%" STRING_MATCHES_REGEXP ".*\.spl$" = 0 AND SecTypeToAdd = DiseaseSecType BEGIN
@@ -1114,7 +1114,7 @@ COPY_EXISTING_REGEXP GLOB ~.+\.\(spl\|itm\)$~ override
     ne = 0
     al = "%SOURCE_EXT%" STRING_EQUAL_CASE itm ? 0x38 : 0x28
 
-
+    //Check for effects to remove e.g. fear or disease and effects that grant immunity to e.g. fear or disease
     FOR (i=0;i<na AND ao + na*al < SOURCE_SIZE;++i) BEGIN
       ei += ne
       WRITE_SHORT ao + al*i + 0x20 ei
