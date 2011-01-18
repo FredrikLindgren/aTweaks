@@ -1,0 +1,21 @@
+IF TRIGGER
+  TargetBlock(PCsPreferringStrong)
+  TriggerBlock(Disabled|Enemy|MR75|SIEnc|MinorGlobe|Hold)
+  NumCreatureLT([EVILCUTOFF],3)
+  !GlobalTimerNotExpired("flHoldEmOff","LOCALS")
+THEN DO
+  Combine()
+  Action(Spell,CLERIC_HOLD_PERSON|100|50)
+  SetGlobalTimer("flHoldEmOff","LOCALS",12)
+END
+
+IF TRIGGER 
+  TargetBlock(PCsPreferringStrong)
+  TriggerBlock(Disabled|Enemy|MR50|SIEnc|MinorGlobe|Hold)
+  NumCreatureGT([EVILCUTOFF],2)
+  !GlobalTimerNotExpired("flHoldEmOff","LOCALS")
+THEN DO
+  Combine()
+  Action(Spell,CLERIC_HOLD_PERSON|100|100)
+  SetGlobalTimer("flHoldEmOff","LOCALS",24)
+END

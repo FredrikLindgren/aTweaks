@@ -1,0 +1,211 @@
+
+INCLUDE FILE(beholder/definitions_beholder.ssl)
+
+VARIABLE(ThereAreExtraActions=True&ExtraActions=SetGlobal("flCone","LOCALS",0) SetGlobal("flBolt","LOCALS",0))
+INCLUDE FILE(include/baseinitial.ssl)
+
+//Gauths can apparently use all their eyes all the time
+//1 Cause Serious Wounds
+//2 Repulsion
+//3 Cone of Cold 3x day
+//4 Lightning bolt 4x day
+//5 Paralyzation
+//6 Central eye (Feeblemind)
+//7 Dweomer drain (interrupts spells and saps active spells)
+
+IF
+  Global("flLightUp","LOCALS",0)
+  Global("flActive","LOCALS",1)
+THEN
+  RESPONSE #100
+    ReallyForceSpellRES("fl#gauth",Myself)
+    SetGlobal("flLightUp","LOCALS",1)
+END
+
+IF
+  Die()
+THEN
+  RESPONSE #98
+    BEGIN LOOP(loopvar||1;2;3;4;5;6)
+      ReallyForceSpellDeadRES("fl#bhrhl",Playerloopvar)
+    END LOOP
+  RESPONSE #2
+    ReallyForceSpellDeadRES("fl#bhxpl",Myself)
+    BEGIN LOOP(loopvar||1;2;3;4;5;6)
+      ReallyForceSpellDeadRES("fl#bhrhl",Playerloopvar)
+    END LOOP
+END
+
+INCLUDE FILE(beholder/gauth_eyes.ssl)
+
+IF
+  !GlobalTimerNotExpired("flRound","LOCALS")
+THEN
+  RESPONSE #100
+    BEGIN LOOP(loopvar||1;2;3;4;5;6;7)
+      SetGlobal("flUseEyeloopvar","LOCALS",1)
+    END LOOP
+    SetGlobalTimer("flRound","LOCALS",6)
+END
+
+//1 Cause Serious Wounds
+//2 Repulsion
+//3 Cone of Cold 3x day
+//4 Lightning bolt 4x day
+//5 Paralyzation
+//6 Central eye (Feeblemind)
+//7 Dweomer Drain
+
+//Fire away!
+
+///////////////////////////////
+//Feeblemind
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled6","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy)
+  !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+THEN DO
+  Combine()
+  Action(BHCentralEye,WIZARD_FEEBLEMIND,flUseEye6|100|50)
+END
+
+///////////////////////////////
+//Paralyzation
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled5","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|Hold)
+THEN DO
+  Combine()
+  Action(BeholderRay,BEHOLDER_PARALYZATION,flUseEye5|100|50)
+END
+
+///////////////////////////////
+//Repulsion
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled2","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TriggerBlock(Disabled|Enemy)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhrep",flUseEye2|100|100)
+END
+
+///////////////////////////////
+//Cone of Cold
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled3","LOCALS",0)
+  TargetBlock(EnemiesReverse)
+  TriggerBlock(Disabled|Enemy|ColdRes75|SIEvo)
+  Range(scstarget,15)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Action(BHRayRESLimited,"fl#bhcne",flUseEye3,flCone,3|100|50)
+END
+
+///////////////////////////////
+//Lightning bolt
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled4","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|ElecRes75|SIEvo)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BHRayRESLimited,"fl#bhblt",flUseEye4,flBolt,4|100|75)
+END
+
+///////////////////////////////
+//Cause Serious Wounds
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled1","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BeholderRay,BEHOLDER_CAUSE_SERIOUS_WOUNDS,flUseEye1|100|100)
+END
+
+///////////////////////////////
+//Dweomer Drain
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled7","LOCALS",0)
+  TargetBlock(PCCasters)
+  TargetBlock(PlayersInOrder)
+  TriggerBlock(Enemy)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhdrn",flUseEye7|100|100)
+END
+
+
+
+//Start gunning for the disabled etc
+
+///////////////////////////////
+//Cone of Cold
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled3","LOCALS",0)
+  TargetBlock(EnemiesReverse)
+  TriggerBlock(Enemy|ColdRes75)
+  !StateCheck(scstarget,STATE_STONE_DEATH) //but the petrified dude next to him is toast, sorry dude
+  Range(scstarget,15)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Action(BHRayRESLimited,"fl#bhcne",flUseEye3,flCone,3|100|100)
+END
+
+///////////////////////////////
+//Lightning bolt
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled4","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Enemy|ElecRes75)
+  !StateCheck(scstarget,STATE_STONE_DEATH)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BHRayRESLimited,"fl#bhblt",flUseEye4,flBolt,4|100|100)
+END
+
+///////////////////////////////
+//Cause Serious Wounds
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled1","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Enemy)
+  !StateCheck(scstarget,STATE_STONE_DEATH)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BeholderRay,BEHOLDER_CAUSE_SERIOUS_WOUNDS,flUseEye1|100|100)
+END
+
+INCLUDE FILE(beholder/attack.ssl)
+
+INCLUDE FILE(include/baseend.ssl)
+
+
+
+
+
+
+

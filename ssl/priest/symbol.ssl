@@ -1,0 +1,24 @@
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|MR50|SICon|Stun)
+  !Gender(scstarget,SUMMONED)
+  !Gender(scstarget,20)
+THEN DO
+  Combine()
+  Action(SpellReplace,CLERIC_SYMBOL_STUN,WIZARD_NPC_SYMBOL_STUN|100|50)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|MR50|SICon|Slayable)
+  !Gender(scstarget,SUMMONED)
+  !Gender(scstarget,20)
+  OR(4)
+    HPPercentLT(scstarget,50)
+    Class(scstarget,MAGE)
+    Class(scstarget,MAGE_THIEF)
+    Class(scstarget,CLERIC_MAGE)
+THEN DO
+  Combine()
+  Action(SpellReplace,CLERIC_SYMBOL_DEATH,WIZARD_NPC_SYMBOL_DEATH|100|50)
+END  

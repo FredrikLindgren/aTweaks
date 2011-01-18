@@ -1,0 +1,122 @@
+
+INCLUDE FILE(beholder/definitions_beholder.ssl)
+
+INCLUDE FILE(include/baseinitial.ssl)
+
+//1 Cause Serious Wounds
+//2 Paralyze
+//3 Central eye (spell reflection)
+
+INCLUDE FILE(beholder/spectator_eyes.ssl)
+
+IF
+  !GlobalTimerNotExpired("flRound","LOCALS")
+THEN
+  RESPONSE #100
+    BEGIN LOOP(loopvar||1;2)
+      SetGlobal("flUseEyeloopvar","LOCALS",1)
+    END LOOP
+    SetGlobalTimer("flRound","LOCALS",6)
+END
+
+IF
+  !HasBounceEffects(Myself)
+  Global("flDisabled3","LOCALS",0)
+THEN
+  RESPONSE #100
+    ReallyForceSpell(Myself,BEHOLDER_SPELL_TURNING)
+    Continue()
+END
+
+///////////////////////////////
+//Paralyzation
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled1","LOCALS",0)
+  TargetBlock(PCsPreferringStrong)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|Hold)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhpar",flUseEye1|100|50)
+END
+
+///////////////////////////////
+//Cause Serious Wounds
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled2","LOCALS",0)
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(Disabled|Enemy)
+  !HasItemEquiped("clck26",scstarget)
+  !HPPercentGT(scstarget,25)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhwnd",flUseEye2|100|50)
+END
+
+IF TRIGGER
+  Global("flDisabled2","LOCALS",0)
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(Disabled|Enemy)
+  !HasItemEquiped("clck26",scstarget)
+  !HPPercentGT(scstarget,50)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhwnd",flUseEye2|100|50)
+END
+
+IF TRIGGER
+  Global("flDisabled2","LOCALS",0)
+  TargetBlock(PCsPreferringWeak)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhwnd",flUseEye2|100|50)
+END
+
+//Disabled
+
+///////////////////////////////
+//Cause Serious Wounds
+///////////////////////////////
+IF TRIGGER
+  Global("flDisabled2","LOCALS",0)
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(Enemy)
+  !HasItemEquiped("clck26",scstarget)
+  !HPPercentGT(scstarget,25)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhwnd",flUseEye2|100|50)
+END
+
+IF TRIGGER
+  Global("flDisabled2","LOCALS",0)
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(Enemy)
+  !HasItemEquiped("clck26",scstarget)
+  !HPPercentGT(scstarget,50)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhwnd",flUseEye2|100|50)
+END
+
+IF TRIGGER
+  Global("flDisabled2","LOCALS",0)
+  TargetBlock(PCsPreferringWeak)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Enemy)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(BeholderRayRES,"fl#bhwnd",flUseEye2|100|50)
+END
+
+INCLUDE FILE(beholder/attack.ssl)
+
+INCLUDE FILE(include/baseend.ssl)
+
+

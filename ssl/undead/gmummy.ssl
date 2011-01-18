@@ -1,0 +1,85 @@
+INCLUDE FILE(include/definitions.ssl)
+
+IF
+  !GlobalTimerNotExpired("flAura","LOCALS")
+  !StateCheck(Myself,STATE_REALLY_DEAD)
+  Detect(NearestEnemyOf(Myself))
+THEN
+  RESPONSE #100
+    ForceSpellRES("fl#gmumf",Myself)
+    SetGlobalTimer("flAura","LOCALS",18)
+    Continue()
+END
+
+//E.g. if some stupid undead hasn't realised it's now working for the forces of evil (borrowed from SCSII)
+IF
+  AttackedBy([ENEMY.UNDEAD],DEFAULT)
+  Allegiance(LastAttackerOf(Myself),ENEMY)
+  General(LastAttackerOf(Myself),UNDEAD)
+  Allegiance(Myself,ENEMY)
+THEN
+  RESPONSE #100
+    ClearActions(LastAttackerOf(Myself))
+    Continue()
+END
+
+INCLUDE FILE(include/baseinitial.ssl)
+
+IF
+  Global(flActive","LOCALS",0)
+  !Allegiance(Myself,ENEMY)
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+//Time to turn any undead, but don't do it too often
+VARIABLE(TurnUndead=True&TurnLevel=17)
+INCLUDE FILE(general/turn.ssl)
+
+//Summons
+IF TRIGGER
+  Target(LastSeenBy(Myself))
+  TriggerBlock(Enemy|CanCastPriest)
+  !See([ENEMY.UNDEAD.0.0.SUMMONED])
+  !See([ENEMY.UNDEAD.0.0.20])
+THEN DO
+  Action(SpellMyself,CLERIC_ANIMATE_DEAD|200|50)
+END
+
+
+
+
+
+IF TRIGGER
+  TargetBlock(PCsPreferringStrong)
+  TriggerBlock(Enemy|Disabled|SIEnc|CanCastPriest|MR50|MinorGlobe|Hold)
+THEN DO
+  Action(Spell,CLERIC_HOLD_PERSON|100|25)
+END
+
+//Symbol, Death
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(Enemy|Disabled|SICon|CanCastPriest|MR50|Slayable)
+THEN DO
+  Action(Spell,1719|100|100)
+END
+
+
+
+
+
+IF TRIGGER
+  Target(LastSeenBy(Myself))
+  TriggerBlock(Enemy|CanCastPriest)
+THEN DO
+  Action(SpellMyself,CLERIC_AERIAL_SERVANT|100|25)
+END
+
+
+
+
+
+
+
