@@ -1826,3 +1826,34 @@ DECOMPILE_BCS_TO_BAF
   REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpell(Myself,WIZARD_INVISIBILITY)~ ~SpellNoDec(Myself,WIZARD_INVISIBILITY)~ // Prevent annoying perma-invisibility
 COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
+
+//Fix minhp items so the wearer can't be killed by the Nabassu's Death Gaze
+COPY_EXISTING ABAZRING.ITM override
+              BHAALHP1.ITM override
+              FINMEL01.ITM override
+              GORFIRG.ITM override
+              ICEREGEN.ITM override
+              IMOENHP1.ITM override
+              JONHP1.ITM override
+              MEL01.ITM override
+              MINHP1.ITM override
+              MINHP20.ITM override
+              MINHP60.ITM override
+              MONHP01.ITM override
+              MONHP1.ITM override
+              MONHP20.ITM override
+              MONHP80.ITM override
+              SENGUA04.ITM override
+              SUREHP1.ITM override
+              TSTATUE.ITM override
+  PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+    LPF ADD_ITEM_EQEFFECT 
+      INT_VAR
+        opcode = 206
+        target = 1
+        timing = 2
+      STR_VAR
+        resource = rr#dgaze
+    END
+  END
+BUT_ONLY
