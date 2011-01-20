@@ -155,7 +155,7 @@ TRIGGER=Disabled
  
 TRIGGER=Enemy
  Allegiance(Myself,ENEMY)
- !Allegiance(scstarget,ENEMY)
+ !Allegiance(scstarget,EVILCUTOFF)
  
 TRIGGER=CanCastMage
  CheckStatLT(Myself,50,SPELLFAILUREMAGE)
@@ -229,6 +229,28 @@ TRIGGER=Slow
  !HasItemEquiped("npsw01",scstarget)
  !HasItemEquiped("ring09",scstarget)
  !HasItemEquiped("ipsion",scstarget)
+ 
+TRIGGER=NoTrueSeeing
+ !CheckStatGT(Myself,0,TRUE_SIGHT)
+ !CheckStatGT([EVILCUTOFF],0,TRUE_SIGHT)
+ !CheckStatGT(SecondNearest[EVILCUTOFF],0,TRUE_SIGHT)
+ !CheckStatGT(ThirdNearest[EVILCUTOFF],0,TRUE_SIGHT)
+ !CheckStatGT(FourthNearest[EVILCUTOFF],0,TRUE_SIGHT)
+ !CheckStatGT(FifthNearest[EVILCUTOFF],0,TRUE_SIGHT)
+ !CheckStatGT(SixthNearest[EVILCUTOFF],0,TRUE_SIGHT)
+ 
+TRIGGER=Poison
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,GOLEM)
+ !Race(scstarget,ELEMENTAL)
+ !StateCheck(scstarget,STATE_POISON)
+ !CheckStatGT(scstarget,50,RESISTPOISON)
+ !HasItemEquiped("amul22",scstarget)
+ !HasItemEquiped("helm30",scstarget)
+ !HasItemEquiped("ring39",scstarget)
+ !HasItemEquiped("ring46",scstarget)
+ !HasItemEquipedReal("sw1h34",scstarget)
 
 TARGET=PlayersReverse
  Player6
@@ -256,7 +278,6 @@ TARGET=PlayersRandomOrder
 
 TARGET=PCsPreferringWeak
  [PC.0.0.MAGE]
- [PC.0.0.SORCERER]
  [PC.0.0.MAGE_THIEF]
  [PC.0.0.MAGE_ALL]
  [PC.0.0.THIEF]
@@ -279,7 +300,6 @@ TARGET=PCArchers
 
 TARGET=Squishy
  [PC.0.0.MAGE]
- [PC.0.0.SORCERER]
  [PC.0.0.MAGE_THIEF]
  [PC.0.0.THIEF]
  [PC.0.0.BARD]
@@ -314,6 +334,11 @@ TARGET=EnemiesInOrder
  FourthNearestEnemyOf(Myself)
  FifthNearestEnemyOf(Myself)
  SixthNearestEnemyOf(Myself)
+ 
+TARGET=EnemiesInOrderShort
+  NearestEnemyOf(Myself)
+  SecondNearestEnemyOf(Myself)
+  ThirdNearestEnemyOf(Myself)
  
 TARGET=HumanoidsPreferringStrong
  [GOODCUTOFF.HUMANOID.0.FIGHTER]
@@ -351,8 +376,12 @@ TARGET=PCsInOrder
  FifthNearest([PC])
  SixthNearest([PC])
  
+TARGET=PCsInOrderShort
+ [PC]
+ SecondNearest([PC])
+ ThirdNearest([PC])
+ 
 TARGET=SpellCasters
- [GOODCUTOFF.0.0.SORCERER]
  [GOODCUTOFF.0.0.MAGE]
  [GOODCUTOFF.0.0.CLERIC_MAGE]
  [GOODCUTOFF.0.0.MAGE_ALL]
@@ -363,7 +392,6 @@ TARGET=SpellCasters
  [GOODCUTOFF.0.0.CLERIC_ALL]
  
 TARGET=PureCasters
- [GOODCUTOFF.0.0.SORCERER]
  [GOODCUTOFF.0.0.MAGE]
  [GOODCUTOFF.0.0.CLERIC_MAGE]
  [GOODCUTOFF.0.0.MAGE_THIEF]
@@ -419,6 +447,20 @@ TARGET=EvilInOrderShort
  [EVILCUTOFF]
  SecondNearest([EVILCUTOFF])
  ThirdNearest([EVILCUTOFF])
+ 
+TARGET=BoltOfGlory
+ [GOODCUTOFF.DEMONIC]
+ SecondNearest([GOODCUTOFF.DEMONIC])
+ ThirdNearest([GOODCUTOFF.DEMONIC])
+ [GOOFCUTOFF.UNDEAD]
+ SecondNearest([GOODCUTOFF.UNDEAD])
+ ThirdNearest([GOODCUTOFF.UNDEAD])
+ NearestEnemyOf(Myself)
+ SecondNearestEnemyOf(Myself)
+ ThirdNearestEnemyOf(Myself)
+ FourthNearestEnemyOf(Myself)
+ FifthNearestEnemyOf(Myself)
+ SixthNearestEnemyOf(Myself)
 
 
 
