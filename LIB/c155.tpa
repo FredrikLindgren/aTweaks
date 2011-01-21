@@ -3,8 +3,10 @@ COPY "atweaks/bam/fl#cacoc.bam" override
      "atweaks/bam/fl#cacol.bam" override
      "atweaks/bam/fl#fienc.bam" override
      "atweaks/bam/fl#fienl.bam" override
-     "atweaks/bam/fl#gatea.bam" override
-     "atweaks/bam/fl#gateb.bam" override
+     "atweaks/bam/fl#gatea.bam" "override/spwi905c.bam" //wth does GATE use fl#gatec for its spellbook icon if you write fl#gatea to 0x3a?!
+     "atweaks/bam/fl#gateb.bam" "override/spwi905b.bam"
+     "atweaks/bam/fl#gatea.bam" "override/sppr703c.bam"
+     "atweaks/bam/fl#gateb.bam" "override/sppr703b.bam"
      "atweaks/bam/fl#gatec.bam" override
      "atweaks/bam/fl#gatel.bam" override
 
@@ -61,10 +63,10 @@ COPY_EXISTING spwi707.spl "override/fl#cacoc.spl"
               spwi807.spl "override/fl#fienl.spl"
               spwi905.spl "override/fl#gatec.spl"
               spwi905.spl "override/fl#gatel.spl"
-  PATCH_IF "%DEST_RES%" STRING_MATCHES_REGEXP "fl#....c$" = 0 BEGIN
+  PATCH_IF "%DEST_RES%" STRING_MATCHES_REGEXP "fl#.+c$" = 0 BEGIN
     SAY NAME1 @755
     alignment = 48
-  END ELSE PATCH_IF "%DEST_RES%" STRING_MATCHES_REGEXP "fl#....l$" = 0 BEGIN
+  END ELSE PATCH_IF "%DEST_RES%" STRING_MATCHES_REGEXP "fl#.+l$" = 0 BEGIN
     SAY NAME1 @756
     alignment = 16
   END
@@ -92,11 +94,18 @@ COPY_EXISTING spwi707.spl "override/fl#cacoc.spl"
     ei += ne
   END
 
-OUTER_SPRINT $array(spwi707) fl#caco
-OUTER_SPRINT $array(spwi807) fl#fien
-OUTER_SPRINT $array(spwi905) fl#gate
-OUTER_SPRINT $array(sppr703) fl#gate
-  
+OUTER_SPRINT $array(spwi707 16) fl#cacol
+OUTER_SPRINT $array(spwi707 32) fl#cacon
+OUTER_SPRINT $array(spwi707 48) fl#cacoc
+OUTER_SPRINT $array(spwi807 16) fl#fienl
+OUTER_SPRINT $array(spwi807 32) fl#fienn
+OUTER_SPRINT $array(spwi807 48) fl#fienc
+ACTION_FOR_EACH spell IN spwi905 sppr703 BEGIN
+  OUTER_SPRINT $array("%spell%" 16) fl#gatel
+  OUTER_SPRINT $array("%spell%" 32) fl#gaten
+  OUTER_SPRINT $array("%spell%" 48) fl#gatec
+END
+
 COPY_EXISTING spwi707.spl override
               spwi807.spl override
               spwi905.spl override
@@ -105,41 +114,37 @@ COPY_EXISTING spwi707.spl override
   READ_LONG  0x64 ao
   READ_LONG  0x6a eo
   READ_SHORT 0x70 ei
-  PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE spwi905 OR "%SOURCE_RES%" STRING_EQUAL_CASE sppr703 BEGIN
-    WRITE_ASCII 0x3a fl#gatea #8 //spellbook icon
-  END
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
-    PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE spwi905 OR "%SOURCE_RES%" STRING_EQUAL_CASE sppr703 BEGIN
-      WRITE_ASCII ao + 0x28*i + 0x4 fl#gateb #8 //ability icon
-    END
-    WRITE_BYTE  ao + 0x28*i + 0xc  5 //target (caster)   
+    WRITE_BYTE  ao + 0x28*i + 0xc  5 //target (caster)
     WRITE_BYTE  ao + 0x28*i + 0x12 0 //casting speed
     WRITE_SHORT ao + 0x28*i + 0x20 ei
     READ_SHORT  ao + 0x28*i + 0x1e ne
+    remove_neutral = 0
     FOR (j=0;j<ne;++j) BEGIN
-      READ_SHORT eo + 0x30*(ei + j) type
-      READ_LONG  eo + 0x30*(ei + j) p1
-      PATCH_IF type = 177 BEGIN 
-        WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 $array("%SOURCE_RES%") #7
-        PATCH_IF p1 = 16 BEGIN
-          WRITE_ASCII eo + 0x30*(ei + j) + 0x1b l #1
-        END
-        PATCH_IF p1 = 32 BEGIN
-          WRITE_ASCII eo + 0x30*(ei + j) + 0x1b n #1
-        END
-        PATCH_IF p1 = 48 BEGIN
-          WRITE_ASCII eo + 0x30*(ei + j) + 0x1b c #1
-        END
+      READ_SHORT eo + 0x30*(ei + j)       type
+      READ_LONG  eo + 0x30*(ei + j) + 0x4 p1
+      PATCH_IF type != 177 OR !VARIABLE_IS_SET $array("%SOURCE_RES%" "%p1%") OR (type = 177 AND p1 = 32 AND remove_neutral) BEGIN
+        DELETE_BYTES eo + 0x30*(ei + j) 0x30
+        --j
+        --ne
       END
+      PATCH_IF type = 177 AND VARIABLE_IS_SET $array("%SOURCE_RES%" "%p1%") BEGIN
+        WRITE_BYTE   eo + 0x30*(ei + j) + 0x12 100 //ptob1
+        WRITE_BYTE   eo + 0x30*(ei + j) + 0x13 0 //ptob2
+        WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 $array("%SOURCE_RES%" "%p1%") #8
+      END
+      remove_neutral = type = 177 AND p1 = 32 ? 1 : remove_neutral
     END
+    WRITE_SHORT ao + 0x28*i + 0x1e ne
+    ei += ne
   END
 BUT_ONLY
 
 COPY_EXISTING scrl81.itm override
               scrl9b.itm override
               scrl9n.itm override
-  //UPDATE DESC
-BUT_ONLY              
+  //UPDATE DESC, AND SCROLL ICON FOR GATE
+BUT_ONLY
       
       
     
