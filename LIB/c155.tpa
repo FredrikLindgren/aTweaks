@@ -113,6 +113,11 @@ ACTION_FOR_EACH spell IN spwi905 sppr703 BEGIN
   OUTER_SPRINT $array("%spell%" 48) fl#gatec
 END
 
+//Create fiend-summoning spells for NPCs to use
+COPY_EXISTING spwi707.spl "override/fl#canpc.spl"
+              spwi807.spl "override/fl#finpc.spl"
+              spwi905.spl "override/fl#ganpc.spl"
+
 //Alter fiend-summoning spells to the bring up the selection screen
 COPY_EXISTING spwi707.spl override
               spwi807.spl override
@@ -163,25 +168,35 @@ COPY_EXISTING scrl81.itm override
   END
 BUT_ONLY
 
-//Fix NPC scripts so they go straight to summoning tanar'ri
-COPY_EXISTING_REGEXP ".*\.bcs$" override
-  DECOMPILE_BCS_TO_BAF
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~\1Spell\2RES("fl#gatec",\3)~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),WIZARD_SUMMON_FIEND)~ ~\1Spell\2RES("fl#fienc",\3)~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),WIZARD_CACOFIEND)~ ~\1Spell\2RES("fl#cacoc",\3)~
+DEFINE_PATCH_MACRO ReplaceFiendSpells BEGIN
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~\1Spell\2RES("fl#ganpc",\3)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),WIZARD_SUMMON_FIEND)~ ~\1Spell\2RES("fl#finpc",\3)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),WIZARD_CACOFIEND)~ ~\1Spell\2RES("fl#canpc",\3)~
     
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~Spell\1NoDecRES("fl#gatec",\2) RemoveSpell(\3)~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_SUMMON_FIEND\))~ ~Spell\1NoDecRES("fl#fienc",\2) RemoveSpell(\3)~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_CACOFIEND\))~ ~Spell\1NoDecRES("fl#cacoc",\2) RemoveSpell(\3)~
-  
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~Spell\1NoDecRES("fl#gatec",\2)~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),WIZARD_SUMMON_FIEND)~ ~Spell\1NoDecRES("fl#fienc",\2)~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),WIZARD_CACOFIEND)~ ~Spell\1NoDecRES("fl#cacoc",\2)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~Spell\1NoDecRES("fl#ganpc",\2) RemoveSpell(\3)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_SUMMON_FIEND\))~ ~Spell\1NoDecRES("fl#finpc",\2) RemoveSpell(\3)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_CACOFIEND\))~ ~Spell\1NoDecRES("fl#canpc",\2) RemoveSpell(\3)~
+
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~Spell\1NoDecRES("fl#ganpc",\2)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),WIZARD_SUMMON_FIEND)~ ~Spell\1NoDecRES("fl#finpc",\2)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),WIZARD_CACOFIEND)~ ~Spell\1NoDecRES("fl#canpc",\2)~
+END
+
+//Fix NPC scripts so they use the old-style spells
+COPY_EXISTING_REGEXP GLOB ".*\.bcs$" override
+  DECOMPILE_BCS_TO_BAF
+    LPM ReplaceFiendSpells
   COMPILE_BAF_TO_BCS
 BUT_ONLY
-IF ~3707\|3807\|3905\|1703~ //If there's something that could be an IDS label for a fiend-summoning spell
+IF ~^\(2707\|2807\|2905\|1703\)~ //If there's something that could be an IDS label for a fiend-summoning spell
 
-
+//In case someone had the bright idea of sticking fiend-summoning spells into their dialogue
+COPY_EXISTING_REGEXP GLOB ".*\dlg$" override
+  DECOMPILE_DLG_TO_D
+    LPM ReplaceFiendSpells
+  COMPILE_D_TO_DLG
+BUT_ONLY
+IF ~WIZARD_GATE\|CLERIC_GATE\|WIZARD_SUMMON_FIEND\|WIZARD_CACOFIEND~
 
 
 
