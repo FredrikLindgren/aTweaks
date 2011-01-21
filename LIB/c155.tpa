@@ -1,14 +1,13 @@
 
-COPY "atweaks/bam/fl#cacoc.bam" override
-     "atweaks/bam/fl#cacol.bam" override
-     "atweaks/bam/fl#fienc.bam" override
-     "atweaks/bam/fl#fienl.bam" override
-     "atweaks/bam/fl#gatea.bam" "override/spwi905c.bam" //wth does GATE use fl#gatec for its spellbook icon if you write fl#gatea to 0x3a?!
-     "atweaks/bam/fl#gateb.bam" "override/spwi905b.bam"
-     "atweaks/bam/fl#gatea.bam" "override/sppr703c.bam"
-     "atweaks/bam/fl#gateb.bam" "override/sppr703b.bam"
-     "atweaks/bam/fl#gatec.bam" override
-     "atweaks/bam/fl#gatel.bam" override
+COPY "atweaks/bam/fl#cacoc.bam" "override/fl#707cb.bam" //apparently the stinkin' game doesn't like it when the resref at 0x3a in a .spl doesn't end with "c"
+     "atweaks/bam/fl#cacol.bam" "override/fl#707lb.bam"
+     "atweaks/bam/fl#fienc.bam" "override/fl#807cb.bam"
+     "atweaks/bam/fl#fienl.bam" "override/fl#807lb.bam"
+     "atweaks/bam/fl#gatea.bam" "override/fl#905c.bam"
+     "atweaks/bam/fl#gateb.bam" "override/fl#905b.bam"
+     "atweaks/bam/fl#gatec.bam" "override/fl#905cb.bam"
+     "atweaks/bam/fl#gatel.bam" "override/fl#905lb.bam"
+     "atweaks/bam/flscrl9n.bam" "override/fl#905a.bam"
 
 COPY "atweaks/2da/spwi510.2da" "override/fl#cacoc.2da"
      "atweaks/2da/spwi510.2da" "override/fl#cacon.2da"
@@ -56,7 +55,15 @@ COPY_EXISTING spcaco.eff "override/fl#cacoc.eff"
   FOR (i=0x38;i<0x65;i+=0x4) BEGIN
     WRITE_LONG i 0 
   END
+  
+OUTER_SPRINT $icon(fl#cacoc) fl#707cb
+OUTER_SPRINT $icon(fl#cacol) fl#707lb
+OUTER_SPRINT $icon(fl#fienc) fl#807cb
+OUTER_SPRINT $icon(fl#fienl) fl#807lb
+OUTER_SPRINT $icon(fl#gatec) fl#905cb
+OUTER_SPRINT $icon(fl#gatel) fl#905lb  
 
+//Create spells that summon a specific type of fiend with certainty
 COPY_EXISTING spwi707.spl "override/fl#cacoc.spl"
               spwi707.spl "override/fl#cacol.spl"
               spwi807.spl "override/fl#fienc.spl"
@@ -74,7 +81,7 @@ COPY_EXISTING spwi707.spl "override/fl#cacoc.spl"
   READ_LONG  0x6a eo
   READ_SHORT 0x70 ei
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
-    WRITE_ASCIIE ao + 0x28*i + 0x4  "%DEST_RES%" #8 //ability icon
+    WRITE_ASCIIE ao + 0x28*i + 0x4  $icon("%DEST_RES%") #8 //ability icon
     WRITE_SHORT ao + 0x28*i + 0x20 ei
     READ_SHORT  ao + 0x28*i + 0x1e ne
     FOR (j=0;j<ne;++j) BEGIN
@@ -106,15 +113,22 @@ ACTION_FOR_EACH spell IN spwi905 sppr703 BEGIN
   OUTER_SPRINT $array("%spell%" 48) fl#gatec
 END
 
+//Alter fiend-summoning spells to the bring up the selection screen
 COPY_EXISTING spwi707.spl override
               spwi807.spl override
               spwi905.spl override
               sppr703.spl override
   //UPDATE DESC
+  PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE spwi905 OR "%SOURCE_RES%" STRING_EQUAL_CASE sppr703 BEGIN
+    WRITE_ASCII 0x3a fl#905c #8
+  END
   READ_LONG  0x64 ao
   READ_LONG  0x6a eo
   READ_SHORT 0x70 ei
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE spwi905 OR "%SOURCE_RES%" STRING_EQUAL_CASE sppr703 BEGIN
+      WRITE_ASCII ao + 0x28*i + 0x4 fl#905b #8
+    END
     WRITE_BYTE  ao + 0x28*i + 0xc  5 //target (caster)
     WRITE_BYTE  ao + 0x28*i + 0x12 0 //casting speed
     WRITE_SHORT ao + 0x28*i + 0x20 ei
@@ -143,8 +157,35 @@ BUT_ONLY
 COPY_EXISTING scrl81.itm override
               scrl9b.itm override
               scrl9n.itm override
-  //UPDATE DESC, AND SCROLL ICON FOR GATE
+  //UPDATE DESC
+  PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE scrl9n BEGIN
+    WRITE_ASCII 0x3a fl#905a #8
+  END
 BUT_ONLY
+
+//Fix NPC scripts so they go straight to summoning tanar'ri
+COPY_EXISTING_REGEXP ".*\.bcs$" override
+  DECOMPILE_BCS_TO_BAF
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~\1Spell\2RES("fl#gatec",\3)~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),WIZARD_SUMMON_FIEND)~ ~\1Spell\2RES("fl#fienc",\3)~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),WIZARD_CACOFIEND)~ ~\1Spell\2RES("fl#cacoc",\3)~
+    
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~Spell\1NoDecRES("fl#gatec",\2) RemoveSpell(\3)~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_SUMMON_FIEND\))~ ~Spell\1NoDecRES("fl#fienc",\2) RemoveSpell(\3)~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_CACOFIEND\))~ ~Spell\1NoDecRES("fl#cacoc",\2) RemoveSpell(\3)~
+  
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~Spell\1NoDecRES("fl#gatec",\2)~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),WIZARD_SUMMON_FIEND)~ ~Spell\1NoDecRES("fl#fienc",\2)~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),WIZARD_CACOFIEND)~ ~Spell\1NoDecRES("fl#cacoc",\2)~
+  COMPILE_BAF_TO_BCS
+BUT_ONLY
+IF ~3707\|3807\|3905\|1703~ //If there's something that could be an IDS label for a fiend-summoning spell
+
+
+
+
+
+
       
       
     
