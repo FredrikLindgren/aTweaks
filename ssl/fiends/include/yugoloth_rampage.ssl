@@ -1,0 +1,23 @@
+//Rampage
+IF
+  !GlobalTimerNotExpired("fl#Taunt","LOCALS") //Demons and devils have different rampage blocks. Oh, why, aVENGER, must you torment me so?
+  !StateCheck(Myself,STATE_INVISIBLE)
+  !See(NearestEnemyOf(Myself))
+  See([0.HUMANOID.0.INNOCENT])
+THEN
+  RESPONSE #40
+    SetGlobalTimer("fl#Taunt","LOCALS",12)
+    DisplayStringHead(Myself,@660) // Despair mortal, your time has come!
+    DisplayStringHead(LastSeenBy(Myself),@665) // Wha-?! Gods, help me!
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+  RESPONSE #30
+    SetGlobalTimer("fl#Taunt","LOCALS",12)
+    DisplayStringHead(Myself,@661) // Pathetic creature, you have nothing to offer me but your life.
+    DisplayStringHead(LastSeenBy(Myself),@666) // No, please! Aaaaaargh!
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+  RESPONSE #30
+    SetGlobalTimer("fl#Taunt","LOCALS",12)
+    DisplayStringHead(LastSeenBy(Myself),@667) // Is that a... d-devil?! Run for your lives!
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+    DisplayStringHead(Myself,@662) // By all means, do try to flee. It's much more entertaining that way!
+END

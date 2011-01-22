@@ -27,3 +27,25 @@ BEGIN_ACTION_DEFINITION
       SetGlobal("cast","LOCALS",6)
       ForceSpell(Myself,scsargument1)
 END
+
+BEGIN_ACTION_DEFINITION
+  Name(Spell)
+  TRIGGER
+    !GlobalTimerNotExpired("cast","LOCALS")
+    HaveSpell(scsargument1)
+  ACTION
+    RESPONSE #scsprob1
+      SetGlobalTimer("cast","LOCALS",6)
+      Spell(scstarget,scsargument1)
+END
+
+BEGIN_ACTION_DEFINITION
+  Name(SpellMyself)
+  TRIGGER
+    !GlobalTimerNotExpired("cast","LOCALS")
+    HaveSpell(scstargument1)
+  ACTION
+    RESPONSE #scsprob1
+      SetGlobalTimer("cast","LOCALS",6)
+      Spell(Myself,scsargument1)
+END

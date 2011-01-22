@@ -31,55 +31,7 @@ THEN
     AddexperienceParty(x)
 END
 
-IF
-  Global("fl#EACheck","LOCALS",0)
-  Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
-THEN
-  RESPONSE #100
-    SetInterrupt(FALSE)
-    SetGlobal("fl#EACheck","LOCALS",2)
-    DialogInterrupt(FALSE)
-    LeaveParty()
-    ChangeEnemyAlly(Myself,ALLY)
-    SetInterrupt(TRUE)
-END
-
-IF
-  Global("fl#EACheck","LOCALS",0)
-  Allegiance(LastSummonerOf(Myself),EVILCUTOFF)
-THEN
-  RESPONSE #100
-    SetInterrupt(FALSE)
-    SetGlobal("fl#EACheck","LOCALS",1)
-    Enemy()
-    SetInterrupt(TRUE)
-END
-
-IF
-  Global("fl#EACheck","LOCALS",2)
-  Global("fl#Hostile","LOCALS",1)
-  Allegiance(Myself,EVILCUTOFF)
-  !See([PC])
-THEN
-  RESPONSE #100
-    SetInterrupt(FALSE)
-    LeaveParty()
-    ChangeEnemyAlly(Myself,ALLY)
-    SetInterrupt(TRUE)
-END
-
-IF
-  Global("fl#EACheck","LOCALS",2)
-  Global("fl#Hostile","LOCALS",0)
-  !Allegiance(Myself,EVILCUTOFF)
-  See([PC])
-THEN
-  RESPONSE #100
-    SetInterrupt(FALSE)
-    SetGlobal("fl#Hostile","LOCALS",1)
-    Enemy()
-    SetInterrupt(TRUE)
-END
+INCLUDE FILE(fiends/include/summoned_check.ssl)
 
 IF
   StateCheck(Myself,STATE_REALLY_DEAD)
@@ -103,77 +55,33 @@ IF
     AreaCheck("AR3008")
 THEN
   RESPONSE #100
-    SetGlobalTimer("cast","LOCALS",600)
+    SetGlobalTimer("cast","LOCALS",600) //No casting in dead-magic areas
 END
 
-IF TRIGGER
-  !GlobalTimerNotExpired("cast","LOCALS")
-  Exists(LastAttackerOf(Myself))
-  !Range(LastATtackerOf(Myself),6)
-  InMyArea(LastAttackerOf(Myself))
-  OR(2)
-    !Allegiance(LastAttackerOf(Myself),GOODCUTOFF)
-    !Allegiance(Myself,GOODCUTOFF)
-  !StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
-  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
-  !See(NearestEnemyOf(Myself))
-THEN DO
-  SetGlobalTimer("cast","LOCALS",6)
-  ForceSpellRES("RR#TELWE",LastAttackerOf(Myself))
-END
+INCLUDE FILE(fiends/include/high_porting.ssl)
 
-//Teleport to immobile targets  
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil) 
-  !HasItemEquiped("lich",scstarget)
-  StateCheck(scstarget,STATE_IMMOBILE) //OR this with HPPercentLT
-  !Range(scstarget,6)
-THEN DO
-  Action(ForceSpellRES,"RR#TELWE")
-END
-
-//Rampage
-IF
-  !GlobalTimerNotExpired("fl#Taunt","LOCALS") //Demons and devils have different rampage blocks. Oh, why, aVENGER, must you torment me so?
-  !StateCheck(Myself,STATE_INVISIBLE)
-  !See(NearestEnemyOf(Myself))
-  See([0.HUMANOID.0.INNOCENT])
-THEN
-  RESPONSE #40
-    SetGlobalTimer("fl#Taunt","LOCALS",12)
-    DisplayStringHead(Myself,@660) // Despair mortal, your time has come!
-    DisplayStringHead(LastSeenBy(Myself),@665) // Wha-?! Gods, help me!
-    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
-  RESPONSE #30
-    SetGlobalTimer("fl#Taunt","LOCALS",12)
-    DisplayStringHead(Myself,@661) // Pathetic creature, you have nothing to offer me but your life.
-    DisplayStringHead(LastSeenBy(Myself),@666) // No, please! Aaaaaargh!
-    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
-  RESPONSE #30
-    SetGlobalTimer("fl#Taunt","LOCALS",12)
-    DisplayStringHead(LastSeenBy(Myself),@667) // Is that a... d-devil?! Run for your lives!
-    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
-    DisplayStringHead(Myself,@662) // By all means, do try to flee. It's much more entertaining that way!
-END
+INCLUDE FILE(fiends/include/yugoloth_rampage.ssl)
 
 //Animate Dead if the enemy isn't too close
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
   !Range(scstarget,10)
 THEN DO
-  Combine()
-  Action(ForceSpell,CLERIC_ANIMATE_DEAD|100|150)
+  Action(ForceSpell,CLERIC_ANIMATE_DEAD|50|150)
 END
 
 //Mirror Image if there's no True Sight
 IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  !CheckStatGT(scstarget,0,TRUE_SIGHT)
+  Detect(NearestEnemyOf(Myself))
+  !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(FifthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
   !StateCheck(Myself,STATE_MIRRORIMAGE)
   GlobalLT("flMirrorImage","LOCALS",3)
 THEN DO
-  Combine()
   Action(ForceSpellMyself,WIZARD_MIRROR_IMAGE)
   IncrementGlobal("flMirrorImage","LOCALS",1)
 END
@@ -206,7 +114,7 @@ IF TRIGGER
   TriggerBlock(Disabled|MinorGlobe|SpellTurning|Charm|SIEnc|MR50)
 THEN DO
   Combine()
-  Action(ForceSpell,WIZARD_CHARM|50|100)
+  Action(ForceSpell,WIZARD_CHARM_PERSON|50|100)
 END  
   
 //Toss fire at targets low on HP

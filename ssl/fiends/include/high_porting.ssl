@@ -1,0 +1,26 @@
+IF TRIGGER
+  !GlobalTimerNotExpired("cast","LOCALS")
+  Exists(LastAttackerOf(Myself))
+  !Range(LastAttackerOf(Myself),6)
+  InMyArea(LastAttackerOf(Myself))
+  OR(2)
+    !Allegiance(LastAttackerOf(Myself),GOODCUTOFF)
+    !Allegiance(Myself,GOODCUTOFF)
+  !StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
+  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
+  !See(NearestEnemyOf(Myself))
+THEN DO
+  SetGlobalTimer("cast","LOCALS",6)
+  ForceSpellRES("RR#TELWE",LastAttackerOf(Myself))
+END
+
+//Teleport to immobile targets  
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil) 
+  !HasItemEquiped("lich",scstarget)
+  StateCheck(scstarget,STATE_IMMOBILE) //OR this with HPPercentLT
+  !Range(scstarget,6)
+THEN DO
+  Action(ForceSpellRES,"RR#TELWE")
+END

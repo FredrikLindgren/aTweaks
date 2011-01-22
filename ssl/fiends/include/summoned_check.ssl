@@ -1,0 +1,49 @@
+IF
+  Global("fl#EACheck","LOCALS",0)
+  Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    SetGlobal("fl#EACheck","LOCALS",2)
+    DialogInterrupt(FALSE)
+    LeaveParty()
+    ChangeEnemyAlly(Myself,ALLY)
+    SetInterrupt(TRUE)
+END
+
+IF
+  Global("fl#EACheck","LOCALS",0)
+  Allegiance(LastSummonerOf(Myself),EVILCUTOFF)
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    SetGlobal("fl#EACheck","LOCALS",1)
+    Enemy()
+    SetInterrupt(TRUE)
+END
+
+IF
+  Global("fl#EACheck","LOCALS",2)
+  Global("fl#Hostile","LOCALS",1)
+  Allegiance(Myself,EVILCUTOFF)
+  !See([PC])
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    LeaveParty()
+    ChangeEnemyAlly(Myself,ALLY)
+    SetInterrupt(TRUE)
+END
+
+IF
+  Global("fl#EACheck","LOCALS",2)
+  Global("fl#Hostile","LOCALS",0)
+  !Allegiance(Myself,EVILCUTOFF)
+  See([PC])
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    SetGlobal("fl#Hostile","LOCALS",1)
+    Enemy()
+    SetInterrupt(TRUE)
+END

@@ -4,11 +4,17 @@ TRIGGER=MagicSafeArea
  !AreaCheck("ar3008")
  !AreaCheck("ar3009")
 
-TRIGGER=FireRes
+TRIGGER=FireRes50
  !CheckStatGT(scstarget,50,RESISTFIRE)
  
-TRIGGER=ColdRes
+TRIGGER=ColdRes50
  !CheckStatGT(scstarget,50,RESISTCOLD)
+ 
+TRIGGER=ElecRes50
+ !CheckStatGT(scstarget,50,RESISTELECTRICITY)
+ 
+TRIGGER=AcidRes50
+ !CheckStatGT(scstarget,50,RESISTACID)
 
 TRIGGER=FireRes75
  !CheckStatGT(scstarget,75,RESISTFIRE)
@@ -297,8 +303,15 @@ TRIGGER=Confusion
  !Race(scstarget,SLIME)
  !Race(scstarget,DEMONIC)
  !Race(scstarget,TROLL)
+ !Race(scstarget,UMBERHULK)
  !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
  !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
+ !HasItem("ipsion",scstarget)
+ !HasItemEquiped("leat20",scstarget)
+ !HasItemEquiped("shld25",scstarget)
+ !HasItemEquipedReal("sw1h54",scstarget)
+ !HasItemEquipedReal("sw2h14",scstarget)
+ !HasItemEquipedReal("sw2h21",scstarget)
 
 TRIGGER=OKForInvis
  !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
@@ -522,17 +535,26 @@ TARGET=BoltOfGlory
  SixthNearestEnemyOf(Myself)
  
 TARGET=aVENGERFunnel
- [0.0.MAGE]
- SecondNearest([0.0.MAGE])
- [0.0.MAGE_THIEF]
- SecondNearest([0.0.MAGE_THIEF])
- [0.0.MAGE_ALL]
- SecondNearest([0.0.MAGE_ALL])
- ThirdNearest([0.0.MAGE_ALL])
- [0.0.CLERIC_ALL]
- SecondNearest([0.0.CLERIC_ALL])
- [0.0.DRUID_ALL]
- [0.0.BARD_ALL]
-
+ [0.0.0.MAGE]
+ SecondNearest([0.0.0.MAGE])
+ [0.0.0.MAGE_THIEF]
+ SecondNearest([0.0.0.MAGE_THIEF])
+ [0.0.0.MAGE_ALL]
+ SecondNearest([0.0.0.MAGE_ALL])
+ ThirdNearest([0.0.0.MAGE_ALL])
+ [0.0.0.CLERIC_ALL]
+ SecondNearest([0.0.0.CLERIC_ALL])
+ [0.0.0.DRUID_ALL]
+ [0.0.0.BARD_ALL]
+ 
+TARGET=MagesInOrder
+ NearestEnemyOfType([0.0.0.MAGE])
+ SecondNearestEnemyOfType([0.0.0.MAGE])
+ NearestEnemyOfType([0.0.0.MAGE_ALL])
+ SecondNearestEnemyOfType([0.0.0.MAGE_ALL])
+ NearestEnemyOfType([0.0.0.BARD_ALL])
+ NearestEnemyOf(Myself)
+ SecondNearestEnemyOf(Myself)
+ Third NearestEnemyOf(Myself)
 
 

@@ -1,0 +1,334 @@
+//fear, 1x/day
+//invisibility
+//magic missile
+//telekinesis
+//mage of 12th level
+//They all have this:
+//animate dead
+//cause disease
+//charm person
+//produce flame
+//teleport without error
+
+INCLUDE FILE(fiends/definitions.ssl)
+
+IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
+END
+
+IF
+  Die()
+  Global("fl#EACheck","LOCALS",1) // Fiend was summoned by an enemy
+  Global("fl#XP","LOCALS",0)
+THEN
+  RESPONSE #100
+    SetGlobal("fl#XP","LOCALS",1)
+    AddexperienceParty(x)
+END
+
+INCLUDE FILE(fiends/include/summoned_check.ssl)
+
+IF
+  StateCheck(Myself,STATE_REALLY_DEAD)
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+IF 
+  !InActiveArea(Myself)
+  !See([ANYONE])
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+IF
+  !GlobalTimerNotExpired("cast","LOCALS")
+  OR(2)
+    AreaCheck("AR3004")
+    AreaCheck("AR3008")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("cast","LOCALS",600) //No casting in dead-magic areas
+END
+
+INCLUDE FILE(fiends/include/high_porting.ssl)
+
+INCLUDE FILE(fiends/include/yugoloth_rampage.ssl)
+
+IF TRIGGER
+  TriggerBlock(CanCastMage)
+  !CheckStatGT(Myself,0,STONESKINS)
+THEN DO
+  Action(SpellMyself,WIZARD_STONESKINS)
+END
+
+IF TRIGGER
+  TriggerBlock(CanCastMage)
+  !CheckStatGT(Myself,0,RESISTCOLD)
+THEN DO
+  Action(SpellMyself,WIZARD_PROTECTION_FROM_COLD|100|50)
+END
+
+IF TRIGGER
+  TriggerBlock(CanCastMage)
+  !HasItem("melfmet",Myself)
+THEN DO
+  Action(SpellMyself,WIZARD_MELF_METEOR|100|50)
+END
+
+IF TRIGGER
+  Detect(NearestEnemyOf(Myself))
+  !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(FifthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  TriggerBlock(CanCastMage)
+  !StateCheck(Myself,STATE_MIRRORIMAGE)
+THEN DO
+  Combine()
+  Action(SpellMyself,WIZARD_MIRROR_IMAGE|100|100)
+END
+
+IF TRIGGER
+  TriggerBlock(CanCastMage)
+THEN DO
+  Action(SpellMyself,WIZARD_SHIELD|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(MagesInOrder)
+  TriggerBlock(CanCastMage|Disabled)
+  !CheckStatGT(scstarget,0,WIZARD_SPELL_TRAP)
+  OR(6)
+    CheckStatGT(scstarget,0,WIZARD_SPELL_IMMUNITY)
+    CheckStatGT(scstarget,0,WIZARD_SPELL_DEFLECTION)
+    CheckStatGT(scstarget,0,WIZARD_SPELL_TURNING)
+    CheckStat(scstarget,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    CheckStatGT(scstarget,0,MINORGLOBE)
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_SECRET_WORD|100|50)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|SpellTurning|SIAbj|Disabled)
+  OR(5)
+    CheckStatGT(scstarget,0,TRUE_SIGHT)
+    CheckStatGT(scstarget,0,STONESKINS)
+    CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+    CheckStatGT(scstarget,0,CLERIC_FREE_ACTION)
+    CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_BREACH|100|50)
+END 
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|SIEnc)
+THEN DO
+  Action(Spell,WIZARD_GREATER_MALISON|100|25)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|Confusion|SIEnc)
+THEN DO
+  Action(Spell,WIZARD_CHAOS|100|100)
+END  
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|ElecRes50|SpellTurning|SIEvo)
+  !HasItemEquiped("clck24",scstarget)
+  !HasItemEquiped("clck26",scstarget) 
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_CHAIN_LIGHTNING|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|SpellTurnng|SIEnc|Charm)
+  LevelGT(scstarget,8)
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_DOMINATION|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|SpellTurning|MinorGlobe|SIEnc|Hold)
+  LevelGT(scstarget,8)
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_HOLD_MONSTER|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|SICon|MinorGlobe|SpellTurning|FireRes50)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_FLAME_ARROW|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|SINec|MinorGlobe|Fear)
+THEN DO
+  Action(Spell,WIZARD_HORROR|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|SICon|MinorGlobe|SpellTurning|AcidRes50)
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_MELF_ACID_ARROW|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|SIEvo|MinorGlobe|SpellTurning|Slayable)
+  CheckStat(scstarget,1,24) //Greater Malison
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_CHROMATIC_ORB|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|SIIll|MinorGlobe|SpellTurning|Blindness)
+  !StateCheck(scstarget,STATE_BLIND)
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_BLINDNESS|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|SIIll|MinorGlobe|SpellTurning|Fear)
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_SPOOK|100|100)
+END
+
+//Fear, once per day, cone-shaped
+//Flee for CasterLevel rounds, save vs. spell
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SIIll|Fear)
+  !Range(scstarget,5) //Because cone-shaped projectiles pack a lot of suck at the narrow end
+  Range(scstarget,15)
+  Global("fl#FearCone","LOCALS",0)
+THEN DO
+  Action(ForceSpellRES,"fl#cnefr"¡100|100)
+  IncrementGlobal("fl#FearCone","LOCALS",1)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR75|SpellTurning|MinorGlobe|SIEvo)
+  !Race(scstarget,LICH)
+  !Race(scstarget,RAKSHASA)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Action(ForceSpell,WIZARD_MAGIC_MISSILE|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR75|SpellTurning)
+  Range(scstarget,10)
+  !Race(scstarget,GIANT)
+  !Race(scstarget,DRAGON)
+THEN DO
+  Action(ForceSpellRES,"fl#telki"|100|50)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIAbj|Disease)
+  Range(scstarget,5)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"fl#csdis"|40|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  General(scstarget,HUMANOID)
+  !Race(scstarget,RAKSHASA)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIEnc|Charm)
+THEN DO
+  Combine()
+  Action(ForceSpell,WIZARD_CHARM_PERSON|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIEvo)
+  !Race(scstarget,LICH)
+  !Race(scstarget,RAKSHASA)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#PFLAM"|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  !Range(scstarget,10)
+THEN DO
+  Action(ForceSpell,CLERIC_ANIMATE_DEAD|50|150)
+END
+
+//Melf
+//Melee  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
