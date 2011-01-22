@@ -1,4 +1,5 @@
 
+
 // Imp
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
@@ -1727,6 +1728,99 @@ COPY_EXISTING ~AR3004.ARE~ ~override~                                           
 BUT_ONLY_IF_IT_CHANGES
 
 
+
+
+//////////
+//Yugoloth
+//////////
+
+//Ultroloth
+
+WRITE_LONG 0x14
+LAUNCH_PATCH_FUNCTION RR#MDCRE
+  INT_VAR
+    newhp        = 130
+    newac        = "-8"
+    newth        = 7
+    mewapr       = 2
+    newsvd       = 
+    newsvw       = 
+    newsvp       = 
+    newsvb       = 
+    newsvs       = 
+    newmr        = 60
+    newfr        = 100
+    newcr        = "-100"
+    newer        = 0
+    newar        = 100
+    newstr       = 21
+    newint       = 20
+    newmor       = 16
+    newalign     = 19
+    
+    
+//Nycaloth
+COPY_EXISTING telbal1.cre "override/fl#snyca.cre"
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+  SAY NAME1 @734 SAY NAME2 @734                                                    //Nycaloth   
+  REPLACE_CRE_ITEM fl#nyca #0 #0 #0 unstealable&undroppable weapon1 EQUIP
+  REPLACE_CRE_ITEM immune2 #0 #0 #0 none lring
+  WRITE_LONG 0x14
+  LAUNCH_PATCH_FUNCTION RR#MDCRE
+    INT_VAR
+      newhp        = 110
+      newac        = "-6"
+      newth        = 9
+      newapr       = 2
+      newsvd       = 8
+      newsvw       = 10
+      newsvp       = 9
+      newsvb       = 9
+      newsvs       = 11
+      newlvl1      = 11
+      newmr        = 70
+      newfr        = 100
+      newcr        = "-100"
+      newer        = 0
+      newar        = 100 
+      newstr       = 20
+      newint       = 18 
+      newmor       = 16
+      newalign     = 19 //NE
+      
+      enforce      = 1
+    
+
+//Arcanaloth
+
+WRITE_LONG 0x14
+LAUNCH_PATCH_FUNCTION RR#MDCRE
+  INT_VAR
+    newhp        = 120
+    newac        = "-8"
+    newth        = 9
+    newapr       = 3
+    newsvd       = 
+    newsvw       = 
+    newsvp       = 
+    newsvb       = 
+    newsvs       = 
+    newmr        = 60
+    newfr        = 100
+    newcr        = "-100"
+    newer        = 0
+    newar        = 100 
+    newstr       = 18
+    newint       = 20 
+    newmor       = 16
+    newalign     = 19
+    
+
+
+
 //Create scripts and creatures outside the ACTION_IF in case SCSII is installed after 
 COMPILE ~atweaks/baf/fiends/fl#nabsu.baf~
         ~atweaks/baf/fiends/fl#corsu.baf~
@@ -1921,292 +2015,6 @@ COPY_EXISTING demnabsu.cre  override
   PATCH_IF FILE_EXISTS_IN_GAME dw#sumfi.itm AND !FILE_CONTAINS_EVALUATED ("%SOURCE_FILE%" "dw#sumfi") BEGIN
     ADD_CRE_ITEM "dw#sumfi" #0 #0 #0 none boots
   END
-
-/*
-COPY ~aTweaks/CRE/RR#SCORN.CRE~ ~override~                                         // Summoned Cornugon (for Cacofiend)
-
-COPY ~aTweaks/CRE/RR#SGELU.CRE~ ~override~                                         // Summoned Gelugon (for Summon Fiend)
-  SAY NAME1 @670 SAY NAME2 @670                                                    // Gelugon
-COPY ~aTweaks/CRE/RR#SBALR.CRE~ ~override~                                         // Summoned Balor (for Gate)
-
-
-// Summoned Nabassu
-
-COPY_EXISTING ~DEMNABSU.CRE~ ~override~                                            // Nabassu (summoned)
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DNABA~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-WRITE_LONG 0x10  "2"                                                               // clear flags, leave only "no corpse"
-WRITE_LONG 0x14 "0"                                                                // XP awarded when killed (nulling this as XP is handled via script)
-WRITE_ASCII 0x248 ~RR#SNABA~ #8                                                    // summoned Nabassu script
-WRITE_ASCII 0x250 ~None~ #8                                                        // disable class AI script
-WRITE_ASCII 0x258 ~None~ #8                                                        // disable race AI script
-WRITE_ASCII 0x260 ~None~ #8                                                        // disable general AI script
-WRITE_ASCII 0x268 ~None~ #8                                                        // disable default AI script
-WRITE_BYTE  0x270 "128"                                                            // set initial allegiance to NEUTRAL
-WRITE_SHORT 0x28 "4352"                                                            // Nabassu should use the TANARRI (winged demon) avatar
-LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-INT_VAR                                                                            // Initialize variables
-"newhp"    = "76"                                                                  // new hit point value
-"newac"    = "-5"                                                                  // new Armor Class value
-"newth"    = "13"                                                                  // new THAC0 value
-"newapr"   = "3"                                                                   // new number of attacks per round
-"newsvd"   = "10"                                                                  // new Save vs. Death
-"newsvw"   = "12"                                                                  // new Save vs. Wand
-"newsvp"   = "11"                                                                  // new Save vs. Polymorph
-"newsvb"   = "12"                                                                  // new Save vs. Breath
-"newsvs"   = "13"                                                                  // new Save vs. Spell
-"newmr"    = "50"                                                                  // new Magic Resistance value
-"newfr"    = "100"                                                                 // new Resist Fire value
-"newcr"    = "50"                                                                  // new Resist Cold value
-"newer"    = "100"                                                                 // new Resist Electricity value
-"newlvl1"  = "7"                                                                   // new level (first class)
-"newstr"   = "19"                                                                  // new Strength value
-"newint"   = "14"                                                                  // new Intelligence value
-"newwis"   = "15"                                                                  // new Wisdom value
-"newdex"   = "14"                                                                  // new Dexterity value
-"newcon"   = "19"                                                                  // new Constitution value
-"newchr"   = "18"                                                                  // new Charisma value
-"newmor"   = "16"                                                                  // new morale value
-"newmorb"  = "4"                                                                   // new morale break value
-"newmorr"  = "15"                                                                  // new morale recovery value
-"newrace"  = "121"                                                                 // new race (Demonic)
-"newclass" = "160"                                                                 // new class (Tanari)
-"newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-STR_VAR                                                                            // initialize strings
-"enfc01"   = "DEMNABSU"                                                            // enforced creature 1 (uses strict PnP values)
-END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-INT_VAR
-opcode = "300"                                                                     // effect: #300 (NPC Bump)
-target = "1"                                                                       // target: 1 (self)
-timing = "9"                                                                       // timing mode: 9 (permanent after death)
-"duration" = "0"                                                                   // duration: 0
-"sectype" = "0"                                                                    // secondary type: none
-parameter2 = "1"                                                                   // param2: 1 (constant value)
-probability1 = "100"                                                               // probability1: 100%
-STR_VAR
-"effsource" = ""                                                                   // effsource: none
-END
-PATCH_FOR_EACH ~spell~ IN                                                          // grant immunity to each of the following spells (prevents AI quirks)
-            ~SPIN561~                                                              // Fire Giant Lava Pit (FIRE_GIANT_LAVA)
-            ~SPIN819~                                                              // Lava Burst (LAVA_BURST)
-            ~SPWI022~                                                              // Lava Pit (TRAP_MUCK)
-            ~SPWI103~                                                              // Burning Hands
-            ~SPWI217~                                                              // Agannazar's Scorcher
-            ~SPWI304~                                                              // Fireball
-            ~SPWI308~                                                              // Lightning Bolt (Tanar'ri only)
-            ~SPWI502~                                                              // Cloudkill
-            ~SPWI523~                                                              // Sunfire
-            ~SPWI712~                                                              // Delayed Blast Fireball
-            ~SPWI810~                                                              // Incendiary Cloud
-            ~SPWI911~                                                              // Meteor Swarm
-            ~SPPR705~                                                              // Fire Storm
-            ~RR#PR211~                                                             // Nabassu's own Silence 15' Radius
-BEGIN                                                                              // execute the following
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-INT_VAR                                                                            // initialize variables
-"opcode" = "206"                                                                   // effect: #101 (Protection from Opcode)
-"target" = "1"                                                                     // target: 1 (self)
-"timing" = "9"                                                                     // timing mode: 9 (permanent after death)
-"duration" = "0"                                                                   // duration: 0
-"sectype" = "0"                                                                    // secondary type: none
-"probability1" = "100"                                                             // probability1: 100%
-STR_VAR                                                                            // initialize strings
-"resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-"effsource" = ""                                                                   // effsource: none
-END                                                                                // ends FUNCTION
-END                                                                                // ends PATCH_FOR_EACH block
-BUT_ONLY_IF_IT_CHANGES
-
-
-
-// Summoned Glabrezu
-
-COPY_EXISTING ~DEMGLASU.CRE~ ~override~                                            // Glabrezu (summoned)
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DGLAB~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-WRITE_LONG 0x10  "2"                                                               // clear flags, leave only "no corpse"
-WRITE_LONG 0x14 "0"                                                                // XP awarded when killed (nulling this as XP is handled via script)
-WRITE_SHORT 0x28 "57585"                                                           // Glabrezu should use the IC_GLAB avatar
-WRITE_ASCII 0x248 ~RR#SGLAB~ #8                                                    // summoned Glabrezu script
-WRITE_ASCII 0x250 ~None~ #8                                                        // disable class AI script
-WRITE_ASCII 0x258 ~None~ #8                                                        // disable race AI script
-WRITE_ASCII 0x260 ~None~ #8                                                        // disable general AI script
-WRITE_ASCII 0x268 ~None~ #8                                                        // disable default AI script
-WRITE_BYTE  0x270 "128"                                                            // set initial allegiance to NEUTRAL
-LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-INT_VAR                                                                            // Initialize variables
-"newhp"    = "80"                                                                  // new hit point value
-"newac"    = "-7"                                                                  // new Armor Class value
-"newth"    = "11"                                                                  // new THAC0 value
-"newapr"   = "5"                                                                   // new number of attacks per round
-"newsvd"   = "8"                                                                   // new Save vs. Death
-"newsvw"   = "10"                                                                  // new Save vs. Wand
-"newsvp"   = "9"                                                                   // new Save vs. Polymorph
-"newsvb"   = "9"                                                                   // new Save vs. Breath
-"newsvs"   = "11"                                                                  // new Save vs. Spell
-"newmr"    = "50"                                                                  // new Magic Resistance value
-"newfr"    = "100"                                                                 // new Resist Fire value
-"newcr"    = "50"                                                                  // new Resist Cold value
-"newer"    = "100"                                                                 // new Resist Electricity value
-"newar"    = "100"                                                                 // new Resist Acid value
-"newlvl1"  = "10"                                                                  // new level (first class)
-"newstr"   = "20"                                                                  // new Strength value
-"newint"   = "16"                                                                  // new Intelligence value
-"newwis"   = "13"                                                                  // new Wisdom value
-"newdex"   = "18"                                                                  // new Dexterity value
-"newcon"   = "20"                                                                  // new Constitution value
-"newchr"   = "22"                                                                  // new Charisma value
-"newmor"   = "18"                                                                  // new morale value
-"newmorb"  = "3"                                                                   // new morale break value
-"newmorr"  = "15"                                                                  // new morale recovery value
-"newrace"  = "121"                                                                 // new race (Demonic)
-"newclass" = "160"                                                                 // new class (Tanari)
-"newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-STR_VAR                                                                            // initialize strings
-"enfc01"   = "DEMGLASU"                                                            // enforced creature 1 (uses strict PnP values)
-END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-INT_VAR
-opcode = "300"                                                                     // effect: #300 (NPC Bump)
-target = "1"                                                                       // target: 1 (self)
-timing = "9"                                                                       // timing mode: 9 (permanent after death)
-"duration" = "0"                                                                   // duration: 0
-"sectype" = "0"                                                                    // secondary type: none
-parameter2 = "1"                                                                   // param2: 1 (constant value)
-probability1 = "100"                                                               // probability1: 100%
-STR_VAR
-"effsource" = ""                                                                   // effsource: none
-END
-PATCH_FOR_EACH ~spell~ IN                                                          // grant immunity to each of the following spells (prevents AI quirks)
-            ~SPIN561~                                                              // Fire Giant Lava Pit (FIRE_GIANT_LAVA)
-            ~SPIN819~                                                              // Lava Burst (LAVA_BURST)
-            ~SPWI022~                                                              // Lava Pit (TRAP_MUCK)
-            ~SPWI103~                                                              // Burning Hands
-            ~SPWI217~                                                              // Agannazar's Scorcher
-            ~SPWI304~                                                              // Fireball
-            ~SPWI308~                                                              // Lightning Bolt (Tanar'ri only)
-            ~SPWI502~                                                              // Cloudkill
-            ~SPWI523~                                                              // Sunfire
-            ~SPWI614~                                                              // Death Fog (Glabrezu only)
-            ~SPWI712~                                                              // Delayed Blast Fireball
-            ~SPWI810~                                                              // Incendiary Cloud
-            ~SPWI911~                                                              // Meteor Swarm
-            ~SPPR705~                                                              // Fire Storm
-BEGIN                                                                              // execute the following
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-INT_VAR                                                                            // initialize variables
-"opcode" = "206"                                                                   // effect: #101 (Protection from Opcode)
-"target" = "1"                                                                     // target: 1 (self)
-"timing" = "9"                                                                     // timing mode: 9 (permanent after death)
-"duration" = "0"                                                                   // duration: 0
-"sectype" = "0"                                                                    // secondary type: none
-"probability1" = "100"                                                             // probability1: 100%
-STR_VAR                                                                            // initialize strings
-"resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-"effsource" = ""                                                                   // effsource: none
-END                                                                                // ends FUNCTION
-END                                                                                // ends PATCH_FOR_EACH block
-BUT_ONLY_IF_IT_CHANGES
-
-
-
-// Summoned Pit Fiend
-
-COPY_EXISTING   ~DEMPITSU.CRE~ ~override~                                          // Pit Fiend (summoned)
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DPITF~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace generic attack with a Pit Fiend specific attack
-WRITE_LONG 0x10  "2"                                                               // clear flags, leave only "no corpse"
-WRITE_LONG 0x14 "0"                                                                // XP awarded when killed (nulling this as XP is handled via script)
-WRITE_SHORT 0x28 "4352"                                                            // Pit Fiends should use the TANARRI (winged demon) avatar
-WRITE_ASCII 0x248 ~RR#SPITF~ #8                                                    // summoned Pit Fiend script
-WRITE_ASCII 0x250 ~None~ #8                                                        // disable class AI script
-WRITE_ASCII 0x258 ~None~ #8                                                        // disable race AI script
-WRITE_ASCII 0x260 ~None~ #8                                                        // disable general AI script
-WRITE_ASCII 0x268 ~None~ #8                                                        // disable default AI script
-WRITE_BYTE  0x270 "128"                                                            // set initial allegiance to NEUTRAL
-LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-INT_VAR                                                                            // Initialize variables
-"newhp"    = "104"                                                                 // new hit point value
-"newac"    = "-5"                                                                  // new Armor Class value
-"newth"    = "13"                                                                  // new THAC0 value
-"newapr"   = "5"                                                                   // new number of attacks per round
-"newsvd"   = "5"                                                                   // new Save vs. Death
-"newsvw"   = "7"                                                                   // new Save vs. Wand
-"newsvp"   = "6"                                                                   // new Save vs. Polymorph
-"newsvb"   = "5"                                                                   // new Save vs. Breath
-"newsvs"   = "8"                                                                   // new Save vs. Spell
-"newmr"    = "50"                                                                  // new Magic Resistance value
-"newfr"    = "100"                                                                 // new Resist Fire value
-"newcr"    = "50"                                                                  // new Resist Cold value
-"newer"    = "0"                                                                   // new Resist Electricity value
-"newlvl1"  = "13"                                                                  // new level (first class)
-"newstr"   = "18"                                                                  // new Strength value
-"newstrx"  = "100"                                                                 // new Exceptional Strength value
-"newint"   = "18"                                                                  // new Intelligence value
-"newwis"   = "16"                                                                  // new Wisdom value
-"newdex"   = "16"                                                                  // new Dexterity value
-"newcon"   = "16"                                                                  // new Constitution value
-"newchr"   = "25"                                                                  // new Charisma value
-"newmor"   = "20"                                                                  // new morale value
-"newmorb"  = "0"                                                                   // new morale break value
-"newmorr"  = "1"                                                                   // new morale recovery value
-"newrace"  = "121"                                                                 // new race (Demonic)
-"newclass" = "179"                                                                 // new class (Imp)
-"newalign" = "19"                                                                  // new alignment (Lawful Evil)
-STR_VAR                                                                            // initialize strings
-"enfc01"   = "DEMPITSU"                                                            // enforced creature 1 (uses strict PnP values)
-END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-INT_VAR opcode_to_delete = "16" END                                                // mark opcode #16 (Haste) for deletion
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-INT_VAR opcode_to_delete = "292" END                                               // mark opcode #292 (Protection from Backstab) for deletion
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-INT_VAR
-opcode = "300"                                                                     // effect: #300 (NPC Bump)
-target = "1"                                                                       // target: 1 (self)
-timing = "9"                                                                       // timing mode: 9 (permanent after death)
-parameter2 = "1"                                                                   // param2: 1 (constant value)
-"duration" = "0"                                                                   // duration: 0
-"sectype" = "0"                                                                    // secondary type: none
-probability1 = "100"                                                               // probability1: 100%
-STR_VAR                                                                            // initialize strings
-"effsource" = ""                                                                   // effsource: none
-END                                                                                // ends FUNCTION
-PATCH_FOR_EACH ~spell~ IN                                                          // grant immunity to each of the following spells (prevents AI quirks)
-            ~SPIN561~                                                              // Fire Giant Lava Pit (FIRE_GIANT_LAVA)
-            ~SPIN819~                                                              // Lava Burst (LAVA_BURST)
-            ~SPWI022~                                                              // Lava Pit (TRAP_MUCK)
-            ~SPWI103~                                                              // Burning Hands
-            ~SPWI217~                                                              // Agannazar's Scorcher
-            ~SPWI304~                                                              // Fireball
-           ~RR#WI304~                                                              // Pit Fiend's own Fireball
-            ~SPWI502~                                                              // Cloudkill
-            ~SPWI523~                                                              // Sunfire
-            ~SPWI712~                                                              // Delayed Blast Fireball
-            ~SPWI810~                                                              // Incendiary Cloud
-            ~SPWI911~                                                              // Meteor Swarm
-            ~SPPR705~                                                              // Fire Storm
-BEGIN                                                                              // execute the following
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-INT_VAR                                                                            // initialize variables
-"opcode" = "206"                                                                   // effect: #101 (Protection from Opcode)
-"target" = "1"                                                                     // target: 1 (self)
-"timing" = "9"                                                                     // timing mode: 9 (permanent after death)
-"duration" = "0"                                                                   // duration: 0
-"sectype" = "0"                                                                    // secondary type: none
-"probability1" = "100"                                                             // probability1: 100%
-STR_VAR                                                                            // initialize strings
-"resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-"effsource" = ""                                                                   // effsource: none
-END                                                                                // ends FUNCTION
-END                                                                                // ends PATCH_FOR_EACH block
-BUT_ONLY_IF_IT_CHANGES
-*/
 
 
 // Spell changes

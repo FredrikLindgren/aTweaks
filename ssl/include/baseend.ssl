@@ -1,0 +1,30 @@
+//Pursue
+BEGIN LOOP(loopvar||1;2;3;4;5;6)
+IF
+  !See([GOODCUTOFF])
+  !Detect(Playerloopvar)
+  Allegiance(Myself,EVILCUTOFF)
+  GlobalTimerNotExpired("flChasePlayerloopvar","LOCALS")
+THEN
+  RESPONSE #100
+    MoveToObject(Playerloopvar)
+END
+END LOOP
+
+//Just keep busy
+IF
+  ActionListEmpty()
+  See(NearestEnemyOf(Myself))
+THEN
+  RESPONSE #100
+  AttackOneRound(LastSeenBy(Myself))
+END
+
+IF
+  ActionListEmpty()
+  !Allegiance(Myself,ENEMY)
+  AttackedBy([ANYONE],DEFAULT)
+  See(LastAttackerOf(Myself))
+THEN DO
+  AttackOneRound(LastAttackerOf(Myself))
+END

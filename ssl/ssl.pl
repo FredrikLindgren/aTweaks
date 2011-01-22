@@ -262,7 +262,7 @@ sub process_line {
 				@defaulttrigger=split('&',$scsline)
 			}
 		}
-		elsif ($scsline eq "BEGIN_ACTION_DEFINITION") {
+                elsif ($scsline eq "BEGIN_ACTION_DEFINITION") {
 			$location="actiondefinename";
 		}
 		elsif ($scsline eq "IF TRIGGER") {
@@ -480,7 +480,7 @@ sub process_line {
 			die "3: Unexpected THEN DO at line $linenum";
 		}
 		else {
-			push @alwaysaction, $scsline;
+			push @alwaysaction, $scsline; #always here
 		}
 		return;
 	}
@@ -489,7 +489,7 @@ sub process_line {
 		if ($scsline eq "END") {
 			$location="none";
 			if ($ignorethisresponse eq "No") {
-				push @bafblock,@bafactionarray;
+                                push @bafblock,@bafactionarray;
 			}
 			push @bafblock,$scsline;
 			
@@ -501,7 +501,7 @@ sub process_line {
 		elsif ($scsline=~m/RESPONSE/ eq "1") {
 			$baflocation="responses";
 			if ($ignorethisresponse eq "No") {
-				push @bafblock,@bafactionarray;
+                                push @bafblock,@bafactionarray;
 			}
 			@bafactionarray=();
 			push @bafactionarray,$scsline;
@@ -662,6 +662,7 @@ sub process_block {
 		block_print();
 		$combine ="No";
 		@target=('LastSeenBy(Myself)');
+		push @trigger, "See(LastSeenBy(Myself))";
 		@targetcondition=();
 	}
 	if (scalar @action eq 0) {
@@ -714,7 +715,7 @@ sub make_action {
 					$actiontop[$actionlabel]=$tempstring;
 					$actiontop[$actionlabel]=~s/$replacelabel/$replace/g;
 					$actionlabel=$actionlabel+1;
-				} 
+				}
 			}
 		}
 		foreach $replace (@actionargs) {
@@ -733,11 +734,11 @@ sub make_action {
 		}
 		$replacelabel="scsprob1";
 		$actionlabel=0;
-		foreach (@actiontop) {
+                foreach (@actiontop) {
 			$actiontop[$actionlabel]=~s/$replacelabel/$prob1/g;
 			$actionlabel=$actionlabel+1;
 		}
-		push @actiontop, @alwaysaction;
+                push @actiontop, @alwaysaction;
 	}
 
 	elsif ($actionargs[0] eq "SpellReplaceRandom") {
@@ -864,13 +865,13 @@ sub block_print {
 			push @output, "False()";
 		}
 		push @output, "THEN";
-		foreach $4 (@actiontop) { 
+                foreach $4 (@actiontop) {
 			push @output, sub_target($4,$3);
 		}
-		push @output, "END";
+                push @output, "END";
 		push @output, "";
 		$conditioncounter=$conditioncounter+1;
-		
+
 	}
 }
 

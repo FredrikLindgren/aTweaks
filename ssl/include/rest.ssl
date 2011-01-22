@@ -1,0 +1,35 @@
+//Rest
+IF
+  RequireBlock(ThereAreExtraActions)
+  !Detect(NearestEnemyOf(Myself))
+  Global("flRest","LOCALS",1)
+  !GlobalTimerNotExpired("flRestTimer","LOCALS")
+THEN
+  RESPONSE #100
+    SetGlobal("flRest","LOCALS",0)
+    ExtraActions
+    ApplySpell(Myself,RESTORE_FULL_HEALTH)
+    Rest()
+END
+
+IF
+  IgnoreBlock(ThereAreExtraActions)
+  !Detect(NearestEnemyOf(Myself))
+  Global("flRest","LOCALS",1)
+  !GlobalTimerNotExpired("flRestTimer","LOCALS")
+THEN
+  RESPONSE #100
+    SetGlobal("flRest","LOCALS",0)
+    ApplySpell(Myself,RESTORE_FULL_HEALTH)
+    Rest()
+END
+
+IF
+  !GlobalTimerNotExpired("flRestTimer","LOCALS")
+  Detect(NearestEnemyOf(Myself))
+  Global("flRest","LOCALS",0)
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flRestTimer","LOCALS",2400)
+    SetGlobal("flRest","LOCALS",1)
+END

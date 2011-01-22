@@ -1,0 +1,26 @@
+
+IF TRIGGER
+  RequireBlock(TurnUndead)
+  TargetBlock(GoodUndeadInOrder)
+  Allegiance(Myself,ENEMY)
+  !Class(LastSeenBy(Myself),SKELETON_WARRIOR)
+  LevelLT(LastSeenBy(Myself),TurnLevel)
+  !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+THEN DO
+  DisplayStringHead(Myself,@1023)
+  Action(Turn|100|50)
+END
+
+IF TRIGGER
+  RequireBlock(TurnUndead)
+  TargetBlock(GoodPaladinsInOrder)
+  TriggerBlock(Disabled|Fear)
+  Allegiance(Myself,ENEMY)
+  Alignment(Myself,MASK_EVIL)
+  LevelLT(scstarget,TurnLevel)
+  !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+THEN DO
+  Action(Turn|100|50)
+END
+
+

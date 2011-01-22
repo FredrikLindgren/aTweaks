@@ -10,11 +10,26 @@ TRIGGER=FireRes
 TRIGGER=ColdRes
  !CheckStatGT(scstarget,50,RESISTCOLD)
 
+TRIGGER=FireRes75
+ !CheckStatGT(scstarget,75,RESISTFIRE)
+
+TRIGGER=ColdRes75
+ !CheckStatGT(scstarget,75,RESISTCOLD)
+ 
+TRIGGER=ElecRes75
+ !CheckStatGT(scstarget,75,RESISTELECTRICITY)
+ 
+TRIGGER=FireResFull
+ !CheckStatGT(scstarget,99,RESISTFIRE)
+
 TRIGGER=MR50
  !CheckStatGT(scstarget,50,RESISTMAGIC)
 
 TRIGGER=MR75
  !CheckStatGT(scstarget,75,RESISTMAGIC)
+
+TRIGGER=MRFull
+ !CheckStatGT(scstarget,99,RESISTMAGIC)
 
 TRIGGER=SIAbj
  !CheckStat(scstarget,1,WIZARD_SPELL_IMMUNITY)
@@ -55,22 +70,23 @@ TRIGGER=Slayable
  !HasItemEquiped("sw1h71",scstarget)
  
 TRIGGER=Fear
- !CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
- !Kit(scstarget,CAVALIER)
  !General(scstarget,UNDEAD)
  !Race(scstarget,SLIME)
  !Race(scstarget,GOLEM)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,TROLL)
+ !Kit(scstarget,CAVALIER)
+ !CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
  !HasItemEquiped("CLCK30",scstarget) // Cloak of Bravery
  !HasItemEquipedReal("SW1H32",scstarget) // Dragonslayer
  !HasItemEquipedReal("MISCBC",scstarget) // Blackrazor
  !HasItemEquiped("RR#HELMD",scstarget) // Dead Man's Face (RR)
- CheckStatGT(scstarget,0,SAVEVSSPELL)
 
 TRIGGER=Blindness
  !General(scstarget,UNDEAD)
  !Race(scstarget,SLIME)
  !Race(scstarget,DEMONIC)
- CheckStatGT(scstarget,0,SAVEVSSPELL)
  !HasItemEquiped("NPMISC1",scstarget) // Jansen Spectroscopes
  !HasItemEquiped("RR#HEL02",scstarget) // Cowl of Acuity 
  
@@ -78,7 +94,10 @@ TRIGGER=Stun
  !General(scstarget,UNDEAD)
  !Race(scstarget,SLIME)
  !Race(scstarget,DEMONIC)
+ !Race(scstarget,GOLEM)
+ !Race(scstarget,TROLL)
  !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
 
 TRIGGER=Stoneskin
  !CheckStatGT(scstarget,0,STONESKINS)
@@ -86,43 +105,212 @@ TRIGGER=Stoneskin
 TRIGGER=MirrorImage
  !StateCheck(scstarget,STATE_MIRRORIMAGE)
 
-TRIGGER=OKForMelee
+TRIGGER=WeaponImmunity
  OR(2)
-   CheckStatGT(Myself,0,CLERIC_HALLOW)
-   CheckStat(scstarget,0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+   CheckStatGT(Myself,0,CLERIC_HALLOW) //You need magical weapons to bypass PfNW
+   CheckStat(scstarget,0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS) //PfNW
  OR(2)
-   CheckStat(Myself,0,CLERIC_HALLOW)
-   !CheckStat(scstarget,4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+   CheckStat(Myself,0,CLERIC_HALLOW) //You need normal weapons to bypass PfMW
+   !CheckStat(scstarget,4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //PfMW
  OR(2)
-   CheckStatGT(Myself,2,CLERIC_HALLOW)
-   !CheckStat(scstarget,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+   CheckStatGT(Myself,2,CLERIC_HALLOW) //You need +3 or better to bypass Mantle
+   !CheckStat(scstarget,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Mantle
  OR(2)
-   CheckStatGT(Myself,3,CLERIC_HALLOW)
-   !CheckStat(scstarget,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+   CheckStatGT(Myself,3,CLERIC_HALLOW) //You need +4 or better to bypass Improved Mantle
+   !CheckStat(scstarget,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Improved Mantle
  OR(2)
-   CheckStatGT(Myself,4,CLERIC_HALLOW)
-   !CheckStat(scstarget,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+   CheckStatGT(Myself,5,CLERIC_HALLOW) //You need +6 or better to bypass Absolute Immunity
+   !CheckStat(scstarget,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Absolute Immunity
  !HasItem("MORSWORD",scstarget)
 
-TRIGGER=OKForSlash
- !CheckStatGT(scstarget,99,RESISTSLASHING)
+TRIGGER=SlashRes
+ CheckStatLT(scstarget,50,RESISTSLASHING)
  
 TRIGGER=CrushRes
+ CheckStatLT(scstarget,50,RESISTCRUSHING)
+ 
+TRIGGER=PierceRes
+ CheckStatLT(scstarget,50,RESISTPIERCING)
+ 
+TRIGGER=MissileRes
+ CheckStatLT(scstarget,50,RESISTMISSILE)
+
+TRIGGER=SlashRes75
+ !CheckStatGT(scstarget,75,RESISTSLASHING)
+ 
+TRIGGER=CrushRes75
+ !CheckStatGT(scstarget,75,RESISTCRUSHING)
+ 
+TRIGGER=PierceRes75
+ !CheckStatGT(scstarget,75,RESISTPIERCING)
+ 
+TRIGGER=MissileRes75
+ !CheckStatGT(scstarget,75,RESISTMISSILE)
+
+TRIGGER=SlashResFull
+ !CheckStatGT(scstarget,99,RESISTSLASHING)
+ 
+TRIGGER=CrushResFull
  !CheckStatGT(scstarget,99,RESISTCRUSHING)
  
+TRIGGER=PierceResFull
+ !CheckStatGT(scstarget,99,RESISTPIERCING)
+ 
+TRIGGER=MissileResFull
+ !CheckStatGT(scstarget,99,RESISTMISSILE)
+
 TRIGGER=Disabled
  !StateCheck(scstarget,STATE_DISABLED)
  !CheckStatGT(scstarget,0,HELD)
+ !StateCheck(scstarget,STATE_STONE_DEATH)
  
 TRIGGER=Enemy
  Allegiance(Myself,ENEMY)
- !Allegiance(scstarget,ENEMY)
+ !Allegiance(scstarget,EVILCUTOFF)
  
-TRIGGER=CanCast
-  CheckStatLT(Myself,50,SPELLFAILUREMAGE)
-  !CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
-  !StateCheck(Myself,STATE_SILENCED)
+TRIGGER=CanCastMage
+ CheckStatLT(Myself,50,SPELLFAILUREMAGE)
+ !StateCheck(Myself,STATE_SILENCED)
  
+TRIGGER=CanCastPriest
+ CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+ !StateCheck(Myself,STATE_SILENCED)
+
+TRIGGER=ProEvil
+ !CheckStatGT(scstarget,0,PROTECTION_FROM_EVIL)
+ !HasItemEquipedReal("staf11",scstarget)
+ !HasItemEquiped("wa2amu",scstarget)
+ 
+TRIGGER=Charm
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,ELF)
+ !Race(scstarget,GOLEM)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,TROLL)
+ !Class(scstarget,MONK)
+ !Kit(scstarget,INQUISITOR)
+ !Kit(scstarget,CAVALIER)
+ !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
+ !HasItemEquiped("helm06",scstarget) //charm protection
+ !HasItemEquiped("ipsion",scstarget) //mordy sword
+ !HasItemEquipedReal("miscbc",scstarget) //Blackrazor
+ !HasItemEquiped("npchan",scstarget) //Valygar's
+ !HasItemEquiped("shld25",scstarget) //of harmony
+ !HasItemEquipedReal("sper07",scstarget) //of the unicorn
+ !HasItemEquipedReal("staf11",scstarget) //of the magi
+ !HasItemEquipedReal("sw1h35",scstarget) //Adjatha
+ !HasItemEquipedReal("sw1h54",scstarget) //Equalizer
+ !HasItemEquipedReal("sw2h14",scstarget) //Lilarcor
+ 
+TRIGGER=Petrify
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,SLIME)
+ !CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_PETRIFICATION)
+ !HasItemEquiped("clck26",scstarget)
+ 
+TRIGGER=Hold
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,GOLEM)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,TROLL)
+ !Kit(scstarget,UNDEADHUNTER)
+ !Kit(scstarget,INQUISITOR)
+ !CheckStatGT(scstarget,0,CLERIC_FREE_ACTION)
+ !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
+ !HasItemEquiped("shld25",scstarget) //harmony
+ !HasItemEquipedReal("blun30",scstarget) //FoA
+ !HasItemEquiped("ipsion",scstarget) //mordy sword
+ !HasItemEquiped("npplat",scstarget) //Keldorn's
+ !HasItemEquiped("ring09",scstarget) //Free action
+ !HasItemEquipedReal("sper12",scstarget) //Ixil's spike
+ !HasItemEquipedReal("sw1h27",scstarget) //Arbane's sword
+ 
+TRIGGER=Sleep
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,ELF)
+ !Race(scstarget,GOLEM)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,TROLL)
+ !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
+ !HasItemEquiped("ipsion",scstarget)
+ 
+TRIGGER=LevelDrain
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,SLIME)
+ !CheckStatGT(scstarget,0,SCRIPTINGSTATE3)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
+ !HasItemEquiped("amul21",scstarget)
+ !HasItemEquipedReal("blun25",scstarget)
+ !HasItemEquipedReal("hamm10",scstarget)
+ !HasItemEquipedReal("hamm11",scstarget)
+ !HasItemEquipedReal("sw1h61",scstarget)
+ !HasItemEquipedReal("sw1h69",scstarget)
+ 
+TRIGGER=Slow
+ !CheckStatGT(scstarget,0,CLERIC_FREE_ACTION)
+ !HasItemEquipedReal("blun30",scstarget)
+ !HasItemEquipedReal("sper12",scstarget)
+ !HasItemEquiped("npplat",scstarget)
+ !HasItemEquiped("npsw01",scstarget)
+ !HasItemEquiped("ring09",scstarget)
+ !HasItemEquiped("ipsion",scstarget)
+ 
+TRIGGER=NoTrueSeeing
+ !CheckStatGT(Myself,0,TRUE_SIGHT)
+ !CheckStatGT([EVILCUTOFF],0,TRUE_SIGHT)
+ !CheckStatGT(SecondNearest[EVILCUTOFF],0,TRUE_SIGHT)
+ !CheckStatGT(ThirdNearest[EVILCUTOFF],0,TRUE_SIGHT)
+ !CheckStatGT(FourthNearest[EVILCUTOFF],0,TRUE_SIGHT)
+ !CheckStatGT(FifthNearest[EVILCUTOFF],0,TRUE_SIGHT)
+ !CheckStatGT(SixthNearest[EVILCUTOFF],0,TRUE_SIGHT)
+ 
+TRIGGER=Poison
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,GOLEM)
+ !Race(scstarget,ELEMENTAL)
+ !Race(scstarget,SLIME)
+ !StateCheck(scstarget,STATE_POISON)
+ !CheckStatGT(scstarget,50,RESISTPOISON)
+ !HasItemEquiped("amul22",scstarget)
+ !HasItemEquiped("helm30",scstarget)
+ !HasItemEquiped("ring39",scstarget)
+ !HasItemEquiped("ring46",scstarget)
+ !HasItemEquipedReal("sw1h34",scstarget)
+ 
+TRIGGER=Disease
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,GOLEM)
+ !Race(scstarget,ELEMENTAL)
+ !Race(scstarget,SLIME)
+ !StateCheck(scstarget,STATE_DISEASED)
+ !HasItemEquiped("ring39",scstarget)
+ !HasItemEquiped("misc8j",scstarget)
+ 
+TRIGGER=Confusion
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,TROLL)
+ !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
+
+TRIGGER=OKForInvis
+ !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(FifthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !Global("dvgldust","LOCALS",1)
+ 
+
 TARGET=PlayersReverse
  Player6
  Player5
@@ -140,12 +328,12 @@ TARGET=PlayersInOrder
  Player6
  
 TARGET=PlayersRandomOrder
- Player3
- Player5
  Player2
- Player6
- Player4
+ Player5
  Player1
+ Player4
+ Player3
+ Player6
 
 TARGET=PCsPreferringWeak
  [PC.0.0.MAGE]
@@ -154,18 +342,27 @@ TARGET=PCsPreferringWeak
  [PC.0.0.THIEF]
  [PC.0.0.BARD]
  [PC.0.0.THIEF_ALL]
+ [PC.0.0.DRUID]
  [PC.0.0.CLERIC]
  [PC]
  SecondNearest([PC])
  ThirdNearest([PC])
- 
+
+TARGET=PCArchers
+ [PC.0.0.RANGER]
+ [PC.0.0.FIGHTER]
+ [PC.0.0.FIGHTER_THIEF]
+ [PC.0.0.THIEF]
+ [PC.0.0.BARD]
+ [PC.0.0.THIEF_ALL]
+ [PC.0.0.FIGHTER_ALL]
+
 TARGET=Squishy
  [PC.0.0.MAGE]
  [PC.0.0.MAGE_THIEF]
  [PC.0.0.THIEF]
  [PC.0.0.BARD]
 
- 
 TARGET=CloseEnemies
  NearestEnemyOf(Myself)
  SecondNearestEnemyOf(Myself)
@@ -180,6 +377,14 @@ TARGET=EnemiesReverseClose
  ThirdNearestEnemyOf(Myself)
  SecondNearestEnemyOf(Myself)
  NearestEnemyOf(Myself)
+ 
+TARGET=EnemiesReverse
+ SixthNearestEnemyOf(Myself)
+ FifthNearestEnemyOf(Myself)
+ FourthNearestEnemyOf(Myself)
+ ThirdNearestEnemyOf(Myself)
+ SecondNearestEnemyOf(Myself)
+ NearestEnemyOf(Myself)
 
 TARGET=EnemiesInOrder
  NearestEnemyOf(Myself)
@@ -188,3 +393,146 @@ TARGET=EnemiesInOrder
  FourthNearestEnemyOf(Myself)
  FifthNearestEnemyOf(Myself)
  SixthNearestEnemyOf(Myself)
+ 
+TARGET=EnemiesInOrderShort
+  NearestEnemyOf(Myself)
+  SecondNearestEnemyOf(Myself)
+  ThirdNearestEnemyOf(Myself)
+ 
+TARGET=HumanoidsPreferringStrong
+ [GOODCUTOFF.HUMANOID.0.FIGHTER]
+ [GOODCUTOFF.HUMANOID.0.PALADIN]
+ [GOODCUTOFF.HUMANOID.0.RANGER]
+ [GOODCUTOFF.HUMANOID.0.FIGHTER_ALL]
+ [GOODCUTOFF.HUMANOID.0.RANGER_ALL]
+ [GOODCUTOFF.HUMANOID]
+ SecondNearest([GOODCUTOFF.HUMANOID])
+ ThirdNearest([GOODCUTOFF.HUMANOID])
+ 
+TARGET=GoodPreferringStrong
+ [GOODCUTOFF.0.0.FIGHTER_ALL]
+ [GOODCUTOFF.0.0.RANGER_ALL]
+ [GOODCUTOFF.0.0.PALADIN]
+ [GOODCUTOFF]
+ SecondNearest([GOODCUTOFF])
+ ThirdNearest([GOODCUTOFF])
+ FourthNearest([GOODCUTOFF])
+ 
+TARGET=PCsPreferringStrong
+ [PC.0.0.FIGHTER_ALL]
+ [PC.0.0.RANGER_ALL]
+ [PC.0.0.PALADIN]
+ [PC]
+ SecondNearest([PC])
+ ThirdNearest([PC])
+ FourthNearest([PC])
+ 
+TARGET=PCsInOrder
+ [PC]
+ SecondNearest([PC])
+ ThirdNearest([PC])
+ FourthNearest([PC])
+ FifthNearest([PC])
+ SixthNearest([PC])
+ 
+TARGET=PCsInOrderShort
+ [PC]
+ SecondNearest([PC])
+ ThirdNearest([PC])
+ 
+TARGET=SpellCasters
+ [GOODCUTOFF.0.0.MAGE]
+ [GOODCUTOFF.0.0.CLERIC_MAGE]
+ [GOODCUTOFF.0.0.MAGE_ALL]
+ [GOODCUTOFF.0.0.DRUID]
+ [GOODCUTOFF.0.0.CLERIC]
+ [GOODCUTOFF.0.0.BARD]
+ [GOODCUTOFF.0.0.FIGHTER_DRUID]
+ [GOODCUTOFF.0.0.CLERIC_ALL]
+ 
+TARGET=PureCasters
+ [GOODCUTOFF.0.0.MAGE]
+ [GOODCUTOFF.0.0.CLERIC_MAGE]
+ [GOODCUTOFF.0.0.MAGE_THIEF]
+ [GOODCUTOFF.0.0.DRUID]
+ [GOODCUTOFF.0.0.CLERIC]
+ [GOODCUTOFF.0.0.BARD]
+ [GOODCUTOFF.0.0.CLERIC_THIEF]
+ 
+TARGET=FighterCasters
+ [GOODCUTOFF.0.0.FIGHTER_MAGE]
+ [GOODCUTOFF.0.0.FIGHTER_DRUID]
+ [GOODCUTOFF.0.0.FIGHTER_CLERIC]
+ 
+TARGET=Beholders
+ [0.0.BEHOLDER]
+ SecondNearest([0.0.BEHOLDER])
+ ThirdNearest([0.0.BEHOLDER])
+ FourthNearest([0.0.BEHOLDER])
+ FifthNearest([0.0.BEHOLDER])
+ SixthNearest([0.0.BEHOLDER])
+ 
+TARGET=Summons
+ [GOODCUTOFF.0.0.0.0.SUMMONED]
+ SecondNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
+ ThirdNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
+ FourthNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
+ FifthNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
+ SixthNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
+ 
+TARGET=PCCasters
+ [PC.0.0.MAGE_ALL]
+ [PC.0.0.DRUID_ALL]
+ [PC.0.0.CLERIC_ALL]
+ [PC.0.0.BARD]
+ 
+TARGET=GoodUndeadInOrder
+ [GOODCUTOFF.UNDEAD]
+ SecondNearest([GOODCUTOFF.UNDEAD])
+ ThirdNearest([GOODCUTOFF.UNDEAD])
+ FourthNearest([GOODCUTOFF.UNDEAD])
+ FifthNearest([GOODCUTOFF.UNDEAD])
+ SixthNearest([GOODCUTOFF.UNDEAD])
+ 
+TARGET=GoodPaladinsInOrder
+ [GOODCUTOFF.0.0.PALADIN]
+ SecondNearest([GOODCUTOFF.0.0.PALADIN])
+ ThirdNearest([GOODCUTOFF.0.0.PALADIN])
+ FourthNearest([GOODCUTOFF.0.0.PALADIN])
+ FifthNearest([GOODCUTOFF.0.0.PALADIN])
+ SixthNearest([GOODCUTOFF.0.0.PALADIN])
+ 
+TARGET=EvilInOrderShort
+ [EVILCUTOFF]
+ SecondNearest([EVILCUTOFF])
+ ThirdNearest([EVILCUTOFF])
+ 
+TARGET=BoltOfGlory
+ [GOODCUTOFF.DEMONIC]
+ SecondNearest([GOODCUTOFF.DEMONIC])
+ ThirdNearest([GOODCUTOFF.DEMONIC])
+ [GOOFCUTOFF.UNDEAD]
+ SecondNearest([GOODCUTOFF.UNDEAD])
+ ThirdNearest([GOODCUTOFF.UNDEAD])
+ NearestEnemyOf(Myself)
+ SecondNearestEnemyOf(Myself)
+ ThirdNearestEnemyOf(Myself)
+ FourthNearestEnemyOf(Myself)
+ FifthNearestEnemyOf(Myself)
+ SixthNearestEnemyOf(Myself)
+ 
+TARGET=aVENGERFunnel
+ [0.0.MAGE]
+ SecondNearest([0.0.MAGE])
+ [0.0.MAGE_THIEF]
+ SecondNearest([0.0.MAGE_THIEF])
+ [0.0.MAGE_ALL]
+ SecondNearest([0.0.MAGE_ALL])
+ ThirdNearest([0.0.MAGE_ALL])
+ [0.0.CLERIC_ALL]
+ SecondNearest([0.0.CLERIC_ALL])
+ [0.0.DRUID_ALL]
+ [0.0.BARD_ALL]
+
+
+

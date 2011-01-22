@@ -1,0 +1,379 @@
+//Command, 3x/day
+//detect invisibility, always active
+//dispel magic
+//fear, by touch
+//invisibility
+//mirror image, 3x/day
+//They all have this:
+//animate dead
+//cause disease
+//charm person
+//produce flame
+//teleport without error
+
+INCLUDE FILE(fiends/definitions.ssl)
+
+IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
+END
+
+IF
+  Die()
+  Global("fl#EACheck","LOCALS",1) // Fiend was summoned by an enemy
+  Global("fl#XP","LOCALS",0)
+THEN
+  RESPONSE #100
+    SetGlobal("fl#XP","LOCALS",1)
+    AddexperienceParty(x)
+END
+
+IF
+  Global("fl#EACheck","LOCALS",0)
+  Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    SetGlobal("fl#EACheck","LOCALS",2)
+    DialogInterrupt(FALSE)
+    LeaveParty()
+    ChangeEnemyAlly(Myself,ALLY)
+    SetInterrupt(TRUE)
+END
+
+IF
+  Global("fl#EACheck","LOCALS",0)
+  Allegiance(LastSummonerOf(Myself),EVILCUTOFF)
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    SetGlobal("fl#EACheck","LOCALS",1)
+    Enemy()
+    SetInterrupt(TRUE)
+END
+
+IF
+  Global("fl#EACheck","LOCALS",2)
+  Global("fl#Hostile","LOCALS",1)
+  Allegiance(Myself,EVILCUTOFF)
+  !See([PC])
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    LeaveParty()
+    ChangeEnemyAlly(Myself,ALLY)
+    SetInterrupt(TRUE)
+END
+
+IF
+  Global("fl#EACheck","LOCALS",2)
+  Global("fl#Hostile","LOCALS",0)
+  !Allegiance(Myself,EVILCUTOFF)
+  See([PC])
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    SetGlobal("fl#Hostile","LOCALS",1)
+    Enemy()
+    SetInterrupt(TRUE)
+END
+
+IF
+  StateCheck(Myself,STATE_REALLY_DEAD)
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+IF 
+  !InActiveArea(Myself)
+  !See([ANYONE])
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+IF
+  !GlobalTimerNotExpired("cast","LOCALS")
+  OR(2)
+    AreaCheck("AR3004")
+    AreaCheck("AR3008")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("cast","LOCALS",600)
+END
+
+IF TRIGGER
+  !GlobalTimerNotExpired("cast","LOCALS")
+  Exists(LastAttackerOf(Myself))
+  !Range(LastATtackerOf(Myself),6)
+  InMyArea(LastAttackerOf(Myself))
+  OR(2)
+    !Allegiance(LastAttackerOf(Myself),GOODCUTOFF)
+    !Allegiance(Myself,GOODCUTOFF)
+  !StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
+  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
+  !See(NearestEnemyOf(Myself))
+THEN DO
+  SetGlobalTimer("cast","LOCALS",6)
+  ForceSpellRES("RR#TELWE",LastAttackerOf(Myself))
+END
+
+//Teleport to immobile targets  
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil) 
+  !HasItemEquiped("lich",scstarget)
+  StateCheck(scstarget,STATE_IMMOBILE) //OR this with HPPercentLT
+  !Range(scstarget,6)
+THEN DO
+  Action(ForceSpellRES,"RR#TELWE")
+END
+
+//Rampage
+IF
+  !GlobalTimerNotExpired("fl#Taunt","LOCALS") //Demons and devils have different rampage blocks. Oh, why, aVENGER, must you torment me so?
+  !StateCheck(Myself,STATE_INVISIBLE)
+  !See(NearestEnemyOf(Myself))
+  See([0.HUMANOID.0.INNOCENT])
+THEN
+  RESPONSE #40
+    SetGlobalTimer("fl#Taunt","LOCALS",12)
+    DisplayStringHead(Myself,@660) // Despair mortal, your time has come!
+    DisplayStringHead(LastSeenBy(Myself),@665) // Wha-?! Gods, help me!
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+  RESPONSE #30
+    SetGlobalTimer("fl#Taunt","LOCALS",12)
+    DisplayStringHead(Myself,@661) // Pathetic creature, you have nothing to offer me but your life.
+    DisplayStringHead(LastSeenBy(Myself),@666) // No, please! Aaaaaargh!
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+  RESPONSE #30
+    SetGlobalTimer("fl#Taunt","LOCALS",12)
+    DisplayStringHead(LastSeenBy(Myself),@667) // Is that a... d-devil?! Run for your lives!
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+    DisplayStringHead(Myself,@662) // By all means, do try to flee. It's much more entertaining that way!
+END
+
+//Animate Dead if the enemy isn't too close
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  !Range(scstarget,10)
+THEN DO
+  Combine()
+  Action(ForceSpell,CLERIC_ANIMATE_DEAD|100|150)
+END
+
+//Mirror Image if there's no True Sight
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  !CheckStatGT(scstarget,0,TRUE_SIGHT)
+  !StateCheck(Myself,STATE_MIRRORIMAGE)
+  GlobalLT("flMirrorImage","LOCALS",3)
+THEN DO
+  Combine()
+  Action(ForceSpellMyself,WIZARD_MIRROR_IMAGE)
+  IncrementGlobal("flMirrorImage","LOCALS",1)
+END
+
+//Fear, by touch
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,5)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|Fear|MR75|SIIll)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#DCFEA"|30|100)
+END
+
+//Cause disease, also by touch
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,5)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|Disease|MR75|SIAbj)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"fl#csdis"|30|100)
+END 
+
+//Charm person
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  General(scstarget,HUMANOID)
+  !Race(scstarget,RAKSHASA)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|Charm|SIEnc|MR50)
+THEN DO
+  Combine()
+  Action(ForceSpell,WIZARD_CHARM|50|100)
+END  
+  
+//Toss fire at targets low on HP
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  HPLT(scstarget,15)
+  !Race(scstarget,LICH)
+  !Race(scstarget,RAKSHASA)
+  TriggerBlock(MinorGlobe|SpellTurning|FireResFull|MR75|SIEvo)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#PFLAM"|100|100)
+END
+
+//Command
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,6)
+  LevelLT(scstarget,6)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|SIEnc|Sleep|MR50|Soneskin|MirrorImage)
+  GlobalLT("flCommand","LOCALS",3)
+THEN DO
+  Combine()
+  Action(ForceSpell,CLERIC_COMMAND|100|100)
+  IncrementGlobal("flCommand","LOCALS",1)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,6)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|SIEnc|Sleep|MR50|Stoneskin|MirrorImage)
+  GlobalLT("flCommand","LOCALS",3)
+THEN DO
+  Combine()
+  Action(ForceSpell,CLERIC_COMMAND|100|200)
+  IncrementGlobal("flCommand","LOCALS",1)
+END
+
+IF TRIGGER
+  Global("fl#Summoner","LOCALS",0)
+  Target(LastSummonerOf(Myself))
+  Exists(scstarget)
+  TriggerBlock(ProEvil)
+  !HasItemEquiped("lich",scstarget)
+  !StateCheck(scstarget,STATE_REALLY_DEAD)
+  !StateCheck(Myself,STATE_INVISIBLE)
+THEN DO
+  SetInterrupt(FALSE)
+  SetGlobal("fl#Summoner","LOCALS",1)
+  FaceObject(scstarget)
+  DisplayStringHead(Myself,@681) // Foolish mortal! You have unleashed powers far beyond your comprehension by summoning me here.
+  SetInterrupt(TRUE)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  !Race(scstarget,LICH)
+  !Race(scstarget,RAKSHASA)
+  TriggerBlock(MRFull|FireResFull|SpellTurning|MinorGlobe|SIEvo|ProEvil)
+  !HasItemEquiped("lich",scstarget)
+  !HasItemEquiped("clck26",scstarget)
+  Range(NearestEnemyOf(Myself),5)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#PFLAM"|100|100)
+END 
+
+IF TRIGGER
+  TargetBlock(aVENGERFunnel)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil|Stoneskin|MirrorImage|Disabled)
+  !HasItemEquiped("lich",scstarget)
+  Range(scstarget,5)
+THEN DO
+  AttackOneRound(scstarget)
+END 
+
+IF TRIGGER
+  TargetBlock(aVENGERFunnel)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil|Stoneskin|MirrorImage|Disabled)
+  !HasItemEquiped("lich",scstarget)
+  !Range(scstarget,5)
+  InMyArea(scstarget)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#TELWE")
+END
+
+IF TRIGGER
+  TargetBlock(aVENGERFunnel)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
+  !HasItemEquiped("lich",scstarget)
+  Range(scstarget,5)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(aVENGERFunnel)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
+  !HasItemEquiped("lich",scstarget)
+  !Range(scstarget,5)
+  InMyArea(scstarget)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#TELWE")
+END
+
+//Inviso-up if there's nothing better to do
+IF TRIGGER
+  !StateCheck(Myself,STATE_INVISIBLE)
+  TriggerBlock(OKForInvis)
+THEN DO
+  Action(ForceSpellMyself,WIZARD_INVISIBILITY|100|25)
+END
+
+//ADD: Behaviour for when attacked by someone under ProEvil
+
+IF
+  See([ANYONE])
+  Allegiance(Myself,EVILCUTOFF)
+  Race(LastSeenBY(Myself),DEMONIC)
+  Alignment(LastSeenBy(Myself),MASK_EVIL)
+  !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
+  See([ANYONE])
+  Allegiance(Myself,GOODCUTOFF)
+  Race(LastSeenBY(Myself),DEMONIC)
+  Alignment(LastSeenBy(Myself),MASK_EVIL)
+  !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF TRIGGER
+  Target([ANYONE])
+  Triggerblock(WeaponImmunity|SlashResFull|ProEvil)
+  !HasItemEquiped("lich",scstarget)
+  Range(scstarget,5)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  Target([ANYONE])
+  Triggerblock(WeaponImmunity|SlashResFull|ProEvil)
+  !HasItemEquiped("lich",scstarget)
+  !Range(scstarget,5)
+  InMyArea(scstarget)
+THEN DO
+  Action(ForceSpellRES,"RR#TELWE")
+END
+
+IF
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    RandomWalkContinous()
+END
+    
