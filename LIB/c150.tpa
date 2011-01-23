@@ -1729,7 +1729,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 
 
-
+/*
 //////////
 //Yugoloth
 //////////
@@ -1851,6 +1851,58 @@ ADD_MEMORIZED_SPELL spwi615 #5 wizard      //Chain Lightning
 //charm person
 //produce flame
 //teleport without error
+*/
+
+
+///////////////////////////////////////////////////////////
+//Create gating spells
+///////////////////////////////////////////////////////////
+
+//files for summoned marilith
+
+//Balor: summon 1-6 lesser (alu-fiend, cambion, succubus), 1-4 greater (nabassu) or 1 true tanar'ri (balor, marilith, glabrezu)
+COPY_EXISTING spwi905.spl "override/fl#gtbal.spl"
+  LPF prep_for_gate_making END
+  //cast spell effects
+  
+//Marilith: summon 1-6 lesser, 1-4 greater or 1 true tanar'ri
+COPY_EXISTING spwi905.spl "override/fl#gtmar.spl"
+  LPF prep_for_gate_making END
+  //cast spell effects
+
+//Glabrezu: summon 1 true tanar'ri (balor, marilith, glabrezu)
+COPY_EXISTING spwi905.spl "override/fl#gtgla.spl"
+  LPF prep_for_gate_making END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 198 probability1 = 33 STR_REF resource = rr#sbalr EBD
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 198 probability1 = 66 probability2 = 34 STR_VAR resource = spfiend END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 198 probability1 = 100 probability2 = 67 STR_VAR resource = rr#smari END
+
+//Succubus: summon 1 balor
+COPY_EXISTING spwi905.spl "override/fl#gtsuc.spl"
+  LPF prep_for_gate_making END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 paramater2 = 2 duration = 198 STR_REF resource = rr#sbalr END
+  
+
+//Pit Fiend: summon 2 lesser (abishai, erinyes, osyluth) or 1 greater (cornugon, gelugon, pit fiend) baatezu
+COPY_EXISTING spwi905.spl "override/fl#gtpit.spl"
+  LPF prep_for_gate_making END
+  
+//Gelugon: summon 2-8 osyluth or 1-2 gelugons
+COPY_EXISTING spwi905.spl "override/fl#gtgel.spl"
+  LPF prep_for_gate_making END
+  
+//Cornugon: summon 2-16 abishai or 1-3 cornugons
+COPY_EXISTING spwi905.spl "override/fl#gtcor.spl"
+  LPF prep_for_gate_making END
+  
+//Abishai: summon 1-3 abishai
+COPY_EXISTING spwi905.spl "override/fl#gtabi.spl"
+  LPF prep_for_gate_making END
+  
+//Osyluth: summon 1-2 osyluth
+COPY_EXISTING spwi905.spl "override/fl#gtosy.spl"
+  LPF prep_for_gate_making END
+
 
 
 //Create scripts and creatures outside the ACTION_IF in case SCSII is installed after 
