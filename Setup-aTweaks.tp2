@@ -8,7 +8,7 @@
 
 BACKUP ~aTweaks/BACKUP~
 AUTHOR "Wisp, shsforums.net"                                                       // Author and e-mail address
-VERSION ~v3.41~                                                                    // Mod version
+VERSION ~v3.42~                                                                    // Mod version
 ALWAYS                                                                             // Always do this block
   INCLUDE ~aTweaks/LIB/RR#AGLEF.TPH~                                               // Include my custom "Add Global Effect" function
   INCLUDE ~aTweaks/LIB/RR#SP2IN.TPH~                                               // Include my custom "Spell to Innate" function
@@ -461,7 +461,7 @@ INCLUDE "atweaks/lib/c150.tpa"                                                  
 ///////////////////////////
 
 
-BEGIN @155 DESIGNATED 155 // Revised Fiend summoning
+BEGIN @155 DESIGNATED 155 DEPRECATED @93 // Revised Fiend summoning
 GROUP @1   // PnP tweaks 
 REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
 REQUIRE_PREDICATE FILE_EXISTS_IN_GAME fl#atfiends1.mrk @94
@@ -800,6 +800,18 @@ ACTION_IF BGT BEGIN
   OUTER_SPRINT BG2Check ~Global("ENDOFBG1","GLOBAL",2)~
 END ELSE BEGIN
   OUTER_SPRINT BG2Check ~~
+END
+
+ACTION_FOR_EACH spell IN spin101 spin102 spin103 spin104 spin105 spin106 BEGIN //Stinkin' game's hard-coded to remove the SPIN###s in ToB
+  OUTER_PATCH_SAVE shell "%spell%" BEGIN
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH spin fl#gp
+  END
+  OUTER_PATCH_SAVE copy "%spell%" BEGIN
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH spin fl#bp
+  END
+  COPY_EXISTING "%spell%.spl" "override/%copy%.spl"
+  COPY "atweaks/spl/base.spl" "override/%shell%.spl"
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 171 target = 2 timing = 1 STR_VAR resource = EVAL "%copy%" END
 END
 
 EXTEND_BOTTOM dplayer3.bcs "atweaks/baf/regainbhaalpowers1.baf" EVAL
