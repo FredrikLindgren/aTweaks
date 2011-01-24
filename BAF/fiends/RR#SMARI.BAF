@@ -968,7 +968,8 @@ THEN
 END
 
 IF
-	InWeaponRange([GOODCUTOFF.0.0.DRUID_ALL]) // special case, nearby spellcaster priority targeting
+	Allegiance(Myself,EVILCUTOFF)
+        InWeaponRange([GOODCUTOFF.0.0.DRUID_ALL]) // special case, nearby spellcaster priority targeting
 	!CheckStatGT([GOODCUTOFF.0.0.DRUID_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
 	!StateCheck([GOODCUTOFF.0.0.DRUID_ALL],STATE_PANIC)
         CheckStatLT([GOODCUTOFF.0.0.DRUID_ALL],100,RESISTSLASHING)
@@ -981,7 +982,8 @@ THEN
 END
 
 IF
-	InWeaponRange([GOODCUTOFF.0.0.CLERIC_ALL]) // special case, nearby spellcaster priority targeting
+	Allegiance(Myself,EVILCUTOFF)
+        InWeaponRange([GOODCUTOFF.0.0.CLERIC_ALL]) // special case, nearby spellcaster priority targeting
 	!CheckStatGT([GOODCUTOFF.0.0.CLERIC_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
 	!StateCheck([GOODCUTOFF.0.0.CLERIC_ALL],STATE_PANIC)
         CheckStatLT([GOODCUTOFF.0.0.CLERIC_ALL],100,RESISTSLASHING)
@@ -994,7 +996,8 @@ THEN
 END
 
 IF
-	InWeaponRange([GOODCUTOFF.0.0.MAGE_ALL]) // special case, nearby spellcaster priority targeting
+	Allegiance(Myself,EVILCUTOFF)
+        InWeaponRange([GOODCUTOFF.0.0.MAGE_ALL]) // special case, nearby spellcaster priority targeting
 	!CheckStatGT([GOODCUTOFF.0.0.MAGE_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
 	!StateCheck([GOODCUTOFF.0.0.MAGE_ALL],STATE_PANIC)
         CheckStatLT([GOODCUTOFF.0.0.MAGE_ALL],100,RESISTSLASHING)
@@ -1130,7 +1133,6 @@ IF
         !StateCheck(Myself,STATE_INVISIBLE)
         See(LastSummonerOf(Myself))
   !Race(LastSummonerOf(Myself),DEMONIC)
-  !Alignment(LastSummonerOf(Myself),CHAOTIC_EVIL)
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -1188,6 +1190,9 @@ IF
         !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
 	!CheckStatGT(LastSeenBy(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
         CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
+       	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi
+	!HasItemEquiped("WA2AMU",LastSeenBy(Myself)) // Sensate Amulet
+	!HasItemEquiped("LICH",LastSeenBy(Myself)) // Lich innate Protection from Evil
         ActionListEmpty()
 THEN
 	RESPONSE #100

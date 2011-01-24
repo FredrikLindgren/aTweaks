@@ -1878,6 +1878,10 @@ COPY_EXISTING ~demnabsu.cre~ ~override/fl#nabsu.cre~
   WRITE_BYTE   0x270 255                                                           //Enemy                                                                                                                                  
   WRITE_BYTE   0x275 1                                                             //Male 
   WRITE_ASCII  0x280 ~~ #32                                                        //no script name 
+  READ_LONG 0x2bc io
+  FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN                                              //Make all items unstealable&undroppable
+    WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
+  END
   PATCH_IF FILE_EXISTS_IN_GAME dw#sumfi.itm AND !FILE_CONTAINS_EVALUATED ("%SOURCE_FILE%" "dw#sumfi") BEGIN
     ADD_CRE_ITEM "dw#sumfi" #0 #0 #0 none boots
   END
@@ -2052,9 +2056,13 @@ COPY_EXISTING demnabsu.cre "override/demnabsu.cre"
   WRITE_ASCII  0x258 ~~ #8                                                         // disable race AI script
   WRITE_ASCII  0x260 ~~ #8                                                         // disable general AI script
   WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
-  WRITE_BYTE   0x270 128                                                           //Initially neutral                                                                         
+  WRITE_BYTE   0x270 128                                                           //Initially neutral
   WRITE_BYTE   0x275 9                                                             //SUMMONED_DEMON 
-  WRITE_ASCII  0x280 ~~ #32                                                        //no script name 
+  WRITE_ASCII  0x280 ~~ #32                                                        //no script name
+  READ_LONG 0x2bc io
+  FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN                                              //Make all items unstealable&undroppable
+    WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
+  END
   PATCH_IF FILE_EXISTS_IN_GAME dw#sumfi.itm AND !FILE_CONTAINS_EVALUATED ("%SOURCE_FILE%" "dw#sumfi") BEGIN
     ADD_CRE_ITEM "dw#sumfi" #0 #0 #0 none boots
   END

@@ -1,11 +1,14 @@
 IF
   Global("flNoGating","LOCALS",0)
   !GlobalTimerNotExpired("flGatingTimer","LOCALS")
-  !GlobalTImerNotExpired("RR#Cast","LOCALS")
-  HPPercentLT(Myself,50)
-  Detect(NearestEnemyOf(Myself))
+  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+  OR(2)
+    HPPercentLT(Myself,50)
+    G("flGatingTrue",1)
   InActiveArea(Myself)
-  RandomNum(5,1)
+  OR(2)
+    RandomNum(5,1)
+    G("flGatingTrue",1)
 THEN
   RESPONSE #100
     SetInterrupt(FALSE)
