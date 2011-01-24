@@ -1472,7 +1472,7 @@ END                                                                             
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
               ~DEMOSUM1~                                                           // Marilith
-              ~ICMARILI~                                                           // Marilith
+              ~ICMARILI~                                                           // Marilith (no animation)
               ~MELSUM05~                                                           // Marilith
               ~GORWOM03~                                                           // Y'tossi (Watcher's Keep final seal Huntress' party)
 BEGIN                                                                              // execute the following
@@ -1515,7 +1515,7 @@ PATCH_IF FiendsScripts = 0 BEGIN                                                
       "newclass" = "160"                                                                 // new class (Tanari)
       "newalign" = "51"                                                                  // new alignment (Chaotic Evil)
     STR_VAR                                                                            // initialize strings
-      //"enfc01"   = "DEMOSUM1"                                                            // enforced creature 1 (uses strict PnP values)
+      "enfc01"   = "DEMOSUM1"                                                            // enforced creature 1 (uses strict PnP values)
       "enfc02"   = "ICMARILI"                                                            // enforced creature 2 (uses strict PnP values)
   END                                                                                // ends FUNCTION call
 END
@@ -1853,18 +1853,47 @@ ADD_MEMORIZED_SPELL spwi615 #5 wizard      //Chain Lightning
 //teleport without error
 
 
-
+*/
 ///////////////////////////////////////////////////////////
 //Create gating spells
 ///////////////////////////////////////////////////////////
 
-//files for summoned marilith
+//creatures and scripts are handled down below, by the other summoned creatures and scripts
 
 //Balor: summon 1-6 lesser (alu-fiend, cambion, succubus), 1-4 greater (nabassu) or 1 true tanar'ri (balor, marilith, glabrezu)
-COPY_EXISTING spwi905.spl "override/fl#gtbal.spl"
+COPY ~atweaks/spl/base.spl~ "override/fl#gtbal.spl"
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 parameter2 = 0 probability1 = 33                    STR_VAR resource = fl#gtba1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 parameter2 = 0 probability1 = 66  probability2 = 34 STR_VAR resource = fl#gtba2 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 parameter2 = 0 probability1 = 100 probability2 = 67 STR_VAR resource = fl#gtba3 END
+COPY_EXISTING spwi905.spl "override/fl#gtba1.spl"
   LPF prep_for_gate_making END
-  //cast spell effects
-  
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 33                    STR_VAR resource = rr#sbalr END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 66  probability2 = 34 STR_VAR resource = spfiend  END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 100 probability2 = 67 STR_VAR resource = rr#smari END
+COPY_EXISTING spwi905.spl "override/fl#gtba2.spl"
+  LPF prep_for_gate_making END
+  FOR (i=0;i<2;++i) BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 STR_VAR resource = spcaco END
+  END
+COPY_EXISTING spwi905.spl "override/fl#gtba3.spl"
+  LPF prep_for_gate_making INT_VAR f_CastingTime = 1 END
+  probability1 = 0
+  probability2 = 0
+  PATCH_FOR_EACH resource IN rr#saluf rr#scamb rr#ssucc BEGIN 
+    probability2 = probability1 > 0 ? probability2 + 33 : probability2
+    probability2 = probability2 = 33 ? probability2 + 1 : probability2
+    probability1 += 33
+    probability1 = probability1 = 99 ? 100 : probability1
+    FOR (i=0;i<4;++i) BEGIN
+      LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 probability2 STR_VAR resource END
+    END
+  END
+COPY_EXISTING spcaco.eff "override/rr#smari.eff"
+              spcaco.eff "override/rr#saluf.eff"
+              spcaco.eff "override/rr#scamb.eff"
+              spcaco.eff "override/rr#ssucc.eff"
+  WRITE_ASCIIE 0x30 "%DEST_RES%" #8
+      
 //Marilith: summon 1-6 lesser, 1-4 greater or 1 true tanar'ri
 COPY_EXISTING spwi905.spl "override/fl#gtmar.spl"
   LPF prep_for_gate_making END
@@ -1873,14 +1902,14 @@ COPY_EXISTING spwi905.spl "override/fl#gtmar.spl"
 //Glabrezu: summon 1 true tanar'ri (balor, marilith, glabrezu)
 COPY_EXISTING spwi905.spl "override/fl#gtgla.spl"
   LPF prep_for_gate_making END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 198 probability1 = 33 STR_REF resource = rr#sbalr EBD
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 198 probability1 = 66 probability2 = 34 STR_VAR resource = spfiend END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 198 probability1 = 100 probability2 = 67 STR_VAR resource = rr#smari END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 33                    STR_VAR resource = rr#sbalr END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 66  probability2 = 34 STR_VAR resource = spfiend  END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 100 probability2 = 67 STR_VAR resource = rr#smari END
 
 //Succubus: summon 1 balor
 COPY_EXISTING spwi905.spl "override/fl#gtsuc.spl"
   LPF prep_for_gate_making END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 paramater2 = 2 duration = 198 STR_REF resource = rr#sbalr END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 paramater2 = 2 duration = 198 STR_VAR resource = rr#sbalr END
   
 
 //Pit Fiend: summon 2 lesser (abishai, erinyes, osyluth) or 1 greater (cornugon, gelugon, pit fiend) baatezu
@@ -1902,7 +1931,6 @@ COPY_EXISTING spwi905.spl "override/fl#gtabi.spl"
 //Osyluth: summon 1-2 osyluth
 COPY_EXISTING spwi905.spl "override/fl#gtosy.spl"
   LPF prep_for_gate_making END
-*/
 
 
 //Create scripts and creatures outside the ACTION_IF in case SCSII is installed after 
@@ -2074,21 +2102,30 @@ END
 // Creature changes
 
 OUTER_SPRINT $sscript(demnabsu)   rr#snaba
-OUTER_SPRINT $sscript(telcor1)    rr#scorn
 OUTER_SPRINT $sscript(demglasu)   rr#sglab
-OUTER_SPRINT $sscript(rr#hgel)    rr#sgelu
 OUTER_SPRINT $sscript(dempitsu)   rr#spitf
-OUTER_SPRINT $sscript(telbal1)    rr#sbalr
 
-COPY_EXISTING demnabsu.cre  override
+COPY_EXISTING demnabsu.cre "override/demnabsu.cre"
               telcor1.cre  "override/rr#scorn.cre"
-              demglasu.cre  override
+              demglasu.cre "override/demglasu.cre"
               rr#hgel.cre  "override/rr#sgelu.cre"
-              dempitsu.cre  override
+              dempitsu.cre "override/dempitsu.cre"
               telbal1.cre  "override/rr#sbalr.cre"
+  
+              demosum1.cre "override/rr#smari.cre"                                 //these are only intended for use against the party
+              gorsuc01.cre "override/rr#ssucc.cre"
+              alufie01.cre "override/rr#saluf.cre"
+              cambion1.cre "override/rr#scamb.cre"
+              demabi01.cre "override/rr#sabis.cre"
+              deriny01.cre "override/rr#serin.cre"
+              dbonef01.cre "override/rr#sbfnd.cre"
   WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
   WRITE_LONG 0x14 0                                                                //XP is handled by script
-  WRITE_ASCIIE 0x248 $sscript("%SOURCE_RES%") #8                                   // summoned script
+  PATCH_IF VARIABLE_IS_SET $sscript("%DEST_RES%") BEGIN
+    WRITE_ASCIIE 0x248 $sscript("%DEST_RES%") #8                                     // summoned script
+  END ELSE BEGIN
+    WRITE_ASCIIE 0x248 "%DEST_RES%" #8
+  END
   WRITE_ASCII  0x250 ~~ #8                                                         // disable class AI script
   WRITE_ASCII  0x258 ~~ #8                                                         // disable race AI script
   WRITE_ASCII  0x260 ~~ #8                                                         // disable general AI script
@@ -2291,6 +2328,14 @@ COMPILE ~aTweaks/BAF/fiends/RR#SGLAB.BAF~                                       
 COMPILE ~aTweaks/BAF/fiends/RR#SGELU.BAF~                                                 // Summoned Gelugon AI script
 COMPILE ~aTweaks/BAF/fiends/RR#SPITF.BAF~                                                 // Summoned Pit Fiend AI script
 COMPILE ~aTweaks/BAF/fiends/RR#SBALR.BAF~                                                 // Summoned Balor AI script
+        ~atweaks/baf/fiends/rr#sabis.baf~                                                 //These are scripts for fiends summoned by other fiends      
+        ~atweaks/baf/fiends/rr#saluf.baf~
+        ~atweaks/baf/fiends/rr#sbfnd.baf~
+        ~atweaks/baf/fiends/rr#scamb.baf~
+        ~atweaks/baf/fiends/rr#serin.baf~
+        ~atweaks/baf/fiends/rr#smari.baf~
+        ~atweaks/baf/fiends/rr#ssucc.baf~
+        
 COPY_EXISTING ~RUNENEMY.BCS~  ~override~                                           // innocent bystander run away script
   DECOMPILE_BCS_TO_BAF                                                             // replace RunAwayFrom() with RandomWalkContinuous()
     REPLACE_TEXTUALLY ~RunAwayFrom(LastSeenBy(Myself),30)~ ~RandomWalkContinuous()~

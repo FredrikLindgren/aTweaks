@@ -1,0 +1,14 @@
+IF
+  !GlobalTimerNotExpired("cast","LOCALS)
+  Allegiance(Myself,GOODCUTOFF)
+  AttackedBy([GOODCUTOFF],DEFAULT)
+	CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
+  !See(NearestEnemyOf(Myself))
+THEN
+  RESPONSE #100
+		SetInterrupt(FALSE)
+		DisplayStringHead(Myself,@724) // Bah, mortals are ever fools!
+    SetGlobalTimer("cast","LOCALS",6)
+    ForceSpellRES("RR#TELAW",Myself) // Teleport away
+		SetInterrupt(TRUE)
+END

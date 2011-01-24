@@ -1,49 +1,93 @@
+
+//Note: this script always fights against the party
+
 IF
-	Die()
-        Name("GorWom01",Myself) // Nalmissra
+  HasItem("dw#sumfi",Myself)
 THEN
-	RESPONSE #100
-		ReallyForceSpellDead(Myself,ILLUSION_DEATH)
-		Wait(1)
-		DestroySelf()
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
 END
 
 IF
-	Global("RR#Intdlg","LOCALS",0)
-        Name("KIRINHALE",Myself) // Kirinhale
-	NumTimesTalkedTo(0)
+	Die()
+        Global("RR#EACheck","LOCALS",1) // Fiend was summoned by an enemy
+        Global("RR#XP","LOCALS",0)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#XP","LOCALS",1)
+                AddexperienceParty(11000) // Succubus XP value
+                Continue()
+END
+
+IF
+        Global("RR#EACheck","LOCALS",0)
+	Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#EACheck","LOCALS",2)
+		LeaveParty()
+		ChangeEnemyAlly(Myself,ALLY)
+                DialogueInterrupt(FALSE)
+		SetInterrupt(TRUE)
+END
+
+IF
+        Global("RR#EACheck","LOCALS",0)
+	OR(2)
+	  Allegiance(LastSummonerOf(Myself),EVILCUTOFF)
+          !Exists(LastSummonerOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#EACheck","LOCALS",1)
+		Enemy()
+		SetInterrupt(TRUE)
+END
+
+IF
+	OnCreation()
+        Global("RR#EACheck","LOCALS",2)
+	!InParty(LastSummonerOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		LeaveParty()
+		ChangeEnemyAlly(Myself,ALLY)
+                DialogueInterrupt(FALSE)
+		SetInterrupt(TRUE)
+END
+
+IF
+        Global("RR#Hostile","LOCALS",1)
+	Allegiance(Myself,EVILCUTOFF)
+        !See([PC])
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#Hostile","LOCALS",0)
+		LeaveParty()
+		ChangeEnemyAlly(Myself,ALLY)
+                DialogueInterrupt(FALSE)
+		SetInterrupt(TRUE)
+END
+
+IF
+        Global("RR#EACheck","LOCALS",2)
+        Global("RR#Hostile","LOCALS",0)
+	Allegiance(Myself,GOODCUTOFF)
         See([PC])
 THEN
 	RESPONSE #100
-		SetGlobal("RR#Intdlg","LOCALS",1)
-		StartDialogueNoSet([PC])
-END
-
-IF
-	Global("RR#Active","LOCALS",0)
-	OR(2)
-	  AttackedBy([ANYONE],DEFAULT)
-	  TookDamage()
-THEN
-	RESPONSE #100
-		SetGlobal("RR#Active","LOCALS",1)
+		SetInterrupt(FALSE)
+                SetGlobal("RR#Hostile","LOCALS",1)
 		Enemy()
-		Continue()
+		SetInterrupt(TRUE)
 END
 
 IF
-	Global("RR#Active","LOCALS",0)
-        Allegiance(Myself,EVILCUTOFF)
-	See([GOODCUTOFF])
-THEN
-	RESPONSE #100
-		SetGlobal("RR#Active","LOCALS",1)
-		Continue()
-END
-
-IF
-	OR(3)
-	  Global("RR#Active","LOCALS",0)
+	OR(2)
 	  StateCheck(Myself,STATE_REALLY_DEAD)
 	  StateCheck(Myself,STATE_DISABLED)
 THEN
@@ -52,9 +96,8 @@ THEN
 END
 
 IF
-	Global("RR#Active","LOCALS",1)
 	!InActiveArea(Myself)
-	!See([GOODCUTOFF])
+	!See([0])
 THEN
 	RESPONSE #100
 		NoAction()
@@ -62,13 +105,78 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	OR(2)
+          AreaCheck("AR3004") // Dead Magic zone
+          AreaCheck("AR3008") // Dead Magic zone
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",600) // no spellcasting in Dead Magic zones
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Ethsc","LOCALS")
+        Global("RR#ETHPL","LOCALS",0) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
+         AttackedBy([GOODCUTOFF],DEFAULT)
+        !Allegiance(Myself,GOODCUTOFF)
+	CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
+        !See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		DisplayStringHead(Myself,@664) // Bah, the magic of mortals is so predictable.
+		ForceSpellRES("RR#ETHER",Myself) // Etherealness
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !Range([0.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // do not disrupt the Blood War
+        Allegiance(Myself,GOODCUTOFF)
+        AttackedBy([GOODCUTOFF],DEFAULT)
+	CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
+        !See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		DisplayStringHead(Myself,@724) // Bah, mortals are ever fools!
+                ForceSpellRES("RR#TELAW",Myself) // Teleport away
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Exists(LastAttackerOf(Myself))
+	!Range(LastAttackerOf(Myself),6)
+        InMyArea(LastAttackerOf(Myself))
+	OR(2)
+          !Allegiance(LastAttackerOf(Myself),GOODCUTOFF) // don't teleport to attacking party members if green circled
+          !Allegiance(Myself,GOODCUTOFF)
+	!StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
+        CheckStat(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
+	!CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
+	!See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Ethsc","LOCALS")
         Global("RR#ETHPL","LOCALS",0) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 	OR(4)
-	  AttackedBy([GOODCUTOFF],0)
-          HitBy([GOODCUTOFF],0)
+	  AttackedBy([0],0)
+          HitBy([0],0)
           TookDamage()
-	  Range([GOODCUTOFF],4)
+	  Range([0],4)
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -82,6 +190,7 @@ IF
         Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!Range([GOODCUTOFF],8)
+	Allegiance(Myself,EVILCUTOFF)
 	OR(2)
 	  See([GOODCUTOFF])
 	  StateCheck([EVILCUTOFF.HUMANOID.0.0.0.MALE],STATE_CHARMED) // A charmed male party member is in visual range
@@ -98,6 +207,7 @@ IF
         Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
+	Allegiance(Myself,EVILCUTOFF)
         InMyArea(Player1)
 	!Range(Player1,4)
         Gender(Player1,MALE)
@@ -126,6 +236,7 @@ IF
         Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
+	Allegiance(Myself,EVILCUTOFF)
         InMyArea(Player2)
 	!Range(Player2,4)
         Gender(Player2,MALE)
@@ -154,6 +265,36 @@ IF
         Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
+	Allegiance(Myself,EVILCUTOFF)
+        InMyArea(Player2)
+	!Range(Player2,4)
+        Gender(Player2,MALE)
+        StateCheck(Player2,STATE_CHARMED)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+        !StateCheck(Player2,STATE_INVISIBLE)
+	!CheckStatGT(Player2,0,SCRIPTINGSTATE3) // Negative Plane protection
+	!HasItemEquiped("AMUL21",Player2) // Amulet of Power
+	!HasItemEquipedReal("BLUN25",Player2) // Mace of Disruption +2
+	!HasItemEquipedReal("HAMM10",Player2) // Runehammer +4
+	!HasItemEquipedReal("HAMM11",Player2) // Runehammer +5
+	!HasItemEquipedReal("SW1H69",Player2) // Spectral Brand +5
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#ETHPL","LOCALS",0) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
+		SetGlobalTimer("RR#SKiss","LOCALS",3)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ApplySpellRES("RR#UNETH",Myself) // Leaving the Ethereal Plane
+                ForceSpellRES("RR#TELWE",Player2) // Teleport Without Error
+                ForceSpellRES("RR#SKISS",Player2) // Succubus Kiss
+		SetInterrupt(TRUE)
+END
+
+IF
+        Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
+	Allegiance(Myself,EVILCUTOFF)
         InMyArea(Player3)
 	!Range(Player3,4)
         Gender(Player3,MALE)
@@ -182,6 +323,7 @@ IF
         Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
+	Allegiance(Myself,EVILCUTOFF)
         InMyArea(Player4)
 	!Range(Player4,4)
         Gender(Player4,MALE)
@@ -210,6 +352,7 @@ IF
         Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
+	Allegiance(Myself,EVILCUTOFF)
         InMyArea(Player5)
 	!Range(Player5,4)
         Gender(Player5,MALE)
@@ -238,6 +381,7 @@ IF
         Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
+	Allegiance(Myself,EVILCUTOFF)
         InMyArea(Player6)
 	!Range(Player6,4)
         Gender(Player6,MALE)
@@ -266,6 +410,7 @@ IF
         Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 	!StateCheck([EVILCUTOFF.HUMANOID.0.0.0.MALE],STATE_CHARMED) // No charmed male party members nearby
 	!See([GOODCUTOFF])
+	Allegiance(Myself,EVILCUTOFF)
         InMyArea(Player1)
         !Detect(Player1)
         OR(2)
@@ -279,7 +424,7 @@ END
 IF
         Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
         OR(2)
-	  Range([GOODCUTOFF],8)
+	  Range(NearestEnemyOf(Myself),8)
           !StateCheck(Myself,STATE_INVISIBLE)
 THEN
 	RESPONSE #100
@@ -293,9 +438,11 @@ THEN
 		NoAction()
 END
 
+
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(Player1)
+	Allegiance(Myself,EVILCUTOFF)
 	Gender(LastSeenBy(Myself),MALE)
 	OR(3)
           Class(LastSeenBy(Myself),FIGHTER_ALL)
@@ -335,6 +482,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(Player2)
+	Allegiance(Myself,EVILCUTOFF)
 	Gender(LastSeenBy(Myself),MALE)
 	OR(3)
           Class(LastSeenBy(Myself),FIGHTER_ALL)
@@ -374,6 +522,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(Player3)
+	Allegiance(Myself,EVILCUTOFF)
 	Gender(LastSeenBy(Myself),MALE)
 	OR(3)
           Class(LastSeenBy(Myself),FIGHTER_ALL)
@@ -413,6 +562,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(Player4)
+	Allegiance(Myself,EVILCUTOFF)
 	Gender(LastSeenBy(Myself),MALE)
 	OR(3)
           Class(LastSeenBy(Myself),FIGHTER_ALL)
@@ -452,6 +602,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(Player5)
+	Allegiance(Myself,EVILCUTOFF)
 	Gender(LastSeenBy(Myself),MALE)
 	OR(3)
           Class(LastSeenBy(Myself),FIGHTER_ALL)
@@ -491,6 +642,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(Player6)
+	Allegiance(Myself,EVILCUTOFF)
 	Gender(LastSeenBy(Myself),MALE)
 	OR(3)
           Class(LastSeenBy(Myself),FIGHTER_ALL)
@@ -530,6 +682,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL.0.MALE])
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
@@ -562,6 +715,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
@@ -594,6 +748,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(ThirdNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
@@ -626,6 +781,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See([GOODCUTOFF.HUMANOID.0.RANGER_ALL.0.MALE])
+	Allegiance(Myself,EVILCUTOFF)
 	!Race(LastSeenBy(Myself),ELF)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
@@ -657,6 +813,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SecondNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Race(LastSeenBy(Myself),ELF)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
@@ -688,6 +845,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(ThirdNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Race(LastSeenBy(Myself),ELF)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
@@ -719,6 +877,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See([GOODCUTOFF.HUMANOID.0.0.0.MALE])
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -753,6 +912,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SecondNearest([GOODCUTOFF.HUMANOID.0.0.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -787,6 +947,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(ThirdNearest([GOODCUTOFF.HUMANOID.0.0.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -821,6 +982,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(FourthNearest([GOODCUTOFF.HUMANOID.0.0.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -855,6 +1017,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(FifthNearest([GOODCUTOFF.HUMANOID.0.0.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -889,6 +1052,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SixthNearest([GOODCUTOFF.HUMANOID.0.0.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -923,6 +1087,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SeventhNearest([GOODCUTOFF.HUMANOID.0.0.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -957,6 +1122,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(EighthNearest([GOODCUTOFF.HUMANOID.0.0.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -991,6 +1157,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(NinthNearest([GOODCUTOFF.HUMANOID.0.0.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -1025,6 +1192,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(TenthNearest([GOODCUTOFF.HUMANOID.0.0.0.MALE]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -1056,8 +1224,10 @@ THEN
 		ForceSpell(LastSeenBy(Myself),SUCCUBUS_CHARM_MALE)
 END
 
+
 IF
 	StateCheck([EVILCUTOFF.HUMANOID.0.0.0.MALE],STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
 	!StateCheck([EVILCUTOFF.HUMANOID.0.0.0.MALE],STATE_PANIC)
 	!CheckStatGT([EVILCUTOFF.HUMANOID.0.0.0.MALE],0,SCRIPTINGSTATE3) // Negative Plane protection
 	!HasItemEquiped("AMUL21",[EVILCUTOFF.HUMANOID.0.0.0.MALE]) // Amulet of Power
@@ -1074,6 +1244,7 @@ END
 
 IF
 	StateCheck(SecondNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
 	!StateCheck(SecondNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),STATE_PANIC)
 	!CheckStatGT(SecondNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),0,SCRIPTINGSTATE3) // Negative Plane protection
 	!HasItemEquiped("AMUL21",SecondNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE])) // Amulet of Power
@@ -1090,6 +1261,7 @@ END
 
 IF
 	StateCheck(ThirdNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
 	!StateCheck(ThirdNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),STATE_PANIC)
 	!CheckStatGT(ThirdNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),0,SCRIPTINGSTATE3) // Negative Plane protection
 	!HasItemEquiped("AMUL21",ThirdNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE])) // Amulet of Power
@@ -1106,6 +1278,7 @@ END
 
 IF
 	StateCheck(FourthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
 	!StateCheck(FourthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),STATE_PANIC)
 	!CheckStatGT(FourthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),0,SCRIPTINGSTATE3) // Negative Plane protection
 	!HasItemEquiped("AMUL21",FourthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE])) // Amulet of Power
@@ -1122,6 +1295,7 @@ END
 
 IF
 	StateCheck(FifthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
 	!StateCheck(FifthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),STATE_PANIC)
 	!CheckStatGT(FifthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),0,SCRIPTINGSTATE3) // Negative Plane protection
 	!HasItemEquiped("AMUL21",FifthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE])) // Amulet of Power
@@ -1138,6 +1312,7 @@ END
 
 IF
 	StateCheck(SixthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
         !StateCheck(SixthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),STATE_PANIC)
 	!CheckStatGT(SixthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]),0,SCRIPTINGSTATE3) // Negative Plane protection
 	!HasItemEquiped("AMUL21",SixthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE])) // Amulet of Power
@@ -1154,6 +1329,7 @@ END
 
 IF
 	StateCheck(Player6,STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
         !StateCheck(Player6,STATE_PANIC)
 	Gender(Player6,MALE)
 	!CheckStatGT(Player6,0,SCRIPTINGSTATE3) // Negative Plane protection
@@ -1171,6 +1347,7 @@ END
 
 IF
 	StateCheck(Player5,STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
         !StateCheck(Player5,STATE_PANIC)
 	Gender(Player5,MALE)
 	!CheckStatGT(Player5,0,SCRIPTINGSTATE3) // Negative Plane protection
@@ -1188,6 +1365,7 @@ END
 
 IF
 	StateCheck(Player4,STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
         !StateCheck(Player4,STATE_PANIC)
 	Gender(Player4,MALE)
 	!CheckStatGT(Player4,0,SCRIPTINGSTATE3) // Negative Plane protection
@@ -1205,6 +1383,7 @@ END
 
 IF
 	StateCheck(Player3,STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
         !StateCheck(Player3,STATE_PANIC)
 	Gender(Player3,MALE)
 	!CheckStatGT(Player3,0,SCRIPTINGSTATE3) // Negative Plane protection
@@ -1222,6 +1401,7 @@ END
 
 IF
 	StateCheck(Player2,STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
         !StateCheck(Player2,STATE_PANIC)
 	Gender(Player2,MALE)
 	!CheckStatGT(Player2,0,SCRIPTINGSTATE3) // Negative Plane protection
@@ -1239,6 +1419,7 @@ END
 
 IF
 	StateCheck(Player1,STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
         !StateCheck(Player1,STATE_PANIC)
 	Gender(Player1,MALE)
 	!CheckStatGT(Player1,0,SCRIPTINGSTATE3) // Negative Plane protection
@@ -1256,6 +1437,7 @@ END
 
 IF
 	ActionListEmpty()
+  Allegiance(Myself,EVILCUTOFF)
         !Range([GOODCUTOFF],30) // no non-charmed party members present
         !Range(LastSeenBy(Myself),2)
 THEN
@@ -1307,6 +1489,7 @@ IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
         InMyArea(Player1)
+        Allegiance(Myself,EVILCUTOFF)
 	!Range(Player1,4)
         Gender(Player1,MALE)
         StateCheck(Player1,STATE_CHARMED)
@@ -1332,6 +1515,7 @@ IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
         InMyArea(Player2)
+        Allegiance(Myself,EVILCUTOFF)
 	!Range(Player2,4)
         Gender(Player2,MALE)
         StateCheck(Player2,STATE_CHARMED)
@@ -1357,6 +1541,7 @@ IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
         InMyArea(Player3)
+        Allegiance(Myself,EVILCUTOFF)
 	!Range(Player3,4)
         Gender(Player3,MALE)
         StateCheck(Player3,STATE_CHARMED)
@@ -1382,6 +1567,7 @@ IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
         InMyArea(Player4)
+        Allegiance(Myself,EVILCUTOFF)
 	!Range(Player4,4)
         Gender(Player4,MALE)
         StateCheck(Player4,STATE_CHARMED)
@@ -1407,6 +1593,7 @@ IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
         InMyArea(Player5)
+        Allegiance(Myself,EVILCUTOFF)
 	!Range(Player5,4)
         Gender(Player5,MALE)
         StateCheck(Player5,STATE_CHARMED)
@@ -1432,6 +1619,7 @@ IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#SKiss","LOCALS")
         InMyArea(Player6)
+        Allegiance(Myself,EVILCUTOFF)
 	!Range(Player6,4)
         Gender(Player6,MALE)
         StateCheck(Player6,STATE_CHARMED)
@@ -1456,6 +1644,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL])
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
@@ -1488,6 +1677,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
@@ -1520,6 +1710,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See([GOODCUTOFF.HUMANOID.0.RANGER_ALL])
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
@@ -1552,6 +1743,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SecondNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
@@ -1584,6 +1776,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See([GOODCUTOFF.HUMANOID])
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -1618,6 +1811,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SecondNearest([GOODCUTOFF.HUMANOID]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -1652,6 +1846,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(ThirdNearest([GOODCUTOFF.HUMANOID]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -1686,6 +1881,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(FourthNearest([GOODCUTOFF.HUMANOID]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -1720,6 +1916,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(FifthNearest([GOODCUTOFF.HUMANOID]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -1754,6 +1951,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SixthNearest([GOODCUTOFF.HUMANOID]))
+	Allegiance(Myself,EVILCUTOFF)
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -1791,6 +1989,7 @@ IF
 	!GlobalTimerNotExpired("RR#Ethsc","LOCALS")
 	!StateCheck([EVILCUTOFF.HUMANOID.0.0.0.MALE],STATE_CHARMED) // No charmed male party members nearby
 	!See([GOODCUTOFF])
+	Allegiance(Myself,EVILCUTOFF)
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -1803,6 +2002,7 @@ END
 IF
         ActionListEmpty()
         Range([GOODCUTOFF],8)
+        Allegiance(Myself,EVILCUTOFF)
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()
@@ -1843,7 +2043,12 @@ END
 IF
         ActionListEmpty()
 	!StateCheck([EVILCUTOFF.HUMANOID.0.0.0.MALE],STATE_CHARMED)
+	Allegiance(Myself,EVILCUTOFF)
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()
 END
+
+
+
+
