@@ -1,0 +1,173 @@
+///////////////////////////////////////////////////////////
+//Create gating spells
+///////////////////////////////////////////////////////////
+
+//creatures and scripts are handled in #150, along with the other summons
+
+//Balor: summon 1-6 (4) lesser (alu-fiend, cambion, succubus), 1-4 (2) greater (nabassu) or 1 true tanar'ri (balor, marilith, glabrezu)
+COPY ~atweaks/spl/base.spl~ "override/fl#gtbal.spl"
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 probability1 = 33                    STR_VAR resource = fl#gtba1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 probability1 = 66  probability2 = 34 STR_VAR resource = fl#gtba2 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 probability1 = 100 probability2 = 67 STR_VAR resource = fl#gtba3 END
+COPY_EXISTING spwi905.spl "override/fl#gtba1.spl"
+  LPF prep_for_gate_making END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 33                    STR_VAR resource = rr#sbalr END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 66  probability2 = 34 STR_VAR resource = spfiend  END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 100 probability2 = 67 STR_VAR resource = rr#smari END
+COPY_EXISTING spwi905.spl "override/fl#gtba2.spl"
+  LPF prep_for_gate_making END
+  FOR (i=0;i<2;++i) BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 STR_VAR resource = spcaco END
+  END
+COPY_EXISTING spwi905.spl "override/fl#gtba3.spl"
+  LPF prep_for_gate_making INT_VAR f_CastingTime = 1 END
+  probability1 = 0
+  probability2 = 0
+  PATCH_FOR_EACH resource IN rr#saluf rr#scamb rr#ssucc BEGIN 
+    probability2 = probability1 > 0 ? probability2 + 33 : probability2
+    probability2 = probability2 = 33 ? probability2 + 1 : probability2
+    probability1 += 33
+    probability1 = probability1 = 99 ? 100 : probability1
+    FOR (i=0;i<4;++i) BEGIN
+      LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 probability2 STR_VAR resource END
+    END
+  END
+COPY_EXISTING spcaco.eff "override/rr#smari.eff"
+              spcaco.eff "override/rr#saluf.eff"
+              spcaco.eff "override/rr#scamb.eff"
+              spcaco.eff "override/rr#ssucc.eff"
+  WRITE_ASCIIE 0x30 "%DEST_RES%" #8
+      
+//Marilith: summon 1-6 (4) lesser, 1-4 (2) greater or 1 true tanar'ri
+//Mariliths can use the Balor spell
+
+//Glabrezu: summon 1 true tanar'ri (balor, marilith, glabrezu)
+COPY_EXISTING spwi905.spl "override/fl#gtgla.spl"
+  LPF prep_for_gate_making INT_VAR f_CastingTime = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 33                    STR_VAR resource = rr#sbalr END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 66  probability2 = 34 STR_VAR resource = spfiend  END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 100 probability2 = 67 STR_VAR resource = rr#smari END
+
+//Succubus: summon 1 balor
+COPY_EXISTING spwi905.spl "override/fl#gtsuc.spl"
+  LPF prep_for_gate_making INT_VAR f_CastingTime = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 paramater2 = 2 duration = 198 STR_VAR resource = rr#sbalr END
+  
+
+//Pit Fiend: summon 2 lesser (abishai, erinyes, osyluth) or 1 greater (cornugon, gelugon, pit fiend) baatezu
+COPY ~atweaks/spl/base.spl~ ~override/fl#gtpit.spl~
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 probability1 = 50 STR_VAR resource = fl#gtpi1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 probability2 = 51 STR_VAR resource = fl#gtpi2 END
+COPY_EXISTING spwi905.spl ~override/fl#gtpi1.spl~
+  LPF prep_for_gate_making INT_VAR f_CastingTime = 1 BEGIN
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 33                   STR_VAR resource = rr#spitf END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 66 probability2 = 34 STR_VAR resource = rr#sgelu END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198                   probability2 = 67 STR_VAR resource = rr#scorn END
+COPY_EXISTING spwi905.spl "override/fl#gtpi2.spl"
+  LPF prep_for_gate_making INT_VAR f_CastingTime = 1 BEGIN
+  probability1 = 0
+  probability2 = 0
+  PATCH_FOR_EACH resource IN rr#sabis rr#serin rr#sbfnd BEGIN 
+    probability2 = probability1 > 0 ? probability2 + 33 : probability2
+    probability2 = probability2 = 33 ? probability2 + 1 : probability2
+    probability1 += 33
+    probability1 = probability1 = 99 ? 100 : probability1
+    FOR (i=0;i<2;++i) BEGIN
+      LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 probability2 STR_VAR resource END
+    END
+  END
+COPY_EXISTING spcaco.eff "override/rr#sabis.eff"
+              spcaco.eff "override/rr#serin.eff"
+              spcaco.eff "override/rr#sbfnd.eff"
+  WRITE_ASCIIE 0x30 "%DEST_RES%" #8 
+
+//Gelugon: summon 2-8 (5) osyluth or 1-2 (1) gelugons
+COPY_EXISTING spwi905.spl "override/fl#gtgel.spl"
+  LPF prep_for_gate_making f_CastingTime = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 50 STR_VAR resource = rr#sgelu END
+  FOR (i=0;i<5;++i) BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability2 = 51 STR_VAR resource = rr#bfnd END
+  END
+  
+//Cornugon: summon 2-16 (8) abishai or 1-3 (2) cornugons
+COPY_EXISTING spwi905.spl "override/fl#gtcor.spl"
+  LPF prep_for_gate_making f_CastingTime = 1 END
+  FOR (i=0;i<2;++i) BEGIN
+    LPF ADD_SPELL_EFFECT opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 = 50 STR_VAR resource = rr#scorn END
+  END
+  FOR (i=0;i<8;++i) BEGIN
+    LPF ADD_SPELL_EFFECT opcode = 177 target = 2 parameter2 = 2 duration = 198 probability2 = 51 STR_VAR resource = rr#sabis END
+  END
+  
+//Abishai: summon 1-3 abishai
+COPY_EXISTING spwi905.spl "override/fl#gtabi.spl"
+  LPF prep_for_gate_making INT_VAR f_CastingTime = 1 END
+  probability1 = 0
+  probability2 = 0
+  PATCH_FOR_EACH n IN 1 2 3 BEGIN
+    probability2 = probability1 > 0 ? probability2 + 33 : probability2
+    probability2 = probability2 = 33 ? probability2 + 1 : probability2
+    probability1 += 33
+    probability1 = probability1 = 99 ? 100 : probability1
+    FOR (i=0;i<n;++i) BEGIN
+      LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability1 probability2 STR_VAR resource = rr#sabis END
+    END
+  END
+  
+//Osyluth: summon 1-2 osyluth
+COPY_EXISTING spwi905.spl "override/fl#gtosy.spl"
+  LPF prep_for_gate_making INT_VAR f_CastingTime = 1 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probabiltiy1 = 50 STR_VAR resource = rr#sbfnd END
+  FOR (i=0;i<2;++i) BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter2 = 2 duration = 198 probability2 = 51 STR_VAR resource = rr#sbfnd END
+  END
+  
+<<<<<<<< atweaks/fl-inlined/Placeholder4Gating.baf
+IF
+  False()
+  Global("flPlaceholder4Gating","LOCALS",0)
+THEN
+  RESPONSE #100
+    Continue()
+END
+>>>>>>>>
+
+COPY_EXISTING rr#habis.bcs override
+  REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder4Gating.baf~ ~atweaks/baf/gate_abishai.baf~
+  
+COPY_EXISTING rr#hbalr.bcs override
+  REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder4Gating.baf~ ~atweaks/baf/gate_balor.baf~
+  
+COPY_EXISTING rr#hbfnd.bcs override
+  REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder4Gating.baf~ ~atweaks/baf/gate_osyluth.baf~
+
+COPY_EXISTING rr#hcorn.bcs override
+  REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder4Gating.baf~ ~atweaks/baf/gate_cornugon.baf~
+  
+COPY_EXISTING rr#hgelu.bcs override
+  REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder4Gating.baf~ ~atweaks/baf/gate_gelugon.baf~
+  
+COPY_EXISTING rr#hglab.bcs override
+  REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder4Gating.baf~ ~atweaks/baf/gate_glabrezu.baf~
+  
+COPY_EXISTING rr#hmari.bcs override
+  REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder4Gating.baf~ ~atweaks/baf/gate_marilith.baf~
+  
+COPY_EXISTING rr#hpitf.bcs override
+  REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder4Gating.baf~ ~atweaks/baf/gate_pit_fiend.baf~
+  
+COPY_EXISTING rr#hsucc.bcs override
+  REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder4Gating.baf~ ~atweaks/baf/gate_succubus.baf~          
+
+
+
+
+
+
+
+
+
+
+  
+  
+  

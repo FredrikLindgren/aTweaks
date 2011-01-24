@@ -1,0 +1,24 @@
+IF
+  Global("flNoGating","LOCALS",0)
+  !GlobalTimerNotExpired("flGatingTimer","LOCALS")
+  !GlobalTImerNotExpired("RR#Cast","LOCALS")
+  HPPercentLT(Myself,50)
+  Detect(NearestEnemyOf(Myself))
+  InActiveArea(Myself)
+  RandomNum(3,1)
+THEN
+  RESPONSE #50
+    SetInterrupt(FALSE)
+    DisplayStringHead(Myself,@758) //Attempts to open a gate to the Abyss
+    Wait(5)
+    ReallyForceSpellRES("fl#gtgla",Myself)
+    SetGlobalTimer("flGatingTimer","LOCALS",7200)
+    SetInterrupt(TRUE)
+  RESPONSE #50
+    SetInterrupt(FALSE)
+    DisplayStringHead(Myself,@758) //Attempts to open a gate to the Abyss
+    Wait(5)
+    DisplayStringHead(Myself,@769) //The attempt fails
+    SetGlobalTimer("flGatingTimer","LOCALS",7200)
+    SetInterrupt(TRUE)
+END

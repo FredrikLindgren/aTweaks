@@ -1,0 +1,24 @@
+IF
+  Global("flNoGating","LOCALS",0)
+  !GlobalTimerNotExpired("flGatingTimer","LOCALS")
+  !GlobalTImerNotExpired("RR#Cast","LOCALS")
+  HPPercentLT(Myself,30)
+  Detect(NearestEnemyOf(Myself))
+  InActiveArea(Myself)
+  RandomNum(2,1)
+THEN
+  RESPONSE #35
+    SetInterrupt(FALSE)
+    DisplayStringHead(Myself,@759) //Attempts to open a gate to Baator
+    Wait(5)
+    ReallyForceSpellRES("fl#gtosy",Myself)
+    SetGlobalTimer("flGatingTimer","LOCALS",7200)
+    SetInterrupt(TRUE)
+  RESPONSE #65
+    SetInterrupt(FALSE)
+    DisplayStringHead(Myself,@759) //Attempts to open a gate to Baator
+    Wait(5)
+    DisplayStringHead(Myself,@760) //The attempt fails
+    SetGlobalTimer("flGatingTimer","LOCALS",7200)
+    SetInterrupt(TRUE)
+END

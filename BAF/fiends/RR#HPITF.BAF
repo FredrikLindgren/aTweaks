@@ -1,3 +1,20 @@
+
+IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
+END
+
+IF
+  Exists(LastSummonerOf(Myself))
+  Global("flNoGating","LOCALS",0)
+THEN
+  RESPONSE #100
+    SetGlobal("flNoGating","LOCALS",1)
+END
+
 IF
 	Global("RR#Active","LOCALS",0)
 	OR(2)
@@ -58,6 +75,14 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",600) // no spellcasting in Dead Magic zones
+END
+
+IF
+  False()
+  Global("flPlaceholder4Gating","LOCALS",0)
+THEN
+  RESPONSE #100
+    Continue()
 END
 
 IF
