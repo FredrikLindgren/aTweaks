@@ -642,5 +642,61 @@ COMPILE ~aTweaks/BAF/fiends/RR#WISH.BAF~                                        
 COMPILE ~aTweaks/BAF/fiends/RR#GHAST.BAF~                                                 // Spawned Ghast AI script
 
 
+
+
+///////////
+//Yugoloth
+///////////
+
+//Invisible, cone-shaped projectile
+ADD_PROJECTILE ~atweaks/pro/fl#cone.pro~
+
+//Arcanaloth's fear spell
+COPY "atweaks/spl/base.spl" "override/fl#cnefr.spl"
+  WRITE_LONG NAME1 2619 //Fear
+  //WRITE_ASCII 0x10 CAS_M01 #8 //casting sound
+  WRITE_BYTE  0x19 BIT2 //flags: hostile
+  WRITE_SHORT 0x22 13 //illusion (animation)
+  WRITE_SHORT 0x25 5 //illusion (school)
+  WRITE_BYTE  0x27 11 //disabling (secondary type)
+  READ_LONG   0x64 ao
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    WRITE_BYTE  ao + 0x28*i + 0xc  4 //any point, but likely not important
+    WRITE_SHORT ao + 0x28*i + 0x12 4 //casting time
+    WRITE_SHORT ao + 0x28*i + 0x26 fl#cone #8 //projectile
+  END
+  target = 2
+  power = 4
+  dispel_resist = 1
+  duration = 72
+  savingthrow = 1 //vs. spell
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 24  target power dispel_resist duration savingthrow END //Panic
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14007 timing = 1 dispel_resist savingthrow END //Display string
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 39 duration dispel_resist savingthrow END //Portrait icon
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 4 duration dispel_resist savingthrow STR_VAR resource = eff_e05 END //Play sound
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target power parameter2 = 17 timing = 1 dispel_resist savingthrow END //Lighting effect
+  
+//Telekinesis
+COPY "atweaks/spl/base.spl" "override/fl#telki.spl"
+  SAY NAME1 @731 //Telekinesis
+  //WRITE_ASCII 0x10 ~~ #8 //casting sound
+  WRITE_BYTE  0x19 BIT2 //flags: hostile
+  WRITE_SHORT 0x22 10 //alteration (animation)
+  WRITE_SHORT 0x25 8 //transmutation (school)
+  WRITE_BYTE  0x27 11 //disabling (secondary type)
+  READ_LONG   0x64 ao
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    WRITE_SHORT ao + 0x28*i + 0x12 5 //casting time
+  END
+  target = 2
+  power = 5
+  dispel_resist = 1
+  savingthrow = 1
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 235 target power parameter1 = 30 parameter2 = 2 timing = 1 dispel_resist savingthrow END //Wing buffet
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter1 = 12 parameter2 = 0x100000 timing = 1 dispel_resist savingthrow END //Damage
+  
+
+
+
 END  // ends RR#FIEND main ACTION_IF block
 END  // ends macro

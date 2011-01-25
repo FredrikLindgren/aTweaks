@@ -76,7 +76,13 @@ END
 
 //Mirror Image if there's no True Sight
 IF TRIGGER
-  Detect(NearestEnemyOf(Myself))
+  OR(6)
+    Detect(NearestEnemyOf(Myself))
+    CheckStatGT(NearestEnemyOf(Myself),0,PROTECTION_FROM_EVIL)
+    HasItemEquipedReal("staf11",NearestEnemyOf(Myself))
+    HasItemEquiped("wa2amu",NearestEnemyOf(Myself))
+    HasItemEquiped("lich",NearestEnemyOf(Myself))
+    HasItemEquiped("jonhp1",NearestEnemyOf(Myself))
   !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
   !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
   !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
@@ -163,9 +169,11 @@ IF TRIGGER
   Target(LastSummonerOf(Myself))
   Exists(scstarget)
   TriggerBlock(ProEvil)
-  !HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("jonhp1",scstarget)
   !StateCheck(scstarget,STATE_REALLY_DEAD)
   !StateCheck(Myself,STATE_INVISIBLE)
+  !Race(scstarget,DEMONIC)
 THEN DO
   SetInterrupt(FALSE)
   SetGlobal("fl#Summoner","LOCALS",1)
@@ -179,7 +187,8 @@ IF TRIGGER
   !Race(scstarget,LICH)
   !Race(scstarget,RAKSHASA)
   TriggerBlock(MRFull|FireResFull|SpellTurning|MinorGlobe|SIEvo|ProEvil)
-  !HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("jonhp1",scstarget)
   !HasItemEquiped("clck26",scstarget)
   Range(NearestEnemyOf(Myself),5)
 THEN DO
@@ -188,20 +197,20 @@ THEN DO
 END 
 
 IF TRIGGER
-  TargetBlock(aVENGERFunnel)
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|SlashResFull|ProEvil|Stoneskin|MirrorImage|Disabled)
-  !HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("jonhp1",scstarget)
   Range(scstarget,5)
 THEN DO
   AttackOneRound(scstarget)
 END 
 
 IF TRIGGER
-  TargetBlock(aVENGERFunnel)
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|SlashResFull|ProEvil|Stoneskin|MirrorImage|Disabled)
-  !HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("jonhp1",scstarget)
   !Range(scstarget,5)
   InMyArea(scstarget)
 THEN DO
@@ -209,21 +218,21 @@ THEN DO
   Action(ForceSpellRES,"RR#TELWE")
 END
 
-IF TRIGGER
-  TargetBlock(aVENGERFunnel)
+IF TRIGGER)
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
-  !HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("jonhp1",scstarget)
   Range(scstarget,5)
 THEN DO
   AttackOneRound(scstarget)
 END
 
 IF TRIGGER
-  TargetBlock(aVENGERFunnel)
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
-  !HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("jonhp1",scstarget)
   !Range(scstarget,5)
   InMyArea(scstarget)
 THEN DO
@@ -239,32 +248,35 @@ THEN DO
   Action(ForceSpellMyself,WIZARD_INVISIBILITY|100|25)
 END
 
-IF
-  See([ANYONE])
-  Allegiance(Myself,EVILCUTOFF)
-  Race(LastSeenBY(Myself),DEMONIC)
-  Alignment(LastSeenBy(Myself),MASK_EVIL)
-  !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
-THEN
-  RESPONSE #100
-    RandomWalkContinuous()
-END
+//IF
+//  See([ANYONE])
+//  Allegiance(Myself,EVILCUTOFF)
+//  Race(LastSeenBY(Myself),DEMONIC)
+//  Alignment(LastSeenBy(Myself),MASK_EVIL)
+//  !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+//THEN
+//  RESPONSE #100
+//    RandomWalkContinuous()
+//END
 
-IF
-  See([ANYONE])
-  Allegiance(Myself,GOODCUTOFF)
-  Race(LastSeenBY(Myself),DEMONIC)
-  Alignment(LastSeenBy(Myself),MASK_EVIL)
-  !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
-THEN
-  RESPONSE #100
-    RandomWalkContinuous()
-END
+//IF
+//  See([ANYONE])
+//  Allegiance(Myself,GOODCUTOFF)
+//  Race(LastSeenBy(Myself),DEMONIC)
+//  Alignment(LastSeenBy(Myself),MASK_EVIL)
+//  !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+//THEN
+//  RESPONSE #100
+//    RandomWalkContinuous()
+//END
+
+//We need something for not attacking other summoned demons that also works
 
 IF TRIGGER
   Target([ANYONE])
   Triggerblock(WeaponImmunity|SlashResFull|ProEvil)
-  !HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("jonhp1",scstarget)
   Range(scstarget,5)
 THEN DO
   AttackOneRound(scstarget)
@@ -273,7 +285,8 @@ END
 IF TRIGGER
   Target([ANYONE])
   Triggerblock(WeaponImmunity|SlashResFull|ProEvil)
-  !HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("jonhp1",scstarget)
   !Range(scstarget,5)
   InMyArea(scstarget)
 THEN DO

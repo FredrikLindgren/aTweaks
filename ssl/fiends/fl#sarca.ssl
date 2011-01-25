@@ -85,7 +85,13 @@ THEN DO
 END
 
 IF TRIGGER
-  Detect(NearestEnemyOf(Myself))
+  OR(6)
+    Detect(NearestEnemyOf(Myself))
+    CheckStatGT(NearestEnemyOf(Myself),0,PROTECTION_FROM_EVIL)
+    HasItemEquipedReal("staf11",NearestEnemyOf(Myself))
+    HasItemEquiped("wa2amu",NearestEnemyOf(Myself))
+    HasItemEquiped("lich",NearestEnemyOf(Myself))
+    HasItemEquiped("jonhp1",NearestEnemyOf(Myself)))
   !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
   !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
   !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
@@ -297,8 +303,67 @@ THEN DO
   Action(ForceSpell,CLERIC_ANIMATE_DEAD|50|150)
 END
 
-//Melf
-//Melee  
+//Gun for susceptible mages (add clerics) primarily
+IF TRIGGER
+  HasItem("melfmet",Myself)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|FireResFull|PierceRes75|WeaponImmunity)
+  CheckStatGT(scstarget,0,STONESKINS)
+  !Race(scstarget,LICH)
+  !Race(scstarget,RAKSHASA)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+//Then anyone else
+IF TRIGGER
+  HasItem("melfmet",Myself)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|PierceRes75|WeaponImmunity)
+THEN DO
+  AttackOneRound(scstarget)
+END  
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  TriggerBlock(WeaponImmunity|SlashResFull)
+  StateCheck(scstarget,STATE_IMMOBILE)
+  Range(scstarget,5)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  TriggerBlock(WeaponImmunity|SlashResFull)
+  Range(scstarget,5)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  Target([0.HUMANOID.0.INNOCENT])
+  !See(NearestEnemyOf(Myself))
+  !Range(scstarget,6)
+THEN DO
+  Action(ForceSpellRES,"RR#TELWE")
+END
+
+IF TRIGGER
+  Target([0.HUMANOID.0.INNOCENT])
+  !See(NearestEnemyOf(Myself))
+  Range(scstarget,6)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+  
   
   
 
