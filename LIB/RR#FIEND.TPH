@@ -505,7 +505,23 @@ COPY_EXISTING ~SPWI817.SPL~  ~override/RR#WI817.SPL~                            
   END 
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
-
+COPY_EXISTING sppr301.spl "override/RR#PR301.spl"                                  //Animate Dead
+  LPF RR#SP2IN INT_VAR rr#rinvis = 1 END
+  
+COPY_EXISTING spwi112.spl "override/RR#WI112.spl"                                  //Magic Missile
+  LPF RR#SP2IN INT_VAR rr#rinvis = 1 END 
+  
+COPY_EXISTING spwi104.spl "override/RR#WI104.spl"                                  //Charm Person
+  LPF RR#SP2IN INT_AVR rr#rinvis = 1 END
+  
+COPY_EXISTING sppr102.spl "override/RR#PR102.spl"                                  //Command
+  LPF RR#SP2IN INT_VAR rr#rinvis = 1 END
+  
+COPY_EXISTING sppr302.spl "override/RR#PR302.spl"                                  //Call Lightning
+  LPF RR#SP2IN INT_VAR rr#rinvis = 1 END
+  
+COPY_EXISTING sppr705.spl "override/RR#PR705.spl"                                  //Fire Storm
+  LPF RR#SP2IN INT_VAR rr#rinvis = 1 END   
 
 // New items
 
@@ -651,7 +667,7 @@ COMPILE ~aTweaks/BAF/fiends/RR#GHAST.BAF~                                       
 //Invisible, cone-shaped projectile
 ADD_PROJECTILE ~atweaks/pro/fl#cone.pro~
 
-//Arcanaloth's fear spell
+//Fear
 COPY "atweaks/spl/base.spl" "override/fl#cnefr.spl"
   WRITE_LONG NAME1 2619 //Fear
   //WRITE_ASCII 0x10 CAS_M01 #8 //casting sound
@@ -660,21 +676,36 @@ COPY "atweaks/spl/base.spl" "override/fl#cnefr.spl"
   WRITE_SHORT 0x25 5 //illusion (school)
   WRITE_BYTE  0x27 11 //disabling (secondary type)
   READ_LONG   0x64 ao
-  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+  READ_SHORT  0x68 na
+  READ_LONG   0x6a eo
+  READ_ASCII  ao ab_copy (0x28)
+  number = 20 - na
+  FOR (i=0;i<number;++i) BEGIN
+    INSERT_BYTES   ao + 0x28*na 0x28
+      WRITE_ASCIIE ao + 0x28*na "%ab_copy%"
+    ++na
+    eo+=0x28
+  END
+  WRITE_SHORT 0x68 na
+  WRITE_LONG  0x6a eo  
+  FOR (i=0;i<na;++i) BEGIN
     WRITE_BYTE  ao + 0x28*i + 0xc  4 //any point, but likely not important
+    WRITE_SHORT ao + 0x28*i + 0x10 i+1 //minumum level
     WRITE_SHORT ao + 0x28*i + 0x12 4 //casting time
-    WRITE_SHORT ao + 0x28*i + 0x26 fl#cone #8 //projectile
+    WRITE_SHORT ao + 0x28*i + 0x26 fl#cone //projectile
   END
   target = 2
   power = 4
-  dispel_resist = 1
-  duration = 72
-  savingthrow = 1 //vs. spell
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 24  target power dispel_resist duration savingthrow END //Panic
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14007 timing = 1 dispel_resist savingthrow END //Display string
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 39 duration dispel_resist savingthrow END //Portrait icon
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 4 duration dispel_resist savingthrow STR_VAR resource = eff_e05 END //Play sound
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target power parameter2 = 17 timing = 1 dispel_resist savingthrow END //Lighting effect
+  resist_dispel = 1
+  savingthrow = 1
+  FOR (header=1;header<=20;++header) BEGIN
+    duration = header*6
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 24  target power resist_dispel duration savingthrow header END //Panic
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14007 timing = 1 resist_dispel savingthrow header END //Display string
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 39 duration resist_dispel savingthrow header END //Portrait icon
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 4 duration resist_dispel savingthrow header STR_VAR resource = eff_e05 END //Play sound
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target power parameter2 = 17 timing = 1 resist_dispel savingthrow header END //Lighting effect
+  END
   
 //Telekinesis
 COPY "atweaks/spl/base.spl" "override/fl#telki.spl"
@@ -690,11 +721,190 @@ COPY "atweaks/spl/base.spl" "override/fl#telki.spl"
   END
   target = 2
   power = 5
-  dispel_resist = 1
+  resist_dispel = 1
   savingthrow = 1
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 235 target power parameter1 = 30 parameter2 = 2 timing = 1 dispel_resist savingthrow END //Wing buffet
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter1 = 12 parameter2 = 0x100000 timing = 1 dispel_resist savingthrow END //Damage
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 235 target power parameter1 = 30 parameter2 = 2 timing = 1 resist_dispel savingthrow END //Wing buffet
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter1 = 12 parameter2 = 0x100000 timing = 1 resist_dispel savingthrow END //Damage
+
+//Cause disease
+COPY "atweaks/spl/base.spl" "override/fl#csdis.spl"
+  SAY NAME1 @736
+  //WRITE_ASCII 0x10 ~~ #8 //casting sound
+  WRITE_BYTE  0x19 BIT2 //flags: hostile
+  WRITE_SHORT 0x22 12   //abjuration (animation)
+  WRITE_SHORT 0x25 1    //abjuration (school)
+  WRITE_BYTE  0x27 11   //disabling (secondary type)
+  READ_LONG 0x64 ao
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    WRITE_BYTE  ao + 0x28*i + 0xc  1 //living actor 
+    WRITE_SHORT ao + 0x28*i + 0xe  1 //range
+    WRITE_SHORT ao + 0x28*i + 0x12 1 //casting time
+  END
+  target = 2
+  power = 3
+  resist_dispel = 1
+  savingthrow = 1
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target power parameter1 = 2 parameter2 = 4 timing = 1 resist_dispel savingthrow END //Disease: 2 points of STR
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target power parameter1 = 6 parameter2 = 3 timing = 1 resist_dispel savingthrow END //Disease: 1 HP damage/round
+    
+//Mass suggestion
+COPY "atweaks/spl/base.spl" "override/fl#mssug.spl"
+  SAY NAME1 @737
+  //WRITE_ASCII 0x10 ~~ #8 //casting sound
+  WRITE_SHORT 0x22 11 //enchantment (animation)
+  WRITE_SHORT 0x25 4  //enchanter (school)
+  WRITE_BYTE  0x27 11 //disabling (secondary type)
+  READ_LONG   0x64 ao
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    WRITE_BYTE  ao + 0x28*i + 0xc  4 //any point
+    WRITE_SHORT ao + 0x28*i + 0xe  30 //range
+    WRITE_SHORT ao + 0x28*i + 0x12 6 //casting time
+    WRITE_SHORT ao + 0x28*i + 0x26 170 //projectile (spargonp)
+  END
+  target = 2
+  power = 6
+  duration = 3840
+  resist_dispel = 1
+  savingthrow = 1
+  savebonus = "-1"
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 5 target power parameter1 = 1 parameter2 = 1 duration resist_dispel savingthrow savebonus END //Charm
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 50 target power parameter1 = 0x9390FF00 parameter2 = 0x1E0000 resist_dispel duration = 1 savingthrow savebonus END //Colour pule
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power resist_dispel duration savingthrow savebonus END //Icon
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target power parameter2 = 1 resist_dispel duration = 3 savingthrow savebonus STR_VAR resource = spnwchrm END //Play visial effect
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 3 duration resist_dispel savingthrow savebonus STR_VAR resource = eff_e07 END //play sound
+
+//Custom Color Spray
+COPY "atweaks/spl/base.spl" "override/fl#clrsp.spl"
+  WRITE_LONG NAME1 12075 //Color Spray
+  WRITE_ASCII 0x10 CAS_M08 #8 //casting sound
+  WRITE_BYTE  0x19 BIT2 //flags: hostile
+  WRITE_SHORT 0x22 10 //alteration (animation)
+  WRITE_SHORT 0x25 8 //transmuter (school)
+  WRITE_BYTE  0x27 11 //disabling (secondary type)
+  READ_LONG   0x64 ao
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    WRITE_BYTE  ao + 0x28*i + 0xc  4 //any point
+    WRITE_SHORT ao + 0x28*i + 0xe  15 //range
+    WRITE_SHORT ao + 0x28*i + 0x12 1 //casting time
+    WRITE_SHORT ao + 0x28*i + 0x26 249 //color spray
+  END
+  target = 2
+  power = 1
+  resist_dispel = 1
+  duration = 30
+  dicenumber = 6
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 39 target power resist_dispel duration dicenumber END //Sleep, if level<6, no save
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 14 resist_dispel duration dicenumber END //icon (sleep)
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14001 resist_dispel duration dicenumber END //display string: sleep
+  PATCH_FOR_EACH parameter2 IN 5 3 1 0 BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 7 target power parameter1 = 34 parameter2 resist_dispel duration dicenumber END //colour
+  END
+  PATCH_FOR_EACH parameter2 IN 6 4 2 BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 7 target power parameter1 = 35 parameter2 resist_dispel duration dicenumber END   //colour
+  END
+  dicenumber = 15
+  dicesize = 7
+  savingthrow = 1
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 39 target power resist_dispel duration dicenumber dicesize savingthrow END //16>level>6, sleep with save
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power resist_dispel duration dicenumber dicesize savingthrow END //icon
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14001 resist_dispel duration dicenumber dicesize savingthrow END //display string: sleep
+  PATCH_FOR_EACH parameter2 IN 5 3 1 0 BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 7 target power parameter1 = 34 parameter2 resist_dispel duration dicenumber dicesize savingthrow END
+  END
+  PATCH_FOR_EACH parameter2 IN 6 4 2 BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 7 target power parameter1 = 35 parameter2 resist_dispel duration dicenumber dicesize savingthrow END
+  END
+  dicenumber = 17
+  dicesize = 16
+  duration = 12
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 74 target power resist_dispel duration dicenumber dicesize savingthrow END // 18>level>15, blindness with save
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 50 target power parameter1 = 0x7F7F7F00 parameter2 = 0x140000 resist_dispel duration = 1 dicenumber dicesize savingthrow END //colour pulse
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14674 resist_dispel timing = 1 dicenumber dicesize savingthrow END //display string: blinded
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 8 resist_dispel duration dicenumber dicesize savingthrow END //portrait icon: blind
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 4 duration resist_dispel dicenumber dicesize savingthrow STR_VAR resource = eff_e07 END //play sound
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power duration resist_dispel dicenumber dicesize savingthrow STR_VAR resource = EVAL "%DEST_RES%" END //non-cumulativity if you're blinded
+  dicesize = 18
+  duration = 6
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 128 target power resist_dispel duration dicesize savingthrow END //level>17, confused with save
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14782 resist_dispel duration dicesize savingthrow END //confused
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 3 resist_dispel duration dicesize savingthrow END //confused
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target power parameter2 = 1 resist_dispel duration dicesize savingthrow STR_VAR resource = spconfus END //visual effect
+
+//Patch immunity to fl#clrsp into spells, items that cause blindness
+COPY_EXISTING spdr101.spl  override
+              spin595.spl  override
+              spin878.spl  override
+              spin893.spl  override
+              spin929.spl  override
+              spin931.spl  override
+              sppr704.spl  override
+              sppr707.spl  override
+              spwi106.spl  override
+              spwi118.spl  override
+              spwi224.spl  override
+              spwi714.spl  override
+              spwi815.spl  override
+              spwi958.spl  override
+              spwm178.spl  override
+              chalcy2.itm  override
+              gorwom4.itm  override
+              halb06.itm   override
+              sorb.itm     override
+              sw1h51.itm   override
+              wand19.itm   override
+  LPF add_conditional_immunity INT_VAR f_Condition = 74 STR_VAR f_Spell = fl#clrsp END
+BUT_ONLY
   
+  
+//Shout
+COPY "atweaks/spl/base.spl" "override/fl#shout.spl"
+  SAY NAME1 @738 //Shout
+  //WRITE_ASCII 0x10 ~~ #8 //casting sound
+  WRITE_BYTE  0x19 BIT2 //flags: hostile
+  WRITE_SHORT 0x22 15 //evocation (animation)
+  WRITE_SHORT 0x25 6 //evoker (school)
+  WRITE_BYTE  0x27 11 //disabling (secondary type)
+  READ_LONG   0x64 ao
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    WRITE_BYTE  ao + 0x28*i + 0xc  4 //any point
+    WRITE_SHORT ao + 0x28*i + 0xe  15 //range
+    WRITE_SHORT ao + 0x28*i + 0x12 1 //casting time
+    WRITE_SHORT ao + 0x28*i + 0x26 fl#cone //maybe we should use a non-party-fiendly projectile instead?
+  END
+  target = 2
+  power = 4
+  resist_dispel = 1
+  duration = 36
+  savingthrow = 1
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 80 target power resist_dispel duration savingthrow END //Deafness
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14073 resist_dispel timing = 1 savingthrow END //string: deafness
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 112 resist_dispel duration savingthrow END //icon: deafness
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target power parameter2 = 1 resist_dispel duration = 3 savingthrow STR_VAR resource = SPH1HI01 END //visual effect
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target power parameter2 = 1 resist_dispel duration = 3 savingthrow STR_VAR resource = SPHLHI02 END //more visual effects
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power duration resist_dispel savingthrow STR_VAR resource = EVAL "%DEST_RES%" END //non-cumulativity if you are deafened
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter2 = 0x400000 resist_dispel timing = 1 dicenumber = 1 dicesize = 6 END //1d6 damage, no save
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter2 = 0x400000 resist_dispel timing = 1 dicenumber = 1 dicesize = 6 savingthrow END //1d6, with save
+
+//Patch immunity to fl#shout into silence and deafening spells, items  
+COPY_EXISTING sppr211.spl  override
+              rr#dneth.spl override
+              rr#ether.spl override
+              rr#pr211.spl override
+              spin692.spl  override
+              spin998.spl  override
+              sppr988.spl  override
+              spwi612.spl  override
+              spwish35.spl override
+              spwi223.spl  override
+              misc3l.itm   override
+              sw1h36.itm   override
+              wand19.itm   override
+  LPF add_conditional_immunity INT_VAR f_Condition = 38 STR_VAR f_Spell = fl#shout END
+  LPF add_conditional_immunity INT_VAR f_Condition = 80 STR_VAR f_Spell = fl#shout END
+BUT_ONLY
+          
+      
+              
 
 
 

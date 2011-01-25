@@ -1,4 +1,4 @@
-DEFINE_PATCH_FUNCTION prep_for_gate_making INT_VAR f_CastingTime = 0 BEGIN
+DEFINE_PATCH_FUNCTION prep_for_gate INT_VAR f_CastingTime = 1 BEGIN
   READ_LONG  0x64 ao
   READ_LONG  0x6a eo
   READ_SHORT 0x70 ei
@@ -13,5 +13,33 @@ DEFINE_PATCH_FUNCTION prep_for_gate_making INT_VAR f_CastingTime = 0 BEGIN
     END
     WRITE_SHORT ao + 0x28*i + 0x1e ne
     ei += ne
+  END
+END
+
+DEFINE_PATCH_FUNCTION add_conditional_immunity INT_VAR f_Condition = 999 BEGIN
+  PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+    READ_LONG  0x64 ao
+    READ_LONG  0x6a eo
+    READ_SHORT 0x70 ei
+    al = "%SOURCE_EXT%" STRING_EQUAL_CASE spl ? 0x28 : 0x38
+    FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+      WRITE_SHORT ao + al*i + 0x20 ei
+      READ_SHORT  ao + al*i + 0x1e ne
+      FOR (j=0;j<ne;++j) BEGIN
+        READ_SHORT eo + 0x30*(ei + j) type
+        PATCH_IF type = f_Condition BEGIN
+          READ_ASCII   eo + 0x30*(ei + j) copy (0x30)
+          INSERT_BYTES eo + 0x30*(ei + j) 0x30
+            WRITE_ASCIIE eo + 0x30*(ei + j)        "%copy%"
+            WRITE_SHORT  eo + 0x30*(ei + j)        206 //immunity to spell
+            WRITE_LONG   eo + 0x30*(ei + j) + 0x4  0
+            WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 "%f_Spell%" #8
+          ++ne
+          j=ne
+        END
+      END
+      WRITE_SHORT ao + al*i + 0x1e ne
+      ei+=ne
+    END
   END
 END

@@ -14,7 +14,7 @@ BEGIN_ACTION_DEFINITION
     !GlobalTimerNotExpired("cast","LOCALS")
   ACTION
     RESPONSE #scsprob1
-      SetGlobal("cast","LOCALS",6)
+      SetGlobalTimer("cast","LOCALS",6)
       ForceSpell(scstarget,scsargument1)
 END
 
@@ -24,8 +24,18 @@ BEGIN_ACTION_DEFINITION
     !GlobalTimerNotExpired("cast","LOCALS")
   ACTION
     RESPONSE #scsprob1
-      SetGlobal("cast","LOCALS",6)
+      SetGlobalTimer("cast","LOCALS",6)
       ForceSpell(Myself,scsargument1)
+END
+
+BEGIN_ACTION_DEFINITION
+  Name(ForceSpellRESMyself)
+  TRIGGER
+    !GlobalTimerNotExpired("cast","LOCALS")
+  ACTION
+    RESPONSE #scsprob1
+      SetGlobalTimer("cast","LOCALS",6)
+      ForceSpellRES(scsargument1,Myself)
 END
 
 BEGIN_ACTION_DEFINITION

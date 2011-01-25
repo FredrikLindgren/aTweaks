@@ -184,11 +184,28 @@ END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR75|SpellTurning|SIAlt)
+  Range(scstarget,10)
+  !Race(scstarget,GIANT)
+  !Race(scstarget,DRAGON)
+THEN DO
+  Action(ForceSpellRES,"fl#telki"|100|50)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|SICon|MinorGlobe|SpellTurning|FireRes50)
   !HasItemEquiped("clck26",scstarget)
 THEN DO
   Combine()
   Action(Spell,WIZARD_FLAME_ARROW|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  !Range(scstarget,10)
+THEN DO
+  Action(ForceSpellRES,"RR#PR301"|50|100)
 END
 
 IF TRIGGER
@@ -201,10 +218,33 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|SICon|MinorGlobe|SpellTurning|AcidRes50)
+  !HasItemEquiped("clck26",scstarget)
 THEN DO
   Combine()
   Action(Spell,WIZARD_MELF_ACID_ARROW|100|100)
 END
+
+//Fear, once per day, cone-shaped
+//Flee for CasterLevel rounds, save vs. spell
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SIIll|Fear)
+  !Range(scstarget,5) //Because cone-shaped projectiles pack a lot of suck at the narrow end
+  Range(scstarget,15)
+  Global("fl#FearCone","LOCALS",0)
+THEN DO
+  Action(ForceSpellRES,"fl#cnefr"¡100|100)
+  IncrementGlobal("fl#FearCone","LOCALS",1)
+END
+
+IF TRIGGER
+  TargetBlock(AnyTroll)
+  TriggerBlock(FireResFull|SpellTurning|MinorGlobe)
+  !StateCheck(scstarget,STATE_NOT_TARGETABLE)
+  HPLT(scstarget,15)
+THEN DO
+  Action(ForceSpellRES,"RR#PFLAM"|100|50)
+END  
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
@@ -233,39 +273,6 @@ THEN DO
   Action(Spell,WIZARD_SPOOK|100|100)
 END
 
-//Fear, once per day, cone-shaped
-//Flee for CasterLevel rounds, save vs. spell
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|SIIll|Fear)
-  !Range(scstarget,5) //Because cone-shaped projectiles pack a lot of suck at the narrow end
-  Range(scstarget,15)
-  Global("fl#FearCone","LOCALS",0)
-THEN DO
-  Action(ForceSpellRES,"fl#cnefr"¡100|100)
-  IncrementGlobal("fl#FearCone","LOCALS",1)
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR75|SpellTurning|MinorGlobe|SIEvo)
-  !Race(scstarget,LICH)
-  !Race(scstarget,RAKSHASA)
-  !HasItemEquiped("clck26",scstarget)
-THEN DO
-  Action(ForceSpell,WIZARD_MAGIC_MISSILE|100|100)
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR75|SpellTurning)
-  Range(scstarget,10)
-  !Race(scstarget,GIANT)
-  !Race(scstarget,DRAGON)
-THEN DO
-  Action(ForceSpellRES,"fl#telki"|100|50)
-END
-
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
   TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIAbj|Disease)
@@ -277,38 +284,39 @@ END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
-  General(scstarget,HUMANOID)
-  !Race(scstarget,RAKSHASA)
-  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIEnc|Charm)
-THEN DO
-  Combine()
-  Action(ForceSpell,WIZARD_CHARM_PERSON|100|100)
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIEvo)
+  TriggerBlock(Disabled|MR75|SpellTurning|MinorGlobe|SIEvo)
   !Race(scstarget,LICH)
   !Race(scstarget,RAKSHASA)
   !HasItemEquiped("clck26",scstarget)
 THEN DO
-  Combine()
-  Action(ForceSpellRES,"RR#PFLAM"|100|100)
+  Action(ForceSpellRES,"RR#WI112"|100|100)
 END
 
 IF TRIGGER
-  TargetBlock(EnemiesInOrderShort)
-  !Range(scstarget,10)
+  TargetBlock(EnemiesInOrder)
+  General(scstarget,HUMANOID)
+  !Race(scstarget,RAKSHASA)
+  CheckStatGT(scstarget,0,SAVEVSSPELL)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIEnc|Charm)
 THEN DO
-  Action(ForceSpell,CLERIC_ANIMATE_DEAD|50|150)
+  Combine()
+  Action(ForceSpellRES,"RR#WI104"|100|100)
 END
 
-//Gun for susceptible mages (add clerics) primarily
+//Gun for susceptible spellcasters primarily
 IF TRIGGER
   HasItem("melfmet",Myself)
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|FireResFull|PierceRes75|WeaponImmunity)
-  CheckStatGT(scstarget,0,STONESKINS)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|PierceRes75|WeaponImmunity)
+  OR(2)
+    CheckStatLT(scstarget,100,RESISTFIRE)
+    !CheckStatGT(scstarget,0,STONESKINS)
+  OR(5)
+    Class(scstarget,MAGE_ALL)
+    Class(scstarget,BARD_ALL)
+    Class(scstarget,CLERIC_ALL)
+    Class(scstarget,CLERIC_RANGER)
+    Class(scstarget-DRUID_ALL)
   !Race(scstarget,LICH)
   !Race(scstarget,RAKSHASA)
 THEN DO
@@ -320,6 +328,14 @@ IF TRIGGER
   HasItem("melfmet",Myself)
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|PierceRes75|WeaponImmunity)
+THEN DO
+  AttackOneRound(scstarget)
+END 
+
+IF TRIGGER
+  HasItem("melfmet",Myself)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(PierceResFull|WeaponImmunity)
 THEN DO
   AttackOneRound(scstarget)
 END  
@@ -340,6 +356,8 @@ IF TRIGGER
 THEN DO
   AttackOneRound(scstarget)
 END
+
+//Can these guys get lost, since they don't spontaneously port to the enemy?
 
 IF TRIGGER
   Target([0.HUMANOID.0.INNOCENT])
