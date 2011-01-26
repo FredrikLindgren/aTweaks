@@ -1,3 +1,5 @@
+
+//Deletes all extended effects from the source spell and sets casting time for all extended headers to f_CastingTime
 DEFINE_PATCH_FUNCTION prep_for_gate INT_VAR f_CastingTime = 1 BEGIN
   READ_LONG  0x64 ao
   READ_LONG  0x6a eo
@@ -16,6 +18,8 @@ DEFINE_PATCH_FUNCTION prep_for_gate INT_VAR f_CastingTime = 1 BEGIN
   END
 END
 
+//Adds an opcode 206 (protection from spell) with the resref f_Spell to the extended header of the source spell or item, 
+//if an effect of type f_Condition is found on the header
 DEFINE_PATCH_FUNCTION add_conditional_immunity INT_VAR f_Condition = 999 BEGIN
   PATCH_IF SOURCE_SIZE > 0x71 BEGIN
     READ_LONG  0x64 ao
@@ -43,3 +47,120 @@ DEFINE_PATCH_FUNCTION add_conditional_immunity INT_VAR f_Condition = 999 BEGIN
     END
   END
 END
+
+//Deletes all effects and extended headers from the source item or spell and inserts a new extended header of type f_Type (defaults to f_Type = 1)
+//if the source file is an item file and f_Type = 1, the function launches an auxilliary function to set up the basics of the melee header
+//FAILs if the source file is too small or doesn't have a proper ITM or SPL signature
+DEFINE_PATCH_FUNCTION prep_itm_spl INT_VAR f_Type = 1 BEGIN
+  PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+    READ_ASCII 0x00 sig (3)
+    PATCH_IF "%sig%" STRING_EQUAL_CASE itm OR "%sig%" STRING_EQUAL_CASE spl BEGIN
+      al = "%sig%" STRING_EQUAL_CASE spl ? 0x28 : 0x38
+      READ_LONG  0x64 ao
+      READ_SHORT 0x68 na
+      READ_LONG  0x6a eo
+      FOR (i=0;i<na;++i) BEGIN
+        READ_SHORT ao + al*i + 0x1e ne
+        READ_SHORT ao + al*i + 0x20 ei
+        FOR (j=0;j<ne;++j) BEGIN
+          DELETE_BYTES eo + 0x30*(ei + j) 0x30
+          --ne
+          --j
+        END
+        DELETE_BYTES ao + al*i al
+        --na
+        --i
+        eo -= al
+      END
+      READ_SHORT 0x70 ne
+      FOR (i=0;i<ne;++i) BEGIN
+        DELETE_BYTES eo + 0x30*i 0x30
+        --ne
+        --i
+      END
+      WRITE_SHORT 0x70 ne
+      INSERT_BYTES ao al
+      WRITE_BYTE ao f_Type
+      ++na
+      eo+=al
+      WRITE_SHORT 0x68 na
+      WRITE_LONG  0x6a eo
+      PATCH_IF f_Type = 1 AND al = 0x38 BEGIN
+        READ_ASCII 0x3a f_Icon
+        LPF configure_weapon_header STR_VAR f_Icon END
+      END
+    END ELSE BEGIN
+      PATCH_FAIL ~The signature of the file %SOURCE_FILE% is not recognised.~
+    END
+  END ELSE BEGIN
+    PATCH_FAIL ~File %SOURCE_FILE% is below required size.~
+  END
+END
+
+//Writes to the more and less common fields of the item melee header
+DEFINE_PATCH_FUNCTION configure_weapon_header INT_VAR 
+                                                      f_Slot = 1
+                                                      f_Target = 1
+                                                      f_Range = 1                                                          
+                                                      f_Speed = 0 
+                                                      f_ToHit = 0 
+                                                      f_Damage = 0 
+                                                      f_NumDice = 0 
+                                                      f_DieSize = 0 
+                                                      f_DamageType = 0 
+                                                      f_Flags = 1
+                                                      f_Charges = 0
+                                                      f_Drained = 1
+                                                      f_Projectile = 1
+                                                      f_Overhand = 50
+                                                      f_Backhand = 50
+                                                      f_Thrust = 0
+                                                      f_Arrow = 0
+                                                      f_Bolt = 0
+                                                      f_Bullet = 0 
+                                              STR_VAR
+                                                      f_Icon = ~~
+BEGIN
+  READ_LONG  0x64 ao
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    READ_BYTE ao + 0x38*i type
+    PATCH_IF type = 1 BEGIN
+      WRITE_BYTE   ao + 0x38*i + 0x2  f_Slot
+      WRITE_ASCIIE ao + 0x38*i + 0x4  "%f_Icon%"
+      WRITE_BYTE   ao + 0x38*i + 0xc  f_Target
+      WRITE_SHORT  ao + 0x38*i + 0xe  f_Range
+      WRITE_BYTE   ao + 0x38*i + 0x12 f_Speed
+      WRITE_SHORT  ao + 0x38*i + 0x14 f_ToHit
+      WRITE_BYTE   ao + 0x38*i + 0x16 f_DieSize
+      WRITE_BYTE   ao + 0x38*i + 0x18 f_NumDice
+      WRITE_SHORT  ao + 0x38*i + 0x1a f_Damage
+      WRITE_SHORT  ao + 0x38*i + 0x1c f_DamageType
+      WRITE_SHORT  ao + 0x38*i + 0x22 f_Charges
+      WRITE_SHORT  ao + 0x38*i + 0x24 f_Drained
+      WRITE_LONG   ao + 0x38*i + 0x26 f_Flags
+      WRITE_SHORT  ao + 0x38*i + 0x2a f_Projectile
+      WRITE_SHORT  ao + 0x38*i + 0x2c f_Overhand
+      WRITE_SHORT  ao + 0x38*i + 0x2e f_Backhand
+      WRITE_SHORT  ao + 0x38*i + 0x30 f_Thrust
+      WRITE_SHORT  ao + 0x38*i + 0x32 f_Arrow
+      WRITE_SHORT  ao + 0x38*i + 0x34 f_Bolt
+      WRITE_SHORT  ao + 0x38*i + 0x36 f_Bullet
+    END
+  END
+END
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      

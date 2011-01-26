@@ -3,73 +3,22 @@
 IF
   !GlobalTimerNotExpired("fl#Taunt","LOCALS")
   !StateCheck(Myself,STATE_INVISIBLE)
-  !See(nearestEnemyOf(Myself))
-  See([0.HUMANOID.0.INNOCENT])
-THEN
-  RESPONSE #40
-    SetGlobalTimer("fl#Taunt","LOCALS",12)
-    
-    ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
-  RESPONSE #30
-    SetGlobalTimer("fl#Taunt","LOCALS",12)
-    
-    ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
-  RESPONSE #30
-    SetGlobalTimer("fl#Taunt","LOCALS",12)
-    
-    ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
-END
-
-
-IF //Devil
-  !GlobalTimerNotExpired("fl#Taunt","LOCALS")
-  !StateCheck(Myself,STATE_INVISIBLE)
   !See(NearestEnemyOf(Myself))
   See([0.HUMANOID.0.INNOCENT])
 THEN
   RESPONSE #40
     SetGlobalTimer("fl#Taunt","LOCALS",12)
-    DisplayStringHead(Myself,@660) // Despair mortal, your time has come!
-    DisplayStringHead(LastSeenBy(Myself),@665) // Wha-?! Gods, help me!
-    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+    DisplayStringHead(Myself,@739) // Mortal, your soul is mine! 
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
+    DisplayStringHead(LastSeenBy(Myself),@740) // Aaaaiiiieeee!
   RESPONSE #30
     SetGlobalTimer("fl#Taunt","LOCALS",12)
-    DisplayStringHead(Myself,@661) // Pathetic creature, you have nothing to offer me but your life.
-    DisplayStringHead(LastSeenBy(Myself),@666) // No, please! Aaaaaargh!
-    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+    DisplayStringHead(Myself,@741) // Hahaha, the Prime! Come here, mortal!
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
+    DisplayStringHead(LastSeenBy(Myself),@742) // N-No, don't harm me, please!
   RESPONSE #30
     SetGlobalTimer("fl#Taunt","LOCALS",12)
-    DisplayStringHead(LastSeenBy(Myself),@667) // Is that a... d-devil?! Run for your lives!
-    ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
-    DisplayStringHead(Myself,@662) // By all means, do try to flee. It's much more entertaining that way!
-END
-
-IF //Demon
-        !GlobalTimerNotExpired("RR#Taunt","LOCALS")
-        !StateCheck(Myself,STATE_INVISIBLE)
-	!See([0.0.DEMONIC.0.0.0.MASK_LAWFUL])
-        !See(NearestEnemyOf(Myself))
-	See([0.HUMANOID.0.INNOCENT])
-THEN
-	RESPONSE #40
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Taunt","LOCALS",12)
-		DisplayStringHead(Myself,@654) // I shall feast upon your soul, mortal!
-                DisplayStringHead(LastSeenBy(Myself),@666) // No, please! Aaaaaargh!
-		ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
-		SetInterrupt(TRUE)
-	RESPONSE #30
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Taunt","LOCALS",12)
-                DisplayStringHead(LastSeenBy(Myself),@668) // A d-demon!? I must flee!
-		ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
-		DisplayStringHead(Myself,@655) // There is no escape!
-		SetInterrupt(TRUE)
-	RESPONSE #30
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Taunt","LOCALS",12)
-		DisplayStringHead(Myself,@656) // The Abyss awaits you! Hahahaha!
-                DisplayStringHead(LastSeenBy(Myself),@669) // N-no! Stay back!
-		ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
-		SetInterrupt(TRUE)
+    DisplayStringHead(Myself,@743) // Delicious mortal, your suffering will be beyond your wildest imagination.
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
+    DisplayStringHead(LastSeenBy(Myself),@744) // Gods...No, please!
 END
