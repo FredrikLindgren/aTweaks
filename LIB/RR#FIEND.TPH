@@ -3,7 +3,6 @@
 
 
 DEFINE_ACTION_MACRO ~RR#FIEND~ BEGIN
-ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DPITF.ITM~ THEN BEGIN                                    // only install the shared Fiend macro
 
 
 
@@ -683,7 +682,7 @@ LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Entry END
 //Fear, cone
 COPY "atweaks/spl/base.spl" "override/fl#cnefr.spl"
   WRITE_LONG NAME1 2619 //Fear
-  WRITE_ASCII 0x10 ~~ #8 //casting sound
+  WRITE_ASCII 0x10 ~CAS_M01~ #8 //casting sound
   WRITE_BYTE  0x19 BIT2 //flags: hostile
   WRITE_SHORT 0x22 13 //illusion (animation)
   WRITE_SHORT 0x25 5 //illusion (school)
@@ -711,7 +710,7 @@ COPY_EXISTING fl#cnefr.spl "override/fl#tchfr.spl"
 //Telekinesis
 COPY "atweaks/spl/base.spl" "override/fl#telki.spl"
   SAY NAME1 @731 //Telekinesis
-  WRITE_ASCII 0x10 ~~ #8 //casting sound
+  WRITE_ASCII 0x10 ~CAS_M08~ #8 //casting sound
   WRITE_BYTE  0x19 BIT2 //flags: hostile
   WRITE_SHORT 0x22 10 //alteration (animation)
   WRITE_SHORT 0x25 8 //transmutation (school)
@@ -725,15 +724,15 @@ COPY "atweaks/spl/base.spl" "override/fl#telki.spl"
   savingthrow = 1
   FOR (header=1;header<=20;++header) BEGIN
     parameter1 = header
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 235 target power parameter1 = 30 parameter2 = 2 timing resist_dispel savingthrow END //Wing buffet
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter1 parameter2 = 0x100000 timing resist_dispel END //Damage
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 235 target power parameter1 = 30 parameter2 = 2 timing resist_dispel savingthrow header END //Wing buffet
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter1 parameter2 = 0x100000 timing resist_dispel header END //Damage
   END
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above)
 
 //Cause disease
 COPY "atweaks/spl/base.spl" "override/fl#csdis.spl"
   SAY NAME1 @736
-  //WRITE_ASCII 0x10 ~~ #8 //casting sound
+  WRITE_ASCII 0x10 ~CAS_P02~ #8 //casting sound
   WRITE_BYTE  0x19 BIT2 //flags: hostile
   WRITE_SHORT 0x22 12   //abjuration (animation)
   WRITE_SHORT 0x25 1    //abjuration (school)
@@ -755,7 +754,7 @@ COPY "atweaks/spl/base.spl" "override/fl#csdis.spl"
 //Mass suggestion
 COPY "atweaks/spl/base.spl" "override/fl#mssug.spl"
   SAY NAME1 @737
-  WRITE_ASCII 0x10 ~~ #8 //casting sound
+  WRITE_ASCII 0x10 ~CAS_M05~ #8 //casting sound
   WRITE_SHORT 0x22 11 //enchantment (animation)
   WRITE_SHORT 0x25 4  //enchanter (school)
   WRITE_BYTE  0x27 11 //disabling (secondary type)
@@ -768,11 +767,11 @@ COPY "atweaks/spl/base.spl" "override/fl#mssug.spl"
   savebonus = "-1"
   FOR (header=1;header<=20;++header) BEGIN
     duration = 180 + 180*header
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 5 target power parameter1 = 1 parameter2 = 1 duration resist_dispel savingthrow savebonus END //Charm
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 50 target power parameter1 = 0x9390FF00 parameter2 = 0x1E0000 resist_dispel duration = 1 savingthrow savebonus END //Colour pule
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power resist_dispel duration savingthrow savebonus END //Icon
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target power parameter2 = 1 resist_dispel duration = 3 savingthrow savebonus STR_VAR resource = spnwchrm END //Play visial effect
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 3 duration resist_dispel savingthrow savebonus STR_VAR resource = eff_e07 END //play sound
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 5 target power parameter1 = 1 parameter2 = 1 duration resist_dispel savingthrow savebonus header END //Charm
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 50 target power parameter1 = 0x9390FF00 parameter2 = 0x1E0000 resist_dispel duration = 1 savingthrow savebonus header END //Colour pule
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power resist_dispel duration savingthrow savebonus header END //Icon
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target power parameter2 = 1 resist_dispel duration = 3 savingthrow savebonus header STR_VAR resource = spnwchrm END //Play visial effect
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 3 duration resist_dispel savingthrow savebonus header STR_VAR resource = eff_e07 END //play sound
   END
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above)
 
@@ -866,7 +865,7 @@ BUT_ONLY
 //Shout
 COPY "atweaks/spl/base.spl" "override/fl#shout.spl"
   SAY NAME1 @738 //Shout
-  WRITE_ASCII 0x10 ~~ #8 //casting sound
+  WRITE_ASCII 0x10 ~CAS_M06~ #8 //casting sound
   WRITE_BYTE  0x19 BIT2 //flags: hostile
   WRITE_SHORT 0x22 15 //evocation (animation)
   WRITE_SHORT 0x25 6 //evoker (school)
@@ -908,7 +907,7 @@ BUT_ONLY
 //Gaze of Fascination
 COPY "atweaks/spl/base.spl" "override/fl#ultgz.spl"
   SAY NAME1 @745
-  WRITE_ASCII 0x10 ~~ #8
+  WRITE_ASCII 0x10 ~~ #8 //casting sound
   WRITE_BYTE  0x19 BIT2 //hostile
   WRITE_SHORT 0x22 0 //no animation
   WRITE_SHORT 0x25 0 //no school
@@ -934,15 +933,16 @@ COPY_EXISTING s1-12m2.itm "override/fl#nyca.itm"
 //Ultroloth
 COPY_EXISTING b1-12m4.itm "override/fl#ultr.itm"
   LPF prep_itm_spl END
-  LPF configure_weapon_header INT_VAR f_Speed 1 f_DamageType = 2 END
+  LPF configure_weapon_header INT_VAR f_Speed = 1 f_DamageType = 2 END
   //WRITE_LONG 0x18 BIT6
   WRITE_LONG 0x60 6
-  LPF ADD_ITEM_EFFECT INT_VAR opcode = 12 target = 2 parameter2 = 0x400000 timing = 1 dicenumber = 1 dicesize = 12 END //1d12 magical damage
-  
+  LPF ADD_ITEM_EFFECT INT_VAR opcode = 12 target = 2 parameter2 = 0x400000 timing = 1 dicenumber = 1 dicesize = 12 type = 1 END //1d12 magical damage
+  LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 52 target = 1 parameter1 = 0x0000FF00 parameter2 = 0 timing = 2 END
+
 //Arcanaloth 
 COPY_EXISTING b1-12m3.itm "override/fl#arca.itm"
   LPF prep_itm_spl END
-  LPF configure_weapon_header INT_VAR f_Speed 2 f_NumDice = 1 f_Diesize = 6 END
+  LPF configure_weapon_header INT_VAR f_Speed = 2 f_NumDice = 1 f_Diesize = 6 END
   //WRITE_LONG 0x18 BIT6
   WRITE_LONG 0x60 3 
   
@@ -950,19 +950,10 @@ COPY_EXISTING b1-12m3.itm "override/fl#arca.itm"
 COPY_EXISTING clck17.itm "override/fl#yugro.itm"
   LPF prep_itm_spl INT_VAR f_Type = "-1" END
   WRITE_LONG 0x18 BIT6
-  WRITE_ASCII 0x22 4w #2 //hooded robe
+  WRITE_ASCII 0x22 4W #2 //hooded robe, stupid sometimes-case-sensitive engine
   
   
   
   
-  
-  
-  
-  
-   
-             
 
-
-
-END  // ends RR#FIEND main ACTION_IF block
 END  // ends macro

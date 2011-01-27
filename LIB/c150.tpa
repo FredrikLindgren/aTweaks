@@ -1743,6 +1743,13 @@ PATCH_IF valid BEGIN
   SAY NAME1 @733 SAY NAME2 @733                                                    //Ultroloth
   WRITE_LONG 0x14 26000
   WRITE_LONG 0x28 25088                                                            //MAGE_MALE_HUMAN
+  WRITE_BYTE 0x2c 30                                                               //Metal color, standard
+  WRITE_BYTE 0x2d 19                                                               //Minor, red
+  WRITE_BYTE 0x2e 65                                                               //Major, black
+  WRITE_BYTE 0x2f 63                                                               //Skin, a sort of grey-purple
+  WRITE_BYTE 0x30 65                                                               //Leather, black
+  WRITE_BYTE 0x31 28                                                               //Armour, standard
+  WRITE_BYTE 0x32 63                                                               //Hair, grey-purple
   REPLACE_CRE_ITEM fl#ultr #0 #0 #0 none weapon1 EQUIP
   REPLACE_CRE_ITEM fl#yugro #0 #0 #0 none armor
   LAUNCH_PATCH_FUNCTION RR#MDCRE
@@ -1769,7 +1776,7 @@ PATCH_IF valid BEGIN
       newwis       = 20
       newchr       = 25
       newmor       = 16
-      newalign     = 19 //NE
+      newalign     = 35 //NE
       newclass     = 255                                                           //NO_CLASS
       
       enforce      = 1
@@ -1783,7 +1790,7 @@ PATCH_IF valid BEGIN
 // =============================================================================== // the actual work starts from here
   SAY NAME1 @734 SAY NAME2 @734                                                    //Nycaloth   
   WRITE_LONG 0x14 25000
-  REPLACE_CRE_ITEM fl#nyca #0 #0 #0 unstealable&undroppable weapon1 EQUIP
+  REPLACE_CRE_ITEM fl#nyca #0 #0 #0 none weapon1 EQUIP
   REPLACE_TEXTUALLY CASE_INSENSITIVE immune3 immune2
   LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 292 END                         //Immunity to backstab 
   LAUNCH_PATCH_FUNCTION RR#MDCRE
@@ -1810,7 +1817,7 @@ PATCH_IF valid BEGIN
       newwis       = 18
       newchr       = 16
       newmor       = 16
-      newalign     = 19 //NE
+      newalign     = 35 //NE
       newclass     = 255 //NO_CLASS 
       
       enforce      = 1
@@ -1829,6 +1836,8 @@ PATCH_IF valid BEGIN
   REPLACE_CRE_ITEM fl#arca #0 #0 #0 none weapon1 EQUIP
   REPLACE_CRE_ITEM fl#yugro #0 #0 #0 none armor
   REPLACE_TEXTUALLY CASE_INSENSITIVE immune3 immune2
+  LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 292 END                         //Immunity to backstab
+  LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END                         //Invisibility detection
   LAUNCH_PATCH_FUNCTION RR#MDCRE
     INT_VAR
       newhp        = 120
@@ -1853,7 +1862,7 @@ PATCH_IF valid BEGIN
       newwis       = 18
       newchr       = 19 
       newmor       = 16
-      newalign     = 19 //NE
+      newalign     = 35 //NE
       newclass     = 1 //Mage
       
       enforce      = 1
