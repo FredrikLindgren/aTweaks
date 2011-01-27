@@ -1718,6 +1718,7 @@ COPY ~atweaks/cre/RR#SGELU.CRE~ ~override/RR#HGEL.CRE~                          
     END
   END 
   SAY NAME1 @670 SAY NAME2 @670
+  WRITE_BYTE  0x10 BIT2                                                            //flags: permanent corpse   
   WRITE_LONG  0x14 "19000"                                                         // XP value
   WRITE_ASCII 0x248 ~RR#HGELU~ #8                                                  // override AI script
   WRITE_BYTE  0x270 "255"                                                          // set initial allegiance to ENEMY
@@ -1729,130 +1730,154 @@ BUT_ONLY_IF_IT_CHANGES
 
 
 
-/*
+
 //////////
 //Yugoloth
 //////////
 
 //Ultroloth
-
-WRITE_LONG 0x14
-LAUNCH_PATCH_FUNCTION RR#MDCRE
-  INT_VAR
-    newhp        = 130
-    newac        = "-8"
-    newth        = 7
-    mewapr       = 2
-    newsvd       = 
-    newsvw       = 
-    newsvp       =
-    newsvb       = 
-    newsvs       = 
-    newmr        = 60
-    newfr        = 100
-    newcr        = "-100"
-    newer        = 0
-    newar        = 100
-    newstr       = 21
-    newint       = 20
-    newmor       = 16
-    newalign     = 19
-    
+COPY_EXISTING telbal1.cre "override/fl#sultr.cre"
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+// =============================================================================== // the actual work starts from here
+  SAY NAME1 @733 SAY NAME2 @733                                                    //Ultroloth
+  WRITE_LONG 0x14 26000
+  WRITE_LONG 0x28 25088                                                            //MAGE_MALE_HUMAN
+  REPLACE_CRE_ITEM fl#ultr #0 #0 #0 none weapon1 EQUIP
+  REPLACE_CRE_ITEM fl#yugro #0 #0 #0 none armor
+  LAUNCH_PATCH_FUNCTION RR#MDCRE
+    INT_VAR
+      newhp        = 130
+      newac        = "-8"
+      newth        = 7
+      mewapr       = 2
+      newsvd       = 5
+      newsvw       = 7
+      newsvp       = 6
+      newsvb       = 5
+      newsvs       = 8
+      newlvl1      = 15
+      newmr        = 60
+      newfr        = 100
+      newcr        = "-100"
+      newer        = 0
+      newar        = 100
+      newstr       = 21
+      newdex       = 18 
+      newcon       = 18
+      newint       = 20
+      newwis       = 20
+      newchr       = 25
+      newmor       = 16
+      newalign     = 19 //NE
+      newclass     = 255                                                           //NO_CLASS
+      
+      enforce      = 1
+  END
+END 
     
 //Nycaloth
 COPY_EXISTING telbal1.cre "override/fl#snyca.cre"
 PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
 PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
 // =============================================================================== // the actual work starts from here
   SAY NAME1 @734 SAY NAME2 @734                                                    //Nycaloth   
+  WRITE_LONG 0x14 25000
   REPLACE_CRE_ITEM fl#nyca #0 #0 #0 unstealable&undroppable weapon1 EQUIP
-  REPLACE_CRE_ITEM immune2 #0 #0 #0 none lring
-  WRITE_LONG 0x14
+  REPLACE_TEXTUALLY CASE_INSENSITIVE immune3 immune2
+  LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 292 END                         //Immunity to backstab 
   LAUNCH_PATCH_FUNCTION RR#MDCRE
     INT_VAR
       newhp        = 110
       newac        = "-6"
       newth        = 9
-      newapr       = 2
+      newapr       = 1
       newsvd       = 8
       newsvw       = 10
       newsvp       = 9
       newsvb       = 9
       newsvs       = 11
-      newlvl1      = 11
+      newlvl1      = 12
       newmr        = 70
       newfr        = 100
       newcr        = "-100"
       newer        = 0
       newar        = 100 
       newstr       = 20
+      newdex       = 18
+      newcon       = 18
       newint       = 18 
+      newwis       = 18
+      newchr       = 16
       newmor       = 16
       newalign     = 19 //NE
+      newclass     = 255 //NO_CLASS 
       
       enforce      = 1
+  END
+END
     
 
 //Arcanaloth
-
-WRITE_LONG 0x14
-LAUNCH_PATCH_FUNCTION RR#MDCRE
-  INT_VAR
-    newhp        = 120
-    newac        = "-8"
-    newth        = 9
-    newapr       = 3
-    newsvd       = 
-    newsvw       = 
-    newsvp       = 
-    newsvb       = 
-    newsvs       = 
-    newlvl1      = 12
-    newmr        = 60
-    newfr        = 100
-    newcr        = "-100"
-    newer        = 0
-    newar        = 100 
-    newstr       = 18
-    newint       = 20 
-    newmor       = 16
-    newalign     = 19 //NE
-    newclass     = 1 //Mage
+COPY_EXISTING telbal1.cre "override/fl#sarca.cre"
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+// =============================================================================== // the actual work starts from here
+  SAY NAME1 @735 SAY NAME2 @735                                                    //Arcanaloth 
+  WRITE_LONG 0x14 20000
+  WRITE_LONG 0x28 25088                                                            //MAGE_MALE_HUMAN
+  REPLACE_CRE_ITEM fl#arca #0 #0 #0 none weapon1 EQUIP
+  REPLACE_CRE_ITEM fl#yugro #0 #0 #0 none armor
+  REPLACE_TEXTUALLY CASE_INSENSITIVE immune3 immune2
+  LAUNCH_PATCH_FUNCTION RR#MDCRE
+    INT_VAR
+      newhp        = 120
+      newac        = "-8"
+      newth        = 9
+      newapr       = 3
+      newsvd       = 8
+      newsvw       = 10
+      newsvp       = 9
+      newsvb       = 9
+      newsvs       = 11
+      newlvl1      = 12
+      newmr        = 60
+      newfr        = 100
+      newcr        = "-100"
+      newer        = 0
+      newar        = 100 
+      newstr       = 18
+      newdex       = 16
+      newcon       = 16
+      newint       = 20
+      newwis       = 18
+      newchr       = 19 
+      newmor       = 16
+      newalign     = 19 //NE
+      newclass     = 1 //Mage
+      
+      enforce      = 1
+  END
+  ADD_MEMORIZED_SPELL spwi114 #0 wizard      //Shield
+  ADD_MEMORIZED_SPELL spwi118 #0 wizard      //Chromatic Orb
+  ADD_MEMORIZED_SPELL spwi106 #0 wizard      //Blindness
+  ADD_MEMORIZED_SPELL spwi125 #0 wizard      //Spook
+  ADD_MEMORIZED_SPELL spwi212 #1 wizard      //Mirror Image 
+  ADD_MEMORIZED_SPELL spwi211 #1 wizard (2)  //Melf's Acid Arrow
+  ADD_MEMORIZED_SPELL spwi205 #1 wizard      //Horror
+  ADD_MEMORIZED_SPELL spwi303 #2 wizard      //Flame Arrow
+  ADD_MEMORIZED_SPELL spwi320 #2 wizard      //Protection From Cold
+  ADD_MEMORIZED_SPELL spwi325 #2 wizard (2)  //Melf's Minute Meteors
+  ADD_MEMORIZED_SPELL spwi408 #3 wizard (2)  //Stoneskin
+  ADD_MEMORIZED_SPELL spwi419 #3 wizard      //Secret Word
+  ADD_MEMORIZED_SPELL spwi412 #3 wizard      //Greater Malison
+  ADD_MEMORIZED_SPELL spwi507 #4 wizard      //Hold Monster
+  ADD_MEMORIZED_SPELL spwi506 #4 wizard      //Domination
+  ADD_MEMORIZED_SPELL spwi513 #4 wizard      //Breach
+  ADD_MEMORIZED_SPELL spwi508 #4 wizard      //Chaos
+  ADD_MEMORIZED_SPELL spwi615 #5 wizard      //Chain Lightning
 END
-ADD_MEMORIZED_SPELL spwi114 #0 wizard      //Shield
-ADD_MEMORIZED_SPELL spwi118 #0 wizard      //Chromatic Orb
-ADD_MEMORIZED_SPELL spwi106 #0 wizard      //Blindness
-ADD_MEMORIZED_SPELL spwi125 #0 wizard      //Spook
-ADD_MEMORIZED_SPELL spwi212 #1 wizard      //Mirror Image 
-ADD_MEMORIZED_SPELL spwi211 #1 wizard (2)  //Melf's Acid Arrow
-ADD_MEMORIZED_SPELL spwi205 #1 wizard      //Horror
-ADD_MEMORIZED_SPELL spwi303 #2 wizard      //Flame Arrow
-ADD_MEMORIZED_SPELL spwi320 #2 wizard      //Protection From Cold
-ADD_MEMORIZED_SPELL spwi325 #2 wizard (2)  //Melf's Minute Meteors
-ADD_MEMORIZED_SPELL spwi408 #3 wizard (2)  //Stoneskin
-ADD_MEMORIZED_SPELL spwi419 #3 wizard      //Secret Word
-ADD_MEMORIZED_SPELL spwi412 #3 wizard      //Greater Malison
-ADD_MEMORIZED_SPELL spwi507 #4 wizard      //Hold Monster
-ADD_MEMORIZED_SPELL spwi506 #4 wizard      //Domination
-ADD_MEMORIZED_SPELL spwi513 #4 wizard      //Breach
-ADD_MEMORIZED_SPELL spwi508 #4 wizard      //Chaos
-ADD_MEMORIZED_SPELL spwi615 #5 wizard      //Chain Lightning
 
-//fear, 1x/day
-//invisibility
-//magic missile
-//telekinesis
-//mage of 12th level
-//They all have this:
-//animate dead
-//cause disease
-//charm person
-//produce flame
-//teleport without error
-
-
-*/
 
 //Create scripts and creatures outside the ACTION_IF in case SCSII is installed after 
 COMPILE ~atweaks/baf/fiends/fl#nabsu.baf~
@@ -1876,7 +1901,7 @@ COPY_EXISTING ~demnabsu.cre~ ~override/fl#nabsu.cre~
   WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
   WRITE_BYTE   0x270 255                                                           //Enemy                                                                                                                                  
   WRITE_BYTE   0x275 1                                                             //Male 
-  WRITE_ASCII  0x280 ~~ #32                                                        //no script name 
+  WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32                                              //script name 
   READ_LONG 0x2bc io
   FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN                                              //Make all items unstealable&undroppable
     WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
@@ -2036,14 +2061,9 @@ COPY_EXISTING demnabsu.cre "override/demnabsu.cre"
               rr#hgel.cre  "override/rr#sgelu.cre"
               dempitsu.cre "override/dempitsu.cre"
               telbal1.cre  "override/rr#sbalr.cre"
-  
-              demosum1.cre "override/rr#smari.cre"                                 //these are only intended for use against the party
-              gorsuc01.cre "override/rr#ssucc.cre"
-              alufie01.cre "override/rr#saluf.cre"
-              cambion1.cre "override/rr#scamb.cre"
-              demabi01.cre "override/rr#sabis.cre"
-              deriny01.cre "override/rr#serin.cre"
-              dbonef01.cre "override/rr#sbfnd.cre"
+              fl#sultr.cre "override/fl#sultr.cre"
+              fl#snyca.cre "override/fl#snyca.cre"
+              fl#sarca.cre "override/fl#sarca.cre"
   WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
   WRITE_LONG 0x14 0                                                                //XP is handled by script
   PATCH_IF VARIABLE_IS_SET $sscript("%DEST_RES%") BEGIN
@@ -2057,7 +2077,7 @@ COPY_EXISTING demnabsu.cre "override/demnabsu.cre"
   WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
   WRITE_BYTE   0x270 128                                                           //Initially neutral
   WRITE_BYTE   0x275 9                                                             //SUMMONED_DEMON 
-  WRITE_ASCII  0x280 ~~ #32                                                        //no script name
+  WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32                                              //script name
   READ_LONG 0x2bc io
   FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN                                              //Make all items unstealable&undroppable
     WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
@@ -2257,13 +2277,6 @@ COMPILE ~aTweaks/BAF/fiends/RR#SGLAB.BAF~                                       
 COMPILE ~aTweaks/BAF/fiends/RR#SGELU.BAF~                                                 // Summoned Gelugon AI script
 COMPILE ~aTweaks/BAF/fiends/RR#SPITF.BAF~                                                 // Summoned Pit Fiend AI script
 COMPILE ~aTweaks/BAF/fiends/RR#SBALR.BAF~                                                 // Summoned Balor AI script
-        ~atweaks/baf/fiends/rr#sabis.baf~                                                 //These are scripts for fiends summoned by other fiends      
-        ~atweaks/baf/fiends/rr#saluf.baf~
-        ~atweaks/baf/fiends/rr#sbfnd.baf~
-        ~atweaks/baf/fiends/rr#scamb.baf~
-        ~atweaks/baf/fiends/rr#serin.baf~
-        ~atweaks/baf/fiends/rr#smari.baf~
-        ~atweaks/baf/fiends/rr#ssucc.baf~
         
 COPY_EXISTING ~RUNENEMY.BCS~  ~override~                                           // innocent bystander run away script
   DECOMPILE_BCS_TO_BAF                                                             // replace RunAwayFrom() with RandomWalkContinuous()

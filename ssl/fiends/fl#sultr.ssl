@@ -14,6 +14,69 @@
 //produce flame
 //teleport without error
 
+INCLUDE FILE(fiends/definitions.ssl)
+
+IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
+END
+
+IF
+  Die()
+  Global("fl#EACheck","LOCALS",1) // Fiend was summoned by an enemy
+  Global("fl#XP","LOCALS",0)
+THEN
+  RESPONSE #100
+    SetGlobal("fl#XP","LOCALS",1)
+    AddexperienceParty(26000) //Ultroloth XP value
+END
+
+INCLUDE FILE(fiends/include/summoned_check.ssl)
+
+IF
+  StateCheck(Myself,STATE_REALLY_DEAD)
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+IF 
+  !InActiveArea(Myself)
+  !See([ANYONE])
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+IF
+  !GlobalTimerNotExpired("cast","LOCALS")
+  OR(2)
+    AreaCheck("AR3004")
+    AreaCheck("AR3008")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("cast","LOCALS",600) //No casting in dead-magic areas
+END
+
+INCLUDE FILE(fiends/include/teleport_away.ssl)
+
+INCLUDE FILE(fiends/include/high_porting.ssl)
+
+INCLUDE FILE(fiends/include/yugoloth_rampage.ssl)
+
+//Gaze of Fascination
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Hold)
+  !HasItemEquiped("RR#HEL03",scstarget) // Darkveil (RR)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"fl#ultgz"|100|100)
+END
+
 
 //Produce Flame
 IF TRIGGER
@@ -219,6 +282,15 @@ IF TRIGGER
 THEN DO
   Combine()
   Action(ForceSpellRES,"RR#PR302"¡100|50)
+END
+
+//Melee
+
+IF
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
 END
   
   
