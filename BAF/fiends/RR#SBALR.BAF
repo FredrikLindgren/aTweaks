@@ -1597,27 +1597,31 @@ THEN
 END
 
 IF
-	Race(LastSeenBy(Myself),DEMONIC)
-        Alignment(LastSeenBy(Myself),MASK_CHAOTIC)
-        Allegiance(Myself,EVILCUTOFF)
-	OR(2)
-          Allegiance(LastSeenBy(Myself),EVILCUTOFF)
-          Allegiance(LastSeenBy(Myself),NEUTRAL)
+  Race(LastSeenBy(Myself),DEMONIC)
+  OR(2)
+    Alignment(LastSeenBy(Myself),MASK_CHAOTIC)
+    Alignment(LastSeenBy(Myself),NEUTRAL_EVIL)
+  Allegiance(Myself,EVILCUTOFF)
+  OR(2)
+    Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+    Allegiance(LastSeenBy(Myself),NEUTRAL)
 THEN
-	RESPONSE #100
-		RandomWalkContinuous()
+  RESPONSE #100
+    RandomWalkContinuous()
 END
 
 IF
-	Race(LastSeenBy(Myself),DEMONIC)
-        Alignment(LastSeenBy(Myself),MASK_CHAOTIC)
-        Allegiance(Myself,GOODCUTOFF)
-	OR(2)
-          Allegiance(LastSeenBy(Myself),GOODCUTOFF)
-          Allegiance(LastSeenBy(Myself),NEUTRAL)
+  Race(LastSeenBy(Myself),DEMONIC)
+  OR(2)
+    Alignment(LastSeenBy(Myself),MASK_CHAOTIC)
+    Alignment(LastSeenBy(Myself),NEUTRAL_EVIL)
+  Allegiance(Myself,GOODCUTOFF)
+  OR(2)
+    Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+    Allegiance(LastSeenBy(Myself),NEUTRAL)
 THEN
-	RESPONSE #100
-		RandomWalkContinuous()
+  RESPONSE #100
+    RandomWalkContinuous()
 END
 
 IF
@@ -1630,7 +1634,6 @@ IF
         !StateCheck(LastSummonerOf(Myself),STATE_REALLY_DEAD)
         !StateCheck(Myself,STATE_INVISIBLE)
         See(LastSummonerOf(Myself))
-  !Race(LastSummonerOf(Myself),DEMONIC)
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)

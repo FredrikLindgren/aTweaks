@@ -21,16 +21,27 @@ COPY "atweaks/2da/spwi510.2da" "override/fl#cacoc.2da"
 
 //Puke     
 APPEND fl#cacoc.2da "TANARRI fl#cacoc 3"
+APPEND fl#cacoc.2da "YUGOLOTH fl#cacon 3"
 APPEND fl#cacon.2da "TANARRI fl#cacoc 3"
+APPEND fl#cacon.2da "YUGOLOTH fl#cacon 3"
 APPEND fl#cacon.2da "BAATEZU fl#cacol 3"
+APPEND fl#cacol.2da "YUGOLOTH fl#cacon 3"
 APPEND fl#cacol.2da "BAATEZU fl#cacol 3"
+
 APPEND fl#fienc.2da "TANARRI fl#fienc 3"
+APPEND fl#fienc.2da "YUGOLOTH fl#fienn 3"
 APPEND fl#fienn.2da "TANARRI fl#fienc 3"
+APPEND fl#fienn.2da "YUGOLOTH fl#fienn 3"
 APPEND fl#fienn.2da "BAATEZU fl#fienl 3"
+APPEND fl#fienl.2da "YUGOLOTH fl#fienn 3"
 APPEND fl#fienl.2da "BAATEZU fl#fienl 3"
+
 APPEND fl#gatec.2da "TANARRI fl#gatec 3"
+APPEND fl#gatec.2da "YUGOLOTH fl#gaten 3"
 APPEND fl#gaten.2da "TANARRI fl#gatec 3"
+APPEND fl#gaten.2da "YUGOLOTH fl#gaten 3"
 APPEND fl#gaten.2da "BAATEZU fl#gatel 3"
+APPEND fl#gatel.2da "YUGOLOTH fl#gaten 3"
 APPEND fl#gatel.2da "BAATEZU fl#gatel 3"
      
 COPY_EXISTING spcaco.eff "override/fl#cacoc.eff"
@@ -57,18 +68,24 @@ COPY_EXISTING spcaco.eff "override/fl#cacoc.eff"
   END
   
 OUTER_SPRINT $icon(fl#cacoc) fl#707cb
+OUTER_SPRINT $icon(fl#cacon) spwi707b
 OUTER_SPRINT $icon(fl#cacol) fl#707lb
 OUTER_SPRINT $icon(fl#fienc) fl#807cb
+OUTER_SPRINT $icon(fl#fienn) spwi807b
 OUTER_SPRINT $icon(fl#fienl) fl#807lb
 OUTER_SPRINT $icon(fl#gatec) fl#905cb
+OUTER_SPRINT $icon(fl#gaten) fl#905b
 OUTER_SPRINT $icon(fl#gatel) fl#905lb  
 
 //Create spells that summon a specific type of fiend with certainty
 COPY_EXISTING spwi707.spl "override/fl#cacoc.spl"
+              spwi707.spl "override/fl#cacon.spl"
               spwi707.spl "override/fl#cacol.spl"
               spwi807.spl "override/fl#fienc.spl"
+              spwi807.spl "override/fl#fienn.spl"
               spwi807.spl "override/fl#fienl.spl"
               spwi905.spl "override/fl#gatec.spl"
+              spwi905.spl "override/fl#gaten.spl"
               spwi905.spl "override/fl#gatel.spl"
   PATCH_IF "%DEST_RES%" STRING_MATCHES_REGEXP "fl#.+c$" = 0 BEGIN
     SAY NAME1 @755
@@ -76,6 +93,9 @@ COPY_EXISTING spwi707.spl "override/fl#cacoc.spl"
   END ELSE PATCH_IF "%DEST_RES%" STRING_MATCHES_REGEXP "fl#.+l$" = 0 BEGIN
     SAY NAME1 @756
     alignment = 16
+  END ELSE PATCH_IF "%DEST_RES%" STRING_MATCHES_REGEXP "fl#.+n$" = 0 BEGIN
+    SAY NAME1 @757
+    alignment = 32
   END
   READ_LONG  0x64 ao
   READ_LONG  0x6a eo
@@ -142,7 +162,7 @@ COPY_EXISTING spwi707.spl override
     FOR (j=0;j<ne;++j) BEGIN
       READ_SHORT eo + 0x30*(ei + j)       type
       READ_LONG  eo + 0x30*(ei + j) + 0x4 p1
-      PATCH_IF type != 177 OR !VARIABLE_IS_SET $array("%SOURCE_RES%" "%p1%") OR (type = 177 AND p1 = 32 AND remove_neutral) BEGIN
+      PATCH_IF type != 177 OR !VARIABLE_IS_SET $array("%SOURCE_RES%" "%p1%") BEGIN
         DELETE_BYTES eo + 0x30*(ei + j) 0x30
         --j
         --ne
@@ -152,7 +172,6 @@ COPY_EXISTING spwi707.spl override
         WRITE_BYTE   eo + 0x30*(ei + j) + 0x13 0 //ptob2
         WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 $array("%SOURCE_RES%" "%p1%") #8
       END
-      remove_neutral = type = 177 AND p1 = 32 ? 1 : remove_neutral
     END
     WRITE_SHORT ao + 0x28*i + 0x1e ne
     ei += ne
