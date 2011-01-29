@@ -59,6 +59,46 @@ THEN
     SetGlobalTimer("cast","LOCALS",600) //No casting in dead-magic areas
 END
 
+IF
+  Global("flDecideMinorSequencer","LOCALS",0)
+THEN
+  RESPONSE #100
+    SetGlobal("flDecideMinorSequencer","LOCALS",1)
+  RESPONSE #100
+    SetGlobal("flDecideMinorSequencer","LOCALS",2)
+  RESPONSE #100
+    SetGlobal("flDecideMinorSequencer","LOCALS",3)
+END
+
+IF
+  Global("flContingency","LOCALS",0)
+THEN
+  RESPONSE #100
+    DisplayStringHead(Myself,25942)
+    ReallyForceSpell(Myself,WIZARD_IMPROVED_INVISIBILITY)
+    SetGlobal("flContingency","LOCALS",1)
+  RESPONSE #100
+    DisplayStringHead(Myself,25942)
+    ReallyForceSpell(Myself,WIZARD_MINOR_GLOBE_OF_INVULNERABILITY)
+    SetGlobal("flContingency","LOCALS",2)
+  RESPONSE #100
+    DisplayStringHead(Myself,25942)
+    ReallyForceSpell(Myself,WIZARD_STONE_SKIN)
+    SetGlobal("flContingency","LOCALS",3)
+  RESPONSE #100
+    DisplayStringHead(Myself,25942)
+    ReallyForceSpell(Myself,WIZARD_PROTECTION_FROM_COLD)
+    SetGlobal("flContingency","LOCALS",4)
+  RESPONSE #100
+    DisplayStringHead(Myself,25942)
+    ReallyForceSpell(Myself,WIZARD_MELF_METEOR)
+    SetGlobal("flContingency","LOCALS",5)
+  RESPONSE #100
+    DisplayStringHead(Myself,25942)
+    ReallyForceSpell(Myself,WIZARD_FIRE_SHIELD_BLUE)
+    SetGlobal("flContingency","LOCALS",6)
+END
+
 INCLUDE FILE(fiends/include/teleport_away.ssl)
 
 INCLUDE FILE(fiends/include/high_porting.ssl)
@@ -106,6 +146,14 @@ THEN DO
   Action(SpellMyself,WIZARD_SHIELD|100|100)
 END
 
+//Invisibility
+IF TRIGGER
+  !StateCheck(Myself,STATE_INVISIBLE)
+  TriggerBlock(OKForInvis)
+THEN DO
+  Action(ForceSpellRESMyself,"RR#WI206"|100|400)
+END  
+
 IF TRIGGER
   TargetBlock(EnemyMagesInOrder)
   TriggerBlock(CanCastMage|Disabled)
@@ -116,6 +164,8 @@ IF TRIGGER
     CheckStatGT(scstarget,0,WIZARD_SPELL_TURNING)
     CheckStat(scstarget,1,CLERIC_SHIELD_OF_THE_ARCHONS)
     CheckStatGT(scstarget,0,MINORGLOBE)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
 THEN DO
   Combine()
   Action(Spell,WIZARD_SECRET_WORD|100|50)
@@ -130,6 +180,8 @@ IF TRIGGER
     CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
     CheckStatGT(scstarget,0,CLERIC_FREE_ACTION)
     CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
 THEN DO
   Combine()
   Action(Spell,WIZARD_BREACH|100|50)
@@ -138,6 +190,8 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|SIEnc)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
 THEN DO
   Action(Spell,WIZARD_GREATER_MALISON|100|25)
 END
@@ -145,6 +199,7 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|Confusion|SIEnc)
+  !Race(scstarget,RAKSHASA)
 THEN DO
   Action(Spell,WIZARD_CHAOS|100|100)
 END  
@@ -153,7 +208,8 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|ElecRes50|SpellTurning|SIEvo)
   !HasItemEquiped("clck24",scstarget)
-  !HasItemEquiped("clck26",scstarget) 
+  !HasItemEquiped("clck26",scstarget)
+  !Race(scstarget,RAKSHASA)
 THEN DO
   Combine()
   Action(Spell,WIZARD_CHAIN_LIGHTNING|100|100)
@@ -163,6 +219,7 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|SpellTurning|SIEnc|Charm)
   LevelGT(scstarget,8)
+  !Race(scstarget,RAKSHASA)
 THEN DO
   Combine()
   Action(Spell,WIZARD_DOMINATION|100|100)
@@ -172,6 +229,7 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|SpellTurning|MinorGlobe|SIEnc|Hold)
   LevelGT(scstarget,8)
+  !Race(scstarget,RAKSHASA)
 THEN DO
   Combine()
   Action(Spell,WIZARD_HOLD_MONSTER|100|100)
@@ -183,14 +241,63 @@ IF TRIGGER
   Range(scstarget,10)
   !Race(scstarget,GIANT)
   !Race(scstarget,DRAGON)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
 THEN DO
   Action(ForceSpellRES,"fl#telki"|100|50)
+END
+
+IF TRIGGER
+  Global("flDecideMinorSequencer","LOCALS",1)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SICon|CanCastMage|AcidRes75)
+  !HasItemEquiped("clck26",scstarget)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
+THEN DO
+  Action(MinorSequencer,WIZARD_MELF_ACID_ARROW,WIZARD_MELF_ACID_ARROW|100|50)
+END
+
+IF TRIGGER
+  Global("flDecideMinorSequencer","LOCALS",2)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIEvo|CanCastMage|FireRes75)
+  !HasItemEquiped("clck26",scstarget)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
+THEN DO
+  Action(MinorSequencer,WIZARD_AGANNAZAR_SCORCHER,WIZARD_AGANNAZAR_SCOCHER|100|50)
+END 
+
+IF TRIGGER
+  Global("flDecideMinorSequencer","LOCALS",3)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIEvo|CanCastMage|FireRes75|AcidRes75)
+  !HasItemEquiped("clck26",scstarget)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
+THEN DO
+  Action(MinorSequencer,WIZARD_AGANNAZAR_SCORCHER,WIZARD_MELF_ACID_ARROW|100|50)
+END 
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(CanCastMage|Disabled|MR50|SIEvo|MinorGlobe|ElecRes50)
+  !HasItemEquiped("clck24",scstarget)
+  !HasItemEquiped("clck26",scstarget)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
+THEN DO
+  Combine()
+  Action(Spell,WIZARD_LIGHTNING_BOLT|100|100)
 END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|SICon|MinorGlobe|SpellTurning|FireRes50)
   !HasItemEquiped("clck26",scstarget)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
 THEN DO
   Combine()
   Action(Spell,WIZARD_FLAME_ARROW|100|100)
@@ -207,6 +314,7 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|SINec|MinorGlobe|Fear)
+  !Race(scstarget,RAKSHASA)
 THEN DO
   Action(Spell,WIZARD_HORROR|100|100)
 END
@@ -215,18 +323,21 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|SICon|MinorGlobe|SpellTurning|AcidRes50)
   !HasItemEquiped("clck26",scstarget)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
 THEN DO
   Combine()
   Action(Spell,WIZARD_MELF_ACID_ARROW|100|100)
 END
 
-//Fearl
+//Fear
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|MR50|SIIll|Fear)
   !Range(scstarget,5) //Because cone-shaped projectiles pack a lot of suck at the narrow end
   Range(scstarget,15)
   Global("fl#FearCone","LOCALS",0)
+  !Race(scstarget,RAKSHASA)
 THEN DO
   Action(ForceSpellRES,"fl#cnefr"|100|100)
   IncrementGlobal("fl#FearCone","LOCALS",1)
@@ -247,6 +358,8 @@ IF TRIGGER
   TriggerBlock(CanCastMage|Disabled|MR50|SIEvo|MinorGlobe|SpellTurning|Slayable)
   CheckStat(scstarget,1,24) //Greater Malison
   !HasItemEquiped("clck26",scstarget)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
 THEN DO
   Combine()
   Action(Spell,WIZARD_CHROMATIC_ORB|100|100)
@@ -256,6 +369,8 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|SIIll|MinorGlobe|SpellTurning|Blindness)
   !StateCheck(scstarget,STATE_BLIND)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
 THEN DO
   Combine()
   Action(Spell,WIZARD_BLINDNESS|100|100)
@@ -264,6 +379,7 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(CanCastMage|Disabled|MR50|SIIll|MinorGlobe|SpellTurning|Fear)
+  !Race(scstarget,RAKSHASA)
 THEN DO
   Combine()
   Action(Spell,WIZARD_SPOOK|100|100)
@@ -274,6 +390,7 @@ IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
   TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIAbj|Disease)
   Range(scstarget,5)
+  !Race(scstarget,RAKSHASA)
 THEN DO
   Combine()
   Action(ForceSpellRES,"fl#csdis"|40|100)
@@ -316,8 +433,6 @@ IF TRIGGER
     Class(scstarget,CLERIC_ALL)
     Class(scstarget,CLERIC_RANGER)
     Class(scstarget,DRUID_ALL)
-  !Race(scstarget,LICH)
-  !Race(scstarget,RAKSHASA)
 THEN DO
   AttackOneRound(scstarget)
 END
