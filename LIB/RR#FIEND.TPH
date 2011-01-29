@@ -405,6 +405,7 @@ WRITE_SHORT 0x22 "11"                                                           
   END
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
+/* //This spell has been replaced by fl#cnefr
 COPY_EXISTING ~SPWI205.SPL~  ~override/RR#DMFEA.SPL~                               // Change Horror into Fear (used by Maurezhi)
   SAY NAME1 #2619 SAY NAME2 #2619                                                  // Fear
   READ_LONG  0x64 "abil_off"
@@ -418,6 +419,7 @@ COPY_EXISTING ~SPWI205.SPL~  ~override/RR#DMFEA.SPL~                            
     END
   END
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+*/
 
 COPY_EXISTING ~SPWI104.SPL~  ~override/RR#DCHRM.SPL~                               // Change Charm Person into a Glabrezu specific ability (used only on neutral bystanders)
   READ_LONG  0x64 "abil_off"
@@ -706,9 +708,9 @@ COPY "atweaks/spl/base.spl" "override/fl#cnefr.spl"
     duration = header*6
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 24  target power resist_dispel duration savingthrow header END //Panic
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14007 timing = 1 resist_dispel savingthrow header END //Display string
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 39 duration resist_dispel savingthrow header END //Portrait icon
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 36 duration resist_dispel savingthrow header END //Portrait icon
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 4 duration resist_dispel savingthrow header STR_VAR resource = eff_e05 END //Play sound
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target power parameter2 = 17 timing = 1 resist_dispel savingthrow header END //Lighting effect
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target power parameter2 = 16 timing = 1 resist_dispel savingthrow header END //Lighting effect
   END
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above)
 
@@ -779,9 +781,9 @@ COPY "atweaks/spl/base.spl" "override/fl#mssug.spl"
   savingthrow = 1
   savebonus = "-1"
   FOR (header=1;header<=20;++header) BEGIN
-    duration = 180 + 180*header
+    duration = 240 + 240*header
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 5 target power parameter1 = 1 parameter2 = 1 duration resist_dispel savingthrow savebonus header END //Charm
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 50 target power parameter1 = 0x9390FF00 parameter2 = 0x1E0000 resist_dispel duration = 1 savingthrow savebonus header END //Colour pule
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 50 target power parameter1 = 0x9390FF00 parameter2 = 0x1E0000 resist_dispel duration = 1 savingthrow savebonus header END //Colour pulse
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power resist_dispel duration savingthrow savebonus header END //Icon
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target power parameter2 = 1 resist_dispel duration = 3 savingthrow savebonus header STR_VAR resource = spnwchrm END //Play visial effect
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 3 duration resist_dispel savingthrow savebonus header STR_VAR resource = eff_e07 END //play sound
@@ -806,7 +808,6 @@ COPY "atweaks/spl/base.spl" "override/fl#clrsp.spl"
     dicenumber = header >= 5 ? 5 : header
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 39 target power resist_dispel duration dicenumber header END //Sleep
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 14 resist_dispel duration dicenumber header END //icon (sleep)
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14001 resist_dispel duration dicenumber header END //display string: sleep
     PATCH_FOR_EACH parameter2 IN 5 3 1 0 BEGIN
       LPF ADD_SPELL_EFFECT INT_VAR opcode = 7 target power parameter1 = 34 parameter2 resist_dispel duration dicenumber header END //colour
     END
@@ -820,7 +821,6 @@ COPY "atweaks/spl/base.spl" "override/fl#clrsp.spl"
     dicenumber = header
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 39 target power resist_dispel duration dicenumber dicesize savingthrow header END //Sleep
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 14 resist_dispel duration dicenumber dicesize savingthrow header END //icon (sleep)
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14001 resist_dispel duration dicenumber dicesize savingthrow header END //display string: sleep
     PATCH_FOR_EACH parameter2 IN 5 3 1 0 BEGIN
       LPF ADD_SPELL_EFFECT INT_VAR opcode = 7 target power parameter1 = 34 parameter2 resist_dispel duration dicenumber dicesize savingthrow header END //colour
     END
@@ -873,7 +873,6 @@ COPY_EXISTING spdr101.spl  override
               wand19.itm   override
   LPF add_conditional_immunity INT_VAR f_Condition = 74 STR_VAR f_Spell = fl#clrsp END
 BUT_ONLY
-  
   
 //Shout
 COPY "atweaks/spl/base.spl" "override/fl#shout.spl"

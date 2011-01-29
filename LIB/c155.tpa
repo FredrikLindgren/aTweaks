@@ -18,8 +18,7 @@ COPY "atweaks/2da/spwi510.2da" "override/fl#cacoc.2da"
      "atweaks/2da/spwi510.2da" "override/fl#gatec.2da"
      "atweaks/2da/spwi510.2da" "override/fl#gaten.2da"
      "atweaks/2da/spwi510.2da" "override/fl#gatel.2da"
-
-//Puke     
+   
 APPEND fl#cacoc.2da "TANARRI fl#cacoc 3"
 APPEND fl#cacoc.2da "YUGOLOTH fl#cacon 3"
 APPEND fl#cacon.2da "TANARRI fl#cacoc 3"
@@ -143,9 +142,26 @@ COPY_EXISTING spwi707.spl override
               spwi807.spl override
               spwi905.spl override
               sppr703.spl override
-  //UPDATE DESC
-  PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE spwi905 OR "%SOURCE_RES%" STRING_EQUAL_CASE sppr703 BEGIN
-    WRITE_ASCII 0x3a fl#905c #8
+  MATCH "%SOURCE_RES%" WITH //If this works I love MATCH
+    spwi707
+    BEGIN
+      SAY 0x50 @761
+    END
+    spwi807
+    BEGIN
+      SAY 0x50 @762
+    END
+    spwi905
+    BEGIN
+      WRITE_ASCII 0x3a fl#905c #8
+      SAY 0x50 @763
+    END
+    sppr703
+    BEGIN
+      WRITE_ASCII 0x3a fl#905c #8
+      SAY 0x50 @764
+    END
+    DEFAULT
   END
   READ_LONG  0x64 ao
   READ_LONG  0x6a eo
@@ -181,9 +197,21 @@ BUT_ONLY
 COPY_EXISTING scrl81.itm override
               scrl9b.itm override
               scrl9n.itm override
-  //UPDATE DESC
-  PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE scrl9n BEGIN
-    WRITE_ASCII 0x3a fl#905a #8
+  MATCH "%SOURCE_RES%" WITH
+    scrl8i
+    BEGIN
+      SAY 0x54 @761
+    END
+    scrl9b
+    BEGIN
+      SAY 0x54 @762
+    END
+    scrl9n
+    BEGIN
+      SAY 0x54 @763
+      WRITE_ASCII 0x3a fl#905a #8
+    END
+    DEFAULT
   END
 BUT_ONLY
 
