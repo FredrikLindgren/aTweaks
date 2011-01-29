@@ -33,6 +33,8 @@ END
 
 INCLUDE FILE(fiends/include/summoned_check.ssl)
 
+INCLUDE FILE(fiends/include/get_mad_at_summoner.ssl)
+
 IF
   StateCheck(Myself,STATE_REALLY_DEAD)
 THEN
@@ -145,7 +147,7 @@ IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
   Range(scstarget,6)
   LevelLT(scstarget,6)
-  TriggerBlock(Disabled|MinorGlobe|SpellTurning|SIEnc|Sleep|MR50|Soneskin|MirrorImage)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|SIEnc|Sleep|MR50|Stoneskin|MirrorImage)
   GlobalLT("flCommand","LOCALS",3)
 THEN DO
   Combine()
@@ -162,24 +164,6 @@ THEN DO
   Combine()
   Action(ForceSpellRES,"RR#PR102"|100|200)
   IncrementGlobal("flCommand","LOCALS",1)
-END
-
-IF TRIGGER
-  Global("fl#Summoner","LOCALS",0)
-  Target(LastSummonerOf(Myself))
-  Exists(scstarget)
-  TriggerBlock(ProEvil)
-  //!HasItemEquiped("lich",scstarget)
-  //!HasItemEquiped("jonhp1",scstarget)
-  !StateCheck(scstarget,STATE_REALLY_DEAD)
-  !StateCheck(Myself,STATE_INVISIBLE)
-  !Race(scstarget,DEMONIC)
-THEN DO
-  SetInterrupt(FALSE)
-  SetGlobal("fl#Summoner","LOCALS",1)
-  FaceObject(scstarget)
-  DisplayStringHead(Myself,@681) // Foolish mortal! You have unleashed powers far beyond your comprehension by summoning me here.
-  SetInterrupt(TRUE)
 END
 
 IF TRIGGER
@@ -218,7 +202,7 @@ THEN DO
   Action(ForceSpellRES,"RR#TELWE")
 END
 
-IF TRIGGER)
+IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
   //!HasItemEquiped("lich",scstarget)
@@ -248,55 +232,12 @@ THEN DO
   Action(ForceSpellRESMyself,"RR#WI206"|100|25)
 END
 
-//IF
-//  See([ANYONE])
-//  Allegiance(Myself,EVILCUTOFF)
-//  Race(LastSeenBY(Myself),DEMONIC)
-//  Alignment(LastSeenBy(Myself),MASK_EVIL)
-//  !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
-//THEN
-//  RESPONSE #100
-//    RandomWalkContinuous()
-//END
-
-//IF
-//  See([ANYONE])
-//  Allegiance(Myself,GOODCUTOFF)
-//  Race(LastSeenBy(Myself),DEMONIC)
-//  Alignment(LastSeenBy(Myself),MASK_EVIL)
-//  !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
-//THEN
-//  RESPONSE #100
-//    RandomWalkContinuous()
-//END
-
-//We need something for not attacking other summoned demons that also works
-
-IF TRIGGER
-  Target([ANYONE])
-  Triggerblock(WeaponImmunity|SlashResFull|ProEvil)
-  //!HasItemEquiped("lich",scstarget)
-  //!HasItemEquiped("jonhp1",scstarget)
-  Range(scstarget,5)
-THEN DO
-  AttackOneRound(scstarget)
-END
-
-IF TRIGGER
-  Target([ANYONE])
-  Triggerblock(WeaponImmunity|SlashResFull|ProEvil)
-  //!HasItemEquiped("lich",scstarget)
-  //!HasItemEquiped("jonhp1",scstarget)
-  !Range(scstarget,5)
-  InMyArea(scstarget)
-THEN DO
-  Action(ForceSpellRES,"RR#TELWE")
-END
+INCLUDE FILE(fiends/include/end_attack.ssl)
 
 IF
   ActionListEmpty()
 THEN
   RESPONSE #100
-    RandomWalkContinous()
+    RandomWalkContinuous()
 END
     

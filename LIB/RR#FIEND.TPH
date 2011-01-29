@@ -22,6 +22,11 @@ COPY_EXISTING ~msectype.2da~ ~override~                                         
 BUT_ONLY_IF_IT_CHANGES
 APPEND ~RR#EVAL.2DA~ ~RR#ETHER %RR#SECTYPE%~ UNLESS ~RR#ETHER~                        // write the numeric ID to the 2DA
 
+ACTION_IF !FILE_CONTAINS (msectype.2da fl#Disease) BEGIN
+  ADD_SECTYPE fl#Disease @1025
+END
+APPEND RR#EVAL.2da "fl#Disease %fl#Disease%"
+
 ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.pro BEGIN
   ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                          // New projectile for Symbol Pain (party friendly)
   APPEND RR#EVAL.2da "RR#SPAIN %RR#SPAIN%"
@@ -189,6 +194,10 @@ COPY ~aTweaks/EFF/RR#CNSTR.EFF~ ~override~                                      
 COPY ~aTweaks/VVC/RR#CNSTR.VVC~ ~override~                                         // Constrict/Grab/Flaming Whip ability VVC animation
 COPY ~aTweaks/BAM/RR#CNSTR.BAM~ ~override~                                         // Constrict/Grab/Flaming Whip ability BAM graphics
 COPY ~aTweaks/SPL/RR#DPDIS.SPL~ ~override~                                         // Pit Fiend disease (-4 to STR, non-cumulative)
+  WRITE_BYTE 0x27 fl#Disease                                                       // Custom Disease SecType 
+
+OUTER_SET f_AddSecType(RR#DPDIS.SPL) = fl#Disease
+
 COPY ~aTweaks/EFF/RR#DPDIS.EFF~ ~override~                                         // Pit Fiend disease immunity effect
   SAY 0x1C @676                                                                    // Unaffected by Disease
 COPY ~aTweaks/SPL/RR#DBFLW.SPL~ ~override~                                         // Flaming Whip (Balor)
@@ -730,26 +739,30 @@ COPY "atweaks/spl/base.spl" "override/fl#telki.spl"
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above)
 
 //Cause disease
-COPY "atweaks/spl/base.spl" "override/fl#csdis.spl"
+COPY "test/base.spl" "override/fl#csdis.spl"
   SAY NAME1 @736
   WRITE_ASCII 0x10 ~CAS_P02~ #8 //casting sound
   WRITE_BYTE  0x19 BIT2 //flags: hostile
   WRITE_SHORT 0x22 12   //abjuration (animation)
   WRITE_SHORT 0x25 1    //abjuration (school)
-  WRITE_BYTE  0x27 11   //disabling (secondary type)
-  READ_LONG 0x64 ao
-  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
-    WRITE_BYTE  ao + 0x28*i + 0xc  1 //living actor 
-    WRITE_SHORT ao + 0x28*i + 0xe  1 //range
-    WRITE_SHORT ao + 0x28*i + 0x12 1 //casting time
-  END
+  WRITE_BYTE  0x27 fl#Disease //Custum disease SecType
+  LPF fill_headers INT_VAR f_FillLimit = 5 END
   target = 2
   power = 3
   resist_dispel = 1
   savingthrow = 1
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target power parameter1 = 2 parameter2 = 4 timing = 1 resist_dispel savingthrow END //Disease: 2 points of STR
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target power parameter1 = 6 parameter2 = 3 timing = 1 resist_dispel savingthrow END //Disease: 1 HP damage/round
+  FOR (f_Header=1;f_Header<=SHORT_AT 0x68;++f_Header) BEGIN
+    f_Level = f_Header = 1 ? 1 : 5*(f_Header - 1)
+    LPF configure_spell_header INT_VAR f_Header f_Range = 1 f_Level END
+    LPF ADD_SPELL_EFFECT INT_VAR header = f_Header opcode = 78 target power parameter1 = f_Header parameter2 = 4 timing = 1 resist_dispel savingthrow END //Disease: 1 piont of STR damage per 3 levels of the caster
+    LPF ADD_SPELL_EFFECT INT_VAR header = f_Header opcode = 78 target power parameter1 = 60 parameter2 = 3 timing = 1 resist_dispel savingthrow END //Disease: 1 HP damage/turn
+  END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 7 timing = 1 resist_dispel savingthrow END //Icon: Nauseated
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 39752 timing = 1 resist_dispel savingthrow END //Stricken by a foul disease
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power timing = 1 resist_dispel savingthrow STR_VAR resource = fl#csdis END //non-cumulativity
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above) 
+
+OUTER_SET f_AddSecType(fl#csdis.spl) = fl#Disease
     
 //Mass suggestion
 COPY "atweaks/spl/base.spl" "override/fl#mssug.spl"
@@ -927,24 +940,27 @@ COPY "atweaks/spl/base.spl" "override/fl#ultgz.spl"
 COPY_EXISTING s1-12m2.itm "override/fl#nyca.itm"
   LPF prep_itm_spl END
   LPF configure_weapon_header INT_VAR f_Speed = 7 f_ToHit = 7 f_Damage = 3 f_NumDice = 2 f_DieSize = 8 f_DamageType = 3 END
-  //WRITE_LONG 0x18 BIT6 //Magical, null everything else 
-  WRITE_LONG 0x60 3 //Enchantment
+  enchantment = 3
+  WRITE_LONG 0x60 enchantment 
+  LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 233 target = 1 parameter1 = enchantment parameter2 = 109 timing = 2 END //Detectable weapon enchantment
 
 //Ultroloth
 COPY_EXISTING b1-12m4.itm "override/fl#ultr.itm"
   LPF prep_itm_spl END
   LPF configure_weapon_header INT_VAR f_Speed = 1 f_DamageType = 2 END
-  //WRITE_LONG 0x18 BIT6
-  WRITE_LONG 0x60 6
+  enchantment = 6
+  WRITE_LONG 0x60 enchantment
   LPF ADD_ITEM_EFFECT INT_VAR opcode = 12 target = 2 parameter2 = 0x400000 timing = 1 dicenumber = 1 dicesize = 12 type = 1 END //1d12 magical damage
   LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 52 target = 1 parameter1 = 0x0000FF00 parameter2 = 0 timing = 2 END
+  LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 233 target = 1 parameter1 = enchantment parameter2 = 109 timing = 2 END
 
 //Arcanaloth 
 COPY_EXISTING b1-12m3.itm "override/fl#arca.itm"
   LPF prep_itm_spl END
   LPF configure_weapon_header INT_VAR f_Speed = 2 f_NumDice = 1 f_Diesize = 6 END
-  //WRITE_LONG 0x18 BIT6
-  WRITE_LONG 0x60 3 
+  enchantment = 3
+  WRITE_LONG 0x60 enchantment
+  LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 233 target = 1 parameter1 = enchantment parameter2 = 109 timing = 2 END 
   
 //The robe used by Ultroloths and Arcanaloths
 COPY_EXISTING clck17.itm "override/fl#yugro.itm"
@@ -952,8 +968,15 @@ COPY_EXISTING clck17.itm "override/fl#yugro.itm"
   WRITE_LONG 0x18 BIT6
   WRITE_ASCII 0x22 4W #2 //hooded robe, stupid sometimes-case-sensitive engine
   
-  
-  
+
+
+OUTER_SET f_ImmunitySecType(78) = fl#Disease
+
+OUTER_SET f_RemoveSecType(79) = fl#Disease  
+
+LAF integrate_sectypes END
+
+
   
 
 END  // ends macro

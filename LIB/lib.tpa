@@ -204,8 +204,113 @@ BEGIN
     END
   END
 END
+
+
+//Add the SecTypes to items and spells that should grant immunity or be able to remove them
+//Needs the three arrays:
+//f_AddSecType(file) = SecType -> Associates a SecType with a specific file. Items and spells that grant immunity to e.g. disease will grant immunity to this particular file (spell) as well
+//f_ImmunitySecType(opcode) = SecType -> opcode is the opcode used to determine if a spell/item should grant immunity to the file (spell).
+//f_RemoveSecType(opcode) = Secype -> opcode is the opcode used to determine if a spell/item should cure the secondary type.       
+//E.g. is your secondary type covers disease you would have:
+//f_AddSecType(YourDisease-causingSpell.spl) = YourDiseaseSecType
+//f_ImmunitySecType(78) = YourDiseaseSecType
+//f_RemoveSecType(79) = YourDiseaseSecType
+DEFINE_ACTION_FUNCTION integrate_sectypes BEGIN
+  COPY_EXISTING_REGEXP GLOB ~.+\.\(spl\|itm\)$~ override
+    PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+      READ_LONG  0x64 ao
+      READ_SHORT 0x68 na
+      READ_LONG  0x6a eo
+      READ_SHORT 0x6e ei1
+      READ_SHORT 0x70 gne
       
-      
+      FOR (i=0;i<gne;++i) BEGIN
+        READ_SHORT eo + 0x30*(ei1 + i)       type ELSE 999
+        READ_LONG  eo + 0x30*(ei1 + i) + 0x8 p2   ELSE 999
+
+        //On-equip immunity
+        PATCH_IF type = 101 AND VARIABLE_IS_SET $f_ImmunitySecType("%p2%") BEGIN
+          PHP_EACH f_AddSecType AS file => SecTypeToAdd BEGIN
+            PATCH_IF "%SOURCE_EXT%" STRING_EQUAL_CASE itm AND "%file%" STRING_MATCHES_REGEXP ".*\.spl$" = 0 
+                 AND SecTypeToAdd = $f_ImmunitySecType("%p2%") 
+            BEGIN
+              INNER_PATCH "%file%" BEGIN
+                READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
+              END
+              LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 206 target = 1 timing = 2 STR_VAR resource = EVAL "%spell%" END
+              ++i
+              ++gne
+            END
+          END
+        END
+      END
+
+      WRITE_SHORT 0x70 gne
+      ei = ei1 + gne
+      ne = 0
+      al = "%SOURCE_EXT%" STRING_EQUAL_CASE itm ? 0x38 : 0x28
+
+      //Check for effects to remove e.g. fear or disease and effects that grant immunity to e.g. fear or disease
+      FOR (i=0;i<na AND ao + na*al < SOURCE_SIZE;++i) BEGIN
+        ei += ne
+        WRITE_SHORT ao + al*i + 0x20 ei
+        READ_SHORT  ao + al*i + 0x1e ne
+        FOR (j=0;j<ne;++j) BEGIN
+          READ_SHORT eo + 0x30*(ei + j)        type   ELSE 999
+          READ_BYTE  eo + 0x30*(ei + j) + 0x2  target ELSE 0
+          READ_BYTE  eo + 0x30*(ei + j) + 0x3  power  ELSE 0
+          READ_LONG  eo + 0x30*(ei + j) + 0x4  p1     ELSE 999
+          READ_LONG  eo + 0x30*(ei + j) + 0x8  p2     ELSE 999
+          READ_BYTE  eo + 0x30*(ei + j) + 0xc  timing ELSE 0
+          READ_BYTE  eo + 0x30*(ei + j) + 0xd  dr     ELSE 0
+          READ_LONG  eo + 0x30*(ei + j) + 0xe  time   ELSE 0
+
+
+
+          PATCH_IF VARIABLE_IS_SET $f_RemoveSecType("%type%") BEGIN
+            INSERT_BYTES  eo + 0x30*(ei + j)        0x30
+              WRITE_SHORT eo + 0x30*(ei + j)        221 //remove sec type
+              WRITE_BYTE  eo + 0x30*(ei + j) + 0x2  target
+              WRITE_BYTE  eo + 0x30*(ei + j) + 0x3  power
+              WRITE_LONG  eo + 0x30*(ei + j) + 0x4  9
+              WRITE_LONG  eo + 0x30*(ei + j) + 0x8  $f_RemoveSecType("%type%")
+              WRITE_BYTE  eo + 0x30*(ei + j) + 0xc  1
+              WRITE_BYTE  eo + 0x30*(ei + j) + 0x12 100
+            ++ne
+            ++j
+          END
+
+
+
+          PATCH_IF type = 101 AND VARIABLE_IS_SET $f_ImmunitySecType("%p2%") BEGIN
+            PHP_EACH AddSecType AS file => SecTypeToAdd BEGIN
+              PATCH_IF "%file%" STRING_MATCHES_REGEXP ".*\.spl$" = 0 AND SecTypeToAdd = $f_ImmunitySecType("%p2%") BEGIN
+                INNER_PATCH "%file%" BEGIN
+                  READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
+                END
+                INSERT_BYTES   eo + 0x30*(ei + j)        0x30
+                  WRITE_SHORT  eo + 0x30*(ei + j)        206 //protection from spell
+                  WRITE_BYTE   eo + 0x30*(ei + j) + 0x2  target
+                  WRITE_BYTE   eo + 0x30*(ei + j) + 0x3  power
+                  WRITE_BYTE   eo + 0x30*(ei + j) + 0xc  timing
+                  WRITE_BYTE   eo + 0x30*(ei + j) + 0xd  dr
+                  WRITE_LONG   eo + 0x30*(ei + j) + 0xe  time
+                  WRITE_BYTE   eo + 0x30*(ei + j) + 0x12 100
+                  WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 "%spell%" #8
+                ++ne
+                ++j
+              END
+            END
+          END
+
+
+
+        END
+        WRITE_SHORT ao + al*i + 0x1e ne
+      END
+    END
+  BUT_ONLY 
+END     
       
       
       

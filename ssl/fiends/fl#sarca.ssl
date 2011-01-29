@@ -32,6 +32,8 @@ END
 
 INCLUDE FILE(fiends/include/summoned_check.ssl)
 
+INCLUDE FILE(fiends/include/get_mad_at_summoner.ssl)
+
 IF
   StateCheck(Myself,STATE_REALLY_DEAD)
 THEN
@@ -67,7 +69,7 @@ IF TRIGGER
   TriggerBlock(CanCastMage)
   !CheckStatGT(Myself,0,STONESKINS)
 THEN DO
-  Action(SpellMyself,WIZARD_STONESKINS)
+  Action(SpellMyself,WIZARD_STONE_SKIN)
 END
 
 IF TRIGGER
@@ -85,13 +87,7 @@ THEN DO
 END
 
 IF TRIGGER
-  OR(6)
-    Detect(NearestEnemyOf(Myself))
-    CheckStatGT(NearestEnemyOf(Myself),0,PROTECTION_FROM_EVIL)
-    HasItemEquipedReal("staf11",NearestEnemyOf(Myself))
-    HasItemEquiped("wa2amu",NearestEnemyOf(Myself))
-    HasItemEquiped("lich",NearestEnemyOf(Myself))
-    HasItemEquiped("jonhp1",NearestEnemyOf(Myself)))
+  Target(NearestEnemyOf(Myself))
   !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
   !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
   !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
@@ -101,7 +97,6 @@ IF TRIGGER
   TriggerBlock(CanCastMage)
   !StateCheck(Myself,STATE_MIRRORIMAGE)
 THEN DO
-  Combine()
   Action(SpellMyself,WIZARD_MIRROR_IMAGE|100|100)
 END
 
@@ -112,7 +107,7 @@ THEN DO
 END
 
 IF TRIGGER
-  TargetBlock(MagesInOrder)
+  TargetBlock(EnemyMagesInOrder)
   TriggerBlock(CanCastMage|Disabled)
   !CheckStatGT(scstarget,0,WIZARD_SPELL_TRAP)
   OR(6)
@@ -166,7 +161,7 @@ END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(CanCastMage|Disabled|MR50|SpellTurnng|SIEnc|Charm)
+  TriggerBlock(CanCastMage|Disabled|MR50|SpellTurning|SIEnc|Charm)
   LevelGT(scstarget,8)
 THEN DO
   Combine()
@@ -201,6 +196,7 @@ THEN DO
   Action(Spell,WIZARD_FLAME_ARROW|100|100)
 END
 
+//Animate Dead
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
   !Range(scstarget,10)
@@ -224,8 +220,7 @@ THEN DO
   Action(Spell,WIZARD_MELF_ACID_ARROW|100|100)
 END
 
-//Fear, once per day, cone-shaped
-//Flee for CasterLevel rounds, save vs. spell
+//Fearl
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|MR50|SIIll|Fear)
@@ -233,12 +228,13 @@ IF TRIGGER
   Range(scstarget,15)
   Global("fl#FearCone","LOCALS",0)
 THEN DO
-  Action(ForceSpellRES,"fl#cnefr"¡100|100)
+  Action(ForceSpellRES,"fl#cnefr"|100|100)
   IncrementGlobal("fl#FearCone","LOCALS",1)
 END
 
+//Produce Flame
 IF TRIGGER
-  TargetBlock(AnyTroll)
+  TargetBlock(EnemyTroll)
   TriggerBlock(FireResFull|SpellTurning|MinorGlobe)
   !StateCheck(scstarget,STATE_NOT_TARGETABLE)
   HPLT(scstarget,15)
@@ -273,6 +269,7 @@ THEN DO
   Action(Spell,WIZARD_SPOOK|100|100)
 END
 
+//Cause Disease
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
   TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIAbj|Disease)
@@ -282,6 +279,7 @@ THEN DO
   Action(ForceSpellRES,"fl#csdis"|40|100)
 END
 
+//Magic Missile
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|MR75|SpellTurning|MinorGlobe|SIEvo)
@@ -292,6 +290,7 @@ THEN DO
   Action(ForceSpellRES,"RR#WI112"|100|100)
 END
 
+//Charm Person
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   General(scstarget,HUMANOID)
@@ -316,7 +315,7 @@ IF TRIGGER
     Class(scstarget,BARD_ALL)
     Class(scstarget,CLERIC_ALL)
     Class(scstarget,CLERIC_RANGER)
-    Class(scstarget-DRUID_ALL)
+    Class(scstarget,DRUID_ALL)
   !Race(scstarget,LICH)
   !Race(scstarget,RAKSHASA)
 THEN DO
@@ -357,23 +356,23 @@ THEN DO
   AttackOneRound(scstarget)
 END
 
-//Can these guys get lost, since they don't spontaneously port to the enemy?
-
 IF TRIGGER
-  Target([0.HUMANOID.0.INNOCENT])
-  !See(NearestEnemyOf(Myself))
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull)
   !Range(scstarget,6)
 THEN DO
   Action(ForceSpellRES,"RR#TELWE")
 END
 
+//Inviso-up if there's nothing better to do
 IF TRIGGER
-  Target([0.HUMANOID.0.INNOCENT])
-  !See(NearestEnemyOf(Myself))
-  Range(scstarget,6)
+  !StateCheck(Myself,STATE_INVISIBLE)
+  TriggerBlock(OKForInvis)
 THEN DO
-  AttackOneRound(scstarget)
+  Action(ForceSpellRESMyself,"RR#WI206"|100|25)
 END
+
+INCLUDE FILE(fiends/include/end_attack.ssl)
 
 IF
   ActionListEmpty()

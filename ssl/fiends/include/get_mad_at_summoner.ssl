@@ -1,0 +1,17 @@
+IF TRIGGER
+  Global("fl#Summoner","LOCALS",0)
+  Target(LastSummonerOf(Myself))
+  Exists(scstarget)
+  TriggerBlock(ProEvil)
+  //!HasItemEquiped("lich",scstarget)
+  //!HasItemEquiped("jonhp1",scstarget)
+  !StateCheck(scstarget,STATE_REALLY_DEAD)
+  !StateCheck(Myself,STATE_INVISIBLE)
+  !Race(scstarget,DEMONIC)
+THEN DO
+  SetInterrupt(FALSE)
+  SetGlobal("fl#Summoner","LOCALS",1)
+  FaceObject(scstarget)
+  DisplayStringHead(Myself,@681) // Foolish mortal! You have unleashed powers far beyond your comprehension by summoning me here.
+  SetInterrupt(TRUE)
+END

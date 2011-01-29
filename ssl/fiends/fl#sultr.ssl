@@ -15,6 +15,7 @@
 //teleport without error
 
 INCLUDE FILE(fiends/definitions.ssl)
+VARIABLE(IsUltroloth=True)
 
 IF
   HasItem("dw#sumfi",Myself)
@@ -35,6 +36,8 @@ THEN
 END
 
 INCLUDE FILE(fiends/include/summoned_check.ssl)
+
+INCLUDE FILE(fiends/include/get_mad_at_summoner.ssl)
 
 IF
   StateCheck(Myself,STATE_REALLY_DEAD)
@@ -67,6 +70,78 @@ INCLUDE FILE(fiends/include/high_porting.ssl)
 
 INCLUDE FILE(fiends/include/yugoloth_rampage.ssl)
 
+//Call Lightning
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|ElecResFull|MinorGlobe|SIAlt)
+  AreaType(OUTDOOR)
+  !HasItemEquiped("clck26",scstarget)
+  !Race(scstarget,RAKSHASA)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#PR302"|100|50)
+END
+
+//Fire Storm
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|FireRes75|SIEvo|Summoned)
+  !Race(scstarget,RAKSHASA)
+  GlobalLT("flFireStorm","LOCALS",1)
+THEN DO
+  Action(ForceSpellRES,"RR#PR705"|100|100)
+  IncrementGlobal("flFireStorm","LOCALS",1)
+  SetGlobalTimer("flFireStormTimer","LOCALS",24) //Better than nothing, or maybe it's just silly
+END
+
+//Symbol, Death
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SICon|Slayable|Summoned)
+  OR(4)
+    Class(scstarget,MAGE)
+    Class(scstarget,MAGE_THIEF)
+    Class(scstarget,CLERIC_MAGE)
+    HPPercentLT(scstarget,40)
+  GlobalLT("flSymbol","LOCALS",1)
+THEN DO
+  Action(ForceSpellRES,"RR#WI817"|100|50)
+  IncrementGlobal("flSymbol","LOCALS",1)
+END
+
+//Symbol, Stun
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SICon|Stun|Summoned)
+  GlobalLT("flSymbol","LOCALS",1)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#WI816"|30|100)
+  IncrementGlobal("flSymbol","LOCALS",1)
+END
+
+//Symbol, Pain
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SICon|Stun|Summoned)
+  GlobalLT("flSymbol","LOCALS",1)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#SPAIN"|30|100)
+  IncrementGlobal("flSymbol","LOCALS",1)
+END
+
+//Symbol, Fear
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SICon|Fear|Summoned)
+  GlobalLT("flSymbol","LOCALS",1)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#WI811"|30|100)
+  IncrementGlobal("flSymbol","LOCALS",1)
+END
+
 //Gaze of Fascination
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
@@ -77,41 +152,9 @@ THEN DO
   Action(ForceSpellRES,"fl#ultgz"|100|100)
 END
 
-
-//Produce Flame
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|FireRes50|MinorGlobe|SpellTurning|SIEvo)
-  !Race(scstarget,RAKSHASA)
-  !Race(scstarget,LICH)
-THEN DO
-  Combine()
-  Action(ForceSpellRES,"RR#PFLAM"|100|100)
-END
-
-//Charm Person
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|MinorGlobe|SpellTurning|SIEnc|Charm)
-  General(scstarget,HUMANOID)
-  !Race(scstarget,RAKSHASA)
-THEN DO
-  Combine()
-  Action(ForceSpellRES,"RR#WI104"|50|100)
-END
-
-//Cause Disease (beefier)
-IF TRIGGER
-  TargetBlock(EnemiesInOrderShort)
-  Range(scstarget,5)
-  TriggerBlock(Disabled|MR75|MinorGlobe|SpellTurning|SIAbj|Disease)
-THEN DO
-  Combine()
-  Action(ForceSpellRES,"fl#csdi2"|100|100)
-END
-
 //Animate Dead
 IF TRIGGER
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
   TargetBlock(EnemiesInOrder)
   OR(3)
     Class(scstarget,MAGE_ALL)
@@ -123,8 +166,9 @@ THEN DO
 END    
 
 IF
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
   Allegiance(Myself,EVILCUTOFF)
-  !See([EVILCUTOFF.UNDEAD.0.SKELTON_WARRIOR.0.SUMMONED])
+  !See([EVILCUTOFF.UNDEAD.0.SKELETON_WARRIOR.0.SUMMONED])
   !GlobalTimerNotExpired("cast","LOCALS")
 THEN
   RESPONSE #100
@@ -133,8 +177,9 @@ THEN
 END  
 
 IF
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
   Allegiance(Myself,GOODCUTOFF)
-  !See([GOODCUTOFF.UNDEAD.0.SKELTON_WARRIOR.0.SUMMONED])
+  !See([GOODCUTOFF.UNDEAD.0.SKELETON_WARRIOR.0.SUMMONED])
   !GlobalTimerNotExpired("cast","LOCALS")
 THEN
   RESPONSE #100
@@ -142,80 +187,34 @@ THEN
     SetGlobalTimer("cast","LOCALS",6)
 END
 
-//Mass Suggestion
+//Cause Disease
 IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|SIEnc|Charm)
-  GlobalLT("flMassSuggestion","LOCALS",1)
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,5)
+  TriggerBlock(Disabled|MR75|MinorGlobe|SpellTurning|SIAbj|Disease)
+  !Race(scstarget,RAKSHASA)
 THEN DO
-  Action(ForceSpellRES,"fl#mssug"|100|100)
-  IncrementGlobal("flMassSuggestion","LOCALS",1)
+  Combine()
+  Action(ForceSpellRES,"fl#csdis"|50|100)
 END
 
 //Shout
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|MR50|SIEvo)
+  OR(5)
+    Class(scstarget,MAGE_ALL)
+    Class(scstarget,BARD_ALL)
+    Class(scstarget,CLERIC_ALL)
+    Class(scstarget,CLERIC_RANGER)
+    Class(scstarget,DRUID_ALL)
   !StateCheck(scstarget,STATE_SILENCED)
   !Range(scstarget,5)
   Range(scstarget,15)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
 THEN DO
   Action(ForceSpellRES,"fl#shout"|100|100)
-END
-
-//Symbol, Death
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|SICon|Slayable)
-  OR(4)
-    Class(scstarget,MAGE)
-    Class(scstarget,MAGE_THIEF)
-    Class(scstarget,MAGE_CLERIC)
-    HPPercentLT(scstarget,40)
-  GlobalLT("flSymbol","LOCALS",1)
-THEN DO
-  Action(ForceSpellRES,"RR#WI817"|100|50)
-  IncrementGlobal("flSymbol","LOCALS",1)
-END
-
-//Symbol, Stun
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|SICon|Stun)
-  GlobalLT("flSymbol","LOCALS",1)
-THEN DO
-  Action(ForceSpellRES,"RR#WI816"|50|100)
-  IncrementGlobal("flSymbol","LOCALS",1)
-END
-
-//Symbol, Pain
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|SICon|Stun)
-  GlobalLT("flSymbol","LOCALS",1)
-THEN DO
-  Action(ForceSpellRES,"RR#SPAIN"|50|100)
-  IncrementGlobal("flSymbol","LOCALS",1)
-END
-
-//Symbol, Fear
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|SICon|Fear)
-  GlobalLT("flSymbol","LOCALS",1)
-THEN DO
-  Action(ForceSpellRES,"RR#WI811"|50|100)
-  IncrementGlobal("flSymbol","LOCALS",1)
-END
-
-
-//Fire Storm
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|FireRes75|SIEvo)
-  !Race(scstarget,RAKSHASA)
-THEN DO
-  Action(ForceSpellRES,"RR#PR705"|100|100)
 END
 
 //Fear
@@ -225,7 +224,20 @@ IF TRIGGER
   !Range(scstarget,5)
   Range(scstarget,15)
 THEN DO
-  Action(ForceSpellRES,"fl#cnefr"|100|100)
+  Action(ForceSpellRES,"fl#cnefr"|50|100)
+END
+
+//Mass Suggestion
+IF TRIGGER
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+  TargetBlock(EnemiesInOrder)
+  General(scstarget,HUMANOID)
+  !Race(scstarget,RAKSHASA)
+  TriggerBlock(Disabled|MR50|SIEnc|Charm)
+  GlobalLT("flMassSuggestion","LOCALS",1)
+THEN DO
+  Action(ForceSpellRESMyself,"fl#mssug"|100|100)
+  IncrementGlobal("flMassSuggestion","LOCALS",1)
 END
 
 //Colour Spray
@@ -234,6 +246,8 @@ IF TRIGGER
   TriggerBlock(Disabled|MR50|MinorGlobe|Sleep|SIAlt)
   LevelLT(scstarget,6)
   Range(scstarget,10)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
   GlobalLT("flColourSpray","LOCALS",7)
 THEN DO
   Action(ForceSpellRES,"fl#clrsp"|100|50)
@@ -246,6 +260,8 @@ IF TRIGGER
   LevelGT(scstarget,5)
   LevelLT(scstarget,16)
   Range(scstarget,10)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
   GlobalLT("flColourSpray","LOCALS",7)
 THEN DO
   Action(ForceSpellRES,"fl#clrsp"|100|100)
@@ -258,6 +274,8 @@ IF TRIGGER
   LevelGT(scstarget,15)
   LevelLT(scstarget,18)
   Range(scstarget,10)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
   GlobalLT("flColourSpray","LOCALS",7)
 THEN DO
   Action(ForceSpellRES,"fl#clrsp"|100|100)
@@ -269,22 +287,82 @@ IF TRIGGER
   TriggerBlock(Disabled|MR50|MinorGlobe|Confusion|SIAlt)
   LevelGT(scstarget,17)
   Range(scstarget,10)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
   GlobalLT("flColourSpray","LOCALS",7)
 THEN DO
   Action(ForceSpellRES,"fl#clrsp"|100|100)
   IncrementGlobal("flColourSpray","LOCALS",1)
 END
 
+//Produce Flame
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|MR50|ElecResFull|MinorGlobe|SIAlt)
-  AreaType(OUTDOOR)
+  TriggerBlock(MR75|FireResFull|MinorGlobe|SpellTurning|SIEvo)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
+  HPLT(scstarget,15)
+  !HasItemEquiped("clck26",scstarget)
 THEN DO
   Combine()
-  Action(ForceSpellRES,"RR#PR302"¡100|50)
+  Action(ForceSpellRES,"RR#PFLAM"|100|50)
 END
 
-//Melee
+//Charm Person
+IF TRIGGER
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|MinorGlobe|SpellTurning|SIEnc|Charm)
+  General(scstarget,HUMANOID)
+  !Race(scstarget,RAKSHASA)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#WI104"|50|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunityUltroloth|MagicDamageFull)
+  StateCheck(scstarget,STATE_IMMOBILE)
+  Range(scstarget,6)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(EnemyMagesAndPriests)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
+  Range(scstarget,6)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(EnemyMagesAndPriests)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
+  !Range(scstarget,6)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#TELWE"|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
+  Range(scstarget,6)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
+  !Range(scstarget,6)
+THEN DO
+  Action(ForceSpellRES,"RR#TELWE")
+END
+
+INCLUDE FILE(fiends/include/end_attack.ssl)
 
 IF
   ActionListEmpty()

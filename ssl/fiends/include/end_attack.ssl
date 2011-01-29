@@ -1,0 +1,48 @@
+//This is for that mean-spirited behaviour
+
+IF
+  See([ANYONE])
+  False()
+THEN
+  RESPONSE #100
+    Continue()
+END
+
+IF
+  Race(LastSeenBy(Myself),DEMONIC)
+  Alignment(LastSeenBy(Myself),MASK_EVIL)
+  Allegiance(Myself,GOODCUTOFF)
+  !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
+  Race(LastSeenBy(Myself),DEMONIC)
+  Alignment(LastSeenBy(Myself),MASK_EVIL)
+  Allegiance(Myself,EVILCUTOFF)
+  !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
+  !Range(LastSeenBy(Myself),6)
+  !GlobalTimerNotExpired("cast","LOCALS")
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
+    SetGlobalTimer("cast","LOCALS",6)
+END
+
+IF
+  Range(LastSeenBy(Myself),6)
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    AttackOneRound(LastSeenBy(Myself))
+END
+

@@ -4,6 +4,9 @@ TRIGGER=MagicSafeArea
  !AreaCheck("ar3008")
  !AreaCheck("ar3009")
 
+TRIGGER=MR50
+ !CheckStatGT(scstarget,50,RESISTMAGIC)
+
 TRIGGER=FireRes50
  !CheckStatGT(scstarget,50,RESISTFIRE)
  
@@ -15,6 +18,12 @@ TRIGGER=ElecRes50
  
 TRIGGER=AcidRes50
  !CheckStatGT(scstarget,50,RESISTACID)
+ 
+TRIGGER=MagicDamage50
+ !CheckStatGT(scstarget,50,MAGICDAMAGERESISTANCE)
+ 
+TRIGGER=MR75
+ !CheckStatGT(scstarget,75,RESISTMAGIC)
 
 TRIGGER=FireRes75
  !CheckStatGT(scstarget,75,RESISTFIRE)
@@ -25,20 +34,20 @@ TRIGGER=ColdRes75
 TRIGGER=ElecRes75
  !CheckStatGT(scstarget,75,RESISTELECTRICITY)
  
+TRIGGER=MagicDamage75
+ !CheckStatGT(scstarget,75,MAGICDAMAGERESISTANCE)
+ 
+TRIGGER=MRFull
+ !CheckStatGT(scstarget,99,RESISTMAGIC)
+ 
 TRIGGER=FireResFull
  !CheckStatGT(scstarget,99,RESISTFIRE)
  
 TRIGGER=ElecResFull
  !CheckStatGT(scstarget,99,RESISTELECTRICITY)
 
-TRIGGER=MR50
- !CheckStatGT(scstarget,50,RESISTMAGIC)
-
-TRIGGER=MR75
- !CheckStatGT(scstarget,75,RESISTMAGIC)
-
-TRIGGER=MRFull
- !CheckStatGT(scstarget,99,RESISTMAGIC)
+TRIGGER=MagicDamageFull
+ !CheckStatGT(scstarget,99,MAGICDAMAGERESISTANCE)
 
 TRIGGER=SIAbj
  !CheckStat(scstarget,1,WIZARD_SPELL_IMMUNITY)
@@ -133,6 +142,23 @@ TRIGGER=WeaponImmunity
    CheckStatGT(Myself,5,CLERIC_HALLOW) //You need +6 or better to bypass Absolute Immunity
    !CheckStat(scstarget,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Absolute Immunity
  !HasItem("MORSWORD",scstarget)
+ 
+TRIGGER=WeaponImmunityUltroloth
+ OR(2)
+   CheckStatGT(Myself,0,CLERIC_HALLOW) //You need magical weapons to bypass PfNW
+   CheckStat(scstarget,0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS) //PfNW
+ OR(2)
+   CheckStat(Myself,0,CLERIC_HALLOW) //You need normal weapons to bypass PfMW
+   !CheckStat(scstarget,4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //PfMW
+ OR(2)
+   CheckStatGT(Myself,2,CLERIC_HALLOW) //You need +3 or better to bypass Mantle
+   !CheckStat(scstarget,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Mantle
+ OR(2)
+   CheckStatGT(Myself,3,CLERIC_HALLOW) //You need +4 or better to bypass Improved Mantle
+   !CheckStat(scstarget,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Improved Mantle
+ OR(2)
+   CheckStatGT(Myself,5,CLERIC_HALLOW) //You need +6 or better to bypass Absolute Immunity
+   !CheckStat(scstarget,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Absolute Immunity
 
 TRIGGER=SlashRes
  CheckStatLT(scstarget,50,RESISTSLASHING)
@@ -328,6 +354,18 @@ TRIGGER=OKForInvis
  !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
  !Global("dvgldust","LOCALS",1)
 
+TRIGGER=Summoned
+  !Gender(scstarget,SUMMONED)
+  !Gender(scstarget,20)
+
+
+
+
+
+
+
+
+
 TARGET=PlayersReverse
  Player6
  Player5
@@ -374,16 +412,11 @@ TARGET=PCArchers
  [PC.0.0.THIEF_ALL]
  [PC.0.0.FIGHTER_ALL]
 
-TARGET=Squishy
+TARGET=PCSquishy
  [PC.0.0.MAGE]
  [PC.0.0.MAGE_THIEF]
  [PC.0.0.THIEF]
  [PC.0.0.BARD]
-
-TARGET=CloseEnemies
- NearestEnemyOf(Myself)
- SecondNearestEnemyOf(Myself)
- ThirdNearestEnemyOf(Myself)
 
 TARGET=EnemiesReverseFar
  SixthNearestEnemyOf(Myself)
@@ -412,11 +445,11 @@ TARGET=EnemiesInOrder
  SixthNearestEnemyOf(Myself)
  
 TARGET=EnemiesInOrderShort
-  NearestEnemyOf(Myself)
-  SecondNearestEnemyOf(Myself)
-  ThirdNearestEnemyOf(Myself)
+ NearestEnemyOf(Myself)
+ SecondNearestEnemyOf(Myself)
+ ThirdNearestEnemyOf(Myself)
  
-TARGET=HumanoidsPreferringStrong
+TARGET=GoodHumanoidsPreferringStrong
  [GOODCUTOFF.HUMANOID.0.FIGHTER]
  [GOODCUTOFF.HUMANOID.0.PALADIN]
  [GOODCUTOFF.HUMANOID.0.RANGER]
@@ -457,7 +490,7 @@ TARGET=PCsInOrderShort
  SecondNearest([PC])
  ThirdNearest([PC])
  
-TARGET=SpellCasters
+TARGET=GoodSpellCasters
  [GOODCUTOFF.0.0.MAGE]
  [GOODCUTOFF.0.0.CLERIC_MAGE]
  [GOODCUTOFF.0.0.MAGE_ALL]
@@ -468,7 +501,7 @@ TARGET=SpellCasters
  [GOODCUTOFF.0.0.CLERIC_RANGER]
  [GOODCUTOFF.0.0.CLERIC_ALL]
  
-TARGET=PureCasters
+TARGET=GoodPureCasters
  [GOODCUTOFF.0.0.MAGE]
  [GOODCUTOFF.0.0.CLERIC_MAGE]
  [GOODCUTOFF.0.0.MAGE_THIEF]
@@ -477,7 +510,7 @@ TARGET=PureCasters
  [GOODCUTOFF.0.0.BARD]
  [GOODCUTOFF.0.0.CLERIC_THIEF]
  
-TARGET=FighterCasters
+TARGET=GoodFighterCasters
  [GOODCUTOFF.0.0.FIGHTER_MAGE]
  [GOODCUTOFF.0.0.FIGHTER_DRUID]
  [GOODCUTOFF.0.0.FIGHTER_CLERIC]
@@ -490,7 +523,7 @@ TARGET=Beholders
  FifthNearest([0.0.BEHOLDER])
  SixthNearest([0.0.BEHOLDER])
  
-TARGET=Summons
+TARGET=GoodSummons
  [GOODCUTOFF.0.0.0.0.SUMMONED]
  SecondNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
  ThirdNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
@@ -526,7 +559,7 @@ TARGET=EvilInOrderShort
  SecondNearest([EVILCUTOFF])
  ThirdNearest([EVILCUTOFF])
  
-TARGET=BoltOfGlory
+TARGET=GoodBoltOfGlory
  [GOODCUTOFF.DEMONIC]
  SecondNearest([GOODCUTOFF.DEMONIC])
  ThirdNearest([GOODCUTOFF.DEMONIC])
@@ -540,7 +573,7 @@ TARGET=BoltOfGlory
  FifthNearestEnemyOf(Myself)
  SixthNearestEnemyOf(Myself)
  
-TARGET=MagesInOrder
+TARGET=EnemyMagesInOrder
  NearestEnemyOfType([0.0.0.MAGE])
  SecondNearestEnemyOfType([0.0.0.MAGE])
  NearestEnemyOfType([0.0.0.MAGE_ALL])
@@ -548,14 +581,29 @@ TARGET=MagesInOrder
  NearestEnemyOfType([0.0.0.BARD_ALL])
  NearestEnemyOf(Myself)
  SecondNearestEnemyOf(Myself)
- Third NearestEnemyOf(Myself)
+ ThirdNearestEnemyOf(Myself)
  
-TARGET=AnyTroll
- Nearest([0.0.TROLL])
- SecondNearest([0.0.TROLL])
- ThirdNearest([0.0.TROLL])
- FourthNearest([0.0.TROLL])
- FifthNearest([0.0.TROLL])
- SixthNearest([0.0.TROLL])
+TARGET=EnemyMagesAndPriests
+ NearestEnemyOfType([0.0.0.MAGE_ALL])
+ NearestEnemyOfType([0.0.0.CLERIC_ALL])
+ NearestEnemyOfType([0.0.0.CLERIC_RANGER])
+ NearestEnemyOfType([0.0.0.DRUID_ALL])
+ SecondNearestEnemyOfType([0.0.0.MAGE_ALL])
+ SecondNearestEnemyOfType([0.0.0.CLERIC_ALL])
+ SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER])
+ SecondNearestEnemyOfType([0.0.0.DRUID_ALL])
+ ThirdNearestEnemyOfType([0.0.0.MAGE_ALL])
+ ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL])
+ ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER])
+ ThirdNearestEnemyOfType([0.0.0.DRUID_ALL])
+ NearestEnemyOf(Myself)
+ 
+TARGET=EnemyTroll
+ NearestEnemyOfType([0.0.TROLL])
+ SecondNearestEnemyOfType([0.0.TROLL])
+ ThirdNearestEnemyOfType([0.0.TROLL])
+ FourthNearestEnemyOfType([0.0.TROLL])
+ FifthNearestEnemyOfType([0.0.TROLL])
+ SixthNearestEnemyOfType([0.0.TROLL])
 
 
