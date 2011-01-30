@@ -22,8 +22,8 @@ COPY_EXISTING ~msectype.2da~ ~override~                                         
 BUT_ONLY_IF_IT_CHANGES
 APPEND ~RR#EVAL.2DA~ ~RR#ETHER %RR#SECTYPE%~ UNLESS ~RR#ETHER~                        // write the numeric ID to the 2DA
 
-ACTION_IF !FILE_CONTAINS (msectype.2da fl#Disease) BEGIN
-  ADD_SECTYPE fl#Disease @1025
+ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
+  ADD_SECTYPE fl#Disease ~placeholder~
 END
 APPEND RR#EVAL.2da "fl#Disease %fl#Disease%"
 
@@ -196,7 +196,7 @@ COPY ~aTweaks/BAM/RR#CNSTR.BAM~ ~override~                                      
 COPY ~aTweaks/SPL/RR#DPDIS.SPL~ ~override~                                         // Pit Fiend disease (-4 to STR, non-cumulative)
   WRITE_BYTE 0x27 fl#Disease                                                       // Custom Disease SecType 
 
-OUTER_SET f_AddSecType(RR#DPDIS.SPL) = fl#Disease
+OUTER_SET $f_AddSecType(RR#DPDIS.SPL) = fl#Disease
 
 COPY ~aTweaks/EFF/RR#DPDIS.EFF~ ~override~                                         // Pit Fiend disease immunity effect
   SAY 0x1C @676                                                                    // Unaffected by Disease
@@ -730,13 +730,12 @@ COPY "atweaks/spl/base.spl" "override/fl#telki.spl"
   LPF configure_spell_header INT_VAR f_CastTime = 5 END
   target = 2
   power = 5
-  timing = 1
   resist_dispel = 1
   savingthrow = 1
   FOR (header=1;header<=20;++header) BEGIN
     parameter1 = header
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 235 target power parameter1 = 30 parameter2 = 2 timing resist_dispel savingthrow header END //Wing buffet
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter1 parameter2 = 0x100000 timing resist_dispel header END //Damage
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 235 target power parameter1 = 20 parameter2 = 2 duration = 1 resist_dispel savingthrow header END //Wing buffet
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter1 parameter2 = 0x100000 timing = 1 resist_dispel header END //Damage
   END
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above)
 
@@ -764,7 +763,7 @@ COPY "atweaks/spl/base.spl" "override/fl#csdis.spl"
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power timing = 1 resist_dispel savingthrow STR_VAR resource = fl#csdis END //non-cumulativity
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above) 
 
-OUTER_SET f_AddSecType(fl#csdis.spl) = fl#Disease
+OUTER_SET $f_AddSecType(fl#csdis.spl) = fl#Disease
     
 //Mass suggestion
 COPY "atweaks/spl/base.spl" "override/fl#mssug.spl"
@@ -893,9 +892,9 @@ COPY "atweaks/spl/base.spl" "override/fl#shout.spl"
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 112 resist_dispel duration savingthrow END //icon: deafness
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target power parameter2 = 1 resist_dispel duration = 3 savingthrow STR_VAR resource = SPH1HI01 END //visual effect
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target power parameter2 = 1 resist_dispel duration = 3 savingthrow STR_VAR resource = SPHLHI02 END //more visual effects
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power duration resist_dispel savingthrow STR_VAR resource = EVAL "%DEST_RES%" END //non-cumulativity if you are deafened
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter2 = 0x400000 resist_dispel timing = 1 dicenumber = 1 dicesize = 6 END //1d6 damage, no save
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target power parameter2 = 0x400000 resist_dispel timing = 1 dicenumber = 1 dicesize = 6 savingthrow END //1d6, with save
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power duration resist_dispel savingthrow STR_VAR resource = EVAL "%DEST_RES%" END //non-cumulativity if you are deafened
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above)
 
 //Patch immunity to fl#shout into silence and deafening spells, items  
@@ -932,7 +931,7 @@ COPY "atweaks/spl/base.spl" "override/fl#ultgz.spl"
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target parameter2 = 1 duration savingthrow STR_VAR resource = spmindat END //Visual effect
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target timing = 4 duration savingthrow STR_VAR resource = eff_e08 END //Play sound
   LPF RR#SP2IN INT_VAR rr#rinvis = 1 END //General "make innate" treatment
-  
+
   
   
 //The Nycaloths' weapons        
@@ -959,7 +958,8 @@ COPY_EXISTING b1-12m3.itm "override/fl#arca.itm"
   LPF configure_weapon_header INT_VAR f_Speed = 2 f_NumDice = 1 f_Diesize = 6 END
   enchantment = 3
   WRITE_LONG 0x60 enchantment
-  LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 233 target = 1 parameter1 = enchantment parameter2 = 109 timing = 2 END 
+  LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 233 target = 1 parameter1 = enchantment parameter2 = 109 timing = 2 END
+  LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 9 target = 1 parameter1 = 0x00200000 parameter2 = 0x00500001 timing = 2 END  
   
 //The robe used by Ultroloths and Arcanaloths
 COPY_EXISTING clck17.itm "override/fl#yugro.itm"
@@ -969,9 +969,9 @@ COPY_EXISTING clck17.itm "override/fl#yugro.itm"
   
 
 
-OUTER_SET f_ImmunitySecType(78) = fl#Disease
+OUTER_SET $f_ImmunitySecType(78) = fl#Disease
 
-OUTER_SET f_RemoveSecType(79) = fl#Disease  
+OUTER_SET $f_RemoveSecType(79) = fl#Disease
 
 LAF integrate_sectypes END
 
