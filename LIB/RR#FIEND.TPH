@@ -8,27 +8,28 @@ DEFINE_ACTION_MACRO ~RR#FIEND~ BEGIN
 
 INCLUDE "atweaks/lib/dsandstuff.tpa"
 
-// Add new secondary types
-
 ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#EVAL.2DA~ THEN BEGIN                         // only copy the evaluation file once
   COPY ~aTweaks/LIB/RR#EVAL.2DA~ ~override~
 END                                                                                // ends ACTION_IF block
 
-COPY_EXISTING ~msectype.2da~ ~override~                                            // add a new secondary type for Etherealness removal
-  COUNT_2DA_ROWS 2 "rows"
-  INSERT_2DA_ROW "%rows%" 2 ~RR#ETHER RR#ETHEREALNESS~                             // assign secondary type and accompanying string
-  REPLACE ~RR#ETHEREALNESS~ @707                                                   // Etherealness removal feedback string
-  SET "RR#SECTYPE" = ("%rows%" - 2)
-BUT_ONLY_IF_IT_CHANGES
-APPEND ~RR#EVAL.2DA~ ~RR#ETHER %RR#SECTYPE%~ UNLESS ~RR#ETHER~                        // write the numeric ID to the 2DA
+// Add new secondary types
 
-ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
-  ADD_SECTYPE fl#Disease ~placeholder~
+ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da RR#ETHER) BEGIN
+  ADD_SECTYPE RR#ETHER @707
+  APPEND RR#EVAL.2da "RR#ETHER %RR#ETHER%"
 END
-APPEND RR#EVAL.2da "fl#Disease %fl#Disease%"
+ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
+  ADD_SECTYPE fl#Disease #2449
+  APPEND RR#EVAL.2da "fl#Disease %fl#Disease%"
+END
+
+LAF ret_from_eval STR_VAR f_Entry = RR#ETHER RET RR#ETHER = f_Value END            //Retrieve stored values from RR#EVAL.2da
+LAF ret_from_eval STR_VAR f_Entry = fl#Disease RET fl#Disease = f_Value END
+
+//Add new projectiles
 
 ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.pro BEGIN
-  ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                          // New projectile for Symbol Pain (party friendly)
+  ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                        // New projectile for Symbol Pain (party friendly)
   APPEND RR#EVAL.2da "RR#SPAIN %RR#SPAIN%"
 END
 ACTION_IF !FILE_EXISTS_IN_GAME fl#cnenp.pro BEGIN
@@ -39,6 +40,10 @@ ACTION_IF !FILE_EXISTS_IN_GAME fl#sight.pro BEGIN
   ADD_PROJECTILE ~atweaks/pro/fl#sight.pro~                                        //Like INAREANP, but extends roughly as far as you can see 
   APPEND RR#EVAL.2da "fl#sight %fl#sight%"
 END
+
+LAF ret_from_eval STR_VAR f_Entry = RR#SPAIN RET RR#SPAIN = f_Value END
+LAF ret_from_eval STR_VAR f_Entry = fl#cnenp RET fl#cnenp = f_Value END
+LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Value END
 
 
 // Assign the Enchantment school to enchantment based spell-like abilities and make them turn the caster visible
@@ -78,19 +83,9 @@ COPY ~aTweaks/VVC/RR#PSHFT.VVC~ ~override~                                      
 COPY ~aTweaks/BAM/RR#PSHFT.BAM~ ~override~                                         // Plane Shift/Etherealness BAM graphics
 COPY ~aTweaks/WAV/RR#PSHFT.WAV~ ~override~                                         // Plane Shift/Etherealness sound
 
-COPY_EXISTING ~RR#EVAL.2DA~ ~override~
-COUNT_2DA_ROWS ~2~ "rows"
-FOR ( index = 0 ; index < rows ; index = index + 1 ) BEGIN
-  READ_2DA_ENTRY "index" 0 2 "2datmp"
-   PATCH_IF ("%2datmp%" STRING_EQUAL_CASE ~RR#ETHER~) BEGIN                        // Find the Etherealness entry
-     READ_2DA_ENTRY "index" 1 2 "RR#2DAID"                                         // Get the numeric ID
-   END
-END
-BUT_ONLY_IF_IT_CHANGES
-
 COPY ~aTweaks/SPL/RR#ETHER.SPL~ ~override~                                         // Etherealness (Succubus)
   SAY NAME1 @671 SAY NAME2 @671
-  WRITE_BYTE 0x27 ("%RR#2DAID%" + 1)                                               // assign new secondary type
+  WRITE_BYTE 0x27 RR#ETHER                                                         // assign new secondary type
   READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
   READ_LONG  0x6a "fx_off"
@@ -119,7 +114,7 @@ COPY    ~aTweaks/SPL/RR#UNETH.SPL~ ~override~                                   
     FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
       READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
        PATCH_IF ("%opcode%" = 221) BEGIN                             // effect #221: remove secondary type
-        WRITE_LONG  ("%fx_off%" + 0x08 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) ("%RR#2DAID%" + 1)  // set the designated secondary type
+        WRITE_LONG  ("%fx_off%" + 0x08 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) RR#ETHER  // set the designated secondary type
        END
     END
   END
@@ -317,8 +312,6 @@ ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DDOOR.BAM~ THEN BEGIN                     
   COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override/RR#DDOOR.WAV~                     // IWD1's Dimension Door sound effect (custom file name)
   COPY    ~aTweaks/VVC/RR#DDOOR.VVC~   ~override~                                  // Custom Dimension Door VVC
 END                                                                                // ends ACTION_IF block
-
-LAF ret_from_eval STR_VAR f_Entry = RR#SPAIN RET RR#SPAIN = f_Entry END
 
 COPY ~aTweaks/SPL/RR#SPAIN.SPL~ ~override~                                         // Pit Fiend Symbol Pain
   READ_LONG  0x64 ab_off
@@ -687,9 +680,6 @@ COMPILE ~aTweaks/BAF/fiends/RR#GHAST.BAF~                                       
 //Yugoloth
 ///////////
 
-LAF ret_from_eval STR_VAR f_Entry = fl#cnenp RET fl#cnenp = f_Entry END
-LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Entry END
-
 //Fear, cone
 COPY "atweaks/spl/base.spl" "override/fl#cnefr.spl"
   WRITE_LONG NAME1 2619 //Fear
@@ -710,7 +700,7 @@ COPY "atweaks/spl/base.spl" "override/fl#cnefr.spl"
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14007 timing = 1 resist_dispel savingthrow header END //Display string
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 36 duration resist_dispel savingthrow header END //Portrait icon
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 4 duration resist_dispel savingthrow header STR_VAR resource = eff_e05 END //Play sound
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target power parameter2 = 16 timing = 1 resist_dispel savingthrow header END //Lighting effect
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 141 target power parameter2 = 18 timing = 1 resist_dispel savingthrow header END //Lighting effect
   END
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above)
 
@@ -760,7 +750,7 @@ COPY "atweaks/spl/base.spl" "override/fl#csdis.spl"
   END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 7 timing = 1 resist_dispel savingthrow END //Icon: Nauseated
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 39752 timing = 1 resist_dispel savingthrow END //Stricken by a foul disease
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power timing = 1 resist_dispel savingthrow STR_VAR resource = fl#csdis END //non-cumulativity
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power timing = 1 resist_dispel savingthrow STR_VAR resource = EVAL "%DEST_RES%" END //non-cumulativity
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above) 
 
 OUTER_SET $f_AddSecType(fl#csdis.spl) = fl#Disease
@@ -897,7 +887,7 @@ COPY "atweaks/spl/base.spl" "override/fl#shout.spl"
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power duration resist_dispel savingthrow STR_VAR resource = EVAL "%DEST_RES%" END //non-cumulativity if you are deafened
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above)
 
-//Patch immunity to fl#shout into silence and deafening spells, items  
+//Patch immunity to fl#shout into silencing and deafening spells, items  
 COPY_EXISTING sppr211.spl  override
               rr#dneth.spl override
               rr#ether.spl override
@@ -927,7 +917,7 @@ COPY "atweaks/spl/base.spl" "override/fl#ultgz.spl"
   target = 2
   duration = 60
   savingthrow = 1
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 175 target parameter2 = 2 duration savingthrow END //Hold creature
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 175 target parameter1 = 1 parameter2 = 2 duration savingthrow END //Hold creature (humanoid)
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target parameter2 = 1 duration savingthrow STR_VAR resource = spmindat END //Visual effect
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target timing = 4 duration savingthrow STR_VAR resource = eff_e08 END //Play sound
   LPF RR#SP2IN INT_VAR rr#rinvis = 1 END //General "make innate" treatment
@@ -949,13 +939,14 @@ COPY_EXISTING b1-12m4.itm "override/fl#ultr.itm"
   enchantment = 6
   WRITE_LONG 0x60 enchantment
   LPF ADD_ITEM_EFFECT INT_VAR opcode = 12 target = 2 parameter2 = 0x400000 timing = 1 dicenumber = 1 dicesize = 12 type = 1 END //1d12 magical damage
+  LPF ADD_ITEM_EFFECT INT_VAR opcode = 141 target = 2 parameter2 = 24 timing = 1 type = 1 END //Lighting effect
   LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 52 target = 1 parameter1 = 0x0000FF00 parameter2 = 0 timing = 2 END
   LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 233 target = 1 parameter1 = enchantment parameter2 = 109 timing = 2 END
 
 //Arcanaloth 
 COPY_EXISTING b1-12m3.itm "override/fl#arca.itm"
   LPF prep_itm_spl END
-  LPF configure_weapon_header INT_VAR f_Speed = 2 f_NumDice = 1 f_Diesize = 6 END
+  LPF configure_weapon_header INT_VAR f_Speed = 2 f_NumDice = 1 f_Diesize = 6 f_DamageType = 3 END
   enchantment = 3
   WRITE_LONG 0x60 enchantment
   LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 233 target = 1 parameter1 = enchantment parameter2 = 109 timing = 2 END

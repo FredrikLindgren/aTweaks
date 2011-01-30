@@ -29,6 +29,30 @@ THEN
 END
 
 IF
+  General(LastSeenBy(Myself),UNDEAD)
+  OR(2)
+    Gender(LastSeenBy(Myself),SUMMONED)
+    Gender(LastSeenBy(Myself),20)
+  Allegiance(Myself,GOODCUTOFF)
+  !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
+  General(LastSeenBy(Myself),UNDEAD)
+  OR(2)
+    Gender(LastSeenBy(Myself),SUMMONED)
+    Gender(LastSeenBy(Myself),20)
+  Allegiance(Myself,EVILCUTOFF)
+  !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
   !Range(LastSeenBy(Myself),6)
   !GlobalTimerNotExpired("cast","LOCALS")
   ActionListEmpty()

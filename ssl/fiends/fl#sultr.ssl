@@ -146,6 +146,7 @@ END
 //Gaze of Fascination
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
+  General(scstarget,HUMANOID)
   TriggerBlock(Disabled|Hold)
   !HasItemEquiped("RR#HEL03",scstarget) // Darkveil (RR)
 THEN DO
@@ -191,7 +192,7 @@ END
 //Cause Disease
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
-  Range(scstarget,5)
+  Range(scstarget,2)
   TriggerBlock(Disabled|MR75|MinorGlobe|SpellTurning|SIAbj|Disease)
   !Race(scstarget,RAKSHASA)
 THEN DO
@@ -244,7 +245,7 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
   TriggerBlock(Disabled|MR50|MinorGlobe|Sleep|SIAlt)
-  !StateCheck(scstarget,STATE_BLINDED)
+  !StateCheck(scstarget,STATE_BLIND)
   LevelLT(scstarget,6)
   Range(scstarget,15)
   !Race(scstarget,RAKSHASA)
@@ -258,7 +259,7 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
   TriggerBlock(Disabled|MR50|MinorGlobe|Sleep|SIAlt)
-  !StateCheck(scstarget,STATE_BLINDED)
+  !StateCheck(scstarget,STATE_BLIND)
   LevelGT(scstarget,5)
   LevelLT(scstarget,16)
   Range(scstarget,15)
@@ -273,7 +274,7 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
   TriggerBlock(Disabled|MR50|MinorGlobe|Blindness|SIAlt)
-  !StateCheck(scstarget,STATE_BLINDED)
+  !StateCheck(scstarget,STATE_BLIND)
   LevelGT(scstarget,15)
   LevelLT(scstarget,18)
   Range(scstarget,15)
@@ -288,7 +289,7 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
   TriggerBlock(Disabled|MR50|MinorGlobe|Confusion|SIAlt)
-  !StateCheck(scstarget,STATE_BLINDED)
+  !StateCheck(scstarget,STATE_BLIND)
   LevelGT(scstarget,17)
   Range(scstarget,15)
   !Race(scstarget,RAKSHASA)
@@ -364,6 +365,13 @@ IF TRIGGER
   !Range(scstarget,6)
 THEN DO
   Action(ForceSpellRES,"RR#TELWE")
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunityUltroloth|MagicDamageFull)
+THEN DO
+  AttackOneRound(scstarget)
 END
 
 INCLUDE FILE(fiends/include/end_attack.ssl)

@@ -95,7 +95,7 @@ END
 //Fear, by touch
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
-  Range(scstarget,5)
+  Range(scstarget,2)
   TriggerBlock(Disabled|MinorGlobe|SpellTurning|Fear|MR75|SIIll)
   !Race(scstarget,RAKSHASA)
 THEN DO
@@ -106,7 +106,7 @@ END
 //Cause disease, also by touch
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
-  Range(scstarget,5)
+  Range(scstarget,2)
   TriggerBlock(Disabled|MinorGlobe|SpellTurning|Disease|MR75|SIAbj)
   !Race(scstarget,RAKSHASA)
 THEN DO
@@ -167,9 +167,7 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   !Race(scstarget,LICH)
   !Race(scstarget,RAKSHASA)
-  TriggerBlock(MRFull|FireResFull|SpellTurning|MinorGlobe|SIEvo|ProEvil)
-  //!HasItemEquiped("lich",scstarget)
-  //!HasItemEquiped("jonhp1",scstarget)
+  TriggerBlock(MRFull|FireResFull|SpellTurning|MinorGlobe|SIEvo)
   !HasItemEquiped("clck26",scstarget)
   Range(NearestEnemyOf(Myself),5)
 THEN DO
@@ -179,9 +177,7 @@ END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil|Stoneskin|MirrorImage|Disabled)
-  //!HasItemEquiped("lich",scstarget)
-  //!HasItemEquiped("jonhp1",scstarget)
+  TriggerBlock(WeaponImmunity|SlashResFull|Stoneskin|MirrorImage|Disabled)
   Range(scstarget,5)
 THEN DO
   AttackOneRound(scstarget)
@@ -189,11 +185,8 @@ END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil|Stoneskin|MirrorImage|Disabled)
-  //!HasItemEquiped("lich",scstarget)
-  //!HasItemEquiped("jonhp1",scstarget)
+  TriggerBlock(WeaponImmunity|SlashResFull|Stoneskin|MirrorImage|Disabled)
   !Range(scstarget,5)
-  InMyArea(scstarget)
 THEN DO
   Combine()
   Action(ForceSpellRES,"RR#TELWE")
@@ -201,9 +194,7 @@ END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
-  //!HasItemEquiped("lich",scstarget)
-  //!HasItemEquiped("jonhp1",scstarget)
+  TriggerBlock(WeaponImmunity|SlashResFull)
   Range(scstarget,5)
 THEN DO
   AttackOneRound(scstarget)
@@ -211,14 +202,19 @@ END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
-  //!HasItemEquiped("lich",scstarget)
-  //!HasItemEquiped("jonhp1",scstarget)
+  TriggerBlock(WeaponImmunity|SlashResFull)
   !Range(scstarget,5)
   InMyArea(scstarget)
 THEN DO
   Combine()
   Action(ForceSpellRES,"RR#TELWE")
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull)
+THEN DO
+  AttackOneRound(scstarget)
 END
 
 //Inviso-up if there's nothing better to do
