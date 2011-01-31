@@ -1,0 +1,333 @@
+ACTION_IF Restrictions BEGIN
+  
+  ACTION_FOR_EACH area IN
+  /*Bonehill:*/ bh0107 bh0120 bh0123 bh0115 bh2020 bh2024
+  /*Aran Whitehand:*/ "c-ar01" "c-inn0" "c-inn1" "c-inn2" "c-inn3" "c-inn4"
+  /*TDD:*/ dd9x03 dd3334 dd3335 dd3302 dd1008 dd1008b dd0119 dd0118 arpo06 arpo07
+  /*RoT:*/ rr3117 rr3118 ra3901 rr3305 rr3312 rr3105 rr3104 ra5104 ra5105
+  /*Undying:*/ cm7000 cm7100
+  /*Aurora:*/ ag3801 ag1111
+  /*NTotSC*/ ar33pb /*ar4003/*(BG1)*/*/
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
+      COPY_EXISTING "%area%.are" override
+        PATCH_IF SOURCE_SIZE > 0x11b BEGIN
+          WRITE_SHORT 0x48 (THIS BOR 512)
+        END
+      BUT_ONLY
+    END
+  END
+
+  ACTION_IF !BG1 OR BGT BEGIN
+    ACTION_FOR_EACH area IN
+    /*BG2:*/ ar0021 ar0022 ar0313 ar0314 ar0406 ar0509 ar0510 ar0511 ar0513 ar0514 ar0515 ar0704 ar0709 ar0712 ar1105 ar1602 ar2010 ar2100 ar2202 ar2203 ar5003 ar5501
+    /*thief*/ar0321 ar0322 ar0323 ar0324 /*ranger*/ar1107 /*warrior*/ar1304 ar1305 ar1306 ar1307
+    /*Soubar:*/ ar4264 ar4265 ar4266 ar4267 ar4268 ar4269 ar4272 ar4273 ar4274 ar4275 ar4276 ar4262 ar4263
+    /*CtB:*/ ar3651 ar3652
+    BEGIN
+      ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
+        COPY_EXISTING "%area%.are" override
+          PATCH_IF SOURCE_SIZE > 0x11b BEGIN
+            WRITE_SHORT 0x48 (THIS BOR 512)
+          END
+        BUT_ONLY
+      END
+    END
+
+    OUTER_SPRINT $ssareatype(ar0410) scribescrollsmage
+    OUTER_SPRINT $ssareatype(ar0411) scribescrollsmage
+    OUTER_SPRINT $ssareatype(ar0412) scribescrollsmage
+    OUTER_SPRINT $ssareatype(ar0413) scribescrollsmage
+    OUTER_SPRINT $ssareatype(ar0419) scribescrollsmage
+    OUTER_SPRINT $ssareatype(ar0420) scribescrollsmage
+    OUTER_SPRINT $ssareatype(ar0901) scribescrollshelm
+    OUTER_SPRINT $ssareatype(ar0902) scribescrollslathander
+    OUTER_SPRINT $ssareatype(ar0903) scribescrollspaladin
+    OUTER_SPRINT $ssareatype(ar0904) scribescrollstalos
+    OUTER_SPRINT $ssareatype(ar1901) scribescrollsdruid
+    
+    ACTION_FOR_EACH area IN /*mage*/ar0410 ar0411 ar0412 ar0413 ar0419 ar0420 /*helm*/ar0901 /*lathander*/ar0902 /*paladin*/ar0903 /*talos*/ar0904 /*druid*/ar1901 BEGIN
+      ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
+        COPY_EXISTING "%area%.are" override
+          PATCH_IF SOURCE_SIZE > 0x11b BEGIN
+            READ_ASCII 0x94 script
+            SPRINT extendscript $ssareatype("%area%")
+            PATCH_IF FILE_EXISTS_IN_GAME "%script%.bcs" BEGIN
+              INNER_ACTION BEGIN
+                EXTEND_BOTTOM "%script%.bcs" "atweaks/baf/%extendscript%.baf"
+              END
+            END ELSE BEGIN
+              WRITE_ASCIIE 0x94 "%area%" #8
+              INNER_ACTION BEGIN
+                COPY - "atweaks/baf/%extendscript%.baf" "...atweaks/fl-inlined/%area%.baf"
+                COMPILE "...atweaks/fl-inlined/%area%.baf"
+              END
+            END
+          END
+        BUT_ONLY
+      END
+    END
+  END
+  
+  ACTION_IF BG1 OR BGT BEGIN
+    ACTION_IF BGT BEGIN
+      COPY "atweaks/2da/bgt_compat_are.2da" "atweaks/2da/bgt_compat_are.2da"
+        READ_2DA_ENTRIES_NOW r2en_bgtare 2
+        FOR (i=0;i<r2en_bgtare;++i) BEGIN
+          READ_2DA_ENTRY_FORMER r2en_bgtare i 0 bg1are
+          READ_2DA_ENTRY_FORMER r2en_bgtare i 1 bgtare
+          TO_LOWER bg1are
+          TO_LOWER bgtare
+          SPRINT $bgt_compat_are("%bg1are%") "%bgtare%"
+        END
+      BUT_ONLY
+    END
+    
+    ACTION_FOR_EACH area IN
+    /*BG1:*/ ar0103 ar0104 ar0105 ar0106 ar0107 ar0114 ar0115 ar0116 ar0117 ar0118 ar0119 ar0120 ar0121 ar0133 ar0134 ar0135 ar0136 ar0154 ar0165 ar0166 ar0171 ar0705 ar0706 ar0720 ar1001 ar1109 ar1110 ar1215 ar2301 ar2302 ar2303 ar2616 ar2617 ar2629 ar2630 ar3303 ar3304 ar3305 ar3306 ar3307 ar3308 ar3351 ar3352 ar3357 ar4801 ar4809
+    BEGIN
+      ACTION_IF GAME_IS ~tutu tutu_totsc~ AND "%area%" STRING_MATCHES_REGEXP "ar[0-9]+$" = 0 BEGIN
+        OUTER_PATCH_SAVE area "%area%" BEGIN
+          WRITE_ASCII 0 fw
+        END
+      END
+      ACTION_IF GAME_IS bgt AND VARIABLE_IS_SET $bgt_compat_are("%area%") BEGIN
+        OUTER_SPRINT area $bgt_compat_are("%area%")
+      END
+      ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
+        COPY_EXISTING "%area%.are" override
+          PATCH_IF SOURCE_SIZE > 0x11b BEGIN
+            WRITE_SHORT 0x48 (THIS BOR 512)
+          END
+        BUT_ONLY
+      END
+    END
+  END
+
+  OUTER_SPRINT AreaType ~AreaType(512)~
+END
+
+COPY    ~aTweaks/SPL/RR#MSCRL.SPL~ ~override~                                      // Scribe Scrolls (Mage version)
+  SAY UNIDENTIFIED_DESC @8200 SAY DESC @8200
+  
+ACTION_IF FILE_EXISTS_IN_GAME dw#si590.itm BEGIN
+  OUTER_SPRINT SCSIISpellImmunity
+~~~~~
++ ~HaveSpell(2590)~ + @8271 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2590) GiveItemCreate("dw#si590",Myself,1,1,1)~ EXIT //Spell Immunity: Abjuration
++ ~HaveSpell(2591)~ + @8272 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2591) GiveItemCreate("dw#si591",Myself,1,1,1)~ EXIT //Spell Immunity: Conjuration
++ ~HaveSpell(2592)~ + @8273 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2592) GiveItemCreate("dw#si592",Myself,1,1,1)~ EXIT //Spell Immunity: Divination
++ ~HaveSpell(2593)~ + @8274 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2593) GiveItemCreate("dw#si593",Myself,1,1,1)~ EXIT //Spell Immunity: Enchantment
++ ~HaveSpell(2594)~ + @8275 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2594) GiveItemCreate("dw#si594",Myself,1,1,1)~ EXIT //Spell Immunity: Illusion
++ ~HaveSpell(2595)~ + @8276 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2595) GiveItemCreate("dw#si595",Myself,1,1,1)~ EXIT //Spell Immunity: Evocation
++ ~HaveSpell(2596)~ + @8277 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2596) GiveItemCreate("dw#si596",Myself,1,1,1)~ EXIT //Spell Immunity: Necromancy
++ ~HaveSpell(2597)~ + @8278 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2597) GiveItemCreate("dw#si597",Myself,1,1,1)~ EXIT //Spell Immunity: Alteration
+~~~~~
+END ELSE BEGIN
+  OUTER_SPRINT SCSIISpellImmunity ~~
+END
+
+ACTION_IF FILE_EXISTS_IN_GAME d0scrldd.itm BEGIN
+  OUTER_SPRINT D0DimensionDoor
+~~~~~
++ ~HaveSpell(2402)~ + #12082 DO ~TakePartyGold(250) DestroyGold(250) RemoveSpell(2402) GiveItemCreate("d0scrldd",Myself,1,1,1)~ EXIT //Dimension Door
+~~~~~
+END ELSE BEGIN
+  OUTER_SPRINT D0DimensionDoor ~~
+END
+
+ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
+  COPY_EXISTING spwi111.spl override
+    READ_STRREF 0x8 InfravisionText
+  BUT_ONLY
+  COPY_EXISTING spwi208.spl override
+    READ_STRREF 0x8 KnowAlignmentText
+  BUT_ONLY
+  COPY_EXISTING spwi410.spl override
+    READ_STRREF 0x8 RemoveCurseText
+  BUT_ONLY
+  COPY_EXISTING spwi501.spl override
+    READ_STRREF 0x8 AnimateDeadText
+  BUT_ONLY
+  COPY_EXISTING spwi614.spl override
+    READ_STRREF 0x8 DeathFogText
+  BUT_ONLY
+  COPY_EXISTING spwi623.spl override
+    READ_STRREF 0x8 CarrionText
+  BUT_ONLY
+  COPY_EXISTING spwi707.spl override
+    READ_STRREF 0x8 CacofiendText
+  BUT_ONLY
+  OUTER_SPRINT ProtectionFromFireLevel3 ~~
+  OUTER_SPRINT ProtectionFromColdLevel3 ~~
+  OUTER_SPRINT ProtectionFromFireLevel5
+~~~~~
++ ~HaveSpell(2319)~ + #12086 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2319) GiveItemCreate("SCRL6H",Myself,1,1,1)~ EXIT // Protection from Fire
+~~~~~
+  OUTER_SPRINT ProtectionFromColdLevel5
+~~~~~
++ ~HaveSpell(2320)~ + #7539 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2320) GiveItemCreate("SCRL6I",Myself,1,1,1)~ EXIT // Protection from Cold
+~~~~~
+END ELSE BEGIN
+  OUTER_SPRINT InfravisionText #12039
+  OUTER_SPRINT KnowAlignmentText #12043
+  OUTER_SPRINT RemoveCurseText #12087
+  OUTER_SPRINT AnimateDeadText #12073
+  OUTER_SPRINT DeathFogText #7621
+  OUTER_SPRINT CarrionText #29211
+  OUTER_SPRINT CacofiendText #17320
+  OUTER_SPRINT ProtectionFromFireLevel3
+~~~~~
++ ~HaveSpell(2319)~ + #12086 DO ~TakePartyGold(150) DestroyGold(150) RemoveSpell(2319) GiveItemCreate("SCRL6H",Myself,1,1,1)~ EXIT // Protection from Fire
+~~~~~
+  OUTER_SPRINT ProtectionFromColdLevel3
+~~~~~
++ ~HaveSpell(2320)~ + #7539 DO ~TakePartyGold(150) DestroyGold(150) RemoveSpell(2320) GiveItemCreate("SCRL6I",Myself,1,1,1)~ EXIT // Protection from Cold
+~~~~~
+  OUTER_SPRINT ProtectionFromFireLevel5 ~~
+  OUTER_SPRINT ProtectionFromColdLevel5 ~~
+END
+
+OUTER_SPRINT SpellPackL1 ~~
+OUTER_SPRINT SpellPackL2 ~~
+OUTER_SPRINT SpellPackL3 ~~
+OUTER_SPRINT SpellPackL4 ~~
+OUTER_SPRINT SpellPackL5 ~~
+OUTER_SPRINT SpellPackL6 ~~
+OUTER_SPRINT SpellPackL7 ~~
+OUTER_SPRINT SpellPackL8 ~~
+OUTER_SPRINT SpellPackL9 ~~
+/*
+ACTION_IF FILE_EXISTS_IN_GAME lclist_spells.2da BEGIN
+<<<<<<<< ...atweaks/inlined/spellpack
++ ~HaveSpell(%Spell%)~ + ~%Name%~ DO ~TakePartyGold(%Gold%) DestroyGold(%Gold%) RemoveSpell(%Spell%) GiveItemCreate("%Scroll%",Myself,1,1,1)~ EXIT
+>>>>>>>>
+
+  ACTION_DEFINE_ARRAY Gold BEGIN 0 50 100 150 250 500 1000 1500 2500 5000 END
+
+  COPY_EXISTING lclist_spells.2da override
+    READ_2DA_ENTRIES_NOW r2en_lclist 3
+    FOR (i=0;i<r2en_lclist;++i) BEGIN
+      READ_2DA_ENTRY_FORMER r2en_lclist i 2 file
+      TO_LOWER file
+      PATCH_IF "%file%" STRING_MATCHES_REGEXP spwi = 0 BEGIN
+        INNER_ACTION BEGIN
+          COPY_EXISTING "%file%.spl" override
+            READ_STRREF 0x8 Name
+            READ_LONG   0x34 level
+          BUT_ONLY
+        END
+        SET Gold $Gold("%level%")
+        INNER_
+
+  COPY_EXISTING spwi511.spl override
+    READ_STRREF 0x8 PfNWText
+  BUT_ONLY
+  COPY_EXISTING spwi611.spl override
+    READ_STRREF 0x8 PfMWText
+  BUT_ONLY
+END ELSE BEGIN
+  OUTER_SPRINT PfNWText #7606
+  OUTER_SPRINT PfMWText #7610
+END
+*/
+APPEND ~STATE.IDS~ ~0x80101FEF CD_STATE_NOTVALID~ UNLESS ~CD_STATE_NOTVALID~       // CamDawg's custom IsValidForPartyDialogue() state
+//APPEND action.ids ~147 RemoveSpellRES(S:RES*)~
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#SCRL.CRE~ THEN BEGIN                         // Checks for the Scribe Scrolls creature (RR uses it too)
+COPY    ~aTweaks/CRE/RR#SCRL.CRE~  ~override~                                      // Scribe Scrolls invisible creature (used for initiating the dialogue)
+COPY    ~aTweaks/EFF/RR#SCRL.EFF~  ~override~                                      // Scribe Scrolls invisible creature summoning EFF
+COMPILE ~aTweaks/DLG/RR#SCRL.D~ EVAL                                                   // Scribe Scrolls invisible creature dialogue file (used for choosing which spell to scribe)
+COMPILE ~aTweaks/BAF/RR#SCRL.BAF~                                                  // Scribe Scrolls invisible creature AI script (used for initiating the dialogue)
+END                                                                                // ends ACTION_IF block
+
+COPY "atweaks/eff/rr#gscrl.eff" override                                           //Give ability eff
+     "atweaks/spl/fl#nscrl.spl" override                                           //Protection from rr#gscrl
+COPY "atweaks/eff/rr#sscrl.eff" override                                           //Display string eff
+  SAY 0x1c @8270                                                                   //Gained Special Ability: Scribe Scrolls
+COPY "atweaks/spl/rr#gscrl.spl" override
+  PATCH_FOR_EACH resref IN rr#gscrl rr#sscrl BEGIN
+    PATCH_FOR_EACH class IN 1 7 10 13 14 17 BEGIN
+      LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter1 = class parameter2 = 5 STR_VAR resource = EVAL "%resref%" END //Use EFF
+    END
+  END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 timing = 1 STR_VAR resource = fl#nscrl END //Cast spell
+
+OUTER_SPRINT $clabtable(0) clabma01
+OUTER_SET clabcount = 1
+
+COPY_EXISTING kitlist.2da override
+  READ_2DA_ENTRIES_NOW r2en_kitlist 9 
+  FOR (i=1;i<r2en_kitlist;++i) BEGIN
+    READ_2DA_ENTRY_FORMER r2en_kitlist i 8 class
+    PATCH_IF class = 1 BEGIN
+      READ_2DA_ENTRY_FORMER r2en_kitlist i 5 clab
+      SPRINT $clabtable("%clabcount%") "%clab%"
+      ++clabcount
+    END
+  END
+BUT_ONLY
+
+ACTION_PHP_EACH clabtable AS int => clab BEGIN
+  ACTION_IF !FILE_EXISTS_IN_GAME "%clab%.2da" BEGIN
+    COPY "atweaks/2da/clabma01.2da" "override/%clab%.2da"
+      SET_2DA_ENTRY 1 9 10 AP_rr#gscrl
+      PRETTY_PRINT_2DA
+  END ELSE BEGIN
+    COPY_EXISTING "%clab%.2da" override
+      COUNT_2DA_COLS num_col
+      COUNT_2DA_ROWS 10 num_row
+      SPRINT Entry blank
+      FOR (j=1;j<num_row AND !"%Entry%" STRING_EQUAL_CASE "****";++j) BEGIN
+        READ_2DA_ENTRY j 9 10 Entry
+        PATCH_IF "%Entry%" STRING_EQUAL_CASE "****" BEGIN
+          SET_2DA_ENTRY j 9 10 AP_rr#gscrl
+        END
+      END
+      PATCH_IF !"%Entry%" STRING_EQUAL_CASE "****" BEGIN
+        SPRINT row "flssrow **** **** **** **** **** **** **** **** AP_rr#gscrl"
+        FOR (j=10;j<num_col;++j) BEGIN
+          SPRINT row "%row% ****"
+        END
+        INSERT_2DA_ROW num_row 10 "%row%"
+      END
+      PRETTY_PRINT_2DA
+    BUT_ONLY
+    UNLESS "AP_rr#gscrl"
+  END
+END
+
+//For the inevitable "I didn't get my Scribe Scrolls ability"
+EXTEND_BOTTOM dplayer2.bcs "atweaks/baf/mscrl2.baf"
+EXTEND_BOTTOM dplayer3.bcs "atweaks/baf/mscrl2.baf"
+
+
+/*
+ACTION_FOR_EACH file IN clabma01 clabma02 clabma03 clabma04 clabma05 clabma06 clabma07 clabma08 clabma09 BEGIN
+  ACTION_IF !FILE_EXISTS_IN_GAME "%file%.2da" BEGIN
+    COPY "atweaks/2da/clabma01.2da" "override/%file%.2da"
+      SET_2DA_ENTRY 1 9 10 AP_rr#gscrl
+      PRETTY_PRINT_2DA
+  END ELSE BEGIN
+    COPY_EXISTING "%file%.2da" override
+      COUNT_2DA_COLS num_col
+      COUNT_2DA_ROWS 10 num_row
+      FOR (i=1;i<num_col;++i) BEGIN
+        READ_2DA_ENTRY 0 i 10 Level
+        PATCH_IF Level = 9 BEGIN
+          FOR (j=1;j<num_row;++j) BEGIN
+            READ_2DA_ENTRY j i + 1 10 Entry
+            PATCH_IF "%Entry%" STRING_EQUAL_CASE "****" BEGIN //Like a good modder I'll just hope there is a blank row available
+              SET_2DA_ENTRY j i + 1 10 AP_rr#gscrl
+              j = num_row
+              i = num_col
+            END
+          END
+        END
+      END
+      PRETTY_PRINT_2DA
+    BUT_ONLY
+  END
+END
+*/
+//EXTEND_BOTTOM ~dplayer3.bcs~  ~aTweaks/BAF/RR#MSCRL.BAF~                           // extend the party script for Player1
+//EXTEND_BOTTOM ~dplayer2.bcs~  ~aTweaks/BAF/RR#MSCRL.BAF~                           // extend the party script for other party members

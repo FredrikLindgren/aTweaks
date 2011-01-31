@@ -1,0 +1,44 @@
+
+// G3 Detectable Spells (special thanks to CamDawg, DavidW and all the other DS contributors)
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DS.RR~ THEN BEGIN                            // only install Detectable Spells once from within RR and/or aTweaks
+ COPY_EXISTING ~sw1h01.itm~ ~override/RR#DS.RR~                                    // dummy file, prevents other components from re-installing DS
+ PRINT ~Initializing Detectable Spells installation ...~                           // let the user know that DS are being installed
+ INCLUDE ~aTweaks/LIB/DS/DS.tph~
+ INCLUDE ~aTweaks/LIB/DS/ds_oldscript.tph~
+ OUTER_SPRINT ~detectfile~ ~aTweaks/LIB/DS/cddetect.2da~
+ OUTER_SPRINT ~statsfile~ ~aTweaks/LIB/DS/stats.2da~
+ OUTER_SPRINT ~khelbenfile~ ~aTweaks/LIB/DS/spwi705.spl~
+ LAUNCH_ACTION_MACRO ~detectable_spells~
+ OUTER_SPRINT ~detectfile~ ~aTweaks/LIB/DS/dw#detect.2da~
+ LAUNCH_ACTION_MACRO ~detectable_spells~
+ OUTER_SPRINT ~marker~ ~dw#fixasc.mrk~                                             // DavidW's fix for Ascension's DS scripts
+ OUTER_SPRINT ~oldfiles~ ~aTweaks/LIB/DS/oldfiles_asc.2da~
+ OUTER_SPRINT ~oldswapfile~ ~aTweaks/LIB/DS/oldds_swap.2da~
+ LAUNCH_ACTION_MACRO ~fix_old_DS_scripts~ 
+ OUTER_SPRINT ~marker~ ~dw#fixkelsey.mrk~                                          // DavidW's fix for Kelsey's DS scripts
+ OUTER_SPRINT ~oldfiles~ ~aTweaks/LIB/DS/oldfiles_kelsey.2da~
+ OUTER_SPRINT ~oldswapfile~ ~aTweaks/LIB/DS/oldds_swap.2da~
+ LAUNCH_ACTION_MACRO ~fix_old_DS_scripts~ 
+ /*
+ INCLUDE "atweaks/lib/DS/label_weapons.tph"                                        //Lifted from SCSII
+ OUTER_SET ~weapon_enchantment_stat~=109
+ OUTER_SET ~weapon_enchantment_type~=233
+ /// The assumption is that slot 109 ("CLERIC_HALLOW") is used to indicate weapon enchantment. It's a proficiency,
+ /// not a scripting state - that's what
+ /// the ~type~ codes
+ LAUNCH_ACTION_MACRO ~label_weapons~*/
+END
+
+
+
+// STATE.IDS additions (mirrors G3 BG2 Fixpack, SCSII and IESDP code)
+
+APPEND ~STATE.IDS~ ~0x80101FEF CD_STATE_NOTVALID~ UNLESS ~CD_STATE_NOTVALID~                   // CamDawg's custom IsValidForPartyDialogue() state
+APPEND ~STATE.IDS~ ~0x00000FC0 STATE_REALLY_DEAD~ UNLESS ~0x00000FC0 STATE_REALLY_DEAD~        // includes all possible death states (normal, frozen...)
+APPEND ~STATE.IDS~ ~0x00102029 STATE_HARMLESS~ UNLESS ~0x00102029 STATE_HARMLESS~              // includes Feeblemind, Charmed, Helpless, Stunned, Sleeping
+APPEND ~STATE.IDS~ ~0x60400010 STATE_ILLUSIONS~ UNLESS ~0x60400010 STATE_ILLUSIONS~            // includes Invisible, Imp. Invisibility, Mirror Image, Blur
+APPEND ~STATE.IDS~ ~0x80040004 STATE_RANGED_TARGET~ UNLESS ~0x80040004 STATE_RANGED_TARGET~    // includes Blind, Confused, Panic
+APPEND ~STATE.IDS~ ~0x00000029 STATE_IMMOBILE~ UNLESS ~0x00000029 STATE_IMMOBILE~              // includes Helpless, Stunned, Sleeping
+APPEND ~STATE.IDS~ ~0x00400010 STATE_NOT_TARGETABLE~ UNLESS ~0x00400010 STATE_NOT_TARGETABLE~  // includes Improved Invisibility and plain Invisibility
+APPEND ~STATE.IDS~ ~0x8010202D STATE_DISABLED~ UNLESS ~0x8010202D STATE_DISABLED~              // includes Helpless, Stunned, Panic, Sleeping, Charmed, Feebleminded, Confused 

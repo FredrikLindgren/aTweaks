@@ -1,0 +1,93 @@
+
+// This component slightly expands the selection of curative spells which can be cast by NPC priests in temples.
+
+// Expand SPELDESC.2DA with temporary values so that they can be replaced with proper strings later
+
+APPEND  ~SPELDESC.2DA~ ~SPPR317     RR#CUREDIS~ UNLESS ~SPPR317~                   // Cure Disease
+APPEND  ~SPELDESC.2DA~ ~SPPR404     RR#NPOISON~ UNLESS ~SPPR404~                   // Neutralize Poison
+APPEND  ~SPELDESC.2DA~ ~SPPR417     RR#LRESTOR~ UNLESS ~SPPR417~                   // Lesser Restoration
+APPEND  ~SPELDESC.2DA~ ~RR#PR514    RR#MASCURE~ UNLESS ~RR#PR514~                  // Mass Cure
+COPY_EXISTING ~SPELDESC.2DA~                ~override~                             // Replace temporary values with proper strings
+  REPLACE ~RR#CUREDIS~ @601                                                        // Cure Disease description
+  REPLACE ~RR#NPOISON~ @602                                                        // Neutralize Poison description
+  REPLACE ~RR#LRESTOR~ @603                                                        // Lesser Restoration description
+  REPLACE ~RR#MASCURE~ @604                                                        // Mass Cure description
+BUT_ONLY_IF_IT_CHANGES
+
+
+COPY_EXISTING ~sppr514.spl~ ~override/RR#PR514.SPL~                                // Clone Mass Cure and make the new version target the party directly
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  WRITE_SHORT 0x1c 0x04                                                            // Set spell type to Innate (4)
+  WRITE_LONG 0x34 1                                                                // Set spell level to 1 to avoid scripting issues
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_BYTE ("%fx_off%" + 0x02 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "target"
+      PATCH_IF NOT ("%target%" = 3) BEGIN
+       WRITE_BYTE ("%fx_off%" + 0x02 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) 3  // set target to party (3)
+      END
+       WRITE_BYTE ("%abil_off%" + 0x02 + (0x28 * "%index%")) 4                     // change ability icon location to Innate (4)      
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+COPY_EXISTING_REGEXP GLOB ~^.+\.sto$~ ~override~                                   // parses through all stores in the game (even those added by mods)
+PATCH_IF (%SOURCE_SIZE% > 0x9b) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+  READ_LONG 0x34 "sale_offset"
+  READ_LONG 0x38 "sale_num"
+  READ_LONG 0x2c "item_offset"
+  READ_LONG 0x4c "drink_offset"
+  READ_LONG 0x70 "cure_offset"
+  READ_LONG 0x74 "cure_number"
+PATCH_IF ("%cure_number%" > 0) BEGIN                                                 // Only patch stores which offer temple services
+  SET "count" = 0                                                                    // New cure count
+  FOR (index = 0 ; index < cure_number ; index = index + 1) BEGIN
+    READ_ASCII ("%cure_offset%" +        ("%index%" * 0x0c)) "cure"
+    PATCH_IF ("%cure%" STRING_EQUAL_CASE ~SPPR307~) AND (NOT FILE_CONTAINS_EVALUATED(~%SOURCE_FILE%~ ~SPPR317~)) BEGIN  // Add Cure Disease below Remove Curse if not already available in the temple
+      INSERT_BYTES  ("%cure_offset%" + 0x00 + (("%index%" + 1) * 0x0c)) 0x0c
+        WRITE_ASCII ("%cure_offset%" + 0x00 + (("%index%" + 1) * 0x0c)) ~SPPR317~ #8  // spell reference (Cure Disease)
+        WRITE_LONG  ("%cure_offset%" + 0x08 + (("%index%" + 1) * 0x0c)) 200           // spell price
+	SET "count" = ("count" + 1)                                                   // update new cure count
+    END
+    PATCH_IF ("%cure%" STRING_EQUAL_CASE ~SPPR401~) AND (NOT FILE_CONTAINS_EVALUATED(~%SOURCE_FILE%~ ~SPPR404~)) BEGIN  // Adds Neutralize Poison below Cure Serious Wounds if not already available in the temple
+      INSERT_BYTES  ("%cure_offset%" + 0x00 + (("%index%" + 1) * 0x0c)) 0x0c
+        WRITE_ASCII ("%cure_offset%" + 0x00 + (("%index%" + 1) * 0x0c)) ~SPPR404~ #8  // spell reference (Neutralize Poison)
+        WRITE_LONG  ("%cure_offset%" + 0x08 + (("%index%" + 1) * 0x0c)) 250           // spell price
+	SET "count" = ("count" + 1)                                                   // update new cure count
+    END
+    PATCH_IF ("%cure%" STRING_EQUAL_CASE ~SPPR404~) AND (NOT FILE_CONTAINS_EVALUATED(~%SOURCE_FILE%~ ~SPPR417~)) BEGIN  // Adds Lesser Restoration below Neutralize Poison if not already available in the temple
+      INSERT_BYTES  ("%cure_offset%" + 0x00 + (("%index%" + 1) * 0x0c)) 0x0c
+        WRITE_ASCII ("%cure_offset%" + 0x00 + (("%index%" + 1) * 0x0c)) ~SPPR417~ #8  // spell reference (Lesser Restoration)
+        WRITE_LONG  ("%cure_offset%" + 0x08 + (("%index%" + 1) * 0x0c)) 250           // spell price
+	SET "count" = ("count" + 1)                                                   // update new cure count
+    END
+    PATCH_IF ("%cure%" STRING_EQUAL_CASE ~SPPR502~) AND (NOT FILE_CONTAINS_EVALUATED(~%SOURCE_FILE%~ ~RR#PR514~)) BEGIN  // Add Mass Cure below Cure Critical Wounds if not already available in the temple
+      INSERT_BYTES  ("%cure_offset%" + 0x00 + (("%index%" + 1) * 0x0c)) 0x0c
+        WRITE_ASCII ("%cure_offset%" + 0x00 + (("%index%" + 1) * 0x0c)) ~RR#PR514~ #8 // spell reference (custom Mass Cure, targets party)
+        WRITE_LONG  ("%cure_offset%" + 0x08 + (("%index%" + 1) * 0x0c)) 300           // spell price
+	SET "count" = ("count" + 1)                                                   // update new cure count
+    END
+  END
+   WRITE_LONG 0x74 ("%cure_number%" + "%count%")                                      // update total number of available cures
+// correct offsets
+READ_LONG 0x74 "cure_number"
+READ_LONG 0x34 "sale_offset"
+READ_LONG 0x2c "item_offset"
+READ_LONG 0x4c "drink_offset"
+READ_LONG 0x70 "cure_offset"
+    PATCH_IF ("%item_offset%" > "%cure_offset%") BEGIN
+      WRITE_LONG 0x2c ("%item_offset%" + ("%count%" * 0x0c))
+    END
+    PATCH_IF ("%drink_offset%" > "%cure_offset%") BEGIN
+      WRITE_LONG 0x4c ("%drink_offset%" + ("%count%" * 0x0c))
+    END
+    PATCH_IF ("%sale_offset%" > "%cure_offset%") BEGIN
+      WRITE_LONG 0x34 ("%sale_offset%" + ("%count%" * 0x0c))
+    END
+END
+END                                                                                   // end file size sanity check
+BUT_ONLY_IF_IT_CHANGES

@@ -1,0 +1,1020 @@
+
+IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
+END
+
+IF
+	Die()
+        Global("RR#EACheck","LOCALS",1) // Fiend was summoned by an enemy
+        Global("RR#XP","LOCALS",0)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#XP","LOCALS",1)
+                AddexperienceParty(19000) // Gelugon XP value
+END
+
+IF
+        Global("RR#EACheck","LOCALS",0)
+	Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#EACheck","LOCALS",2)
+		LeaveParty()
+		ChangeEnemyAlly(Myself,ALLY)
+                DialogueInterrupt(FALSE)
+		SetInterrupt(TRUE)
+END
+
+IF
+        Global("RR#EACheck","LOCALS",0)
+	OR(2)
+	  Allegiance(LastSummonerOf(Myself),EVILCUTOFF)
+          !Exists(LastSummonerOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#EACheck","LOCALS",1)
+		Enemy()
+		SetInterrupt(TRUE)
+END
+
+IF
+	OnCreation()
+        Global("RR#EACheck","LOCALS",2)
+	!InParty(LastSummonerOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		LeaveParty()
+		ChangeEnemyAlly(Myself,ALLY)
+                DialogueInterrupt(FALSE)
+		SetInterrupt(TRUE)
+END
+
+IF
+        Global("RR#Hostile","LOCALS",1)
+	Allegiance(Myself,EVILCUTOFF)
+        !See([PC])
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#Hostile","LOCALS",0)
+		LeaveParty()
+		ChangeEnemyAlly(Myself,ALLY)
+                DialogueInterrupt(FALSE)
+		SetInterrupt(TRUE)
+END
+
+IF
+        Global("RR#EACheck","LOCALS",2)
+        Global("RR#Hostile","LOCALS",0)
+	Allegiance(Myself,GOODCUTOFF)
+        See([PC])
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#Hostile","LOCALS",1)
+		Enemy()
+		SetInterrupt(TRUE)
+END
+
+IF
+	OR(2)
+	  StateCheck(Myself,STATE_REALLY_DEAD)
+	  StateCheck(Myself,STATE_DISABLED)
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!InActiveArea(Myself)
+	!See([0])
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	OR(2)
+          AreaCheck("AR3004") // Dead Magic zone
+          AreaCheck("AR3008") // Dead Magic zone
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",600) // no spellcasting in Dead Magic zones
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],6) // do not disrupt the Blood War
+        Allegiance(Myself,GOODCUTOFF)
+        AttackedBy([GOODCUTOFF],DEFAULT)
+	CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
+        !See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		DisplayStringHead(Myself,@724) // Bah, mortals are ever fools!
+                ForceSpellRES("RR#TELAW",Myself) // Teleport away
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Exists(LastAttackerOf(Myself))
+	!Range(LastAttackerOf(Myself),6)
+        InMyArea(LastAttackerOf(Myself))
+	OR(2)
+          !Allegiance(LastAttackerOf(Myself),GOODCUTOFF) // don't teleport to attacking party members if green circled
+          !Allegiance(Myself,GOODCUTOFF)
+	!StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
+        CheckStat(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
+	!CheckStatGT(LastAttackerOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTPIERCING)
+	!See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
+		SetInterrupt(TRUE)
+END
+
+IF
+        !GlobalTimerNotExpired("RR#Taunt","LOCALS")
+	See([0.0.DEMONIC.0.0.0.MASK_CHAOTIC])
+        CheckStatGT(LastSeenBy(Myself),3,LEVEL) // exclude Quasits
+        !StateCheck(Myself,STATE_INVISIBLE)
+THEN
+	RESPONSE #40
+		SetGlobalTimer("RR#Taunt","LOCALS",12)
+		FaceObject(LastSeenBy(Myself))
+                DisplayStringHead(LastSeenBy(Myself),@651) // Die Baatezu!
+		DisplayStringHead(Myself,@658) // Worthless Tanar'ri, I shall end your petty existence!
+	RESPONSE #30
+		SetGlobalTimer("RR#Taunt","LOCALS",12)
+		FaceObject(LastSeenBy(Myself))
+		DisplayStringHead(Myself,@657) // Ahh, the Blood War beckons.
+		DisplayStringHead(LastSeenBy(Myself),@653) // In the end... there will be only chaos!
+	RESPONSE #30
+		SetGlobalTimer("RR#Taunt","LOCALS",12)
+		FaceObject(LastSeenBy(Myself))
+		DisplayStringHead(LastSeenBy(Myself),@652) // Witness true power!
+		DisplayStringHead(Myself,@659) // Bah! You are inferior in every possible way.
+END
+
+IF
+        !GlobalTimerNotExpired("RR#Taunt","LOCALS")
+        !StateCheck(Myself,STATE_INVISIBLE)
+	!See([0.0.DEMONIC.0.0.0.MASK_CHAOTIC])
+        !See(NearestEnemyOf(Myself))
+	See([0.HUMANOID.0.INNOCENT])
+THEN
+	RESPONSE #40
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Taunt","LOCALS",12)
+		DisplayStringHead(Myself,@660) // Despair mortal, your time has come!
+                DisplayStringHead(LastSeenBy(Myself),@665) // Wha-?! Gods, help me!
+		ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+		SetInterrupt(TRUE)
+	RESPONSE #30
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Taunt","LOCALS",12)
+		DisplayStringHead(Myself,@661) // Pathetic creature, you have nothing to offer me but your life.
+                DisplayStringHead(LastSeenBy(Myself),@666) // No, please! Aaaaaargh!
+		ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+		SetInterrupt(TRUE)
+	RESPONSE #30
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Taunt","LOCALS",12)
+                DisplayStringHead(LastSeenBy(Myself),@667) // Is that a... d-devil?! Run for your lives!
+		ApplySpellRES("RR#FEAR",LastSeenBy(Myself)) // Fear
+		DisplayStringHead(Myself,@662) // By all means, do try to flee. It's much more entertaining that way!
+		SetInterrupt(TRUE)
+END
+
+IF
+        !GlobalTimerNotExpired("RR#PFear","LOCALS")
+	See(NearestEnemyOf(Myself))
+	Range(LastSeenBy(Myself),10)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#PFear","LOCALS",18)
+                ForceSpellRES("RR#DFA1",Myself) // Cornugon and Gelugon Aura of Fear
+                Continue()
+END
+
+IF
+        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        AttackedBy([GOODCUTOFF],DEFAULT)
+        !Allegiance(Myself,GOODCUTOFF)
+	CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
+        !Race(LastAttackerOf(Myself),LICH)
+        !Race(LastAttackerOf(Myself),RAKSHASA)
+        !See(NearestEnemyOf(Myself))
+        Range(LastAttackerOf(Myself),10)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
+	CheckStatLT(LastAttackerOf(Myself),75,RESISTCOLD)
+	!CheckStatGT(LastAttackerOf(Myself),0,MINORGLOBE)
+	!CheckStat(LastAttackerOf(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	RandomNum(3,1)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+		DisplayStringHead(Myself,@663) // Foolish mortal, your petty trickery cannot deceive me.
+                ForceSpellRES("RR#WI404",Myself) // Ice Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Tactic","LOCALS")
+	RandomNum(7,1)
+	See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+                SetGlobal("RR#Bhave","LOCALS",2) // Charm Person
+		SetGlobalTimer("RR#Tactic","LOCALS",12)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Tactic","LOCALS")
+        !Global("RR#Bhave","LOCALS",0)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#Bhave","LOCALS",0) // Teleport + melee
+		SetGlobalTimer("RR#Tactic","LOCALS",12)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(NearestEnemyOfType([0.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearestEnemyOfType([0.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(ThirdNearestEnemyOfType([0.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FourthNearestEnemyOfType([0.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FifthNearestEnemyOfType([0.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SixthNearestEnemyOfType([0.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(NearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+END
+
+IF
+        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+END
+
+IF
+        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(ThirdNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+END
+
+IF
+        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FourthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+END
+
+IF
+        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FifthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+END
+
+IF
+        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SixthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+END
+
+IF
+        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See([0])
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+        !Class(LastSeenBy(Myself),IMP) // Don't attack other Baatezu
+	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+END
+
+IF
+	!CheckStatGT([0],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+        CheckStatLT([0],100,RESISTPIERCING)
+	See([0])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(NearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+        CheckStatLT(NearestEnemyOf(Myself),100,RESISTPIERCING)
+	See(NearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
+        CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTPIERCING)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(SixthNearestEnemyOf(Myself),1,STONESKINS)
+	See(SixthNearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
+        CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTPIERCING)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(FifthNearestEnemyOf(Myself),1,STONESKINS)
+	See(FifthNearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
+        CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTPIERCING)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(FourthNearestEnemyOf(Myself),1,STONESKINS)
+	See(FourthNearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
+        CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTPIERCING)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(ThirdNearestEnemyOf(Myself),1,STONESKINS)
+	See(ThirdNearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
+        CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTPIERCING)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearestEnemyOf(Myself),1,STONESKINS)
+	See(SecondNearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(NearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+        !StateCheck(NearestEnemyOf(Myself),STATE_PANIC)
+        CheckStatLT(NearestEnemyOf(Myself),100,RESISTPIERCING)
+	!StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(NearestEnemyOf(Myself),1,STONESKINS)
+	See(NearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([0.0.0.BARD_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck([0.0.0.BARD_ALL],STATE_PANIC)
+        CheckStatLT([0.0.0.BARD_ALL],100,RESISTPIERCING)
+	!StateCheck([0.0.0.BARD_ALL],STATE_MIRRORIMAGE)
+        CheckStatLT([0.0.0.BARD_ALL],1,STONESKINS)
+	See([0.0.0.BARD_ALL])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([0.0.0.DRUID_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck([0.0.0.DRUID_ALL],STATE_PANIC)
+        CheckStatLT([0.0.0.DRUID_ALL],100,RESISTPIERCING)
+	!StateCheck([0.0.0.DRUID_ALL],STATE_MIRRORIMAGE)
+        CheckStatLT([0.0.0.DRUID_ALL],1,STONESKINS)
+	See([0.0.0.DRUID_ALL])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([0.0.0.CLERIC_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck(SecondNearest([0.0.0.CLERIC_ALL]),STATE_PANIC)
+        CheckStatLT(SecondNearest([0.0.0.CLERIC_ALL]),100,RESISTPIERCING)
+	!StateCheck(SecondNearest([0.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([0.0.0.CLERIC_ALL]),1,STONESKINS)
+	See(SecondNearest([0.0.0.CLERIC_ALL]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([0.0.0.CLERIC_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck([0.0.0.CLERIC_ALL],STATE_PANIC)
+        CheckStatLT([0.0.0.CLERIC_ALL],100,RESISTPIERCING)
+	!StateCheck([0.0.0.CLERIC_ALL],STATE_MIRRORIMAGE)
+        CheckStatLT([0.0.0.CLERIC_ALL],1,STONESKINS)
+	See([0.0.0.CLERIC_ALL])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([0.0.0.MAGE_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck(ThirdNearest([0.0.0.MAGE_ALL]),STATE_PANIC)
+        CheckStatLT(ThirdNearest([0.0.0.MAGE_ALL]),100,RESISTPIERCING)
+	!StateCheck(ThirdNearest([0.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
+        CheckStatLT(ThirdNearest([0.0.0.MAGE_ALL]),1,STONESKINS)
+	See(ThirdNearest([0.0.0.MAGE_ALL]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([0.0.0.MAGE_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck(SecondNearest([0.0.0.MAGE_ALL]),STATE_PANIC)
+        CheckStatLT(SecondNearest([0.0.0.MAGE_ALL]),100,RESISTPIERCING)
+	!StateCheck(SecondNearest([0.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([0.0.0.MAGE_ALL]),1,STONESKINS)
+	See(SecondNearest([0.0.0.MAGE_ALL]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([0.0.0.MAGE_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck([0.0.0.MAGE_ALL],STATE_PANIC)
+        CheckStatLT([0.0.0.MAGE_ALL],100,RESISTPIERCING)
+	!StateCheck([0.0.0.MAGE_ALL],STATE_MIRRORIMAGE)
+        CheckStatLT([0.0.0.MAGE_ALL],1,STONESKINS)
+	See([0.0.0.MAGE_ALL])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([0.0.0.MAGE_THIEF]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck(SecondNearest([0.0.0.MAGE_THIEF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([0.0.0.MAGE_THIEF]),100,RESISTPIERCING)
+	!StateCheck(SecondNearest([0.0.0.MAGE_THIEF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([0.0.0.MAGE_THIEF]),1,STONESKINS)
+	See(SecondNearest([0.0.0.MAGE_THIEF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([0.0.0.MAGE_THIEF],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck([0.0.0.MAGE_THIEF],STATE_PANIC)
+        CheckStatLT([0.0.0.MAGE_THIEF],100,RESISTPIERCING)
+	!StateCheck([0.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
+        CheckStatLT([0.0.0.MAGE_THIEF],1,STONESKINS)
+	See([0.0.0.MAGE_THIEF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([0.0.0.MAGE]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck(SecondNearest([0.0.0.MAGE]),STATE_PANIC)
+        CheckStatLT(SecondNearest([0.0.0.MAGE]),100,RESISTPIERCING)
+	!StateCheck(SecondNearest([0.0.0.MAGE]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([0.0.0.MAGE]),1,STONESKINS)
+	See(SecondNearest([0.0.0.MAGE]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([0.0.0.MAGE],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	!StateCheck([0.0.0.MAGE],STATE_PANIC)
+        CheckStatLT([0.0.0.MAGE],100,RESISTPIERCING)
+	!StateCheck([0.0.0.MAGE],STATE_MIRRORIMAGE)
+        CheckStatLT([0.0.0.MAGE],1,STONESKINS)
+	See([0.0.0.MAGE])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
+        CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTPIERCING)
+	See(SixthNearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
+        CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTPIERCING)
+	See(FifthNearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
+        CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTPIERCING)
+	See(FourthNearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
+        CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTPIERCING)
+	See(ThirdNearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
+        CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTPIERCING)
+	See(SecondNearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(NearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
+        CheckStatLT(NearestEnemyOf(Myself),100,RESISTPIERCING)
+	See(NearestEnemyOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	HitBy([0],0)
+	!CheckStatGT(LastHitter(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+        !StateCheck(LastHitter(Myself),STATE_PANIC)
+        CheckStatLT(LastHitter(Myself),100,RESISTPIERCING)
+	!StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(LastHitter(Myself),1,STONESKINS)
+	RandomNum(3,1)
+	See(LastHitter(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+        CheckStatLT([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],100,RESISTPIERCING)
+	See([0.0.DEMONIC.0.0.0.MASK_CHAOTIC])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+  Race(LastSeenBy(Myself),DEMONIC)
+  OR(2)
+    Alignment(LastSeenBy(Myself),MASK_LAWFUL)
+    Alignment(LastSeenBy(Myself),NEUTRAL_EVIL)
+  Allegiance(Myself,EVILCUTOFF)
+  OR(2)
+    Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+    Allegiance(LastSeenBy(Myself),NEUTRAL)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
+  Race(LastSeenBy(Myself),DEMONIC)
+  OR(2)
+    Alignment(LastSeenBy(Myself),MASK_LAWFUL)
+    Alignment(LastSeenBy(Myself),NEUTRAL_EVIL)
+  Allegiance(Myself,GOODCUTOFF)
+  OR(2)
+    Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+    Allegiance(LastSeenBy(Myself),NEUTRAL)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
+        Global("RR#Smnr","LOCALS",0)
+	Exists(LastSummonerOf(Myself))
+        !CheckStatGT(LastSummonerOf(Myself),0,PROTECTION_FROM_EVIL)
+	!HasItemEquipedReal("STAF11",LastSummonerOf(Myself)) // Staff of the Magi
+	!HasItemEquiped("WA2AMU",LastSummonerOf(Myself)) // Sensate Amulet
+	!HasItemEquiped("LICH",LastSummonerOf(Myself)) // Lich innate Protection from Evil
+        !StateCheck(LastSummonerOf(Myself),STATE_REALLY_DEAD)
+        !StateCheck(Myself,STATE_INVISIBLE)
+        See(LastSummonerOf(Myself))
+        !Race(LastSummonerOf(Myself),DEMONIC)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#Smnr","LOCALS",1)
+		FaceObject(LastSummonerOf(Myself))
+		DisplayStringHead(Myself,@681) // Foolish mortal! You have unleashed powers far beyond your comprehension by summoning me here.
+		SetInterrupt(TRUE)
+END
+
+IF
+        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !Range(LastSeenBy(Myself),6)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+        !Class(LastSeenBy(Myself),IMP) // Don't attack other Baatezu
+        StateCheck(LastSeenBy(Myself),STATE_PANIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
+		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!Range(LastSeenBy(Myself),6)
+        InMyArea(LastSeenBy(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+        CheckStat(LastSeenBy(Myself),0,PROTECTION_FROM_EVIL)
+	!CheckStatGT(LastSeenBy(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+        CheckStatLT(LastSeenBy(Myself),100,RESISTPIERCING)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastSeenBy(Myself)) // Teleport Without Error
+		SetInterrupt(TRUE)
+END
+
+IF
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+        CheckStat(LastSeenBy(Myself),0,PROTECTION_FROM_EVIL)
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi
+	!HasItemEquiped("WA2AMU",LastSeenBy(Myself)) // Sensate Amulet
+	!HasItemEquiped("LICH",LastSeenBy(Myself)) // Lich innate Protection from Evil
+	!CheckStatGT(LastSeenBy(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+        CheckStatLT(LastSeenBy(Myself),100,RESISTPIERCING)
+        ActionListEmpty()
+THEN
+	RESPONSE #100
+		AttackReevaluate(LastSeenBy(Myself),15)
+END
+
+IF
+	ActionListEmpty()
+THEN
+	RESPONSE #100
+		RandomWalkContinuous()
+END
