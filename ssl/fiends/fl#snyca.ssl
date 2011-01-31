@@ -85,6 +85,10 @@ IF TRIGGER
   !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
   !CheckStatGT(FifthNearestEnemyOf(Myself),0,TRUE_SIGHT)
   !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  !CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
   !StateCheck(Myself,STATE_MIRRORIMAGE)
   GlobalLT("flMirrorImage","LOCALS",3)
 THEN DO
@@ -177,6 +181,15 @@ END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull|Stoneskin)
+  StateCheck(scstarget,STATE_IMMOBILE)
+  Range(scstarget,6)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|SlashResFull|Stoneskin|MirrorImage|Disabled)
   Range(scstarget,5)
 THEN DO
@@ -204,7 +217,6 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|SlashResFull)
   !Range(scstarget,5)
-  InMyArea(scstarget)
 THEN DO
   Combine()
   Action(ForceSpellRES,"RR#TELWE")
