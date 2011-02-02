@@ -546,13 +546,47 @@ COPY ~aTweaks/ITM/RR#DQUAS.ITM~ ~override~                                      
 COPY ~aTweaks/ITM/RR#DNABA.ITM~ ~override~                                         // Nabassu melee attack
 COPY ~aTweaks/ITM/RR#DGLAB.ITM~ ~override~                                         // Glabrezu melee attack
 COPY ~aTweaks/ITM/RR#DMARI.ITM~ ~override~                                         // Marilith melee attack
+
 COPY ~aTweaks/ITM/RR#DBALR.ITM~ ~override~                                         // Balor melee attack
+LPF DELETE_ITEM_EFFECT INT_VAR opcode_to_delete = "-1" END
+target = 2
+timing = 1
+probability1 = 5
+type = 1
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 139 target parameter1 = 64285 timing probability1 END //string: vorpal hit
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 141 target parameter2 = 39 timing probability1 END //visual: hit, finger of death
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 13 target parameter2 = BIT3 timing probability1 END //Kill target, chunky-style
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 146 target parameter2 = 1 timing probability1 = 56 probability2 = 6 savingtrow = BIT1 STR_VAR resource = rr#dbflw END //flaming whip, save vs breath
+
 COPY ~aTweaks/ITM/RR#DIMP.ITM~  ~override~                                         // Imp melee attack
 COPY ~aTweaks/ITM/RR#DFCAT.ITM~ ~override~                                         // Fell Cat melee attack
 COPY ~aTweaks/ITM/RR#DABIS.ITM~ ~override~                                         // Abishai melee attack
 COPY ~aTweaks/ITM/RR#DBFND.ITM~ ~override~                                         // Bone Fiend melee attack
 COPY ~aTweaks/ITM/RR#DCORN.ITM~ ~override~                                         // Cornugon melee attack
+
 COPY ~aTweaks/ITM/RR#DGELU.ITM~ ~override~                                         // Gelugon melee attack
+LPF DELETE_ITEM_EFFECT INT_VAR opcode_to_delete = "-1" END
+target = 2
+timing = 1
+duration = 30
+probability1 = 75
+savingthrow = BIT2 //save vs paralyzation
+type = 1
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 12 target parameter2 = 0x20000 timing probability1 dicesize = 6 dicenumber = 1 END //cold damage
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 40 target timing = 0 duration probability1 savingthrow END //slow
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 141 target parameter2 = 10 timing probability1 savingthrow END //visual, enchantment water
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 174 target timing probability1 savingthrow STR_VAR resource = eff_m29 END //play sound
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 139 target parameter1 = 335 timing probability1 savingthrow END //string: slowed
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 142 target parameter2 = 41 timing = 0 duration probability1 savingthrow END //icon: slowed
+
+duration = 18
+probability2 = 76
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 12 target parameter2 = 0x20000 timing probability2 dicesize = 4 dicenumber = 2 END //cold damage
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 175 target parameter2 = 2 timing = 0 duration probability2 savingthrow END //hold
+LPF ADD_ITEM_EFFECT INT_VAR type opcode = 174 target timing = 4 duration probability2 savingthrow STR_VAR resource = eff_e08 END //Play sound
+
+
+
 COPY ~aTweaks/ITM/RR#DPITF.ITM~ ~override~                                         // Pit Fiend melee attack
 COPY_EXISTING ~DEMSUC01.ITM~  ~override~                                           // Succubus melee attack
 LAUNCH_PATCH_FUNCTION ~DELETE_ITEM_EFFECT~                                         // add new equipping effect
@@ -674,6 +708,11 @@ COMPILE ~aTweaks/BAF/fiends/RR#WISH.BAF~                                        
 COMPILE ~aTweaks/BAF/fiends/RR#GHAST.BAF~                                                 // Spawned Ghast AI script
 
 
+// Kewl upside-down icons for Gate
+COPY
+     "atweaks/bam/flscrl9n.bam" "override/fl#905a.bam"
+     "atweaks/bam/fl#gateb.bam" "override/fl#905b.bam"
+     "atweaks/bam/fl#gatea.bam" "override/fl#905c.bam"
 
 
 ///////////
@@ -745,7 +784,7 @@ COPY "atweaks/spl/base.spl" "override/fl#csdis.spl"
   FOR (f_Header=1;f_Header<=SHORT_AT 0x68;++f_Header) BEGIN
     f_Level = f_Header = 1 ? 1 : 5*(f_Header - 1)
     LPF configure_spell_header INT_VAR f_Header f_Range = 1 f_Level END
-    LPF ADD_SPELL_EFFECT INT_VAR header = f_Header opcode = 78 target power parameter1 = f_Header parameter2 = 4 timing = 1 resist_dispel savingthrow END //Disease: 1 piont of STR damage per 3 levels of the caster
+    LPF ADD_SPELL_EFFECT INT_VAR header = f_Header opcode = 78 target power parameter1 = f_Header parameter2 = 4 timing = 1 resist_dispel savingthrow END //Disease: 1 point of STR damage per 3 levels of the caster
     LPF ADD_SPELL_EFFECT INT_VAR header = f_Header opcode = 78 target power parameter1 = 60 parameter2 = 3 timing = 1 resist_dispel savingthrow END //Disease: 1 HP damage/turn
   END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 7 timing = 1 resist_dispel savingthrow END //Icon: Nauseated
@@ -949,6 +988,7 @@ COPY_EXISTING b1-12m3.itm "override/fl#arca.itm"
   LPF configure_weapon_header INT_VAR f_Speed = 2 f_NumDice = 1 f_Diesize = 6 f_DamageType = 3 END
   enchantment = 3
   WRITE_LONG 0x60 enchantment
+  LPF ADD_ITEM_EFFECT INT_VAR opcode = 278 target = 2 parameter1 = "-1" duration = 2400 type = 1 probability1 = 66 END //-1 to hit for 8 hours, cumulative
   LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 233 target = 1 parameter1 = enchantment parameter2 = 109 timing = 2 END
   LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 9 target = 1 parameter1 = 0x00200000 parameter2 = 0x00500001 timing = 2 END  
   

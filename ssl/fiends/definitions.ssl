@@ -1,73 +1,83 @@
 BEGIN_ACTION_DEFINITION
   Name(ForceSpellRES)
   TRIGGER
-    !GlobalTimerNotExpired("cast","LOCALS")
+    !GlobalTimerNotExpired("flCast","LOCALS")
   ACTION
     RESPONSE #scsprob1
-      SetGlobalTimer("cast","LOCALS",6)
+      SetGlobalTimer("flCast","LOCALS",6)
       ForceSpellRES(scsargument1,scstarget)
 END  
 
 BEGIN_ACTION_DEFINITION
-  Name(ForceSpell)
+  Name(ForceSpellRESVarTimer)
   TRIGGER
-    !GlobalTimerNotExpired("cast","LOCALS")
+    !GlobalTimerNotExpired("scsargument2","LOCALS")
   ACTION
     RESPONSE #scsprob1
-      SetGlobalTimer("cast","LOCALS",6)
+      ForceSpellRES(scsargument1,scstarget)
+      SetGlobalTimer("scsargument2","LOCALS",scsargument3)
+END
+
+BEGIN_ACTION_DEFINITION
+  Name(ForceSpell)
+  TRIGGER
+    !GlobalTimerNotExpired("flCast","LOCALS")
+  ACTION
+    RESPONSE #scsprob1
+      SetGlobalTimer("flCast","LOCALS",6)
       ForceSpell(scstarget,scsargument1)
 END
 
 BEGIN_ACTION_DEFINITION
   Name(ForceSpellMyself)
   TRIGGER
-    !GlobalTimerNotExpired("cast","LOCALS")
+    !GlobalTimerNotExpired("flCast","LOCALS")
   ACTION
     RESPONSE #scsprob1
-      SetGlobalTimer("cast","LOCALS",6)
+      SetGlobalTimer("flCast","LOCALS",6)
       ForceSpell(Myself,scsargument1)
 END
 
 BEGIN_ACTION_DEFINITION
   Name(ForceSpellRESMyself)
   TRIGGER
-    !GlobalTimerNotExpired("cast","LOCALS")
+    !GlobalTimerNotExpired("flCast","LOCALS")
   ACTION
     RESPONSE #scsprob1
-      SetGlobalTimer("cast","LOCALS",6)
+      SetGlobalTimer("flCast","LOCALS",6)
       ForceSpellRES(scsargument1,Myself)
 END
 
 BEGIN_ACTION_DEFINITION
   Name(Spell)
   TRIGGER
-    !GlobalTimerNotExpired("cast","LOCALS")
+    !GlobalTimerNotExpired("flCast","LOCALS")
     HaveSpell(scsargument1)
   ACTION
     RESPONSE #scsprob1
-      SetGlobalTimer("cast","LOCALS",6)
+      SetGlobalTimer("flCast","LOCALS",6)
       Spell(scstarget,scsargument1)
 END
 
 BEGIN_ACTION_DEFINITION
   Name(SpellMyself)
   TRIGGER
-    !GlobalTimerNotExpired("cast","LOCALS")
+    !GlobalTimerNotExpired("flCast","LOCALS")
     HaveSpell(scsargument1)
   ACTION
     RESPONSE #scsprob1
-      SetGlobalTimer("cast","LOCALS",6)
+      SetGlobalTimer("flCast","LOCALS",6)
       Spell(Myself,scsargument1)
 END
 
 BEGIN_ACTION_DEFINITION
   Name(MinorSequencer)
   TRIGGER
-    !GlobalTimerNotExpired("cast","LOCALS")
+    !GlobalTimerNotExpired("flCast","LOCALS")
     Global("flMinorSequencer","LOCALS",0)
   ACTION
     RESPONSE #scsprob1
-      SetGlobalTimer("cast","LOCALS",6)
+      SetGlobalTimer("flCast","LOCALS",6)
       SetGlobal("flMinorSequencer","LOCALS",1)
       DisplayStringHead(Myself,5013)
       SetSequence(SEQ_CAST)

@@ -1,7 +1,7 @@
 IF TRIGGER
   IgnoreBlock(IsUltroloth)
   Target(LastAttackerOf(Myself))
-  !GlobalTimerNotExpired("cast","LOCALS")
+  !GlobalTimerNotExpired("flCast","LOCALS")
   Exists(LastAttackerOf(Myself))
   !Range(LastAttackerOf(Myself),6)
   InMyArea(LastAttackerOf(Myself))
@@ -12,14 +12,14 @@ IF TRIGGER
   TriggerBlock(WeaponImmunity|SlashResFull|ProEvil)
   !See(NearestEnemyOf(Myself))
 THEN DO
-  SetGlobalTimer("cast","LOCALS",6)
+  SetGlobalTimer("flCast","LOCALS",6)
   ForceSpellRES("RR#TELWE",LastAttackerOf(Myself))
 END
 
 IF TRIGGER
   RequireBlock(IsUltroloth)
   Target(LastAttackerOf(Myself))
-  !GlobalTimerNotExpired("cast","LOCALS")
+  !GlobalTimerNotExpired("flCast","LOCALS")
   Exists(LastAttackerOf(Myself))
   !Range(LastAttackerOf(Myself),6)
   InMyArea(LastAttackerOf(Myself))
@@ -30,7 +30,7 @@ IF TRIGGER
   TriggerBlock(WeaponImmunityUltroloth|MagicDamageFull|ProEvil)
   !See(NearestEnemyOf(Myself))
 THEN DO
-  SetGlobalTimer("cast","LOCALS",6)
+  SetGlobalTimer("flCast","LOCALS",6)
   ForceSpellRES("RR#TELWE",LastAttackerOf(Myself))
 END
 
@@ -38,11 +38,11 @@ END
 IF TRIGGER
   IgnoreBlock(IsUltroloth)
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull|ProEvil) 
-  !HasItemEquiped("lich",scstarget)
+  TriggerBlock(WeaponImmunity|SlashResFull) 
   StateCheck(scstarget,STATE_IMMOBILE) //OR this with HPPercentLT
   !Range(scstarget,6)
 THEN DO
+  Combine()
   Action(ForceSpellRES,"RR#TELWE")
 END
 
@@ -50,10 +50,10 @@ END
 IF TRIGGER
   RequireBlock(IsUltroloth)
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunityUltroloth|MagicDamageFull|ProEvil) 
-  !HasItemEquiped("lich",scstarget)
+  TriggerBlock(WeaponImmunityUltroloth|MagicDamageFull) 
   StateCheck(scstarget,STATE_IMMOBILE) //OR this with HPPercentLT
   !Range(scstarget,6)
 THEN DO
+  Combine()
   Action(ForceSpellRES,"RR#TELWE")
 END

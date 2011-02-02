@@ -50,13 +50,13 @@ THEN
 END
 
 IF
-  !GlobalTimerNotExpired("cast","LOCALS")
+  !GlobalTimerNotExpired("flCast","LOCALS")
   OR(2)
     AreaCheck("AR3004")
     AreaCheck("AR3008")
 THEN
   RESPONSE #100
-    SetGlobalTimer("cast","LOCALS",600) //No casting in dead-magic areas
+    SetGlobalTimer("flCast","LOCALS",600) //No casting in dead-magic areas
 END
 
 IF
@@ -386,7 +386,7 @@ IF TRIGGER
   !Race(scstarget,RAKSHASA)
 THEN DO
   Combine()
-  Action(ForceSpellRES,"fl#csdis"|40|100)
+  Action(ForceSpellRES,"fl#csdis"|60|100)
 END
 
 //Magic Missile
@@ -447,37 +447,7 @@ THEN DO
   AttackOneRound(scstarget)
 END  
 
-IF TRIGGER
-  TargetBlock(EnemiesInOrderShort)
-  TriggerBlock(WeaponImmunity|SlashResFull)
-  StateCheck(scstarget,STATE_IMMOBILE)
-  Range(scstarget,5)
-THEN DO
-  AttackOneRound(scstarget)
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrderShort)
-  TriggerBlock(WeaponImmunity|SlashResFull)
-  Range(scstarget,5)
-THEN DO
-  AttackOneRound(scstarget)
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull)
-  !Range(scstarget,6)
-THEN DO
-  Action(ForceSpellRES,"RR#TELWE")
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull)
-THEN DO
-  AttackOneRound(scstarget)
-END
+INCLUDE FILE(fiends/include/standard_attack.ssl)
 
 //Inviso-up if there's nothing better to do
 IF TRIGGER

@@ -3,11 +3,8 @@ COPY "atweaks/bam/fl#cacoc.bam" "override/fl#707cb.bam" //apparently the stinkin
      "atweaks/bam/fl#cacol.bam" "override/fl#707lb.bam"
      "atweaks/bam/fl#fienc.bam" "override/fl#807cb.bam"
      "atweaks/bam/fl#fienl.bam" "override/fl#807lb.bam"
-     "atweaks/bam/fl#gatea.bam" "override/fl#905c.bam"
-     "atweaks/bam/fl#gateb.bam" "override/fl#905b.bam"
      "atweaks/bam/fl#gatec.bam" "override/fl#905cb.bam"
      "atweaks/bam/fl#gatel.bam" "override/fl#905lb.bam"
-     "atweaks/bam/flscrl9n.bam" "override/fl#905a.bam"
 
 COPY "atweaks/2da/spwi510.2da" "override/fl#cacoc.2da"
      "atweaks/2da/spwi510.2da" "override/fl#cacon.2da"
@@ -145,17 +142,14 @@ COPY_EXISTING spwi707.spl override
   PATCH_MATCH ~%SOURCE_RES%~ WITH
     spwi707 BEGIN SAY 0x50 @761 END
     spwi807 BEGIN SAY 0x50 @762 END
-    spwi905 BEGIN WRITE_ASCII 0x3a fl#905c #8 SAY 0x50 @763 END
-    sppr703 BEGIN WRITE_ASCII 0x3a fl#905c #8 SAY 0x50 @764 END
+    spwi905 BEGIN SAY 0x50 @763 END
+    sppr703 BEGIN SAY 0x50 @764 END
     DEFAULT
   END
   READ_LONG  0x64 ao
   READ_LONG  0x6a eo
   READ_SHORT 0x70 ei
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
-    PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE spwi905 OR "%SOURCE_RES%" STRING_EQUAL_CASE sppr703 BEGIN
-      WRITE_ASCII ao + 0x28*i + 0x4 fl#905b #8
-    END
     WRITE_BYTE  ao + 0x28*i + 0xc  5 //target (caster)
     WRITE_BYTE  ao + 0x28*i + 0x12 0 //casting speed
     WRITE_SHORT ao + 0x28*i + 0x20 ei
@@ -170,8 +164,8 @@ COPY_EXISTING spwi707.spl override
         --ne
       END
       PATCH_IF type = 177 AND VARIABLE_IS_SET $array("%SOURCE_RES%" "%p1%") BEGIN
-        WRITE_BYTE   eo + 0x30*(ei + j) + 0x12 100 //ptob1
-        WRITE_BYTE   eo + 0x30*(ei + j) + 0x13 0 //ptob2
+        WRITE_BYTE   eo + 0x30*(ei + j) + 0x12 100 //prob1
+        WRITE_BYTE   eo + 0x30*(ei + j) + 0x13 0 //prob2
         WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 $array("%SOURCE_RES%" "%p1%") #8
       END
     END
@@ -186,7 +180,7 @@ COPY_EXISTING scrl81.itm override
   PATCH_MATCH "%SOURCE_RES%" WITH
     scrl8i BEGIN SAY 0x54 @761 END
     scrl9b BEGIN SAY 0x54 @762 END
-    scrl9n BEGIN SAY 0x54 @763 WRITE_ASCII 0x3a fl#905a #8 END
+    scrl9n BEGIN SAY 0x54 @763 END
     DEFAULT
   END
 BUT_ONLY

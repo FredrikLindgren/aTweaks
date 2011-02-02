@@ -55,13 +55,13 @@ THEN
 END
 
 IF
-  !GlobalTimerNotExpired("cast","LOCALS")
+  !GlobalTimerNotExpired("flCast","LOCALS")
   OR(2)
     AreaCheck("AR3004")
     AreaCheck("AR3008")
 THEN
   RESPONSE #100
-    SetGlobalTimer("cast","LOCALS",600) //No casting in dead-magic areas
+    SetGlobalTimer("flCast","LOCALS",600) //No casting in dead-magic areas
 END
 
 INCLUDE FILE(fiends/include/teleport_away.ssl)
@@ -106,7 +106,7 @@ IF TRIGGER
     HPPercentLT(scstarget,40)
   GlobalLT("flSymbol","LOCALS",1)
 THEN DO
-  Action(ForceSpellRES,"RR#WI817"|100|50)
+  Action(ForceSpellRES,"RR#WI817"|100|100)
   IncrementGlobal("flSymbol","LOCALS",1)
 END
 
@@ -151,7 +151,7 @@ IF TRIGGER
   !HasItemEquiped("RR#HEL03",scstarget) // Darkveil (RR)
 THEN DO
   Combine()
-  Action(ForceSpellRES,"fl#ultgz"|100|100)
+  Action(ForceSpellRESVarTimer,"fl#ultgz",flUltGaze,6|100|100)
 END
 
 //Animate Dead
@@ -171,22 +171,22 @@ IF
   !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
   Allegiance(Myself,EVILCUTOFF)
   !See([EVILCUTOFF.UNDEAD.0.SKELETON_WARRIOR.0.SUMMONED])
-  !GlobalTimerNotExpired("cast","LOCALS")
+  !GlobalTimerNotExpired("flCast","LOCALS")
 THEN
   RESPONSE #100
     ForceSpellRES("RR#PR301",Myself)
-    SetGlobalTimer("cast","LOCALS",6)
+    SetGlobalTimer("flCast","LOCALS",6)
 END  
 
 IF
   !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
   Allegiance(Myself,GOODCUTOFF)
   !See([GOODCUTOFF.UNDEAD.0.SKELETON_WARRIOR.0.SUMMONED])
-  !GlobalTimerNotExpired("cast","LOCALS")
+  !GlobalTimerNotExpired("flCast","LOCALS")
 THEN
   RESPONSE #100
     ForceSpellRES("RR#PR301",Myself)
-    SetGlobalTimer("cast","LOCALS",6)
+    SetGlobalTimer("flCast","LOCALS",6)
 END
 
 //Cause Disease
@@ -230,14 +230,30 @@ END
 
 //Mass Suggestion
 IF TRIGGER
+  Allegiance(Myself,GOODCUTOFF)
   !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
   TargetBlock(EnemiesInOrder)
   General(scstarget,HUMANOID)
+  NumCreatureGT([EVILCUTOFF.HUMANOID],4)
   !Race(scstarget,RAKSHASA)
   TriggerBlock(Disabled|MR50|SIEnc|Charm)
   GlobalLT("flMassSuggestion","LOCALS",1)
 THEN DO
-  Action(ForceSpellRESMyself,"fl#mssug"|100|100)
+  Action(ForceSpellRESMyself,"fl#mssug"|100|50)
+  IncrementGlobal("flMassSuggestion","LOCALS",1)
+END
+
+IF TRIGGER
+  Allegiance(Myself,EVILCUTOFF)
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+  TargetBlock(EnemiesInOrder)
+  General(scstarget,HUMANOID)  
+  NumCreatureGT([GOODCUTOFF.HUMANOID],3)
+  !Race(scstarget,RAKSHASA)
+  TriggerBlock(Disabled|MR50|SIEnc|Charm)
+  GlobalLT("flMassSuggestion","LOCALS",1)
+THEN DO
+  Action(ForceSpellRESMyself,"fl#mssug"|100|50)
   IncrementGlobal("flMassSuggestion","LOCALS",1)
 END
 
@@ -310,7 +326,7 @@ IF TRIGGER
   !HasItemEquiped("clck26",scstarget)
 THEN DO
   Combine()
-  Action(ForceSpellRES,"RR#PFLAM"|100|50)
+  Action(ForceSpellRES,"RR#PFLAM"|100|100)
 END
 
 //Charm Person
@@ -329,32 +345,27 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunityUltroloth|MagicDamageFull)
   StateCheck(scstarget,STATE_IMMOBILE)
-  Range(scstarget,6)
 THEN DO
   AttackOneRound(scstarget)
 END
 
 IF TRIGGER
   TargetBlock(EnemyMagesAndPriests)
-  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
-  Range(scstarget,6)
-THEN DO
-  AttackOneRound(scstarget)
-END
-
-IF TRIGGER
-  TargetBlock(EnemyMagesAndPriests)
-  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull|MirrorImage)
   !Range(scstarget,6)
+  OR(4)
+    Class(scstarget,MAGE_ALL) //Otherwise the script can misbehave, with this block executing for pretty much everyone (due to the targetting, a non-mage, none-priest can be LastSeenBy(Myself))
+    Class(scstarget,DRUID_ALL)
+    Class(scstarget,CLERIC_ALL)
+    Class(scstarget,CLERIC_RANGER)  
 THEN DO
   Combine()
   Action(ForceSpellRES,"RR#TELWE"|100|100)
 END
 
 IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
-  Range(scstarget,6)
+  TargetBlock(EnemyMagesAndPriests)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull|MirrorImage)
 THEN DO
   AttackOneRound(scstarget)
 END
@@ -362,6 +373,21 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
+  !Range(scstarget,6)
+THEN DO
+  Action(ForceSpellRES,"RR#TELWE")
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunityUltroloth|MagicDamageFull)
   !Range(scstarget,6)
 THEN DO
   Action(ForceSpellRES,"RR#TELWE")

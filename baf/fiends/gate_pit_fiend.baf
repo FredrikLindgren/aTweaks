@@ -1,14 +1,14 @@
 IF
   Global("flNoGating","LOCALS",0)
-  !GlobalTimerNotExpired("flGatingTimer","LOCALS")
+  OR(2)
+    !GlobalTimerNotExpired("flGatingTimer","LOCALS")
+    G("flGatingTrue",1)
   !GlobalTimerNotExpired("RR#Cast","LOCALS")
   OR(2)
     HPPercentLT(Myself,50)
     G("flGatingTrue",1)
   InActiveArea(Myself)
-  OR(2)
-    RandomNum(3,1)
-    G("flGatingTrue",1)
+  RandomNum(3,1)
 THEN
   RESPONSE #100
     SetInterrupt(FALSE)

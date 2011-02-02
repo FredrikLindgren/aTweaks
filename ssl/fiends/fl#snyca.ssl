@@ -51,13 +51,13 @@ THEN
 END
 
 IF
-  !GlobalTimerNotExpired("cast","LOCALS")
+  !GlobalTimerNotExpired("flCast","LOCALS")
   OR(2)
     AreaCheck("AR3004")
     AreaCheck("AR3008")
 THEN
   RESPONSE #100
-    SetGlobalTimer("cast","LOCALS",600) //No casting in dead-magic areas
+    SetGlobalTimer("flCast","LOCALS",600) //No casting in dead-magic areas
 END
 
 INCLUDE FILE(fiends/include/teleport_away.ssl)
@@ -90,6 +90,7 @@ IF TRIGGER
   !CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
   !CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
   !StateCheck(Myself,STATE_MIRRORIMAGE)
+  !Class(LastSeenBy(Myself),INNOCENT)
   GlobalLT("flMirrorImage","LOCALS",3)
 THEN DO
   Action(ForceSpellRESMyself,"RR#WI212")
@@ -99,23 +100,21 @@ END
 //Fear, by touch
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
-  Range(scstarget,2)
+  Range(scstarget,10)
   TriggerBlock(Disabled|MinorGlobe|SpellTurning|Fear|MR75|SIIll)
   !Race(scstarget,RAKSHASA)
 THEN DO
-  Combine()
-  Action(ForceSpellRES,"fl#tchfr"|30|100)
+  Action(ForceSpellRES,"fl#tchfr"|50|100)
 END
 
 //Cause disease, also by touch
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
-  Range(scstarget,2)
+  Range(scstarget,10)
   TriggerBlock(Disabled|MinorGlobe|SpellTurning|Disease|MR75|SIAbj)
   !Race(scstarget,RAKSHASA)
 THEN DO
-  Combine()
-  Action(ForceSpellRES,"fl#csdis"|30|100)
+  Action(ForceSpellRES,"fl#csdis"|50|100)
 END 
 
 //Charm person
@@ -132,7 +131,7 @@ END
 //Toss fire at targets low on HP
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
-  HPLT(scstarget,15)
+  HPLT(scstarget,10)
   !Race(scstarget,LICH)
   !Race(scstarget,RAKSHASA)
   TriggerBlock(MinorGlobe|SpellTurning|FireResFull|MR75|SIEvo)
@@ -179,55 +178,7 @@ THEN DO
   Action(ForceSpellRES,"RR#PFLAM"|100|100)
 END 
 
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull|Stoneskin)
-  StateCheck(scstarget,STATE_IMMOBILE)
-  Range(scstarget,6)
-THEN DO
-  AttackOneRound(scstarget)
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull|Stoneskin|MirrorImage|Disabled)
-  Range(scstarget,5)
-THEN DO
-  AttackOneRound(scstarget)
-END 
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull|Stoneskin|MirrorImage|Disabled)
-  !Range(scstarget,5)
-THEN DO
-  Combine()
-  Action(ForceSpellRES,"RR#TELWE")
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull)
-  Range(scstarget,5)
-THEN DO
-  AttackOneRound(scstarget)
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull)
-  !Range(scstarget,5)
-THEN DO
-  Combine()
-  Action(ForceSpellRES,"RR#TELWE")
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|SlashResFull)
-THEN DO
-  AttackOneRound(scstarget)
-END
+INCLUDE FILE(fiends/include/standard_attack.ssl)
 
 //Inviso-up if there's nothing better to do
 IF TRIGGER

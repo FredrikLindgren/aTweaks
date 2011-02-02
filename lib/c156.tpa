@@ -54,7 +54,7 @@ COPY_EXISTING spwi905.spl "override/fl#gtgla.spl"
 //Succubus: summon 1 balor
 COPY_EXISTING spwi905.spl "override/fl#gtsuc.spl"
   LPF prep_for_gate END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 paramater2 = 2 timing = 1 STR_VAR resource = rr#hsbal END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 timing = 1 STR_VAR resource = rr#hsbal END
   
 
 //Pit Fiend: summon 2 lesser (abishai, erinyes, osyluth) or 1 greater (cornugon, gelugon, pit fiend) baatezu
@@ -146,7 +146,7 @@ OUTER_SPRINT $script(rr#hsgel) rr#hgelu
 OUTER_SPRINT $script(rr#hscor) rr#hcorn
 OUTER_SPRINT $script(rr#hsabi) rr#habis
 OUTER_SPRINT $script(rr#hseri) rr#herin
-OUTER_SPRINT $script(rr#hsbfn) ff#hbfnd
+OUTER_SPRINT $script(rr#hsbfn) rr#hbfnd
 
 COPY_EXISTING 
               telbal1.cre  "override/rr#hsbal.cre"
@@ -183,6 +183,15 @@ COPY_EXISTING
 IF
   False()
   Global("flPlaceholder4Gating","LOCALS",0)
+THEN
+  RESPONSE #100
+    Continue()
+END
+>>>>>>>>
+<<<<<<<< atweaks/fl-inlined/Placeholder24Gating.baf
+IF
+  False()
+  Global("Placeholder24Gating","LOCALS",0)
 THEN
   RESPONSE #100
     Continue()
@@ -246,6 +255,7 @@ COPY_EXISTING rr#hpitf.bcs override
   
 COPY_EXISTING rr#hsucc.bcs override
   REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder4Gating.baf~ ~atweaks/baf/fiends/gate_succubus.baf~
+  REPLACE_BCS_BLOCK ~atweaks/fl-inlined/Placeholder24Gating.baf~ ~atweaks/baf/fiends/gate_succubus2.baf~
   DECOMPILE_BCS_TO_BAF
     REPLACE 10000758 @758
     REPLACE 10000760 @760

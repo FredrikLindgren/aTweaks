@@ -104,17 +104,17 @@ NoAction()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 OR(2)
 AreaCheck("AR3004")
 AreaCheck("AR3008")
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",600)
+SetGlobalTimer("flCast","LOCALS",600)
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 Allegiance(Myself,GOODCUTOFF)
 AttackedBy([GOODCUTOFF],DEFAULT)
 CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
@@ -123,14 +123,14 @@ THEN
 RESPONSE #100
 SetInterrupt(FALSE)
 DisplayStringHead(Myself,@724)
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#TELAW",Myself)
 SetInterrupt(TRUE)
 END
 
 IF
 See(LastAttackerOf(Myself))
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 Exists(LastAttackerOf(Myself))
 !Range(LastAttackerOf(Myself),6)
 InMyArea(LastAttackerOf(Myself))
@@ -160,168 +160,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !See(NearestEnemyOf(Myself))
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#TELWE",LastAttackerOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
-See(NearestEnemyOf(Myself))
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(NearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-!CheckStatGT(NearestEnemyOf(Myself),0,PROTECTION_FROM_EVIL)
-!HasItemEquipedReal("staf11",NearestEnemyOf(Myself))
-!HasItemEquiped("wa2amu",NearestEnemyOf(Myself))
-!HasItemEquiped("lich",NearestEnemyOf(Myself))
-StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
-!Range(NearestEnemyOf(Myself),6)
-THEN
-RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
-ForceSpellRES("RR#TELWE",NearestEnemyOf(Myself))
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-See(SecondNearestEnemyOf(Myself))
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(SecondNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(SecondNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-!CheckStatGT(SecondNearestEnemyOf(Myself),0,PROTECTION_FROM_EVIL)
-!HasItemEquipedReal("staf11",SecondNearestEnemyOf(Myself))
-!HasItemEquiped("wa2amu",SecondNearestEnemyOf(Myself))
-!HasItemEquiped("lich",SecondNearestEnemyOf(Myself))
-StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
-!Range(SecondNearestEnemyOf(Myself),6)
-THEN
-RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
-ForceSpellRES("RR#TELWE",SecondNearestEnemyOf(Myself))
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-See(ThirdNearestEnemyOf(Myself))
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(ThirdNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(ThirdNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-!CheckStatGT(ThirdNearestEnemyOf(Myself),0,PROTECTION_FROM_EVIL)
-!HasItemEquipedReal("staf11",ThirdNearestEnemyOf(Myself))
-!HasItemEquiped("wa2amu",ThirdNearestEnemyOf(Myself))
-!HasItemEquiped("lich",ThirdNearestEnemyOf(Myself))
-StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
-!Range(ThirdNearestEnemyOf(Myself),6)
-THEN
-RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
-ForceSpellRES("RR#TELWE",ThirdNearestEnemyOf(Myself))
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-See(FourthNearestEnemyOf(Myself))
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(FourthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(FourthNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(FourthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(FourthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(FourthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-!CheckStatGT(FourthNearestEnemyOf(Myself),0,PROTECTION_FROM_EVIL)
-!HasItemEquipedReal("staf11",FourthNearestEnemyOf(Myself))
-!HasItemEquiped("wa2amu",FourthNearestEnemyOf(Myself))
-!HasItemEquiped("lich",FourthNearestEnemyOf(Myself))
-StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
-!Range(FourthNearestEnemyOf(Myself),6)
-THEN
-RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
-ForceSpellRES("RR#TELWE",FourthNearestEnemyOf(Myself))
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-See(FifthNearestEnemyOf(Myself))
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(FifthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(FifthNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(FifthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(FifthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(FifthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-!CheckStatGT(FifthNearestEnemyOf(Myself),0,PROTECTION_FROM_EVIL)
-!HasItemEquipedReal("staf11",FifthNearestEnemyOf(Myself))
-!HasItemEquiped("wa2amu",FifthNearestEnemyOf(Myself))
-!HasItemEquiped("lich",FifthNearestEnemyOf(Myself))
-StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
-!Range(FifthNearestEnemyOf(Myself),6)
-THEN
-RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
-ForceSpellRES("RR#TELWE",FifthNearestEnemyOf(Myself))
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-See(SixthNearestEnemyOf(Myself))
+!GlobalTimerNotExpired("flCast","LOCALS")
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(SixthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -338,43 +182,215 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(SixthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-!CheckStatGT(SixthNearestEnemyOf(Myself),0,PROTECTION_FROM_EVIL)
-!HasItemEquipedReal("staf11",SixthNearestEnemyOf(Myself))
-!HasItemEquiped("wa2amu",SixthNearestEnemyOf(Myself))
-!HasItemEquiped("lich",SixthNearestEnemyOf(Myself))
 StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
 !Range(SixthNearestEnemyOf(Myself),6)
+See(SixthNearestEnemyOf(Myself))
+False()
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
-ForceSpellRES("RR#TELWE",SixthNearestEnemyOf(Myself))
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(FifthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(FifthNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(FifthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(FifthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(FifthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
+!Range(FifthNearestEnemyOf(Myself),6)
+See(FifthNearestEnemyOf(Myself))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(FourthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(FourthNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(FourthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(FourthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(FourthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
+!Range(FourthNearestEnemyOf(Myself),6)
+See(FourthNearestEnemyOf(Myself))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
+!Range(ThirdNearestEnemyOf(Myself),6)
+See(ThirdNearestEnemyOf(Myself))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(SecondNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
+!Range(SecondNearestEnemyOf(Myself),6)
+See(SecondNearestEnemyOf(Myself))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(NearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
+!Range(NearestEnemyOf(Myself),6)
+See(NearestEnemyOf(Myself))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(LastSeenBy(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(LastSeenBy(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(LastSeenBy(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(LastSeenBy(Myself),99,MAGICDAMAGERESISTANCE)
+StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+!Range(LastSeenBy(Myself),6)
+See(LastSeenBy(Myself))
+THEN
+RESPONSE #100
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
 END
 
 IF
 !GlobalTimerNotExpired("fl#Taunt","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(Myself,STATE_INVISIBLE)
 !See(NearestEnemyOf(Myself))
 See([0.HUMANOID.0.INNOCENT])
 THEN
 RESPONSE #40
+SetInterrupt(FALSE)
 SetGlobalTimer("fl#Taunt","LOCALS",12)
+ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
+SetGlobalTimer("flCast","LOCALS",6)
 DisplayStringHead(Myself,@739)
 ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
 DisplayStringHead(LastSeenBy(Myself),@740)
+SetInterrupt(TRUE)
 RESPONSE #30
+SetInterrupt(FALSE)
 SetGlobalTimer("fl#Taunt","LOCALS",12)
+ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
+SetGlobalTimer("flCast","LOCALS",6)
 DisplayStringHead(Myself,@741)
 ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
 DisplayStringHead(LastSeenBy(Myself),@742)
+SetInterrupt(TRUE)
 RESPONSE #30
+SetInterrupt(FALSE)
 SetGlobalTimer("fl#Taunt","LOCALS",12)
+ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
+SetGlobalTimer("flCast","LOCALS",6)
 DisplayStringHead(Myself,@743)
 ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
 DisplayStringHead(LastSeenBy(Myself),@744)
+SetInterrupt(TRUE)
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -394,7 +410,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -414,7 +430,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -434,7 +450,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -454,7 +470,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -474,7 +490,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
 !StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -494,7 +510,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 !CheckStatGT(LastSeenBy(Myself),0,HELD)
 !StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH)
@@ -509,14 +525,14 @@ AreaType(OUTDOOR)
 See(LastSeenBy(Myself))
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#PR302",LastSeenBy(Myself))
 RESPONSE #50
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -529,7 +545,7 @@ See(NearestEnemyOf(Myself))
 GlobalLT("flFireStorm","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#PR705",NearestEnemyOf(Myself))
 IncrementGlobal("flFireStorm","LOCALS",1)
 SetGlobalTimer("flFireStormTimer","LOCALS",24)
@@ -538,7 +554,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -551,7 +567,7 @@ See(SecondNearestEnemyOf(Myself))
 GlobalLT("flFireStorm","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#PR705",SecondNearestEnemyOf(Myself))
 IncrementGlobal("flFireStorm","LOCALS",1)
 SetGlobalTimer("flFireStormTimer","LOCALS",24)
@@ -560,7 +576,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -573,7 +589,7 @@ See(ThirdNearestEnemyOf(Myself))
 GlobalLT("flFireStorm","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#PR705",ThirdNearestEnemyOf(Myself))
 IncrementGlobal("flFireStorm","LOCALS",1)
 SetGlobalTimer("flFireStormTimer","LOCALS",24)
@@ -582,7 +598,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FourthNearestEnemyOf(Myself))
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
@@ -595,7 +611,7 @@ See(FourthNearestEnemyOf(Myself))
 GlobalLT("flFireStorm","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#PR705",FourthNearestEnemyOf(Myself))
 IncrementGlobal("flFireStorm","LOCALS",1)
 SetGlobalTimer("flFireStormTimer","LOCALS",24)
@@ -604,7 +620,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FifthNearestEnemyOf(Myself))
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
@@ -617,7 +633,7 @@ See(FifthNearestEnemyOf(Myself))
 GlobalLT("flFireStorm","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#PR705",FifthNearestEnemyOf(Myself))
 IncrementGlobal("flFireStorm","LOCALS",1)
 SetGlobalTimer("flFireStormTimer","LOCALS",24)
@@ -626,7 +642,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SixthNearestEnemyOf(Myself))
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
@@ -639,7 +655,7 @@ See(SixthNearestEnemyOf(Myself))
 GlobalLT("flFireStorm","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#PR705",SixthNearestEnemyOf(Myself))
 IncrementGlobal("flFireStorm","LOCALS",1)
 SetGlobalTimer("flFireStormTimer","LOCALS",24)
@@ -648,7 +664,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -670,15 +686,15 @@ HPPercentLT(NearestEnemyOf(Myself),40)
 GlobalLT("flSymbol","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#WI817",NearestEnemyOf(Myself))
 IncrementGlobal("flSymbol","LOCALS",1)
-RESPONSE #50
+RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -700,15 +716,15 @@ HPPercentLT(SecondNearestEnemyOf(Myself),40)
 GlobalLT("flSymbol","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#WI817",SecondNearestEnemyOf(Myself))
 IncrementGlobal("flSymbol","LOCALS",1)
-RESPONSE #50
+RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -730,15 +746,15 @@ HPPercentLT(ThirdNearestEnemyOf(Myself),40)
 GlobalLT("flSymbol","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#WI817",ThirdNearestEnemyOf(Myself))
 IncrementGlobal("flSymbol","LOCALS",1)
-RESPONSE #50
+RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FourthNearestEnemyOf(Myself))
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
@@ -760,15 +776,15 @@ HPPercentLT(FourthNearestEnemyOf(Myself),40)
 GlobalLT("flSymbol","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#WI817",FourthNearestEnemyOf(Myself))
 IncrementGlobal("flSymbol","LOCALS",1)
-RESPONSE #50
+RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FifthNearestEnemyOf(Myself))
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
@@ -790,15 +806,15 @@ HPPercentLT(FifthNearestEnemyOf(Myself),40)
 GlobalLT("flSymbol","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#WI817",FifthNearestEnemyOf(Myself))
 IncrementGlobal("flSymbol","LOCALS",1)
-RESPONSE #50
+RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SixthNearestEnemyOf(Myself))
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
@@ -820,15 +836,15 @@ HPPercentLT(SixthNearestEnemyOf(Myself),40)
 GlobalLT("flSymbol","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#WI817",SixthNearestEnemyOf(Myself))
 IncrementGlobal("flSymbol","LOCALS",1)
-RESPONSE #50
+RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -852,7 +868,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -876,7 +892,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -900,7 +916,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -924,7 +940,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -948,7 +964,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
 !StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -972,7 +988,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 !CheckStatGT(LastSeenBy(Myself),0,HELD)
 !StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH)
@@ -991,7 +1007,7 @@ GlobalLT("flSymbol","LOCALS",1)
 See(LastSeenBy(Myself))
 THEN
 RESPONSE #30
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#WI816",LastSeenBy(Myself))
 IncrementGlobal("flSymbol","LOCALS",1)
 RESPONSE #100
@@ -999,7 +1015,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1023,7 +1039,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1047,7 +1063,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1071,7 +1087,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1095,7 +1111,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1119,7 +1135,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
 !StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1143,7 +1159,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 !CheckStatGT(LastSeenBy(Myself),0,HELD)
 !StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH)
@@ -1162,7 +1178,7 @@ GlobalLT("flSymbol","LOCALS",1)
 See(LastSeenBy(Myself))
 THEN
 RESPONSE #30
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#SPAIN",LastSeenBy(Myself))
 IncrementGlobal("flSymbol","LOCALS",1)
 RESPONSE #100
@@ -1170,7 +1186,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1199,7 +1215,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1228,7 +1244,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1257,7 +1273,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1286,7 +1302,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1315,7 +1331,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
 !StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -1344,7 +1360,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 !CheckStatGT(LastSeenBy(Myself),0,HELD)
 !StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH)
@@ -1368,7 +1384,7 @@ GlobalLT("flSymbol","LOCALS",1)
 See(LastSeenBy(Myself))
 THEN
 RESPONSE #30
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#WI811",LastSeenBy(Myself))
 IncrementGlobal("flSymbol","LOCALS",1)
 RESPONSE #100
@@ -1376,7 +1392,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flUltGaze","LOCALS")
 General(SixthNearestEnemyOf(Myself),HUMANOID)
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
@@ -1406,7 +1422,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flUltGaze","LOCALS")
 General(FifthNearestEnemyOf(Myself),HUMANOID)
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
@@ -1436,7 +1452,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flUltGaze","LOCALS")
 General(FourthNearestEnemyOf(Myself),HUMANOID)
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
@@ -1466,7 +1482,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flUltGaze","LOCALS")
 General(ThirdNearestEnemyOf(Myself),HUMANOID)
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -1496,7 +1512,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flUltGaze","LOCALS")
 General(SecondNearestEnemyOf(Myself),HUMANOID)
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -1526,7 +1542,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flUltGaze","LOCALS")
 General(NearestEnemyOf(Myself),HUMANOID)
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -1556,7 +1572,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flUltGaze","LOCALS")
 General(LastSeenBy(Myself),HUMANOID)
 !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 !CheckStatGT(LastSeenBy(Myself),0,HELD)
@@ -1581,14 +1597,14 @@ General(LastSeenBy(Myself),HUMANOID)
 See(LastSeenBy(Myself))
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
 ForceSpellRES("fl#ultgz",LastSeenBy(Myself))
+SetGlobalTimer("flUltGaze","LOCALS",6)
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 OR(3)
 Class(SixthNearestEnemyOf(Myself),MAGE_ALL)
@@ -1602,7 +1618,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 OR(3)
 Class(FifthNearestEnemyOf(Myself),MAGE_ALL)
@@ -1616,7 +1632,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 OR(3)
 Class(FourthNearestEnemyOf(Myself),MAGE_ALL)
@@ -1630,7 +1646,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 OR(3)
 Class(ThirdNearestEnemyOf(Myself),MAGE_ALL)
@@ -1644,7 +1660,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 OR(3)
 Class(SecondNearestEnemyOf(Myself),MAGE_ALL)
@@ -1658,7 +1674,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 OR(3)
 Class(NearestEnemyOf(Myself),MAGE_ALL)
@@ -1672,7 +1688,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 OR(3)
 Class(LastSeenBy(Myself),MAGE_ALL)
@@ -1681,7 +1697,7 @@ Class(LastSeenBy(Myself),DRUID_ALL)
 See(LastSeenBy(Myself))
 THEN
 RESPONSE #25
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#PR301",LastSeenBy(Myself))
 RESPONSE #100
 Continue()
@@ -1691,26 +1707,26 @@ IF
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 Allegiance(Myself,EVILCUTOFF)
 !See([EVILCUTOFF.UNDEAD.0.SKELETON_WARRIOR.0.SUMMONED])
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 THEN
 RESPONSE #100
 ForceSpellRES("RR#PR301",Myself)
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 END
 
 IF
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 Allegiance(Myself,GOODCUTOFF)
 !See([GOODCUTOFF.UNDEAD.0.SKELETON_WARRIOR.0.SUMMONED])
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 THEN
 RESPONSE #100
 ForceSpellRES("RR#PR301",Myself)
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 Range(ThirdNearestEnemyOf(Myself),2)
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -1739,7 +1755,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 Range(SecondNearestEnemyOf(Myself),2)
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -1768,7 +1784,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 Range(NearestEnemyOf(Myself),2)
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -1797,7 +1813,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 Range(LastSeenBy(Myself),2)
 !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 !CheckStatGT(LastSeenBy(Myself),0,HELD)
@@ -1821,14 +1837,14 @@ Range(LastSeenBy(Myself),2)
 See(LastSeenBy(Myself))
 THEN
 RESPONSE #50
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#csdis",LastSeenBy(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -1847,14 +1863,14 @@ Range(NearestEnemyOf(Myself),20)
 !Race(NearestEnemyOf(Myself),LICH)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#shout",NearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -1873,14 +1889,14 @@ Range(SecondNearestEnemyOf(Myself),20)
 !Race(SecondNearestEnemyOf(Myself),LICH)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#shout",SecondNearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -1899,14 +1915,14 @@ Range(ThirdNearestEnemyOf(Myself),20)
 !Race(ThirdNearestEnemyOf(Myself),LICH)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#shout",ThirdNearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FourthNearestEnemyOf(Myself))
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
@@ -1925,14 +1941,14 @@ Range(FourthNearestEnemyOf(Myself),20)
 !Race(FourthNearestEnemyOf(Myself),LICH)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#shout",FourthNearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FifthNearestEnemyOf(Myself))
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
@@ -1951,14 +1967,14 @@ Range(FifthNearestEnemyOf(Myself),20)
 !Race(FifthNearestEnemyOf(Myself),LICH)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#shout",FifthNearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SixthNearestEnemyOf(Myself))
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
@@ -1977,14 +1993,14 @@ Range(SixthNearestEnemyOf(Myself),20)
 !Race(SixthNearestEnemyOf(Myself),LICH)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#shout",SixthNearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -2007,14 +2023,14 @@ Range(NearestEnemyOf(Myself),20)
 !Race(NearestEnemyOf(Myself),RAKSHASA)
 THEN
 RESPONSE #50
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#cnefr",NearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -2037,14 +2053,14 @@ Range(SecondNearestEnemyOf(Myself),20)
 !Race(SecondNearestEnemyOf(Myself),RAKSHASA)
 THEN
 RESPONSE #50
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#cnefr",SecondNearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -2067,14 +2083,14 @@ Range(ThirdNearestEnemyOf(Myself),20)
 !Race(ThirdNearestEnemyOf(Myself),RAKSHASA)
 THEN
 RESPONSE #50
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#cnefr",ThirdNearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FourthNearestEnemyOf(Myself))
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
@@ -2097,14 +2113,14 @@ Range(FourthNearestEnemyOf(Myself),20)
 !Race(FourthNearestEnemyOf(Myself),RAKSHASA)
 THEN
 RESPONSE #50
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#cnefr",FourthNearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FifthNearestEnemyOf(Myself))
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
@@ -2127,14 +2143,14 @@ Range(FifthNearestEnemyOf(Myself),20)
 !Race(FifthNearestEnemyOf(Myself),RAKSHASA)
 THEN
 RESPONSE #50
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#cnefr",FifthNearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SixthNearestEnemyOf(Myself))
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
@@ -2157,17 +2173,19 @@ Range(SixthNearestEnemyOf(Myself),20)
 !Race(SixthNearestEnemyOf(Myself),RAKSHASA)
 THEN
 RESPONSE #50
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#cnefr",SixthNearestEnemyOf(Myself))
 RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
+Allegiance(Myself,GOODCUTOFF)
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 General(NearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([EVILCUTOFF.HUMANOID],4)
 !Race(NearestEnemyOf(Myself),RAKSHASA)
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -2198,18 +2216,20 @@ General(NearestEnemyOf(Myself),HUMANOID)
 GlobalLT("flMassSuggestion","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#mssug",Myself)
 IncrementGlobal("flMassSuggestion","LOCALS",1)
-RESPONSE #100
+RESPONSE #50
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
+Allegiance(Myself,GOODCUTOFF)
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 General(SecondNearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([EVILCUTOFF.HUMANOID],4)
 !Race(SecondNearestEnemyOf(Myself),RAKSHASA)
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -2240,18 +2260,20 @@ General(SecondNearestEnemyOf(Myself),HUMANOID)
 GlobalLT("flMassSuggestion","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#mssug",Myself)
 IncrementGlobal("flMassSuggestion","LOCALS",1)
-RESPONSE #100
+RESPONSE #50
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
+Allegiance(Myself,GOODCUTOFF)
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 General(ThirdNearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([EVILCUTOFF.HUMANOID],4)
 !Race(ThirdNearestEnemyOf(Myself),RAKSHASA)
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -2282,18 +2304,20 @@ General(ThirdNearestEnemyOf(Myself),HUMANOID)
 GlobalLT("flMassSuggestion","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#mssug",Myself)
 IncrementGlobal("flMassSuggestion","LOCALS",1)
-RESPONSE #100
+RESPONSE #50
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FourthNearestEnemyOf(Myself))
+Allegiance(Myself,GOODCUTOFF)
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 General(FourthNearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([EVILCUTOFF.HUMANOID],4)
 !Race(FourthNearestEnemyOf(Myself),RAKSHASA)
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
@@ -2324,18 +2348,20 @@ General(FourthNearestEnemyOf(Myself),HUMANOID)
 GlobalLT("flMassSuggestion","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#mssug",Myself)
 IncrementGlobal("flMassSuggestion","LOCALS",1)
-RESPONSE #100
+RESPONSE #50
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FifthNearestEnemyOf(Myself))
+Allegiance(Myself,GOODCUTOFF)
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 General(FifthNearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([EVILCUTOFF.HUMANOID],4)
 !Race(FifthNearestEnemyOf(Myself),RAKSHASA)
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
@@ -2366,18 +2392,20 @@ General(FifthNearestEnemyOf(Myself),HUMANOID)
 GlobalLT("flMassSuggestion","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#mssug",Myself)
 IncrementGlobal("flMassSuggestion","LOCALS",1)
-RESPONSE #100
+RESPONSE #50
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SixthNearestEnemyOf(Myself))
+Allegiance(Myself,GOODCUTOFF)
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 General(SixthNearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([EVILCUTOFF.HUMANOID],4)
 !Race(SixthNearestEnemyOf(Myself),RAKSHASA)
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
@@ -2408,15 +2436,279 @@ General(SixthNearestEnemyOf(Myself),HUMANOID)
 GlobalLT("flMassSuggestion","LOCALS",1)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#mssug",Myself)
 IncrementGlobal("flMassSuggestion","LOCALS",1)
-RESPONSE #100
+RESPONSE #50
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(NearestEnemyOf(Myself))
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+General(NearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([GOODCUTOFF.HUMANOID],3)
+!Race(NearestEnemyOf(Myself),RAKSHASA)
+!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOf(Myself),0,HELD)
+!StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
+!CheckStatGT(NearestEnemyOf(Myself),50,RESISTMAGIC)
+!CheckStat(NearestEnemyOf(Myself),4,WIZARD_SPELL_IMMUNITY)
+!General(NearestEnemyOf(Myself),UNDEAD)
+!Race(NearestEnemyOf(Myself),ELF)
+!Race(NearestEnemyOf(Myself),GOLEM)
+!Race(NearestEnemyOf(Myself),SLIME)
+!Race(NearestEnemyOf(Myself),DEMONIC)
+!Race(NearestEnemyOf(Myself),TROLL)
+!Class(NearestEnemyOf(Myself),MONK)
+!Kit(NearestEnemyOf(Myself),INQUISITOR)
+!Kit(NearestEnemyOf(Myself),CAVALIER)
+!CheckStatGT(NearestEnemyOf(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+!CheckStat(NearestEnemyOf(Myself),1,SCRIPTINGSTATE4)
+!HasItemEquiped("helm06",NearestEnemyOf(Myself))
+!HasItemEquiped("ipsion",NearestEnemyOf(Myself))
+!HasItemEquipedReal("miscbc",NearestEnemyOf(Myself))
+!HasItemEquiped("npchan",NearestEnemyOf(Myself))
+!HasItemEquiped("shld25",NearestEnemyOf(Myself))
+!HasItemEquipedReal("sper07",NearestEnemyOf(Myself))
+!HasItemEquipedReal("staf11",NearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h35",NearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h54",NearestEnemyOf(Myself))
+!HasItemEquipedReal("sw2h14",NearestEnemyOf(Myself))
+GlobalLT("flMassSuggestion","LOCALS",1)
+THEN
+RESPONSE #100
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("fl#mssug",Myself)
+IncrementGlobal("flMassSuggestion","LOCALS",1)
+RESPONSE #50
+Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(SecondNearestEnemyOf(Myself))
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+General(SecondNearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([GOODCUTOFF.HUMANOID],3)
+!Race(SecondNearestEnemyOf(Myself),RAKSHASA)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
+!CheckStatGT(SecondNearestEnemyOf(Myself),50,RESISTMAGIC)
+!CheckStat(SecondNearestEnemyOf(Myself),4,WIZARD_SPELL_IMMUNITY)
+!General(SecondNearestEnemyOf(Myself),UNDEAD)
+!Race(SecondNearestEnemyOf(Myself),ELF)
+!Race(SecondNearestEnemyOf(Myself),GOLEM)
+!Race(SecondNearestEnemyOf(Myself),SLIME)
+!Race(SecondNearestEnemyOf(Myself),DEMONIC)
+!Race(SecondNearestEnemyOf(Myself),TROLL)
+!Class(SecondNearestEnemyOf(Myself),MONK)
+!Kit(SecondNearestEnemyOf(Myself),INQUISITOR)
+!Kit(SecondNearestEnemyOf(Myself),CAVALIER)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+!CheckStat(SecondNearestEnemyOf(Myself),1,SCRIPTINGSTATE4)
+!HasItemEquiped("helm06",SecondNearestEnemyOf(Myself))
+!HasItemEquiped("ipsion",SecondNearestEnemyOf(Myself))
+!HasItemEquipedReal("miscbc",SecondNearestEnemyOf(Myself))
+!HasItemEquiped("npchan",SecondNearestEnemyOf(Myself))
+!HasItemEquiped("shld25",SecondNearestEnemyOf(Myself))
+!HasItemEquipedReal("sper07",SecondNearestEnemyOf(Myself))
+!HasItemEquipedReal("staf11",SecondNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h35",SecondNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h54",SecondNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw2h14",SecondNearestEnemyOf(Myself))
+GlobalLT("flMassSuggestion","LOCALS",1)
+THEN
+RESPONSE #100
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("fl#mssug",Myself)
+IncrementGlobal("flMassSuggestion","LOCALS",1)
+RESPONSE #50
+Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(ThirdNearestEnemyOf(Myself))
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+General(ThirdNearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([GOODCUTOFF.HUMANOID],3)
+!Race(ThirdNearestEnemyOf(Myself),RAKSHASA)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),50,RESISTMAGIC)
+!CheckStat(ThirdNearestEnemyOf(Myself),4,WIZARD_SPELL_IMMUNITY)
+!General(ThirdNearestEnemyOf(Myself),UNDEAD)
+!Race(ThirdNearestEnemyOf(Myself),ELF)
+!Race(ThirdNearestEnemyOf(Myself),GOLEM)
+!Race(ThirdNearestEnemyOf(Myself),SLIME)
+!Race(ThirdNearestEnemyOf(Myself),DEMONIC)
+!Race(ThirdNearestEnemyOf(Myself),TROLL)
+!Class(ThirdNearestEnemyOf(Myself),MONK)
+!Kit(ThirdNearestEnemyOf(Myself),INQUISITOR)
+!Kit(ThirdNearestEnemyOf(Myself),CAVALIER)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+!CheckStat(ThirdNearestEnemyOf(Myself),1,SCRIPTINGSTATE4)
+!HasItemEquiped("helm06",ThirdNearestEnemyOf(Myself))
+!HasItemEquiped("ipsion",ThirdNearestEnemyOf(Myself))
+!HasItemEquipedReal("miscbc",ThirdNearestEnemyOf(Myself))
+!HasItemEquiped("npchan",ThirdNearestEnemyOf(Myself))
+!HasItemEquiped("shld25",ThirdNearestEnemyOf(Myself))
+!HasItemEquipedReal("sper07",ThirdNearestEnemyOf(Myself))
+!HasItemEquipedReal("staf11",ThirdNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h35",ThirdNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h54",ThirdNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw2h14",ThirdNearestEnemyOf(Myself))
+GlobalLT("flMassSuggestion","LOCALS",1)
+THEN
+RESPONSE #100
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("fl#mssug",Myself)
+IncrementGlobal("flMassSuggestion","LOCALS",1)
+RESPONSE #50
+Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(FourthNearestEnemyOf(Myself))
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+General(FourthNearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([GOODCUTOFF.HUMANOID],3)
+!Race(FourthNearestEnemyOf(Myself),RAKSHASA)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+!CheckStatGT(FourthNearestEnemyOf(Myself),50,RESISTMAGIC)
+!CheckStat(FourthNearestEnemyOf(Myself),4,WIZARD_SPELL_IMMUNITY)
+!General(FourthNearestEnemyOf(Myself),UNDEAD)
+!Race(FourthNearestEnemyOf(Myself),ELF)
+!Race(FourthNearestEnemyOf(Myself),GOLEM)
+!Race(FourthNearestEnemyOf(Myself),SLIME)
+!Race(FourthNearestEnemyOf(Myself),DEMONIC)
+!Race(FourthNearestEnemyOf(Myself),TROLL)
+!Class(FourthNearestEnemyOf(Myself),MONK)
+!Kit(FourthNearestEnemyOf(Myself),INQUISITOR)
+!Kit(FourthNearestEnemyOf(Myself),CAVALIER)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+!CheckStat(FourthNearestEnemyOf(Myself),1,SCRIPTINGSTATE4)
+!HasItemEquiped("helm06",FourthNearestEnemyOf(Myself))
+!HasItemEquiped("ipsion",FourthNearestEnemyOf(Myself))
+!HasItemEquipedReal("miscbc",FourthNearestEnemyOf(Myself))
+!HasItemEquiped("npchan",FourthNearestEnemyOf(Myself))
+!HasItemEquiped("shld25",FourthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sper07",FourthNearestEnemyOf(Myself))
+!HasItemEquipedReal("staf11",FourthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h35",FourthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h54",FourthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw2h14",FourthNearestEnemyOf(Myself))
+GlobalLT("flMassSuggestion","LOCALS",1)
+THEN
+RESPONSE #100
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("fl#mssug",Myself)
+IncrementGlobal("flMassSuggestion","LOCALS",1)
+RESPONSE #50
+Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(FifthNearestEnemyOf(Myself))
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+General(FifthNearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([GOODCUTOFF.HUMANOID],3)
+!Race(FifthNearestEnemyOf(Myself),RAKSHASA)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+!CheckStatGT(FifthNearestEnemyOf(Myself),50,RESISTMAGIC)
+!CheckStat(FifthNearestEnemyOf(Myself),4,WIZARD_SPELL_IMMUNITY)
+!General(FifthNearestEnemyOf(Myself),UNDEAD)
+!Race(FifthNearestEnemyOf(Myself),ELF)
+!Race(FifthNearestEnemyOf(Myself),GOLEM)
+!Race(FifthNearestEnemyOf(Myself),SLIME)
+!Race(FifthNearestEnemyOf(Myself),DEMONIC)
+!Race(FifthNearestEnemyOf(Myself),TROLL)
+!Class(FifthNearestEnemyOf(Myself),MONK)
+!Kit(FifthNearestEnemyOf(Myself),INQUISITOR)
+!Kit(FifthNearestEnemyOf(Myself),CAVALIER)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+!CheckStat(FifthNearestEnemyOf(Myself),1,SCRIPTINGSTATE4)
+!HasItemEquiped("helm06",FifthNearestEnemyOf(Myself))
+!HasItemEquiped("ipsion",FifthNearestEnemyOf(Myself))
+!HasItemEquipedReal("miscbc",FifthNearestEnemyOf(Myself))
+!HasItemEquiped("npchan",FifthNearestEnemyOf(Myself))
+!HasItemEquiped("shld25",FifthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sper07",FifthNearestEnemyOf(Myself))
+!HasItemEquipedReal("staf11",FifthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h35",FifthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h54",FifthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw2h14",FifthNearestEnemyOf(Myself))
+GlobalLT("flMassSuggestion","LOCALS",1)
+THEN
+RESPONSE #100
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("fl#mssug",Myself)
+IncrementGlobal("flMassSuggestion","LOCALS",1)
+RESPONSE #50
+Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(SixthNearestEnemyOf(Myself))
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+General(SixthNearestEnemyOf(Myself),HUMANOID)
+NumCreatureGT([GOODCUTOFF.HUMANOID],3)
+!Race(SixthNearestEnemyOf(Myself),RAKSHASA)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+!CheckStatGT(SixthNearestEnemyOf(Myself),50,RESISTMAGIC)
+!CheckStat(SixthNearestEnemyOf(Myself),4,WIZARD_SPELL_IMMUNITY)
+!General(SixthNearestEnemyOf(Myself),UNDEAD)
+!Race(SixthNearestEnemyOf(Myself),ELF)
+!Race(SixthNearestEnemyOf(Myself),GOLEM)
+!Race(SixthNearestEnemyOf(Myself),SLIME)
+!Race(SixthNearestEnemyOf(Myself),DEMONIC)
+!Race(SixthNearestEnemyOf(Myself),TROLL)
+!Class(SixthNearestEnemyOf(Myself),MONK)
+!Kit(SixthNearestEnemyOf(Myself),INQUISITOR)
+!Kit(SixthNearestEnemyOf(Myself),CAVALIER)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+!CheckStat(SixthNearestEnemyOf(Myself),1,SCRIPTINGSTATE4)
+!HasItemEquiped("helm06",SixthNearestEnemyOf(Myself))
+!HasItemEquiped("ipsion",SixthNearestEnemyOf(Myself))
+!HasItemEquipedReal("miscbc",SixthNearestEnemyOf(Myself))
+!HasItemEquiped("npchan",SixthNearestEnemyOf(Myself))
+!HasItemEquiped("shld25",SixthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sper07",SixthNearestEnemyOf(Myself))
+!HasItemEquipedReal("staf11",SixthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h35",SixthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw1h54",SixthNearestEnemyOf(Myself))
+!HasItemEquipedReal("sw2h14",SixthNearestEnemyOf(Myself))
+GlobalLT("flMassSuggestion","LOCALS",1)
+THEN
+RESPONSE #100
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("fl#mssug",Myself)
+IncrementGlobal("flMassSuggestion","LOCALS",1)
+RESPONSE #50
+Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -2424,6 +2716,7 @@ See(NearestEnemyOf(Myself))
 !CheckStatGT(NearestEnemyOf(Myself),50,RESISTMAGIC)
 !CheckStatGT(NearestEnemyOf(Myself),0,MINORGLOBE)
 !General(NearestEnemyOf(Myself),UNDEAD)
+!Race(NearestEnemyOf(Myself),DEMONIC)
 !Race(NearestEnemyOf(Myself),ELF)
 !Race(NearestEnemyOf(Myself),GOLEM)
 !Race(NearestEnemyOf(Myself),SLIME)
@@ -2440,7 +2733,7 @@ Range(NearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",NearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #50
@@ -2448,7 +2741,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -2456,6 +2749,7 @@ See(SecondNearestEnemyOf(Myself))
 !CheckStatGT(SecondNearestEnemyOf(Myself),50,RESISTMAGIC)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,MINORGLOBE)
 !General(SecondNearestEnemyOf(Myself),UNDEAD)
+!Race(SecondNearestEnemyOf(Myself),DEMONIC)
 !Race(SecondNearestEnemyOf(Myself),ELF)
 !Race(SecondNearestEnemyOf(Myself),GOLEM)
 !Race(SecondNearestEnemyOf(Myself),SLIME)
@@ -2472,7 +2766,7 @@ Range(SecondNearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",SecondNearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #50
@@ -2480,7 +2774,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -2488,6 +2782,7 @@ See(ThirdNearestEnemyOf(Myself))
 !CheckStatGT(ThirdNearestEnemyOf(Myself),50,RESISTMAGIC)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,MINORGLOBE)
 !General(ThirdNearestEnemyOf(Myself),UNDEAD)
+!Race(ThirdNearestEnemyOf(Myself),DEMONIC)
 !Race(ThirdNearestEnemyOf(Myself),ELF)
 !Race(ThirdNearestEnemyOf(Myself),GOLEM)
 !Race(ThirdNearestEnemyOf(Myself),SLIME)
@@ -2504,7 +2799,7 @@ Range(ThirdNearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",ThirdNearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #50
@@ -2512,7 +2807,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -2520,6 +2815,7 @@ See(NearestEnemyOf(Myself))
 !CheckStatGT(NearestEnemyOf(Myself),50,RESISTMAGIC)
 !CheckStatGT(NearestEnemyOf(Myself),0,MINORGLOBE)
 !General(NearestEnemyOf(Myself),UNDEAD)
+!Race(NearestEnemyOf(Myself),DEMONIC)
 !Race(NearestEnemyOf(Myself),ELF)
 !Race(NearestEnemyOf(Myself),GOLEM)
 !Race(NearestEnemyOf(Myself),SLIME)
@@ -2537,7 +2833,7 @@ Range(NearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",NearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #100
@@ -2545,7 +2841,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -2553,6 +2849,7 @@ See(SecondNearestEnemyOf(Myself))
 !CheckStatGT(SecondNearestEnemyOf(Myself),50,RESISTMAGIC)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,MINORGLOBE)
 !General(SecondNearestEnemyOf(Myself),UNDEAD)
+!Race(SecondNearestEnemyOf(Myself),DEMONIC)
 !Race(SecondNearestEnemyOf(Myself),ELF)
 !Race(SecondNearestEnemyOf(Myself),GOLEM)
 !Race(SecondNearestEnemyOf(Myself),SLIME)
@@ -2570,7 +2867,7 @@ Range(SecondNearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",SecondNearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #100
@@ -2578,7 +2875,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -2586,6 +2883,7 @@ See(ThirdNearestEnemyOf(Myself))
 !CheckStatGT(ThirdNearestEnemyOf(Myself),50,RESISTMAGIC)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,MINORGLOBE)
 !General(ThirdNearestEnemyOf(Myself),UNDEAD)
+!Race(ThirdNearestEnemyOf(Myself),DEMONIC)
 !Race(ThirdNearestEnemyOf(Myself),ELF)
 !Race(ThirdNearestEnemyOf(Myself),GOLEM)
 !Race(ThirdNearestEnemyOf(Myself),SLIME)
@@ -2603,7 +2901,7 @@ Range(ThirdNearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",ThirdNearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #100
@@ -2611,7 +2909,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -2633,7 +2931,7 @@ Range(NearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",NearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #100
@@ -2641,7 +2939,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -2663,7 +2961,7 @@ Range(SecondNearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",SecondNearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #100
@@ -2671,7 +2969,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -2693,7 +2991,7 @@ Range(ThirdNearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",ThirdNearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #100
@@ -2701,7 +2999,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -2730,7 +3028,7 @@ Range(NearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",NearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #100
@@ -2738,7 +3036,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -2767,7 +3065,7 @@ Range(SecondNearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",SecondNearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #100
@@ -2775,7 +3073,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -2804,7 +3102,7 @@ Range(ThirdNearestEnemyOf(Myself),15)
 GlobalLT("flColourSpray","LOCALS",7)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#clrsp",ThirdNearestEnemyOf(Myself))
 IncrementGlobal("flColourSpray","LOCALS",1)
 RESPONSE #100
@@ -2812,7 +3110,7 @@ Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !CheckStatGT(SixthNearestEnemyOf(Myself),75,RESISTMAGIC)
 !CheckStatGT(SixthNearestEnemyOf(Myself),99,RESISTFIRE)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,MINORGLOBE)
@@ -2833,7 +3131,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !CheckStatGT(FifthNearestEnemyOf(Myself),75,RESISTMAGIC)
 !CheckStatGT(FifthNearestEnemyOf(Myself),99,RESISTFIRE)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,MINORGLOBE)
@@ -2854,7 +3152,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !CheckStatGT(FourthNearestEnemyOf(Myself),75,RESISTMAGIC)
 !CheckStatGT(FourthNearestEnemyOf(Myself),99,RESISTFIRE)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,MINORGLOBE)
@@ -2875,7 +3173,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !CheckStatGT(ThirdNearestEnemyOf(Myself),75,RESISTMAGIC)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),99,RESISTFIRE)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,MINORGLOBE)
@@ -2896,7 +3194,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !CheckStatGT(SecondNearestEnemyOf(Myself),75,RESISTMAGIC)
 !CheckStatGT(SecondNearestEnemyOf(Myself),99,RESISTFIRE)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,MINORGLOBE)
@@ -2917,7 +3215,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !CheckStatGT(NearestEnemyOf(Myself),75,RESISTMAGIC)
 !CheckStatGT(NearestEnemyOf(Myself),99,RESISTFIRE)
 !CheckStatGT(NearestEnemyOf(Myself),0,MINORGLOBE)
@@ -2938,7 +3236,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !CheckStatGT(LastSeenBy(Myself),75,RESISTMAGIC)
 !CheckStatGT(LastSeenBy(Myself),99,RESISTFIRE)
 !CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
@@ -2954,14 +3252,14 @@ HPLT(LastSeenBy(Myself),15)
 See(LastSeenBy(Myself))
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#PFLAM",LastSeenBy(Myself))
-RESPONSE #50
+RESPONSE #100
 Continue()
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
@@ -3004,7 +3302,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
@@ -3047,7 +3345,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
@@ -3090,7 +3388,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
@@ -3133,7 +3431,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
@@ -3176,7 +3474,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
@@ -3219,7 +3517,7 @@ RESPONSE #100
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
 !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 !CheckStatGT(LastSeenBy(Myself),0,HELD)
@@ -3257,7 +3555,7 @@ General(LastSeenBy(Myself),HUMANOID)
 See(LastSeenBy(Myself))
 THEN
 RESPONSE #50
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#WI104",LastSeenBy(Myself))
 RESPONSE #100
 Continue()
@@ -3282,7 +3580,6 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(NearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
 StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
-Range(NearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(NearestEnemyOf(Myself))
@@ -3307,7 +3604,6 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(SecondNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
 StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
-Range(SecondNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(SecondNearestEnemyOf(Myself))
@@ -3332,7 +3628,6 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
 StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
-Range(ThirdNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(ThirdNearestEnemyOf(Myself))
@@ -3357,7 +3652,6 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(FourthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
 StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
-Range(FourthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(FourthNearestEnemyOf(Myself))
@@ -3382,7 +3676,6 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(FifthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
 StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
-Range(FifthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(FifthNearestEnemyOf(Myself))
@@ -3407,10 +3700,431 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(SixthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
 StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
-Range(SixthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(SixthNearestEnemyOf(Myself))
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOf(Myself),0,HELD)
+!StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(NearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+!StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+!Range(NearestEnemyOf(Myself),6)
+See(NearestEnemyOf(Myself))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),0,HELD)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
+!Range(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),6)
+See(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,HELD)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_MIRRORIMAGE)
+!Range(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),6)
+See(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,HELD)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
+!Range(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),6)
+See(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),0,HELD)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
+!Range(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),6)
+See(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),0,HELD)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
+!Range(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),6)
+See(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,HELD)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_MIRRORIMAGE)
+!Range(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),6)
+See(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,HELD)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
+!Range(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),6)
+See(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),0,HELD)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
+!Range(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),6)
+See(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(NearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOfType([0.0.0.DRUID_ALL]),0,HELD)
+!StateCheck(NearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(NearestEnemyOfType([0.0.0.DRUID_ALL]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(NearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
+!Range(NearestEnemyOfType([0.0.0.DRUID_ALL]),6)
+See(NearestEnemyOfType([0.0.0.DRUID_ALL]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,HELD)
+!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_MIRRORIMAGE)
+!Range(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),6)
+See(NearestEnemyOfType([0.0.0.CLERIC_RANGER]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_ALL]),0,HELD)
+!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_ALL]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
+!Range(NearestEnemyOfType([0.0.0.CLERIC_ALL]),6)
+See(NearestEnemyOfType([0.0.0.CLERIC_ALL]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(NearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOfType([0.0.0.MAGE_ALL]),0,HELD)
+!StateCheck(NearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(NearestEnemyOfType([0.0.0.MAGE_ALL]),99,MAGICDAMAGERESISTANCE)
+!StateCheck(NearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
+!Range(NearestEnemyOfType([0.0.0.MAGE_ALL]),6)
+See(NearestEnemyOfType([0.0.0.MAGE_ALL]))
+False()
+THEN
+RESPONSE #100
+ Continue()
+END
+
+IF
+!GlobalTimerNotExpired("flCast","LOCALS")
+!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+!CheckStatGT(LastSeenBy(Myself),0,HELD)
+!StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH)
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(LastSeenBy(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(LastSeenBy(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(LastSeenBy(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(LastSeenBy(Myself),99,MAGICDAMAGERESISTANCE)
+!StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+!Range(LastSeenBy(Myself),6)
+See(LastSeenBy(Myself))
+THEN
+RESPONSE #100
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
+RESPONSE #100
+Continue()
 END
 
 IF
@@ -3434,7 +4148,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(NearestEnemyOfType([0.0.0.MAGE_ALL]),99,MAGICDAMAGERESISTANCE)
-Range(NearestEnemyOfType([0.0.0.MAGE_ALL]),6)
+!StateCheck(NearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(NearestEnemyOfType([0.0.0.MAGE_ALL]))
@@ -3461,7 +4175,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_ALL]),99,MAGICDAMAGERESISTANCE)
-Range(NearestEnemyOfType([0.0.0.CLERIC_ALL]),6)
+!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(NearestEnemyOfType([0.0.0.CLERIC_ALL]))
@@ -3488,7 +4202,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),99,MAGICDAMAGERESISTANCE)
-Range(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),6)
+!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(NearestEnemyOfType([0.0.0.CLERIC_RANGER]))
@@ -3515,7 +4229,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(NearestEnemyOfType([0.0.0.DRUID_ALL]),99,MAGICDAMAGERESISTANCE)
-Range(NearestEnemyOfType([0.0.0.DRUID_ALL]),6)
+!StateCheck(NearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(NearestEnemyOfType([0.0.0.DRUID_ALL]))
@@ -3542,7 +4256,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),99,MAGICDAMAGERESISTANCE)
-Range(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),6)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]))
@@ -3569,7 +4283,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),99,MAGICDAMAGERESISTANCE)
-Range(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),6)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]))
@@ -3596,7 +4310,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),99,MAGICDAMAGERESISTANCE)
-Range(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),6)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]))
@@ -3623,7 +4337,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),99,MAGICDAMAGERESISTANCE)
-Range(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),6)
+!StateCheck(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]))
@@ -3650,7 +4364,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),99,MAGICDAMAGERESISTANCE)
-Range(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),6)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]))
@@ -3677,7 +4391,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),99,MAGICDAMAGERESISTANCE)
-Range(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),6)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]))
@@ -3704,7 +4418,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),99,MAGICDAMAGERESISTANCE)
-Range(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),6)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]))
@@ -3731,7 +4445,7 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),99,MAGICDAMAGERESISTANCE)
-Range(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),6)
+!StateCheck(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]))
@@ -3758,14 +4472,15 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(NearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-Range(NearestEnemyOf(Myself),6)
+!StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
 AttackOneRound(NearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(NearestEnemyOf(Myself))
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
 !StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -3786,390 +4501,155 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(NearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
 !Range(NearestEnemyOf(Myself),6)
-See(NearestEnemyOf(Myself))
-False()
 THEN
 RESPONSE #100
- Continue()
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("RR#TELWE",NearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_DISABLED)
-!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),0,HELD)
-!StateCheck(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_STONE_DEATH)
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(SecondNearestEnemyOf(Myself))
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+CheckStat(SecondNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
 OR(2)
 CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(SecondNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(SecondNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(SecondNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),99,MAGICDAMAGERESISTANCE)
-!Range(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]),6)
-See(ThirdNearestEnemyOfType([0.0.0.DRUID_ALL]))
-False()
+!CheckStat(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(SecondNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+!Range(SecondNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
- Continue()
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("RR#TELWE",SecondNearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_DISABLED)
-!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,HELD)
-!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_STONE_DEATH)
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(ThirdNearestEnemyOf(Myself))
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+CheckStat(ThirdNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
 OR(2)
 CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(ThirdNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(ThirdNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(ThirdNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),99,MAGICDAMAGERESISTANCE)
-!Range(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]),6)
-See(ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER]))
-False()
+!CheckStat(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+!Range(ThirdNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
- Continue()
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("RR#TELWE",ThirdNearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_DISABLED)
-!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,HELD)
-!StateCheck(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_STONE_DEATH)
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(FourthNearestEnemyOf(Myself))
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+CheckStat(FourthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
 OR(2)
 CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(FourthNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(FourthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(FourthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),99,MAGICDAMAGERESISTANCE)
-!Range(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]),6)
-See(ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL]))
-False()
+!CheckStat(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(FourthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+!Range(FourthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
- Continue()
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("RR#TELWE",FourthNearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_DISABLED)
-!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),0,HELD)
-!StateCheck(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_STONE_DEATH)
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(FifthNearestEnemyOf(Myself))
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+CheckStat(FifthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
 OR(2)
 CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(FifthNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(FifthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(FifthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),99,MAGICDAMAGERESISTANCE)
-!Range(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]),6)
-See(ThirdNearestEnemyOfType([0.0.0.MAGE_ALL]))
-False()
+!CheckStat(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(FifthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+!Range(FifthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
- Continue()
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("RR#TELWE",FifthNearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_DISABLED)
-!CheckStatGT(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),0,HELD)
-!StateCheck(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_STONE_DEATH)
+!GlobalTimerNotExpired("flCast","LOCALS")
+See(SixthNearestEnemyOf(Myself))
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+CheckStat(SixthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
 OR(2)
 CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(SixthNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(SixthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStat(SixthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),99,MAGICDAMAGERESISTANCE)
-!Range(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),6)
-See(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]))
-False()
+!CheckStat(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!CheckStatGT(SixthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
+!Range(SixthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
- Continue()
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_DISABLED)
-!CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,HELD)
-!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_STONE_DEATH)
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),99,MAGICDAMAGERESISTANCE)
-!Range(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]),6)
-See(SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER]))
-False()
-THEN
-RESPONSE #100
- Continue()
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_DISABLED)
-!CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,HELD)
-!StateCheck(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_STONE_DEATH)
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),99,MAGICDAMAGERESISTANCE)
-!Range(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),6)
-See(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]))
-False()
-THEN
-RESPONSE #100
- Continue()
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_DISABLED)
-!CheckStatGT(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),0,HELD)
-!StateCheck(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_STONE_DEATH)
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),99,MAGICDAMAGERESISTANCE)
-!Range(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),6)
-See(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]))
-False()
-THEN
-RESPONSE #100
- Continue()
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(NearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_DISABLED)
-!CheckStatGT(NearestEnemyOfType([0.0.0.DRUID_ALL]),0,HELD)
-!StateCheck(NearestEnemyOfType([0.0.0.DRUID_ALL]),STATE_STONE_DEATH)
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(NearestEnemyOfType([0.0.0.DRUID_ALL]),99,MAGICDAMAGERESISTANCE)
-!Range(NearestEnemyOfType([0.0.0.DRUID_ALL]),6)
-See(NearestEnemyOfType([0.0.0.DRUID_ALL]))
-False()
-THEN
-RESPONSE #100
- Continue()
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_DISABLED)
-!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,HELD)
-!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),STATE_STONE_DEATH)
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),99,MAGICDAMAGERESISTANCE)
-!Range(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),6)
-See(NearestEnemyOfType([0.0.0.CLERIC_RANGER]))
-False()
-THEN
-RESPONSE #100
- Continue()
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_DISABLED)
-!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_ALL]),0,HELD)
-!StateCheck(NearestEnemyOfType([0.0.0.CLERIC_ALL]),STATE_STONE_DEATH)
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_ALL]),99,MAGICDAMAGERESISTANCE)
-!Range(NearestEnemyOfType([0.0.0.CLERIC_ALL]),6)
-See(NearestEnemyOfType([0.0.0.CLERIC_ALL]))
-False()
-THEN
-RESPONSE #100
- Continue()
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(NearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_DISABLED)
-!CheckStatGT(NearestEnemyOfType([0.0.0.MAGE_ALL]),0,HELD)
-!StateCheck(NearestEnemyOfType([0.0.0.MAGE_ALL]),STATE_STONE_DEATH)
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(NearestEnemyOfType([0.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(NearestEnemyOfType([0.0.0.MAGE_ALL]),99,MAGICDAMAGERESISTANCE)
-!Range(NearestEnemyOfType([0.0.0.MAGE_ALL]),6)
-See(NearestEnemyOfType([0.0.0.MAGE_ALL]))
-False()
-THEN
-RESPONSE #100
- Continue()
-END
-
-IF
-!GlobalTimerNotExpired("cast","LOCALS")
-!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-!CheckStatGT(LastSeenBy(Myself),0,HELD)
-!StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH)
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(LastSeenBy(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(LastSeenBy(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(LastSeenBy(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!CheckStatGT(LastSeenBy(Myself),99,MAGICDAMAGERESISTANCE)
-!Range(LastSeenBy(Myself),6)
-See(LastSeenBy(Myself))
-THEN
-RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
-ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
-RESPONSE #100
-Continue()
+SetGlobalTimer("flCast","LOCALS",6)
+ForceSpellRES("RR#TELWE",SixthNearestEnemyOf(Myself))
 END
 
 IF
@@ -4193,7 +4673,6 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(NearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-Range(NearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(NearestEnemyOf(Myself))
@@ -4220,7 +4699,6 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(SecondNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-Range(SecondNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(SecondNearestEnemyOf(Myself))
@@ -4247,7 +4725,6 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-Range(ThirdNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(ThirdNearestEnemyOf(Myself))
@@ -4274,7 +4751,6 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(FourthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-Range(FourthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(FourthNearestEnemyOf(Myself))
@@ -4301,7 +4777,6 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(FifthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-Range(FifthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(FifthNearestEnemyOf(Myself))
@@ -4328,18 +4803,14 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !CheckStatGT(SixthNearestEnemyOf(Myself),99,MAGICDAMAGERESISTANCE)
-Range(SixthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
 AttackOneRound(SixthNearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
-!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
-!CheckStatGT(NearestEnemyOf(Myself),0,HELD)
-!StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -4359,16 +4830,13 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !Range(NearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#TELWE",NearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
-!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
-!CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
-!StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(SecondNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -4388,16 +4856,13 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !Range(SecondNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#TELWE",SecondNearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
-!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
-!CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
-!StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(ThirdNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -4417,16 +4882,13 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !Range(ThirdNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#TELWE",ThirdNearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FourthNearestEnemyOf(Myself))
-!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
-!CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
-!StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(FourthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -4446,16 +4908,13 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !Range(FourthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#TELWE",FourthNearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(FifthNearestEnemyOf(Myself))
-!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
-!CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
-!StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(FifthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -4475,16 +4934,13 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !Range(FifthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#TELWE",FifthNearestEnemyOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 See(SixthNearestEnemyOf(Myself))
-!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
-!CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
-!StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(SixthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -4504,7 +4960,7 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !Range(SixthNearestEnemyOf(Myself),6)
 THEN
 RESPONSE #100
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#TELWE",SixthNearestEnemyOf(Myself))
 END
 
@@ -4700,16 +5156,15 @@ END
 
 IF
 !Range(LastSeenBy(Myself),6)
-!GlobalTimerNotExpired("cast","LOCALS")
+!GlobalTimerNotExpired("flCast","LOCALS")
 ActionListEmpty()
 THEN
 RESPONSE #100
 ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
-SetGlobalTimer("cast","LOCALS",6)
+SetGlobalTimer("flCast","LOCALS",6)
 END
 
 IF
-Range(LastSeenBy(Myself),6)
 ActionListEmpty()
 THEN
 RESPONSE #100

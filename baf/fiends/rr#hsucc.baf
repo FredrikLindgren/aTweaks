@@ -8,9 +8,10 @@ THEN
 END
 
 IF
-  OR(2)
+  OR(3)
     Exists(LastSummonerOf(Myself))
     Name("RR#HSSUC",Myself)
+    Name("KIRINHALE",Myself)
   Global("flNoGating","LOCALS",0)
 THEN
   RESPONSE #100
@@ -1825,6 +1826,34 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		ForceSpellRES("RR#ETHER",Myself) // Etherealness
 		SetInterrupt(TRUE)
+END
+
+IF
+  False()
+  Global("Placeholder24Gating","LOCALS",0)
+THEN
+  RESPONSE #100
+    Continue()
+END
+
+//IF
+//See(Charmable)
+//RESPONSE
+//NoAction
+//Possibly RandomWalk above 
+
+IF
+  See([GOODCUTOFF])
+  HPPercentLT(Myself,30)
+  ActionListEmpty()
+  !Name("KIRINHALE",Myself)
+  !Name("GorWom01",Myself)
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    DisplayStringHead(Myself,@746) // You are of no use to me, mortal, and you shall have to find your amusement elsewhere, as well.
+    ForceSpellRES("RR#TELAW",Myself)
+    SetInterrupt(TRUE)
 END
 
 IF

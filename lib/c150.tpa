@@ -2197,22 +2197,26 @@ COPY_EXISTING ~SPFIEND.EFF~ ~override/RR#SGELU.EFF~                             
   WRITE_ASCIIE 0x30 "%DEST_RES%" #8                                                // resref
 BUT_ONLY_IF_IT_CHANGES
 
+       
+
 COPY_EXISTING ~SPWI905.SPL~  ~override~                                            // Gate (Wizard)
               ~SPPR703.SPL~  ~override~                                            // Gate (Cleric)
+  WRITE_ASCII 0x3a fl#905c #8                                                      // new spellbook icon 
   READ_LONG  0x64 "abil_off" ELSE 0
   READ_SHORT 0x68 "abil_num" ELSE 0
   READ_LONG  0x6a "fx_off"   ELSE 0
   SET "delta" = 0
   FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN
-   WRITE_SHORT ("%abil_off%" + 0x0e + (0x28 * "%index%")) "30"                     // set range to 30 (visual range)
-  PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~SPWI905~) BEGIN                      // Arcane version
-    WRITE_SHORT ("%abil_off%" + 0x12 + (0x28 * "%index%")) "9"                     // set casting time to 9
-    SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @753 SAY UNIDENTIFIED_DESC @753    // retain old name but set new description (arcane)
-  END
-  PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~SPPR703~) BEGIN                      // Divine version
-    WRITE_SHORT ("%abil_off%" + 0x12 + (0x28 * "%index%")) "5"                     // set casting time to 5
-    SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @754 SAY UNIDENTIFIED_DESC @754    // retain old name but set new description (divine)
-  END
+    WRITE_ASCII abil_off + 0x28*index + 0x4 fl#905b #8                             // new icon (stone background) 
+    WRITE_SHORT ("%abil_off%" + 0x0e + (0x28 * "%index%")) "30"                     // set range to 30 (visual range)
+    PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~SPWI905~) BEGIN                      // Arcane version
+      WRITE_SHORT ("%abil_off%" + 0x12 + (0x28 * "%index%")) "9"                     // set casting time to 9
+      SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @753 SAY UNIDENTIFIED_DESC @753    // retain old name but set new description (arcane)
+    END
+    PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~SPPR703~) BEGIN                      // Divine version
+      WRITE_SHORT ("%abil_off%" + 0x12 + (0x28 * "%index%")) "5"                     // set casting time to 5
+      SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @754 SAY UNIDENTIFIED_DESC @754    // retain old name but set new description (divine)
+    END
     READ_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
     READ_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
     SET "abil_fx_idx" = ("%abil_fx_idx%" + "%delta%")
@@ -2253,13 +2257,14 @@ BUT_ONLY_IF_IT_CHANGES
 // Item changes
 
 COPY_EXISTING ~SCRL8I.ITM~  ~override~                                             // Cacofiend scroll
-SAY NAME1 #17320 SAY NAME2 #17320  SAY DESC @751 SAY UNIDENTIFIED_DESC @751        // retain old name but set new description
+  SAY NAME1 #17320 SAY NAME2 #17320  SAY DESC @751 SAY UNIDENTIFIED_DESC @751        // retain old name but set new description
 BUT_ONLY_IF_IT_CHANGES
 COPY_EXISTING ~SCRL9B.ITM~  ~override~                                             // Summon Fiend scroll
-SAY NAME1 #17360 SAY NAME2 #17360  SAY DESC @752 SAY UNIDENTIFIED_DESC @752        // retain old name but set new description
+  SAY NAME1 #17360 SAY NAME2 #17360  SAY DESC @752 SAY UNIDENTIFIED_DESC @752        // retain old name but set new description
 BUT_ONLY_IF_IT_CHANGES
 COPY_EXISTING ~SCRL9N.ITM~  ~override~                                             // Gate scroll
-SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @753 SAY UNIDENTIFIED_DESC @753        // retain old name but set new description
+  WRITE_ASCII 0x3a fl#905a #8                                                      // new scroll icon
+  SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @753 SAY UNIDENTIFIED_DESC @753        // retain old name but set new description
 BUT_ONLY_IF_IT_CHANGES
 
 
