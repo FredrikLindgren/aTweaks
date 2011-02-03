@@ -202,31 +202,13 @@ COPY ~aTweaks/SPL/RR#DBFLA.SPL~ ~override~                                      
 COPY ~aTweaks/SPL/RR#DBFLE.SPL~ ~override~                                         // Death Throes (Balor)
   SAY NAME1 @683 SAY NAME2 @683
 COPY ~aTweaks/EFF/RR#DBFLW.EFF~ ~override~                                         // Flaming Whip ability immunity (for large and incorporeal creatures)
+
 COPY ~aTweaks/SPL/RR#CNSTR.SPL~ ~override/RR#DGRAB.SPL~                            // Grab ability (Glabrezu)
 SAY NAME1 @684 SAY NAME2 @684                                                    
-  READ_LONG  0x64 "abil_off"
-  READ_SHORT 0x68 "abil_num"
-  READ_LONG  0x6a "fx_off"
-  SET "fx_delta" = 0
-  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN                     // cycle through abilities
-   READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
-   READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
-   SET "abil_fx_idx" = ("%abil_fx_idx%" + "%fx_delta%")
-   WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
-    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
-      READ_SHORT ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "opcode"
-      PATCH_IF (("%opcode%" = "177") OR ("%opcode%" = "206")) BEGIN  // effects #177 and #206: Use EFF File and Protection from Spell
-       WRITE_ASCII  ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "RR#DGRAB" #8 // resref: RR#DGRAB
-      END
-      PATCH_IF ("%opcode%" = "12")  BEGIN  // effect #12: HP Damage
-        DELETE_BYTES ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) 0x30 // delete effect
-        SET "fx_delta" = "%fx_delta%" - 1
-        SET "index2" = "%index2%" - 1
-        SET "abil_fx_num" = "%abil_fx_num%" - 1
-      END
-     WRITE_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%")
-    END
-  END
+  LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = 177 END
+  LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = 12 END
+  
+
 COPY ~aTweaks/EFF/RR#CNSTR.EFF~ ~override/RR#DGRAB.EFF~                            // Grab ability immunity (for large and incorporeal creatures)
   WRITE_ASCII 0x30 ~RR#DGRAB~ #8                                                   // resref: RR#DGRAB
 

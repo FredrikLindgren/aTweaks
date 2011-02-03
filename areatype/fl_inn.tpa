@@ -1,0 +1,147 @@
+///add NEJ and CA
+
+
+
+ACTION_IF ENGINE_IS ~soa tob~ BEGIN
+ 
+  DEFINE_ACTION_FUNCTION fl#inn_add_area_type RET FL_INN BEGIN //By wrapping it in a function we do not accidentally contaminate the install environment with our variables
+  
+    ACTION_IF GAME_IS ~tutu tutu_totsc~ BEGIN //We do a fair amount for platform checking, so to marginally speed things up we only check the game files once
+      OUTER_SET BG1 = 1
+      OUTER_SET BG2 = 0
+    END ELSE ACTION_IF GAME_IS bgt BEGIN
+      OUTER_SET BG1 = 1
+      OUTER_SET BG2 = 1
+    END ELSE BEGIN
+      OUTER_SET BG1 = 0
+      OUTER_SET BG2 = 1
+    END 
+  
+    OUTER_SET FL_INN = IDS_OF_SYMBOL (areatype FL_INN) //This serves to both check if the label even exists and, if so, retrieve the value
+    ACTION_IF FL_INN < 0 BEGIN //A result of "-1" means the label does not exist
+      OUTER_FOR (p=1;p<16;++p) BEGIN
+        OUTER_SET FL_INN = 2 ** p //Try 2^p, 1<=p<16
+        ACTION_IF !FILE_CONTAINS_EVALUATED (areatype.ids "^[ %TAB%]*%FL_INN%") BEGIN //If we have found a free bit, append our label to the file
+          APPEND areatype.ids "%FL_INN% FL_INN"
+          OUTER_SET p = 20
+        END
+      END
+      ACTION_IF p = 16 BEGIN //If p = 16 there were no free bits in areatype.ids and consequently we have to abort, or problems would ensue
+        FAIL ~ERROR: No space in areatype.ids for FL_INN flag~
+      END
+    END
+
+    ACTION_FOR_EACH area IN //Flag mod-added areas, if they are present
+      /*Bonehill:*/ bh0107 bh0120 bh0123 bh0115 bh2020 bh2024
+      /*Aran Whitehand:*/ "c-ar01" "c-inn0" "c-inn1" "c-inn2" "c-inn3" "c-inn4"
+      /*TDD:*/ arpo06 arpo07 dd0118 dd0119 dd1008 dd1008b dd3302 dd3334 dd3335
+      /*RoT:*/ ra3901 ra5104 ra5105 rr3104 rr3105 rr3117 rr3118 rr3305 rr3312
+      /*Undying:*/ cm7000 cm7100
+      /*NTotSC*/ ar33pb
+      /*Soubar:*/ ar4262 ar4263 ar4264 ar4265 ar4266 ar4267 ar4268 ar4269 ar4272 ar4273 ar4274 ar4275 ar4276
+      /*CtB:*/ ar3651 ar3652
+      /*FFT:*/ ys0160 ys0381 ys0382 ys0383 ys0396 ys0413 ys0414
+    BEGIN  
+      ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
+        COPY_EXISTING "%area%.are" override
+          PATCH_IF SOURCE_SIZE > 0x11b BEGIN
+            WRITE_SHORT 0x48 THIS BOR FL_INN
+          END
+        BUT_ONLY
+      END
+    END
+
+    ACTION_IF BG2 BEGIN //If we are on BG2, flag vanilla BG2 areas
+      ACTION_FOR_EACH area IN 
+        /*BG2:*/ ar0021 ar0022 ar0313 ar0314 ar0406 ar0509 ar0510 ar0511 ar0513 ar0514 ar0515 ar0704 ar0709 ar0712 ar1105 ar1602 ar2010 ar2100 ar2202 ar2203 ar5003 ar5501
+      BEGIN
+        ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
+          COPY_EXISTING "%area%.are" override
+            PATCH_IF SOURCE_SIZE > 0x11b BEGIN
+              WRITE_SHORT 0x48 THIS BOR FL_INN
+            END
+          BUT_ONLY
+        END
+      END
+    END
+    
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY fl#inn_bgt_compat_are BEGIN
+      ar0103 => ar7203
+      ar0104 => ar7204
+      ar0105 => ar7205
+      ar0106 => ar7206
+      ar0107 => ar7207
+      ar0114 => ar7214
+      ar0115 => ar7215
+      ar0116 => ar7216
+      ar0117 => ar7217
+      ar0118 => ar7218
+      ar0119 => ar7219
+      ar0120 => ar7220
+      ar0121 => ar7221
+      ar0133 => ar7233
+      ar0134 => ar7234
+      ar0135 => ar7235
+      ar0136 => ar7236
+      ar0154 => ar7254
+      ar0165 => ar7265
+      ar0166 => ar7266
+      ar0171 => ar7271
+      ar0705 => ar7705
+      ar0706 => ar7706
+      ar0720 => ar7720
+      ar1001 => aru001
+      ar1109 => ar8009
+      ar1110 => ar8010
+      ar1215 => ar8115
+      ar2301 => ar6801
+      ar2302 => ar6802
+      ar2303 => ar6803
+      ar2616 => ar6516
+      ar2617 => ar6517
+      ar2629 => ar6529
+      ar2630 => ar6530
+      ar3303 => ar6703
+      ar3304 => ar6704
+      ar3305 => ar6705
+      ar3306 => ar6706
+      ar3307 => ar6707
+      ar3308 => ar6708
+      ar3351 => ar6751
+      ar3352 => ar6752
+      ar3357 => ar6757
+      ar4801 => ar3701
+      ar4809 => ar3709
+    END
+
+    ACTION_IF GAME_IS BG1 BEGIN //If we are on Tutu or BGT
+      ACTION_FOR_EACH area IN
+        /*BG1:*/ ar0103 ar0104 ar0105 ar0106 ar0107 ar0114 ar0115 ar0116 ar0117 ar0118 ar0119 ar0120 ar0121 ar0133 ar0134 ar0135 ar0136 ar0154 ar0165 ar0166 ar0171 ar0705 ar0706 ar0720 ar1001 ar1109 ar1110 ar1215 ar2301 ar2302 ar2303 ar2616 ar2617 ar2629 ar2630 ar3303 ar3304 ar3305 ar3306 ar3307 ar3308 ar3351 ar3352 ar3357 ar4801 ar4809
+      BEGIN
+        ACTION_IF !BG2 AND "%area%" STRING_MATCHES_REGEXP "ar[0-9]+$" = 0 BEGIN //If BG2 is 0 we are on Tutu
+          OUTER_PATCH_SAVE area "%area%" BEGIN
+            WRITE_ASCII 0 fw
+          END
+        END
+        ACTION_IF BG2 AND VARIABLE_IS_SET $fl#inn_bgt_compat_are("%area%") BEGIN //If BG2 is 1 we are on BGT
+          OUTER_SPRINT area $fl#inn_bgt_compat_are("%area%")
+        END
+        ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
+          COPY_EXISTING "%area%.are" override
+            PATCH_IF SOURCE_SIZE > 0x11b BEGIN
+              WRITE_SHORT 0x48 THIS BOR FL_INN
+            END
+          BUT_ONLY
+        END
+      END
+    END
+    
+  END //DEFINE_ACTION_FUNCTION
+  
+  LAF fl#inn_add_area_type RET FL_INN = FL_INN END
+
+END //ACTION_IF ENGINE_IS
+ELSE BEGIN
+  PRINT ~ATTENTION: FL_INN is only available for games based on the BG2 engine~
+END
+  
