@@ -28,6 +28,32 @@ THEN
     SetInterrupt(TRUE)
 END
 
+IF
+  OR(3)
+    Allegiance(LastSummonerOf(Myself),EVILCUTOFF)
+    StateCheck(LastSummonerOf(Myself),STATE_REALLY_DEAD)
+    !Exists(LastSummonerOf(Myself))
+  Global("flHostile","LOCALS",0)
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    SetGlobal("flHostile","LOCALS",1)
+    Enemy()
+    SetInterrupt(TRUE)
+END
+
+IF
+  Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
+  Global("flHostile","LOCALS",1)
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    SetGlobal("flHostile","LOCALS",0)
+    LeaveParty()
+    ChangeEnemyAlly(Myself,ALLY)
+    SetInterrupt(TRUE)
+END
+
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|SlashResFull)
