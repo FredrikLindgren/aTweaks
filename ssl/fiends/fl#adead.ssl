@@ -1,0 +1,83 @@
+
+//This script is for undead summoned by yugoloth
+//They match the allegiance of the summoner, are uncontrollable by the player, do not turn on the summoner and follow the summoner around
+
+IF
+  Global("fl#EACheck","LOCALS",0)
+  Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    SetGlobal("fl#EACheck","LOCALS",2)
+    DialogInterrupt(FALSE)
+    LeaveParty()
+    ChangeEnemyAlly(Myself,ALLY)
+    SetInterrupt(TRUE)
+END
+
+IF
+  Global("fl#EACheck","LOCALS",0)
+  OR(2)
+    Allegiance(LastSummonerOf(Myself),EVILCUTOFF)
+    !Exists(LastSummonerOf(Myself))
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    SetGlobal("fl#EACheck","LOCALS",1)
+    Enemy()
+    SetInterrupt(TRUE)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull)
+  StateCheck(scstarget,STATE_IMMOBILE)
+  Range(scstarget,10)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF
+  OR(2)
+    !See(LastSummonerOf(Myself))
+    !Range(LastSummonerOf(Myself),25)
+  !StateCheck(LastSummonerOf(Myself),STATE_REALLY_DEAD)  
+  !Range(NearestEnemyOf(Myself),3)
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    MoveToObject(LastSummonerOf(Myself))
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull|Stoneskin|MirrorImage|Disabled)
+THEN DO
+  AttackOneRound(scstarget)
+END 
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|WeaponImmunity|SlashResFull)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashResFull)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF
+  ActionListEmpty()
+  !Range(LastSummonerOf(Myself),10)
+  !StateCheck(LastSummonerOf(Myself),STATE_REALLY_DEAD)
+THEN
+  RESPONSE #100
+    MoveToObject(LastSummonerOf(Myself))
+END
+  
+
+

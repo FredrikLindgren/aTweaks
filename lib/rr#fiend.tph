@@ -503,9 +503,6 @@ COPY_EXISTING ~SPWI817.SPL~  ~override/RR#WI817.SPL~                            
   END 
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
-COPY_EXISTING sppr301.spl "override/RR#PR301.spl"                                  //Animate Dead
-  LPF RR#SP2IN INT_VAR rr#rinvis = 1 END
-  
 COPY_EXISTING spwi112.spl "override/RR#WI112.spl"                                  //Magic Missile
   LPF RR#SP2IN INT_VAR rr#rinvis = 1 END 
   
@@ -700,6 +697,71 @@ COPY
 ///////////
 //Yugoloth
 ///////////
+
+//Custom Animate Dead
+COPY_EXISTING sppr301.spl  "override/fl#adead.spl"
+  READ_LONG  0x64 ao
+  READ_LONG  0x6a eo
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    READ_SHORT ao + 0x28*i + 0x10 lvl
+    READ_SHORT ao + 0x28*i + 0x1e ei
+    READ_SHORT ao + 0x28*i + 0x20 ne
+    c = 0
+    FOR (j=0;i<ne;++j) BEGIN
+      READ_SHORT eo + 0x30*(ei + j) type
+      PATCH_IF type = 177 BEGIN
+        READ_ASCII   eo + 0x30*(ei + j) + 0x14 res
+        PATCH_IF "%res%" STRING_EQUAL_CASE spandl15 OR (lvl >= 15 AND !c) BEGIN
+          SPRINT res fl#swasu
+          ++c
+        END ELSE BEGIN
+          SPRINT res fl#skesu
+        END 
+        WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 "%res%"
+      END
+    END
+  END  
+  LPF RR#SP2IN INT_VAR rr#rinvis = 1 END
+
+COPY_EXISTING spandead.eff "override/fl#skesu.eff"
+              spandl15.eff "override/fl#swasu.eff"
+  WRITE_ASCIIE 0x30 "%DEST_RES%" #8
+
+COPY_EXISTING ghastsu.cre  "override/fl#skesu.cre"
+              skelwasu.cre "override/fl#swasu.cre"
+  WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
+  WRITE_LONG 0x14 0                                                                //no xp 
+  WRITE_ASCII_LIST 0x248 fl#adead "" "" "" ""                                      //new script   
+  WRITE_BYTE   0x270 128                                                           //Initially neutral
+  REPLACE_CRE_ITEM "%DEST_RES%" #0 #0 #0 none weapon1 equip
+  PATCH_IF "%DEST_RES%" STRING_EQUAL_CASE fl#swasu BEGIN
+    WRITE_BYTE 0x271 4 //undead
+    WRITE_BYTE 0x273 135 //SKELETON_WARRIOR
+  END
+  
+COPY_EXISTING skelwasu.itm "override/fl#swasu.itm"
+              skelclub.itm "override/fl#skesu.itm"
+  READ_LONG 0x60 enchantment
+  READ_LONG 0x6a eo
+  type = "-1"
+  p1 = "-1"
+  p2 = "-1"
+  FOR (i=0;i<SHORT_AT 0x70 AND type != 177 AND p1 != enchantment AND p2 != 109;++i) BEGIN
+    READ_SHORT eo + 0x30*i       type
+    READ_LONG  eo + 0x30*i + 0x4 p1
+    READ_LONG  eo + 0x30*i + 0x8 p2
+  END
+  PATCH_IF type != 233 AND p1 != enchantment AND p2 != 109 BEGIN
+    LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 233 target = 1 parameter1 = enchantment parameter2 = 109 timing = 2 END //Detectable enchantment
+  END 
+  PATCH_IF "%DEST_RES%" STRING_EQUAL_CASE fl#skesu BEGIN
+    WRITE_ASCII 0x22 SC (2) //appearance: scimitar, because skeletons should have scimitars
+    LPF configure_weapon_header INT_VAR f_DamageType = 3 END //slashing
+  END
+    
+     
+  
+COMPILE "atweaks/baf/fiends/fl#adead.baf"
 
 //Fear, cone
 COPY "atweaks/spl/base.spl" "override/fl#cnefr.spl"

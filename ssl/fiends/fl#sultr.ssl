@@ -6,7 +6,7 @@
 //symbol, any type, 1x/day
 //shout (cone-shaped, deafen and 2d6 damage, save vs spell, does not affect silenced targets)
 //mass suggestion, 1x/day (charm, save vs spell at -1)
-//gaze of fascination (hold person if the target saves vs spell, "see a dearly loved and respected person" if the target fails his save. charm?)
+//gaze of fascination (hold person if the target saves vs spell, "see a dearly loved and respected person" if the target fails his save. charm? [non-hold effects not implemented])
 //They all have this:
 //animate dead
 //cause disease
@@ -117,7 +117,7 @@ IF TRIGGER
   GlobalLT("flSymbol","LOCALS",1)
 THEN DO
   Combine()
-  Action(ForceSpellRES,"RR#WI816"|30|100)
+  Action(ForceSpellRES,"RR#WI816"|50|100)
   IncrementGlobal("flSymbol","LOCALS",1)
 END
 
@@ -128,7 +128,7 @@ IF TRIGGER
   GlobalLT("flSymbol","LOCALS",1)
 THEN DO
   Combine()
-  Action(ForceSpellRES,"RR#SPAIN"|30|100)
+  Action(ForceSpellRES,"RR#SPAIN"|50|100)
   IncrementGlobal("flSymbol","LOCALS",1)
 END
 
@@ -139,7 +139,7 @@ IF TRIGGER
   GlobalLT("flSymbol","LOCALS",1)
 THEN DO
   Combine()
-  Action(ForceSpellRES,"RR#WI811"|30|100)
+  Action(ForceSpellRES,"RR#WI811"|50|100)
   IncrementGlobal("flSymbol","LOCALS",1)
 END
 
@@ -164,7 +164,7 @@ IF TRIGGER
     Class(scstarget,DRUID_ALL)
 THEN DO
   Combine()
-  Action(ForceSpellRES,"RR#PR301"|25|100)
+  Action(ForceSpellRES,"fl#adead"|50|100)
 END    
 
 IF
@@ -175,7 +175,7 @@ IF
   !GlobalTimerNotExpired("flCast","LOCALS")
 THEN
   RESPONSE #100
-    ForceSpellRES("RR#PR301",Myself)
+    ForceSpellRES("fl#adead",Myself)
     SetGlobalTimer("flCast","LOCALS",6)
 END  
 
@@ -187,7 +187,7 @@ IF
   !GlobalTimerNotExpired("flCast","LOCALS")
 THEN
   RESPONSE #100
-    ForceSpellRES("RR#PR301",Myself)
+    ForceSpellRES("fl#adead",Myself)
     SetGlobalTimer("flCast","LOCALS",6)
 END
 
