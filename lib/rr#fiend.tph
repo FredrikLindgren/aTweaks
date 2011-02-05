@@ -207,10 +207,32 @@ COPY ~aTweaks/SPL/RR#CNSTR.SPL~ ~override/RR#DGRAB.SPL~                         
 SAY NAME1 @684 SAY NAME2 @684                                                    
   LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = 177 END
   LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = 12 END
+  LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = 206 END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 duration = 12 STR_VAR resource = rr#dgrab END
+  insert_point = 0
+  opcode = 177
+  target = 2
+  duration = 1
+  SPRINT resource rr#dgrab
+  parameter2 = 4 //race.ids
+  PATCH_FOR_EACH parameter1 IN 119 121 122 123 132 133 134 136 142 143 144 146 BEGIN //slime, demonic, lycanthrope, beholder, shadow, spectre, wraith, mist, giant, orc, golem, dragon
+    LPF ADD_SPELL_EFFECT INT_VAR insert_point opcode target parameter1 parameter2 duration STR_VAR resource END
+  END
+  parameter2 = 5 //class.ids
+  PATCH_FOR_EACH parameter1 IN 120 121 125 //gnoll, hobgoblin, ogre
+    LPF ADD_SPELL_EFFECT INT_VAR insert_point opcode target parameter1 parameter1 duration STR_VAR resource END
+  END
   
 
+Grab now operates with a whitelist instead of a blacklist
 COPY ~aTweaks/EFF/RR#CNSTR.EFF~ ~override/RR#DGRAB.EFF~                            // Grab ability immunity (for large and incorporeal creatures)
   WRITE_ASCII 0x30 ~RR#DGRAB~ #8                                                   // resref: RR#DGRAB
+
+COPY ~atweaks/eff/rr#cnstr.eff~ ~override/rr#dgra2.eff~
+  WRITE_LONG  0x10 146 //cast spell
+  WRITE_LONG  0x20 1 //cast instantly
+  WRITE_LONG  0x24 1 //instant/permanent
+  WRITE_ASCII 0x30 rr#dgrab #8
 
 COPY ~aTweaks/SPL/RR#CNSTR.SPL~ ~override/RR#DMCNS.SPL~                            // Constrict ability (Marilith)
   SAY NAME1 @674 SAY NAME2 @674                                                    
@@ -523,7 +545,19 @@ COPY_EXISTING sppr705.spl "override/RR#PR705.spl"                               
 COPY ~aTweaks/ITM/RR#GHAST.ITM~ ~override~                                         // spawned Ghast melee attack
 COPY ~aTweaks/ITM/RR#DQUAS.ITM~ ~override~                                         // Quasit melee attack
 COPY ~aTweaks/ITM/RR#DNABA.ITM~ ~override~                                         // Nabassu melee attack
+
 COPY ~aTweaks/ITM/RR#DGLAB.ITM~ ~override~                                         // Glabrezu melee attack
+  LPF DELETE_ITEM_EFFECT INT_VAR opcode_to_delete = 146 END
+  opcode = 177
+  target = 2
+  parameter2 = 3 //general.ids
+  probability1 = 20
+  savingthrow = BIT1 //breath
+  SPRINT resource = rr#dgra2 //eff that casts rr#dgrab.spl
+  PATCH_FOR_EACH parameter1 IN 1 4 END //humanoid and undead
+    LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode target parameter1 parameter2 probability1 savingthrow STR_VAR resource END
+  END
+
 COPY ~aTweaks/ITM/RR#DMARI.ITM~ ~override~                                         // Marilith melee attack
 
 COPY ~aTweaks/ITM/RR#DBALR.ITM~ ~override~                                         // Balor melee attack
