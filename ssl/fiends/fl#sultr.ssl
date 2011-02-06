@@ -165,31 +165,41 @@ IF TRIGGER
 THEN DO
   Combine()
   Action(ForceSpellRES,"fl#adead"|50|100)
-END    
+END
 
 IF
-  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
-  Allegiance(Myself,EVILCUTOFF)
-  !See([EVILCUTOFF.UNDEAD.0.SKELETON_WARRIOR.0.SUMMONED])
-  !See([EVILCUTOFF.UNDEAD.0.SKELETON_WARRIOR.0.20])
-  !GlobalTimerNotExpired("flCast","LOCALS")
-THEN
-  RESPONSE #100
-    ForceSpellRES("fl#adead",Myself)
-    SetGlobalTimer("flCast","LOCALS",6)
-END  
-
-IF
-  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+  See([GOODCUTOFF.UNDEAD.0.SKELETON_WARRIOR])
   Allegiance(Myself,GOODCUTOFF)
-  !See([GOODCUTOFF.UNDEAD.0.SKELETON_WARRIOR.0.SUMMONED])
-  !See([EVILCUTOFF.UNDEAD.0.SKELETON_WARRIOR.0.20])
+  Name("fl#propertyoftheyugoloth2",LastSeenBy(Myself))
+  !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+  !GlobalTimerNotExpired("flUltrolothSkelWa","LOCALS")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flUltrolothSkelWa","LOCALS",12)
+END
+
+IF
+  See([EVILCUTOFF.UNDEAD.0.SKELETON_WARRIOR])
+  Allegiance(Myself,EVILCUTOFF)
+  Name("fl#propertyoftheyugoloth2",LastSeenBy(Myself))
+  !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+  !GlobalTimerNotExpired("flUltrolothSkelWa","LOCALS")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flUltrolothSkelWa","LOCALS",12)
+END
+
+IF
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+  !GlobalTimerNotExpired("flUltrolothSkelWa","LOCALS")
   !GlobalTimerNotExpired("flCast","LOCALS")
 THEN
   RESPONSE #100
     ForceSpellRES("fl#adead",Myself)
+    SetGlobalTimer("flUltrolothSkelWa","LOCALS",12)
     SetGlobalTimer("flCast","LOCALS",6)
 END
+
 
 //Cause Disease
 IF TRIGGER

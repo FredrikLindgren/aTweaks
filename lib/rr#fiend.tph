@@ -219,12 +219,10 @@ SAY NAME1 @684 SAY NAME2 @684
     LPF ADD_SPELL_EFFECT INT_VAR insert_point opcode target parameter1 parameter2 duration STR_VAR resource END
   END
   parameter2 = 5 //class.ids
-  PATCH_FOR_EACH parameter1 IN 120 121 125 //gnoll, hobgoblin, ogre
+  PATCH_FOR_EACH parameter1 IN 120 121 125 BEGIN //gnoll, hobgoblin, ogre
     LPF ADD_SPELL_EFFECT INT_VAR insert_point opcode target parameter1 parameter1 duration STR_VAR resource END
   END
-  
 
-Grab now operates with a whitelist instead of a blacklist
 COPY ~aTweaks/EFF/RR#CNSTR.EFF~ ~override/RR#DGRAB.EFF~                            // Grab ability immunity (for large and incorporeal creatures)
   WRITE_ASCII 0x30 ~RR#DGRAB~ #8                                                   // resref: RR#DGRAB
 
@@ -235,7 +233,7 @@ COPY ~atweaks/eff/rr#cnstr.eff~ ~override/rr#dgra2.eff~
   WRITE_ASCII 0x30 rr#dgrab #8
 
 COPY ~aTweaks/SPL/RR#CNSTR.SPL~ ~override/RR#DMCNS.SPL~                            // Constrict ability (Marilith)
-  SAY NAME1 @674 SAY NAME2 @674                                                    
+  SAY NAME1 @674 SAY NAME2 @674
   READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
   READ_LONG  0x6a "fx_off"
@@ -553,8 +551,8 @@ COPY ~aTweaks/ITM/RR#DGLAB.ITM~ ~override~                                      
   parameter2 = 3 //general.ids
   probability1 = 20
   savingthrow = BIT1 //breath
-  SPRINT resource = rr#dgra2 //eff that casts rr#dgrab.spl
-  PATCH_FOR_EACH parameter1 IN 1 4 END //humanoid and undead
+  SPRINT resource  rr#dgra2 //eff that casts rr#dgrab.spl
+  PATCH_FOR_EACH parameter1 IN 1 4 BEGIN //humanoid and undead
     LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode target parameter1 parameter2 probability1 savingthrow STR_VAR resource END
   END
 
@@ -738,10 +736,10 @@ COPY_EXISTING sppr301.spl  "override/fl#adead.spl"
   READ_LONG  0x6a eo
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     READ_SHORT ao + 0x28*i + 0x10 lvl
-    READ_SHORT ao + 0x28*i + 0x1e ei
-    READ_SHORT ao + 0x28*i + 0x20 ne
+    READ_SHORT ao + 0x28*i + 0x1e ne
+    READ_SHORT ao + 0x28*i + 0x20 ei
     c = 0
-    FOR (j=0;i<ne;++j) BEGIN
+    FOR (j=0;j<ne;++j) BEGIN
       READ_SHORT eo + 0x30*(ei + j) type
       PATCH_IF type = 177 BEGIN
         READ_ASCII   eo + 0x30*(ei + j) + 0x14 res
@@ -750,8 +748,8 @@ COPY_EXISTING sppr301.spl  "override/fl#adead.spl"
           ++c
         END ELSE BEGIN
           SPRINT res fl#skesu
-        END 
-        WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 "%res%"
+        END
+        WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 "%res%" #8
       END
     END
   END  
@@ -765,18 +763,29 @@ COPY_EXISTING ghastsu.cre  "override/fl#skesu.cre"
               skelwasu.cre "override/fl#swasu.cre"
   WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
   WRITE_LONG 0x14 0                                                                //no xp 
-  WRITE_ASCII_LIST 0x248 fl#adead "" "" "" ""                                      //new script   
+  WRITE_BYTE 0x6e THIS < 2 ? 2 : THIS                                              //large sword prof
+  WRITE_ASCII_LIST 0x248 fl#adead "" "" "" ""                                      //new script
   WRITE_BYTE   0x270 128                                                           //Initially neutral
-  REPLACE_CRE_ITEM "%DEST_RES%" #0 #0 #0 none weapon1 equip
+  REPLACE_CRE_ITEM "%DEST_RES%" #0 #0 #0 none weapon1 EQUIP
   PATCH_IF "%DEST_RES%" STRING_EQUAL_CASE fl#swasu BEGIN
     WRITE_BYTE 0x271 4 //undead
     WRITE_BYTE 0x273 135 //SKELETON_WARRIOR
   END
+  PATCH_MATCH "%DEST_RES%" WITH
+    fl#swasu
+    BEGIN
+      n = 2
+    END
+    DEFAULT
+      n = 1
+  END
+  WRITE_ASCIIE 0x280 "fl#propertyoftheyugoloth%n%" #32
   
 COPY_EXISTING skelwasu.itm "override/fl#swasu.itm"
-              skelclub.itm "override/fl#skesu.itm"
-  READ_LONG 0x60 enchantment
-  READ_LONG 0x6a eo
+              sw1h22.itm   "override/fl#skesu.itm"
+  WRITE_BYTE 0x18 THIS BAND 251                                                     //remove droppable
+  READ_LONG  0x60 enchantment
+  READ_LONG  0x6a eo
   type = "-1"
   p1 = "-1"
   p2 = "-1"
@@ -787,14 +796,10 @@ COPY_EXISTING skelwasu.itm "override/fl#swasu.itm"
   END
   PATCH_IF type != 233 AND p1 != enchantment AND p2 != 109 BEGIN
     LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 233 target = 1 parameter1 = enchantment parameter2 = 109 timing = 2 END //Detectable enchantment
-  END 
-  PATCH_IF "%DEST_RES%" STRING_EQUAL_CASE fl#skesu BEGIN
-    WRITE_ASCII 0x22 SC (2) //appearance: scimitar, because skeletons should have scimitars
-    LPF configure_weapon_header INT_VAR f_DamageType = 3 END //slashing
   END
-    
+
      
-  
+
 COMPILE "atweaks/baf/fiends/fl#adead.baf"
 
 //Fear, cone

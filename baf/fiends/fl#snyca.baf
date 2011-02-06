@@ -367,6 +367,7 @@ IF
 !StateCheck(Myself,STATE_INVISIBLE)
 !See(NearestEnemyOf(Myself))
 See([0.HUMANOID.0.INNOCENT])
+!Range(LastSeenBy(Myself),8)
 THEN
 RESPONSE #40
 SetInterrupt(FALSE)
@@ -404,8 +405,8 @@ See(NearestEnemyOf(Myself))
 THEN
 RESPONSE #50
 SetGlobalTimer("flCast","LOCALS",6)
-ForceSpellRES("RR#PR301",NearestEnemyOf(Myself))
-RESPONSE #150
+ForceSpellRES("fl#adead",NearestEnemyOf(Myself))
+RESPONSE #100
 Continue()
 END
 
@@ -416,8 +417,8 @@ See(SecondNearestEnemyOf(Myself))
 THEN
 RESPONSE #50
 SetGlobalTimer("flCast","LOCALS",6)
-ForceSpellRES("RR#PR301",SecondNearestEnemyOf(Myself))
-RESPONSE #150
+ForceSpellRES("fl#adead",SecondNearestEnemyOf(Myself))
+RESPONSE #100
 Continue()
 END
 
@@ -428,8 +429,8 @@ See(ThirdNearestEnemyOf(Myself))
 THEN
 RESPONSE #50
 SetGlobalTimer("flCast","LOCALS",6)
-ForceSpellRES("RR#PR301",ThirdNearestEnemyOf(Myself))
-RESPONSE #150
+ForceSpellRES("fl#adead",ThirdNearestEnemyOf(Myself))
+RESPONSE #100
 Continue()
 END
 
@@ -658,6 +659,7 @@ IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 General(SixthNearestEnemyOf(Myself),HUMANOID)
 !Race(SixthNearestEnemyOf(Myself),RAKSHASA)
+CheckStatGT(SixthNearestEnemyOf(Myself),5,SAVEVSSPELL)
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -700,6 +702,7 @@ IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 General(FifthNearestEnemyOf(Myself),HUMANOID)
 !Race(FifthNearestEnemyOf(Myself),RAKSHASA)
+CheckStatGT(FifthNearestEnemyOf(Myself),5,SAVEVSSPELL)
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -742,6 +745,7 @@ IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 General(FourthNearestEnemyOf(Myself),HUMANOID)
 !Race(FourthNearestEnemyOf(Myself),RAKSHASA)
+CheckStatGT(FourthNearestEnemyOf(Myself),5,SAVEVSSPELL)
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
 !StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -784,6 +788,7 @@ IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 General(ThirdNearestEnemyOf(Myself),HUMANOID)
 !Race(ThirdNearestEnemyOf(Myself),RAKSHASA)
+CheckStatGT(ThirdNearestEnemyOf(Myself),5,SAVEVSSPELL)
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
 !StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -826,6 +831,7 @@ IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 General(SecondNearestEnemyOf(Myself),HUMANOID)
 !Race(SecondNearestEnemyOf(Myself),RAKSHASA)
+CheckStatGT(SecondNearestEnemyOf(Myself),5,SAVEVSSPELL)
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
 !StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -868,6 +874,7 @@ IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 General(NearestEnemyOf(Myself),HUMANOID)
 !Race(NearestEnemyOf(Myself),RAKSHASA)
+CheckStatGT(NearestEnemyOf(Myself),5,SAVEVSSPELL)
 !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 !CheckStatGT(NearestEnemyOf(Myself),0,HELD)
 !StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
@@ -910,6 +917,7 @@ IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 General(LastSeenBy(Myself),HUMANOID)
 !Race(LastSeenBy(Myself),RAKSHASA)
+CheckStatGT(LastSeenBy(Myself),5,SAVEVSSPELL)
 !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 !CheckStatGT(LastSeenBy(Myself),0,HELD)
 !StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH)
@@ -1361,11 +1369,11 @@ GlobalLT("flCommand","LOCALS",3)
 !Race(LastSeenBy(Myself),RAKSHASA)
 See(LastSeenBy(Myself))
 THEN
-RESPONSE #100
+RESPONSE #50
 SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("RR#PR102",LastSeenBy(Myself))
 IncrementGlobal("flCommand","LOCALS",1)
-RESPONSE #200
+RESPONSE #100
 Continue()
 END
 
@@ -2730,10 +2738,7 @@ RandomWalkContinuous()
 END
 
 IF
-General(LastSeenBy(Myself),UNDEAD)
-OR(2)
-Gender(LastSeenBy(Myself),SUMMONED)
-Gender(LastSeenBy(Myself),20)
+Name("fl#propertyoftheyugoloth",LastSeenBy(Myself))
 Allegiance(Myself,GOODCUTOFF)
 !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
 THEN
@@ -2742,10 +2747,7 @@ RandomWalkContinuous()
 END
 
 IF
-General(LastSeenBy(Myself),UNDEAD)
-OR(2)
-Gender(LastSeenBy(Myself),SUMMONED)
-Gender(LastSeenBy(Myself),20)
+Name("fl#propertyoftheyugoloth",LastSeenBy(Myself))
 Allegiance(Myself,EVILCUTOFF)
 !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
 THEN

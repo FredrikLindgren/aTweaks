@@ -64,10 +64,10 @@ THEN DO
 END
 
 IF
+  Exists(LastSummonerOf(Myself))
   OR(2)
     !See(LastSummonerOf(Myself))
     !Range(LastSummonerOf(Myself),25)
-  !StateCheck(LastSummonerOf(Myself),STATE_REALLY_DEAD)  
   !Range(NearestEnemyOf(Myself),3)
   ActionListEmpty()
 THEN
@@ -99,7 +99,7 @@ END
 IF
   ActionListEmpty()
   !Range(LastSummonerOf(Myself),10)
-  !StateCheck(LastSummonerOf(Myself),STATE_REALLY_DEAD)
+  Exists(LastSummonerOf(Myself))
 THEN
   RESPONSE #100
     MoveToObject(LastSummonerOf(Myself))
