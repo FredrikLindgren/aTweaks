@@ -20,8 +20,8 @@ ACTION_IF ENGINE_IS ~soa tob~ BEGIN
     OUTER_SET FL_INN = IDS_OF_SYMBOL (areatype FL_INN) //This serves to both check if the label even exists and, if so, retrieve the value
     ACTION_IF FL_INN < 0 BEGIN //A result of "-1" means the label does not exist
       OUTER_FOR (p=1;p<16;++p) BEGIN
-        OUTER_SET FL_INN = 2 ** p //Try 2^p, 1<=p<16
-        ACTION_IF !FILE_CONTAINS_EVALUATED (areatype.ids "^[ %TAB%]*%FL_INN%") BEGIN //If we have found a free bit, append our label to the file
+        OUTER_SET FL_INN = 2 ** p
+        ACTION_IF !FILE_CONTAINS_EVALUATED (areatype.ids "^[ %TAB%]*%FL_INN%") BEGIN //If we have found a free bit, append our label to the file and exit
           APPEND areatype.ids "%FL_INN% FL_INN"
           OUTER_SET p = 20
         END
@@ -31,7 +31,7 @@ ACTION_IF ENGINE_IS ~soa tob~ BEGIN
       END
     END
 
-    ACTION_FOR_EACH area IN //Flag mod-added areas, if they are present
+    ACTION_FOR_EACH area IN
       /*Bonehill:*/ bh0107 bh0120 bh0123 bh0115 bh2020 bh2024
       /*Aran Whitehand:*/ "c-ar01" "c-inn0" "c-inn1" "c-inn2" "c-inn3" "c-inn4"
       /*TDD:*/ arpo06 arpo07 dd0118 dd0119 dd1008 dd1008b dd3302 dd3334 dd3335
@@ -51,9 +51,9 @@ ACTION_IF ENGINE_IS ~soa tob~ BEGIN
       END
     END
 
-    ACTION_IF BG2 BEGIN //If we are on BG2, flag vanilla BG2 areas
+    ACTION_IF BG2 BEGIN
       ACTION_FOR_EACH area IN 
-        /*BG2:*/ ar0021 ar0022 ar0313 ar0314 ar0406 ar0509 ar0510 ar0511 ar0513 ar0514 ar0515 ar0704 ar0709 ar0712 ar1105 ar1602 ar2010 ar2100 ar2202 ar2203 ar5003 ar5501
+        /*BG2:*/ ar0021 ar0022 ar0313 ar0314 ar0406 ar0509 ar0510 ar0511 ar0513 ar0514 ar0515 ar0704 ar0709 ar0712 ar1105 ar1602 ar2010 ar2202 ar2203 ar5003 ar5501
       BEGIN
         ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
           COPY_EXISTING "%area%.are" override
@@ -65,7 +65,7 @@ ACTION_IF ENGINE_IS ~soa tob~ BEGIN
       END
     END
     
-    ACTION_DEFINE_ASSOCIATIVE_ARRAY fl#inn_bgt_compat_are BEGIN
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY fl#inn_areatype_bgt_compat_are BEGIN
       ar0103 => ar7203
       ar0104 => ar7204
       ar0105 => ar7205
@@ -114,17 +114,17 @@ ACTION_IF ENGINE_IS ~soa tob~ BEGIN
       ar4809 => ar3709
     END
 
-    ACTION_IF GAME_IS BG1 BEGIN //If we are on Tutu or BGT
+    ACTION_IF BG1 BEGIN
       ACTION_FOR_EACH area IN
-        /*BG1:*/ ar0103 ar0104 ar0105 ar0106 ar0107 ar0114 ar0115 ar0116 ar0117 ar0118 ar0119 ar0120 ar0121 ar0133 ar0134 ar0135 ar0136 ar0154 ar0165 ar0166 ar0171 ar0705 ar0706 ar0720 ar1001 ar1109 ar1110 ar1215 ar2301 ar2302 ar2303 ar2616 ar2617 ar2629 ar2630 ar3303 ar3304 ar3305 ar3306 ar3307 ar3308 ar3351 ar3352 ar3357 ar4801 ar4809
+        /*BG1:*/ ar0103 ar0104 ar0105 ar0106 ar0107 ar0114 ar0115 ar0116 ar0117 ar0118 ar0119 ar0120 ar0121 ar0133 ar0134 ar0135 ar0136 ar0154 ar0165 ar0166 ar0171 ar0705 ar0706 ar0720 ar0807 ar0808 ar1001 ar1109 ar1110 ar1306 ar1307 ar1215 ar2301 ar2302 ar2303 ar2616 ar2617 ar2629 ar2630 ar3303 ar3304 ar3305 ar3306 ar3307 ar3308 ar3351 ar3352 ar3357 ar4801 ar4809
       BEGIN
-        ACTION_IF !BG2 AND "%area%" STRING_MATCHES_REGEXP "ar[0-9]+$" = 0 BEGIN //If BG2 is 0 we are on Tutu
+        ACTION_IF !BG2 AND "%area%" STRING_MATCHES_REGEXP "ar[0-9]+$" = 0 BEGIN
           OUTER_PATCH_SAVE area "%area%" BEGIN
             WRITE_ASCII 0 fw
           END
         END
-        ACTION_IF BG2 AND VARIABLE_IS_SET $fl#inn_bgt_compat_are("%area%") BEGIN //If BG2 is 1 we are on BGT
-          OUTER_SPRINT area $fl#inn_bgt_compat_are("%area%")
+        ACTION_IF BG2 AND VARIABLE_IS_SET $fl#inn_areatype_bgt_compat_are("%area%") BEGIN
+          OUTER_SPRINT area $fl#inn_areatype_bgt_compat_are("%area%")
         END
         ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
           COPY_EXISTING "%area%.are" override
