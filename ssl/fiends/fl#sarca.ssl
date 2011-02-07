@@ -120,6 +120,7 @@ END
 IF TRIGGER
   TriggerBlock(CanCastMage)
   !HasItem("melfmet",Myself)
+  !Range(NearestEnemyOf(Myself),5)
 THEN DO
   Action(SpellMyself,WIZARD_MELF_METEOR|100|50)
 END
@@ -137,20 +138,6 @@ IF TRIGGER
 THEN DO
   Action(SpellMyself,WIZARD_MIRROR_IMAGE|100|100)
 END
-
-IF TRIGGER
-  TriggerBlock(CanCastMage)
-THEN DO
-  Action(SpellMyself,WIZARD_SHIELD|100|100)
-END
-
-//Invisibility
-IF TRIGGER
-  !StateCheck(Myself,STATE_INVISIBLE)
-  TriggerBlock(OKForInvis)
-THEN DO
-  Action(ForceSpellRESMyself,"RR#WI206"|100|400)
-END  
 
 IF TRIGGER
   TargetBlock(EnemyMagesInOrder)
@@ -191,6 +178,7 @@ IF TRIGGER
   !Race(scstarget,RAKSHASA)
   !Race(scstarget,LICH)
 THEN DO
+  Combine()
   Action(Spell,WIZARD_GREATER_MALISON|100|33)
 END
 
@@ -199,8 +187,9 @@ IF TRIGGER
   TriggerBlock(CanCastMage|Disabled|MR50|Confusion|SIEnc)
   !Race(scstarget,RAKSHASA)
 THEN DO
-  Action(Spell,WIZARD_CHAOS|100|100)
-END  
+  Combine()
+  Action(Spell,WIZARD_CHAOS|100|50)
+END 
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
@@ -248,6 +237,7 @@ IF TRIGGER
   !Race(scstarget,RAKSHASA)
   !Race(scstarget,LICH)
 THEN DO
+  Combine()
   Action(ForceSpellRES,"fl#telki"|100|50)
 END
 
@@ -259,6 +249,7 @@ IF TRIGGER
   !Race(scstarget,RAKSHASA)
   !Race(scstarget,LICH)
 THEN DO
+  Combine()
   Action(MinorSequencer,WIZARD_MELF_ACID_ARROW,WIZARD_MELF_ACID_ARROW|100|50)
 END
 
@@ -270,6 +261,7 @@ IF TRIGGER
   !Race(scstarget,RAKSHASA)
   !Race(scstarget,LICH)
 THEN DO
+  Combine()
   Action(MinorSequencer,WIZARD_AGANNAZAR_SCORCHER,WIZARD_AGANNAZAR_SCORCHER|100|50)
 END 
 
@@ -309,6 +301,7 @@ IF TRIGGER
   TriggerBlock(CanCastMage|Disabled|MR50|SINec|MinorGlobe|Fear)
   !Race(scstarget,RAKSHASA)
 THEN DO
+  Combine()
   Action(Spell,WIZARD_HORROR|100|100)
 END
 
@@ -397,6 +390,7 @@ IF TRIGGER
   !Race(scstarget,RAKSHASA)
   !HasItemEquiped("clck26",scstarget)
 THEN DO
+  Combine()
   Action(ForceSpellRES,"RR#WI112"|100|100)
 END
 
