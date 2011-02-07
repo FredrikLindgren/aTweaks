@@ -1,0 +1,144 @@
+//FL_STRONGHOLD area type
+
+ACTION_IF GAME_IS ~soa tob bgt~ BEGIN
+  
+  DEFINE_ACTION_FUNCTION fl#stronghold_add_area_type RET FL_STRONGHOLD fl#StrongholdKickedOut BEGIN //By wrapping it in a function we do not accidentally contaminate the install environment with our variables
+  
+    OUTER_SET FL_STRONGHOLD = IDS_OF_SYMBOL (areatype FL_STRONGHOLD) //This serves to both check if the label even exists and, if so, retrieve the value
+    ACTION_IF FL_STRONGHOLD < 0 BEGIN //A result of "-1" means the label does not exist
+      OUTER_FOR (p=1;p<16;++p) BEGIN
+        OUTER_SET FL_STRONGHOLD = 2 ** p
+        ACTION_IF !FILE_CONTAINS_EVALUATED (areatype.ids "^[ %TAB%]*%FL_STRONGHOLD%") BEGIN
+          APPEND areatype.ids "%FL_STRONGHOLD% FL_STRONGHOLD"
+          OUTER_SET p = 20
+        END
+      END
+      ACTION_IF p = 16 BEGIN //If p = 16 there were no free bits in areatype.ids and consequently we have to abort, or problems would ensue
+        FAIL ~ERROR: No space in areatype.ids for FL_STRONGHOLD flag~
+      END
+    END
+    
+    ACTION_FOR_EACH area IN
+    /*thief*/ar0321 ar0322 ar0323 ar0324
+    /*ranger*/ar1107
+    /*warrior*/ar1305 ar1306 ar1307
+    /*pocket plane*/ar4500
+    BEGIN
+      ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
+        COPY_EXISTING "%area%.are" override
+          PATCH_IF SOURCE_SIZE > 0x11b BEGIN
+            WRITE_SHORT 0x48 THIS BOR FL_STRONGHOLD
+          END
+        BUT_ONLY
+      END
+    END
+    
+<<<<<<<< fl#stronghold_areatype/inlined/script.baf
+IF
+  Global("fl#AddedStrongholdAreaType","MYAREA",0)
+  %fl#Condition%
+THEN
+  RESPONSE #100
+    AddAreaType(FL_STRONGHOLD)
+    SetGlobal("fl#AddedStrongholdAreaType","MYAREA",1)
+    Continue()
+END
+>>>>>>>>
+
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY fl#stronghold_areatype_conditions BEGIN
+      ar0410 => ~G("PCSphere",1)~
+      ar0411 => ~G("PCSphere",1)~
+      ar0412 => ~G("PCSphere",1)~
+      ar0413 => ~G("PCSphere",1)~
+      ar0419 => ~G("PCSphere",1)~
+      ar0420 => ~G("PCSphere",1)~
+      ar0901 => ~G("JoinHelm",1)~
+      ar0902 => ~G("JoinLathander",1)~
+      ar0903 => ~G("PaladinOrder",1)~
+      ar0904 => ~G("JoinTalos",1)~
+      ar1901 => ~G("DruidStronghold",1)~
+    END
+    
+    ACTION_FOR_EACH area IN
+    /*mage*/ar0410 ar0411 ar0412 ar0413 ar0419 ar0420 
+    /*helm*/ar0901
+    /*lathander*/ar0902
+    /*paladin*/ar0903
+    /*talos*/ar0904
+    /*druid*/ar1901
+    BEGIN
+      COPT_EXISTING "%area%.are" override
+        PATCH_IF SOURCE_SIZE > 0x11b BEGIN
+          TO_LOWER area
+          SPRINT fl#Condition $fl#stronghold_areatype_conditions("%area%")
+          READ_ASCII 0x94 areascript
+          PATCH_IF FILE_EXISTS_IN_GAME "%areascript%.bcs" BEGIN
+            c = 0
+            COPY_EXISTING "%areascript%.bcs" override
+              DECOMPILE_BCS_TO_BAF
+                COUNT_REGEXP_INSTANCES CASE_SENSITIVE EXACT_MATCH ~AddAreaType(FL_STRONGHOLD)~ c
+              COMPILE_BAF_TO_BCS
+            BUT_ONLY
+            IF ~%FL_STRONGHOLD%~
+            PATCH_IF c = 0 BEGIN  
+              EXTEND_TOP "%areascript%.bcs" "fl#stronghold_areatype/inlined/script.baf" EVAL
+            END
+          END ELSE BEGIN
+            COPY - "fl#stronghold_areatype/inlined/script.baf" "fl#stronghold_areatype/inlined/%area%.baf"
+            COMPILE "fl#stronghold_areatype/inlined/%area%.baf" EVAL
+            WRITE_ASCIIE 0x94 "%area%" #8
+          END
+        END
+      BUT_ONLY
+    END
+          
+    OUTER_SPRINT fl#StrongholdKickedOut
+    ~OR(2)
+      !AreaCheck("ar0904")
+      !G("Stripped",1)
+    OR(2)
+      !AreaCheck("ar0901")
+      !G("Stripped",2)
+    OR(2)
+      !AreaCheck("ar0902")
+      !G("Stripped",3)
+    OR(2)
+      !AreaCheck("ar0903")
+      !G("PaladinOrder",3)
+    OR(2)
+      !AreaCheck("ar0321")
+      !G("PGFailed",1)
+    OR(2)
+      !AreaCheck("ar0322")
+      !G("PGFailed",1)
+    OR(2)
+      !AreaCheck("ar0323")
+      !G("PGFailed",1)
+    OR(2)
+      !AreaCheck("ar0324")
+      !G("PGFailed",1)
+    OR(2)
+      !AreaCheck("ar1107")
+      !G("RangerProtector",6)~ 
+      
+  END //DEFINE_ACTION_FUNCTION
+  
+  LAF fl#stronghold_add_area_type RET FL_STRONGHOLD = FL_STRONGHOLD fl#StrongholdKickedOut = fl#StrongholdKickedOut END
+
+END //ACTION_IF GAME_IS ~soa tob bgt~       
+ELSE BEGIN
+  PRINT ~WARNING: FL_STRONGHOLD is only available for BG2, BG2: ToB and BGT games~
+END        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        

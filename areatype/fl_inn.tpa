@@ -1,12 +1,12 @@
+//FL_INN area type
+
 ///add NEJ and CA
-
-
 
 ACTION_IF ENGINE_IS ~soa tob~ BEGIN
  
   DEFINE_ACTION_FUNCTION fl#inn_add_area_type RET FL_INN BEGIN //By wrapping it in a function we do not accidentally contaminate the install environment with our variables
   
-    ACTION_IF GAME_IS ~tutu tutu_totsc~ BEGIN //We do a fair amount for platform checking, so to marginally speed things up we only check the game files once
+    ACTION_IF GAME_IS ~tutu tutu_totsc~ BEGIN //We do a fair amount of checking what platform we are on, so to marginally speed things up we only check the game files once
       OUTER_SET BG1 = 1
       OUTER_SET BG2 = 0
     END ELSE ACTION_IF GAME_IS bgt BEGIN
@@ -21,7 +21,7 @@ ACTION_IF ENGINE_IS ~soa tob~ BEGIN
     ACTION_IF FL_INN < 0 BEGIN //A result of "-1" means the label does not exist
       OUTER_FOR (p=1;p<16;++p) BEGIN
         OUTER_SET FL_INN = 2 ** p
-        ACTION_IF !FILE_CONTAINS_EVALUATED (areatype.ids "^[ %TAB%]*%FL_INN%") BEGIN //If we have found a free bit, append our label to the file and exit
+        ACTION_IF !FILE_CONTAINS_EVALUATED (areatype.ids "^[ %TAB%]*%FL_INN%") BEGIN
           APPEND areatype.ids "%FL_INN% FL_INN"
           OUTER_SET p = 20
         END
@@ -142,6 +142,6 @@ ACTION_IF ENGINE_IS ~soa tob~ BEGIN
 
 END //ACTION_IF ENGINE_IS
 ELSE BEGIN
-  PRINT ~ATTENTION: FL_INN is only available for games based on the BG2 engine~
+  PRINT ~WARNING: FL_INN is only available for games based on the BG2 engine~
 END
   
