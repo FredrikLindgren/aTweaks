@@ -867,9 +867,10 @@ COPY "atweaks/spl/base.spl" "override/fl#csdis.spl"
   FOR (f_Header=1;f_Header<=SHORT_AT 0x68;++f_Header) BEGIN
     f_Level = f_Header = 1 ? 1 : 5*(f_Header - 1)
     LPF configure_spell_header INT_VAR f_Header f_Range = 1 f_Level END
-    LPF ADD_SPELL_EFFECT INT_VAR header = f_Header opcode = 78 target power parameter1 = f_Header parameter2 = 4 timing = 1 resist_dispel savingthrow END //Disease: 1 point of STR damage per 3 levels of the caster
-    LPF ADD_SPELL_EFFECT INT_VAR header = f_Header opcode = 78 target power parameter1 = 60 parameter2 = 3 timing = 1 resist_dispel savingthrow END //Disease: 1 HP damage/turn
+    LPF ADD_SPELL_EFFECT INT_VAR header = f_Header opcode = 78 target power parameter1 = f_Header parameter2 = 4 timing = 1 duration = 1 resist_dispel savingthrow END //Disease: 1 point of STR damage per 3 levels of the caster
+    LPF ADD_SPELL_EFFECT INT_VAR header = f_Header opcode = 78 target power parameter1 = 6 parameter2 = 3 timing = 1 duration = 1 resist_dispel savingthrow END //Disease: 1 HP damage/round
   END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 93 target power parameter1 = 6 timing = 1 resist_dispel savingthrow END //Fatigue +6
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 7 timing = 1 resist_dispel savingthrow END //Icon: Nauseated
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 39752 timing = 1 resist_dispel savingthrow END //Stricken by a foul disease
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power timing = 1 resist_dispel savingthrow STR_VAR resource = EVAL "%DEST_RES%" END //non-cumulativity
@@ -1068,7 +1069,7 @@ COPY_EXISTING b1-12m4.itm "override/fl#ultr.itm"
 //Arcanaloth 
 COPY_EXISTING b1-12m3.itm "override/fl#arca.itm"
   LPF prep_itm_spl END
-  LPF configure_weapon_header INT_VAR f_Speed = 2 f_NumDice = 1 f_Diesize = 6 f_DamageType = 3 END
+  LPF configure_weapon_header INT_VAR f_Speed = 2 f_NumDice = 1 f_DieSize = 6 f_DamageType = 3 END
   enchantment = 3
   WRITE_LONG 0x60 enchantment
   LPF ADD_ITEM_EFFECT INT_VAR opcode = 278 target = 2 parameter1 = "-1" duration = 2400 type = 1 probability1 = 66 END //-1 to hit for 8 hours, cumulative

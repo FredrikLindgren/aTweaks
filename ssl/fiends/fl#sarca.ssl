@@ -127,13 +127,7 @@ END
 
 IF TRIGGER
   Target(NearestEnemyOf(Myself))
-  !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(FifthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  TriggerBlock(CanCastMage)
+  TriggerBlock(CanCastMage|NoEnemyTrueSight)
   !StateCheck(Myself,STATE_MIRRORIMAGE)
 THEN DO
   Action(SpellMyself,WIZARD_MIRROR_IMAGE|100|100)
@@ -224,7 +218,7 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|MR75|SpellTurning|SIAlt)
-  Range(scstarget,10)
+  Range(scstarget,5)
   CheckStatGT(scstarget,3,SAVEVSSPELL) //so there is at least an outside chance for knock-back
   !Race(scstarget,GIANT)
   !Race(scstarget,DRAGON)
@@ -238,7 +232,7 @@ IF TRIGGER
   !Race(scstarget,LICH)
 THEN DO
   Combine()
-  Action(ForceSpellRES,"fl#telki"|100|50)
+  Action(ForceSpellRES,"fl#telki"|100|100)
 END
 
 IF TRIGGER
@@ -291,7 +285,7 @@ END
 //Animate Dead
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
-  !Range(scstarget,10)
+  !Range(scstarget,5)
 THEN DO
   Action(ForceSpellRES,"fl#adead"|50|100)
 END
@@ -446,7 +440,8 @@ INCLUDE FILE(fiends/include/standard_attack.ssl)
 //Inviso-up if there's nothing better to do
 IF TRIGGER
   !StateCheck(Myself,STATE_INVISIBLE)
-  TriggerBlock(OKForInvis)
+  TriggerBlock(NoEnemyTrueSight)
+  !Global("dvgldust","LOCALS",1)
 THEN DO
   Action(ForceSpellRESMyself,"RR#WI206"|100|25)
 END

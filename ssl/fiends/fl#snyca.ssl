@@ -71,7 +71,7 @@ INCLUDE FILE(fiends/include/yugoloth_rampage.ssl)
 //Animate Dead if the enemy isn't too close
 IF TRIGGER
   TargetBlock(EnemiesInOrderShort)
-  !Range(scstarget,10)
+  !Range(scstarget,5)
 THEN DO
   Action(ForceSpellRES,"fl#adead"|50|100)
 END
@@ -79,18 +79,9 @@ END
 //Mirror Image if there's no True Sight
 IF TRIGGER
   Target(NearestEnemyOf(Myself))
-  !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(FifthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-  !CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+  TriggerBlock(NoEnemyTrueSight)
   !StateCheck(Myself,STATE_MIRRORIMAGE)
-  !Class(LastSeenBy(Myself),INNOCENT)
+  !Class(LastSeenBy(Myself),INNOCENT) //Don't mirror image just because some stinking peasant went enemy
   GlobalLT("flMirrorImage","LOCALS",3)
 THEN DO
   Action(ForceSpellRESMyself,"RR#WI212")
@@ -184,7 +175,8 @@ INCLUDE FILE(fiends/include/standard_attack.ssl)
 //Inviso-up if there's nothing better to do
 IF TRIGGER
   !StateCheck(Myself,STATE_INVISIBLE)
-  TriggerBlock(OKForInvis)
+  TriggerBlock(NoEnemyTrueSight)
+  !Global("dvgldust","LOCALS",1)
 THEN DO
   Action(ForceSpellRESMyself,"RR#WI206"|100|25)
 END

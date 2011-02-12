@@ -72,13 +72,14 @@ IF
 See(LastSummonerOf(Myself))
 Global("fl#Summoner","LOCALS",0)
 Exists(LastSummonerOf(Myself))
+Allegiance(Myself,EVILCUTOFF)
+Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
 !CheckStatGT(LastSummonerOf(Myself),0,PROTECTION_FROM_EVIL)
 !HasItemEquipedReal("staf11",LastSummonerOf(Myself))
 !HasItemEquiped("wa2amu",LastSummonerOf(Myself))
 
 !StateCheck(LastSummonerOf(Myself),STATE_REALLY_DEAD)
 !StateCheck(Myself,STATE_INVISIBLE)
-!Race(LastSummonerOf(Myself),DEMONIC)
 THEN
 RESPONSE #100
 SetInterrupt(FALSE)
@@ -481,14 +482,26 @@ IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 HaveSpell(WIZARD_MIRROR_IMAGE)
 See(NearestEnemyOf(Myself))
+CheckStatLT(Myself,50,SPELLFAILUREMAGE)
+!StateCheck(Myself,STATE_SILENCED)
 !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,TRUE_SIGHT)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-CheckStatLT(Myself,50,SPELLFAILUREMAGE)
-!StateCheck(Myself,STATE_SILENCED)
+!CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
+!CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+!CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+!CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+!CheckStatGT(NearestEnemyOfType([0.0.0.MAGE_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(NearestEnemyOfType([0.0.0.BARD_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,TRUE_SIGHT)
+!CheckStatGT(NearestEnemyOfType([0.0.0.DRUID_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),0,TRUE_SIGHT)
 !StateCheck(Myself,STATE_MIRRORIMAGE)
 THEN
 RESPONSE #100
@@ -2076,7 +2089,7 @@ IF
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,WIZARD_SPELL_TRAP)
 !CheckStat(SixthNearestEnemyOf(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 !CheckStat(SixthNearestEnemyOf(Myself),8,WIZARD_SPELL_IMMUNITY)
-Range(SixthNearestEnemyOf(Myself),10)
+Range(SixthNearestEnemyOf(Myself),5)
 CheckStatGT(SixthNearestEnemyOf(Myself),3,SAVEVSSPELL)
 !Race(SixthNearestEnemyOf(Myself),GIANT)
 !Race(SixthNearestEnemyOf(Myself),DRAGON)
@@ -2106,7 +2119,7 @@ IF
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,WIZARD_SPELL_TRAP)
 !CheckStat(FifthNearestEnemyOf(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 !CheckStat(FifthNearestEnemyOf(Myself),8,WIZARD_SPELL_IMMUNITY)
-Range(FifthNearestEnemyOf(Myself),10)
+Range(FifthNearestEnemyOf(Myself),5)
 CheckStatGT(FifthNearestEnemyOf(Myself),3,SAVEVSSPELL)
 !Race(FifthNearestEnemyOf(Myself),GIANT)
 !Race(FifthNearestEnemyOf(Myself),DRAGON)
@@ -2136,7 +2149,7 @@ IF
 !CheckStatGT(FourthNearestEnemyOf(Myself),0,WIZARD_SPELL_TRAP)
 !CheckStat(FourthNearestEnemyOf(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 !CheckStat(FourthNearestEnemyOf(Myself),8,WIZARD_SPELL_IMMUNITY)
-Range(FourthNearestEnemyOf(Myself),10)
+Range(FourthNearestEnemyOf(Myself),5)
 CheckStatGT(FourthNearestEnemyOf(Myself),3,SAVEVSSPELL)
 !Race(FourthNearestEnemyOf(Myself),GIANT)
 !Race(FourthNearestEnemyOf(Myself),DRAGON)
@@ -2166,7 +2179,7 @@ IF
 !CheckStatGT(ThirdNearestEnemyOf(Myself),0,WIZARD_SPELL_TRAP)
 !CheckStat(ThirdNearestEnemyOf(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 !CheckStat(ThirdNearestEnemyOf(Myself),8,WIZARD_SPELL_IMMUNITY)
-Range(ThirdNearestEnemyOf(Myself),10)
+Range(ThirdNearestEnemyOf(Myself),5)
 CheckStatGT(ThirdNearestEnemyOf(Myself),3,SAVEVSSPELL)
 !Race(ThirdNearestEnemyOf(Myself),GIANT)
 !Race(ThirdNearestEnemyOf(Myself),DRAGON)
@@ -2196,7 +2209,7 @@ IF
 !CheckStatGT(SecondNearestEnemyOf(Myself),0,WIZARD_SPELL_TRAP)
 !CheckStat(SecondNearestEnemyOf(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 !CheckStat(SecondNearestEnemyOf(Myself),8,WIZARD_SPELL_IMMUNITY)
-Range(SecondNearestEnemyOf(Myself),10)
+Range(SecondNearestEnemyOf(Myself),5)
 CheckStatGT(SecondNearestEnemyOf(Myself),3,SAVEVSSPELL)
 !Race(SecondNearestEnemyOf(Myself),GIANT)
 !Race(SecondNearestEnemyOf(Myself),DRAGON)
@@ -2226,7 +2239,7 @@ IF
 !CheckStatGT(NearestEnemyOf(Myself),0,WIZARD_SPELL_TRAP)
 !CheckStat(NearestEnemyOf(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 !CheckStat(NearestEnemyOf(Myself),8,WIZARD_SPELL_IMMUNITY)
-Range(NearestEnemyOf(Myself),10)
+Range(NearestEnemyOf(Myself),5)
 CheckStatGT(NearestEnemyOf(Myself),3,SAVEVSSPELL)
 !Race(NearestEnemyOf(Myself),GIANT)
 !Race(NearestEnemyOf(Myself),DRAGON)
@@ -2256,7 +2269,7 @@ IF
 !CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
 !CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)
-Range(LastSeenBy(Myself),10)
+Range(LastSeenBy(Myself),5)
 CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
 !Race(LastSeenBy(Myself),GIANT)
 !Race(LastSeenBy(Myself),DRAGON)
@@ -2273,7 +2286,7 @@ THEN
 RESPONSE #100
 SetGlobalTimer("flCast","LOCALS",6)
 ForceSpellRES("fl#telki",LastSeenBy(Myself))
-RESPONSE #50
+RESPONSE #100
 Continue()
 END
 
@@ -3017,7 +3030,7 @@ END
 IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 See(NearestEnemyOf(Myself))
-!Range(NearestEnemyOf(Myself),10)
+!Range(NearestEnemyOf(Myself),5)
 THEN
 RESPONSE #50
 SetGlobalTimer("flCast","LOCALS",6)
@@ -3029,7 +3042,7 @@ END
 IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 See(SecondNearestEnemyOf(Myself))
-!Range(SecondNearestEnemyOf(Myself),10)
+!Range(SecondNearestEnemyOf(Myself),5)
 THEN
 RESPONSE #50
 SetGlobalTimer("flCast","LOCALS",6)
@@ -3041,7 +3054,7 @@ END
 IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 See(ThirdNearestEnemyOf(Myself))
-!Range(ThirdNearestEnemyOf(Myself),10)
+!Range(ThirdNearestEnemyOf(Myself),5)
 THEN
 RESPONSE #50
 SetGlobalTimer("flCast","LOCALS",6)
@@ -6763,6 +6776,17 @@ IF
 !CheckStatGT(FifthNearestEnemyOf(Myself),0,TRUE_SIGHT)
 !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
 !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
+!CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+!CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+!CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+!CheckStatGT(NearestEnemyOfType([0.0.0.MAGE_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(NearestEnemyOfType([0.0.0.BARD_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,TRUE_SIGHT)
+!CheckStatGT(NearestEnemyOfType([0.0.0.DRUID_ALL]),0,TRUE_SIGHT)
+!CheckStatGT(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),0,TRUE_SIGHT)
 !Global("dvgldust","LOCALS",1)
 THEN
 RESPONSE #100
