@@ -1,7 +1,7 @@
 // creator  : aVENGER
 // argument : RR#SCRL
 
-BEGIN ~RR#SCRL~
+BEGIN ~fl#SCRL~
 
 IF ~%AreaType%~ THEN BEGIN RR#SCRL99
 SAY @8221 // (This ability allows an experienced spellcaster to scribe a spell from <HISHER> spellbook onto a scroll. Only a spell that is currently memorized may be scribed in this manner. Furthermore, the cost of any raw materials that are used in the process must be covered in full.)
