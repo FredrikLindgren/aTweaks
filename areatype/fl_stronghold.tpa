@@ -12,7 +12,7 @@ DEFINE_ACTION_FUNCTION fl#stronghold_add_area_type RET FL_STRONGHOLD fl#Strongho
   ACTION_IF FL_STRONGHOLD < 0 BEGIN //A result of "-1" means the label does not exist
     OUTER_FOR (p=1;p<16;++p) BEGIN
       OUTER_SET FL_STRONGHOLD = 2 ** p //2^p
-      ACTION_IF !FILE_CONTAINS_EVALUATED (areatype.ids "^[ %TAB%]*%FL_STRONGHOLD%") BEGIN
+      ACTION_IF !FILE_CONTAINS_EVALUATED (areatype.ids "^[ %TAB%]*%FL_STRONGHOLD%") BEGIN //redundant, but it can stay until WeiDU 228
         APPEND areatype.ids "%FL_STRONGHOLD% FL_STRONGHOLD"
         OUTER_SET p = 20
       END
@@ -69,25 +69,31 @@ END
   /*talos*/ar0904
   /*druid*/ar1901
   BEGIN
-    COPT_EXISTING "%area%.are" override
+    COPY_EXISTING "%area%.are" override
       PATCH_IF SOURCE_SIZE > 0x11b BEGIN
         TO_LOWER area
         SPRINT fl#Condition $fl#stronghold_areatype_conditions("%area%")
         READ_ASCII 0x94 areascript
         PATCH_IF FILE_EXISTS_IN_GAME "%areascript%.bcs" BEGIN
           c = 0
-          COPY_EXISTING "%areascript%.bcs" override
-            DECOMPILE_BCS_TO_BAF
-              COUNT_REGEXP_INSTANCES CASE_SENSITIVE EXACT_MATCH ~AddAreaType(FL_STRONGHOLD)~ c
-            COMPILE_BAF_TO_BCS
-          BUT_ONLY
-          IF ~%FL_STRONGHOLD%~
+          INNER_ACTION BEGIN
+            COPY_EXISTING "%areascript%.bcs" override
+              DECOMPILE_BCS_TO_BAF
+                COUNT_REGEXP_INSTANCES CASE_SENSITIVE EXACT_MATCH ~AddAreaType(FL_STRONGHOLD)~ c
+              COMPILE_BAF_TO_BCS
+            BUT_ONLY
+            IF ~%FL_STRONGHOLD%~
+          END
           PATCH_IF c = 0 BEGIN  
-            EXTEND_TOP "%areascript%.bcs" "fl#stronghold_areatype/inlined/script.baf" EVAL
+            INNER_ACTION BEGIN
+              EXTEND_TOP "%areascript%.bcs" "fl#stronghold_areatype/inlined/script.baf" EVAL
+            END
           END
         END ELSE BEGIN
-          COPY - "fl#stronghold_areatype/inlined/script.baf" "fl#stronghold_areatype/inlined/%area%.baf"
-          COMPILE "fl#stronghold_areatype/inlined/%area%.baf" EVAL
+          INNER_ACTION BEGIN
+            COPY - "fl#stronghold_areatype/inlined/script.baf" "fl#stronghold_areatype/inlined/%area%.baf"
+            COMPILE "fl#stronghold_areatype/inlined/%area%.baf" EVAL
+          END
           WRITE_ASCIIE 0x94 "%area%" #8
         END
       END

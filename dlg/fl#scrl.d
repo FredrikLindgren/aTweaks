@@ -8,7 +8,7 @@ SAY @8221 // (This ability allows an experienced spellcaster to scribe a spell f
 IF ~~ THEN GOTO RR#SCRL00
 END
 
-IF ~!%AreaType%~ rr#scrl98
+IF ~True()~ rr#scrl98
 SAY @8223
 IF ~~ THEN EXIT
 END
