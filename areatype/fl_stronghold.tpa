@@ -8,6 +8,35 @@ END
 
 DEFINE_ACTION_FUNCTION fl#stronghold_add_area_type RET FL_STRONGHOLD fl#StrongholdKickedOut BEGIN //By wrapping it in a function we do not accidentally contaminate the install environment with our variables
 
+  OUTER_SPRINT fl#StrongholdKickedOut //This variable can be used in .baf or .d files to prevent triggers from returning true when the player is an a stronghold area they've been kicked out of. The logic is that for the entire trigger to be true, the player either has to be in an area that isn't a stronghold, or they need to have not been kicked out of the stronghold they are in.
+  ~OR(2)
+    !AreaCheck("ar0904")
+    !G("Stripped",1)
+  OR(2)
+    !AreaCheck("ar0901")
+    !G("Stripped",2)
+  OR(2)
+    !AreaCheck("ar0902")
+    !G("Stripped",3)
+  OR(2)
+    !AreaCheck("ar0903")
+    !G("PaladinOrder",3)
+  OR(2)
+    !AreaCheck("ar0321")
+    !G("PGFailed",1)
+  OR(2)
+    !AreaCheck("ar0322")
+    !G("PGFailed",1)
+  OR(2)
+    !AreaCheck("ar0323")
+    !G("PGFailed",1)
+  OR(2)
+    !AreaCheck("ar0324")
+    !G("PGFailed",1)
+  OR(2)
+    !AreaCheck("ar1107")
+    !G("RangerProtector",6)~
+  
   OUTER_SET FL_STRONGHOLD = IDS_OF_SYMBOL (areatype FL_STRONGHOLD) //This serves to both check if the label even exists and, if so, retrieve the value
   ACTION_IF FL_STRONGHOLD < 0 BEGIN //A result of "-1" means the label does not exist
     OUTER_FOR (p=1;p<16;++p) BEGIN
@@ -98,36 +127,7 @@ END
         END
       END
     BUT_ONLY
-  END
-        
-  OUTER_SPRINT fl#StrongholdKickedOut
-  ~OR(2)
-    !AreaCheck("ar0904")
-    !G("Stripped",1)
-  OR(2)
-    !AreaCheck("ar0901")
-    !G("Stripped",2)
-  OR(2)
-    !AreaCheck("ar0902")
-    !G("Stripped",3)
-  OR(2)
-    !AreaCheck("ar0903")
-    !G("PaladinOrder",3)
-  OR(2)
-    !AreaCheck("ar0321")
-    !G("PGFailed",1)
-  OR(2)
-    !AreaCheck("ar0322")
-    !G("PGFailed",1)
-  OR(2)
-    !AreaCheck("ar0323")
-    !G("PGFailed",1)
-  OR(2)
-    !AreaCheck("ar0324")
-    !G("PGFailed",1)
-  OR(2)
-    !AreaCheck("ar1107")
-    !G("RangerProtector",6)~ 
+  END 
     
 END //DEFINE_ACTION_FUNCTION
 
