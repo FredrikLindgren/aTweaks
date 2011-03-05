@@ -9,7 +9,7 @@
 
 DEFINE_PATCH_FUNCTION fl#write_area_type INT_VAR fl#areatype = FL_INN BEGIN
   PATCH_IF SOURCE_SIZE > 0x11b BEGIN
-    WRITE_SHORT 0x48 THIS BOR fl#areatype
+    WRITE_SHORT 0x48 THIS BOR (1 << fl#areatype)
   END
 END
  
@@ -26,6 +26,9 @@ DEFINE_ACTION_FUNCTION fl#inn_add_area_type RET FL_INN BEGIN //By wrapping it in
     OUTER_SET BG2 = 1
   END 
 
+  ADD_AREA_TYPE FL_INN
+
+/*
   OUTER_SET FL_INN = IDS_OF_SYMBOL (areatype FL_INN) //This serves to both check if the label even exists and, if so, retrieve the value
   ACTION_IF FL_INN < 0 BEGIN //A result of "-1" means the label does not exist
     OUTER_FOR (p=1;p<16;++p) BEGIN
@@ -39,6 +42,7 @@ DEFINE_ACTION_FUNCTION fl#inn_add_area_type RET FL_INN BEGIN //By wrapping it in
       FAIL ~ERROR: No space in areatype.ids for FL_INN flag~
     END
   END
+*/
 
   ACTION_FOR_EACH area IN
     /*Bonehill:*/ bh0107 bh0120 bh0123 bh0115 bh2020 bh2024

@@ -7,7 +7,7 @@
 
 DEFINE_PATCH_FUNCTION fl#write_area_type INT_VAR fl#areatype = FL_STRONGHOLD BEGIN
   PATCH_IF SOURCE_SIZE > 0x11b BEGIN
-    WRITE_SHORT 0x48 THIS BOR fl#areatype
+    WRITE_SHORT 0x48 THIS BOR (1 << fl#areatype)
   END
 END
 
@@ -41,7 +41,10 @@ DEFINE_ACTION_FUNCTION fl#stronghold_add_area_type RET FL_STRONGHOLD fl#Strongho
   OR(2)
     !AreaCheck("ar1107")
     !G("RangerProtector",6)~
+
+  ADD_AREA_TYPE FL_STRONGHOLD
   
+/*  
   OUTER_SET FL_STRONGHOLD = IDS_OF_SYMBOL (areatype FL_STRONGHOLD) //This serves to both check if the label even exists and, if so, retrieve the value
   ACTION_IF FL_STRONGHOLD < 0 BEGIN //A result of "-1" means the label does not exist
     OUTER_FOR (p=1;p<16;++p) BEGIN
@@ -55,6 +58,7 @@ DEFINE_ACTION_FUNCTION fl#stronghold_add_area_type RET FL_STRONGHOLD fl#Strongho
       FAIL ~ERROR: No space in areatype.ids for FL_STRONGHOLD flag~
     END
   END
+*/
   
   ACTION_FOR_EACH area IN
   /*thief*/ar0321 ar0322 ar0323 ar0324
