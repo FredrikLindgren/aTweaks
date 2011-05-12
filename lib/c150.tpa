@@ -1,4 +1,5 @@
 
+INCLUDE "atweaks/lib/c150_funs.tpa"
 
 // Imp
 
@@ -8,75 +9,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~IMP01~                                                             // Imp
              ~TELIMP1~                                                             // Imp
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DIMP~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                  // replace default weapon with a more PnP accurate weapon
-REMOVE_CRE_ITEM ~RINGDEMN~                                                         // removes RINGDEMN.ITM (Imps are not actual Fiends in 2E)
-REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (regeneration now handled via equipped weapon)
-WRITE_LONG 0x14 1400                                                               //XP
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "18"                                                                  // new hit point value
-      "newac"    = "2"                                                                   // new Armor Class value
-      "newth"    = "19"                                                                  // new THAC0 value
-      "newapr"   = "1"                                                                   // new number of attacks per round
-      "newsvd"   = "10"                                                                  // new Save vs. Death
-      "newsvw"   = "12"                                                                  // new Save vs. Wand
-      "newsvp"   = "11"                                                                  // new Save vs. Polymorph
-      "newsvb"   = "12"                                                                  // new Save vs. Breath
-      "newsvs"   = "13"                                                                  // new Save vs. Spell
-      "newmr"    = "25"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "100"                                                                 // new Resist Cold value
-      "newer"    = "100"                                                                 // new Resist Electricity value
-      "newlvl1"  = "2"                                                                   // new level (first class)
-      "newstr"   = "10"                                                                  // new Strength value
-      "newint"   = "10"                                                                  // new Intelligence value
-      "newwis"   = "12"                                                                  // new Wisdom value
-      "newdex"   = "17"                                                                  // new Dexterity value
-      "newcon"   = "10"                                                                  // new Constitution value
-      "newchr"   = "14"                                                                  // new Charisma value
-      "newmor"   = "10"                                                                  // new morale value
-      "newmorb"  = "5"                                                                   // new morale break value
-      "newmorr"  = "60"                                                                  // new morale recovery value
-      "newrace"  = "141"                                                                 // new race (Imp)
-      "newclass" = "179"                                                                 // new class (Imp)
-      "newalign" = "19"                                                                  // new alignment (Lawful Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DIMP01"                                                              // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "GORBAT4"                                                             // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "IMP01"                                                               // enforced creature 4 (uses strict PnP values)
-      "enfc04"   = "TELIMP1"                                                             // enforced creature 5 (uses strict PnP values)
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HIMP"                                                           // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "DEMIMP"                                                            // fourth AI script name
-"script05"   = "BPWDASGT"                                                          // Big Picture script
-"script06"   = "DW#MELEE"                                                          // SCSII melee script
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "16" END                                                // mark opcode #16 (Haste) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "98" END                                                // mark opcode #98 (Regeneration) for deletion
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_imp END                                                         
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -87,76 +24,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~GORCAMB7~                                                           // Hellcat
                ~HGFEL01~                                                           // Hellcat
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-SAY NAME1 @732 SAY NAME2 @732                                                      // Hellcat
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DFCAT~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-WRITE_LONG 0x14 3000
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "51"                                                                  // new hit point value
-      "newac"    = "6"                                                                   // new Armor Class value
-      "newth"    = "13"                                                                  // new THAC0 value
-      "newapr"   = "3"                                                                   // new number of attacks per round
-      "newsvd"   = "10"                                                                  // new Save vs. Death
-      "newsvw"   = "12"                                                                  // new Save vs. Wand
-      "newsvp"   = "11"                                                                  // new Save vs. Polymorph
-      "newsvb"   = "12"                                                                  // new Save vs. Breath
-      "newsvs"   = "13"                                                                  // new Save vs. Spell
-      "newmr"    = "20"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "0"                                                                   // new Resist Electricity value
-      "newlvl1"  = "7"                                                                   // new level (first class)
-      "newstr"   = "17"                                                                  // new Strength value
-      "newint"   = "10"                                                                  // new Intelligence value
-      "newwis"   = "10"                                                                  // new Wisdom value
-      "newdex"   = "18"                                                                  // new Dexterity value
-      "newcon"   = "14"                                                                  // new Constitution value
-      "newchr"   = "16"                                                                  // new Charisma value
-      "newmor"   = "14"                                                                  // new morale value
-      "newmorb"  = "5"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "179"                                                                 // new class (Imp)
-      "newalign" = "19"                                                                  // new alignment (Lawful Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "GORCAMB6"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "GORCAMB7"                                                            // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "HGFEL01"                                                             // enforced creature 3 (uses strict PnP values)
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HFCAT"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script05"   = "BPDEMON"                                                           // Big Picture Demon AI
-"script06"   = "DW#MELEE"                                                          // SCSII melee script
-"skipfile01" = "GORCAMB6"                                                          // skip script patching for a designated file
-"skipfile02" = "GORCAMB7"                                                          // skip script patching for a designated file
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "292" END                                               // mark opcode #292 (Protection from Backstab) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "16" END                                                // mark opcode #16 (Haste) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "120" END                                               // mark opcode #120 (Protection from Melee Weapons) for deletion
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_hellcat END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 // Special case, inlined script addition for Aesgareth's Hellcats (Watcher's Keep Cambion)
@@ -191,69 +63,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~DERINY01~                                                           // Erinyes
                ~GORBAT2~                                                           // Erinyes
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-WRITE_LONG 0x14 7000                                                               //XP
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "48"                                                                  // new hit point value
-      "newac"    = "2"                                                                   // new Armor Class value
-      "newth"    = "13"                                                                  // new THAC0 value
-      "newapr"   = "1"                                                                   // new number of attacks per round
-      "newsvd"   = "10"                                                                  // new Save vs. Death
-      "newsvw"   = "12"                                                                  // new Save vs. Wand
-      "newsvp"   = "11"                                                                  // new Save vs. Polymorph
-      "newsvb"   = "12"                                                                  // new Save vs. Breath
-      "newsvs"   = "13"                                                                  // new Save vs. Spell
-      "newmr"    = "30"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "0"                                                                   // new Resist Electricity value
-      "newlvl1"  = "6"                                                                   // new level (first class)
-      "newstr"   = "17"                                                                  // new Strength value
-      "newint"   = "14"                                                                  // new Intelligence value
-      "newwis"   = "16"                                                                  // new Wisdom value
-      "newdex"   = "18"                                                                  // new Dexterity value
-      "newcon"   = "14"                                                                  // new Constitution value
-      "newchr"   = "18"                                                                  // new Charisma value
-      "newmor"   = "12"                                                                  // new morale value
-      "newmorb"  = "5"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "179"                                                                 // new class (Imp)
-      "newalign" = "19"                                                                  // new alignment (Lawful Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DERINY01"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "GORBAT2"                                                             // enforced creature 2 (uses strict PnP values)
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HERIN"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "ERINYES"                                                           // fourth AI script name
-"script05"   = "BPDEMON"                                                           // Big Picture Demon AI
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "292" END                                               // mark opcode #292 (Protection from Backstab) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "98" END                                                // mark opcode #98 (Regeneration) for deletion
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_erinyes END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -264,88 +78,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~GORBAT5~                                                           // Bone Fiend
               ~MELSUM02~                                                           // Bone Fiend
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DBFND~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-REPLACE_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNDROPPABLE~ ~RRING~                         // replace undead immunities with fiend immunities 
-REMOVE_CRE_ITEM ~IMMUNE2~                                                          // removes IMMUNE2.ITM (no immunity to +1 weapons in PnP)
-REMOVE_CRE_ITEM ~REGHP2R~                                                          // removes REGHP2R.ITM (no regeneration in PnP)
-WRITE_LONG 0x14 7000                                                               //XP
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "40"                                                                  // new hit point value
-      "newac"    = "3"                                                                   // new Armor Class value
-      "newth"    = "15"                                                                  // new THAC0 value
-      "newapr"   = "4"                                                                   // new number of attacks per round
-      "newsvd"   = "11"                                                                  // new Save vs. Death
-      "newsvw"   = "13"                                                                  // new Save vs. Wand
-      "newsvp"   = "12"                                                                  // new Save vs. Polymorph
-      "newsvb"   = "13"                                                                  // new Save vs. Breath
-      "newsvs"   = "14"                                                                  // new Save vs. Spell
-      "newmr"    = "30"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "0"                                                                   // new Resist Electricity value
-      "newlvl1"  = "5"                                                                   // new level (first class)
-      "newstr"   = "16"                                                                  // new Strength value
-      "newstrx"  = "0"                                                                   // new Exceptional Strength value
-      "newint"   = "12"                                                                  // new Intelligence value
-      "newwis"   = "12"                                                                  // new Wisdom value
-      "newdex"   = "14"                                                                  // new Dexterity value
-      "newcon"   = "15"                                                                  // new Constitution value
-      "newchr"   = "10"                                                                  // new Charisma value
-      "newmor"   = "12"                                                                  // new morale value
-      "newmorb"  = "4"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "179"                                                                 // new class (Imp)
-      "newalign" = "19"                                                                  // new alignment (Lawful Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DBONEF01"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "GORBAT5"                                                             // enforced creature 2 (uses strict PnP values)
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HBFND"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "BPDEMON"                                                           // Big Picture Demon AI
-"script05"   = "DEMBAL01"                                                          // Big Picture script (misassigned?)
-"script06"   = "DW#MELEE"                                                          // SCSII melee script
-"script07"   = "DW#BONEF"                                                          // SCSII Bone Fiend script
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "292" END                                               // mark opcode #292 (Protection from Backstab) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "16" END                                                // mark opcode #16 (Haste) for deletion
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "300"                                                                     // effect: #300 (NPC Bump)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter2 = "1"                                                                   // param2: 1 (constant value)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-  "effsource" = ""                                                                   // effsource: none
-  END
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_bone_fiend END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -355,79 +92,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~ABISRED1~                                                           // Abishai
               ~DEMABI01~                                                           // Abishai
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
-REPLACE_CRE_ITEM ~RR#DABIS~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-WRITE_LONG 0x14 9000                                                               //XP
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "51"                                                                  // new hit point value
-      "newac"    = "1"                                                                   // new Armor Class value
-      "newth"    = "13"                                                                  // new THAC0 value
-      "newapr"   = "3"                                                                   // new number of attacks per round
-      "newsvd"   = "10"                                                                  // new Save vs. Death
-      "newsvw"   = "12"                                                                  // new Save vs. Wand
-      "newsvp"   = "11"                                                                  // new Save vs. Polymorph
-      "newsvb"   = "12"                                                                  // new Save vs. Breath
-      "newsvs"   = "13"                                                                  // new Save vs. Spell
-      "newmr"    = "30"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "0"                                                                   // new Resist Electricity value
-      "newlvl1"  = "6"                                                                   // new level (first class)
-      "newstr"   = "15"                                                                  // new Strength value
-      "newint"   = "10"                                                                  // new Intelligence value
-      "newwis"   = "12"                                                                  // new Wisdom value
-      "newdex"   = "17"                                                                  // new Dexterity value
-      "newcon"   = "15"                                                                  // new Constitution value
-      "newchr"   = "16"                                                                  // new Charisma value
-      "newmor"   = "12"                                                                  // new morale value
-      "newmorb"  = "6"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "179"                                                                 // new class (Imp)
-      "newalign" = "19"                                                                  // new alignment (Lawful Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DEMABI01"                                                            // enforced creature 1 (uses strict PnP values)
-       enfc02    = abisred1
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HABIS"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "BPDEMON"                                                           // Big Picture Demon AI
-"script05"   = "DW#MELEE"                                                          // SCSII melee script
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "300"                                                                     // effect: #300 (NPC Bump)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter2 = "1"                                                                   // param2: 1 (constant value)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-  "effsource" = ""                                                                   // effsource: none
-  END
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_abishai END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -439,97 +108,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~GORBAT3~                                                           // Cornugon
                ~TELCOR1~                                                           // Cornugon
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DCORN~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-WRITE_LONG 0x14 10000
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "80"                                                                  // new hit point value
-      "newac"    = "-2"                                                                  // new Armor Class value
-      "newth"    = "11"                                                                  // new THAC0 value
-      "newapr"   = "2"                                                                   // new number of attacks per round
-      "newsvd"   = "8"                                                                   // new Save vs. Death
-      "newsvw"   = "10"                                                                  // new Save vs. Wand
-      "newsvp"   = "9"                                                                   // new Save vs. Polymorph
-      "newsvb"   = "9"                                                                   // new Save vs. Breath
-      "newsvs"   = "11"                                                                  // new Save vs. Spell
-      "newmr"    = "50"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "0"                                                                   // new Resist Electricity value
-      "newlvl1"  = "10"                                                                  // new level (first class)
-      "newstr"   = "18"                                                                  // new Strength value
-      "newstrx"  = "100"                                                                 // new Exceptional Strength value
-      "newint"   = "16"                                                                  // new Intelligence value
-      "newwis"   = "14"                                                                  // new Wisdom value
-      "newdex"   = "17"                                                                  // new Dexterity value
-      "newcon"   = "17"                                                                  // new Constitution value
-      "newchr"   = "16"                                                                  // new Charisma value
-      "newmor"   = "14"                                                                  // new morale value
-      "newmorb"  = "5"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "179"                                                                 // new class (Imp)
-      "newalign" = "19"                                                                  // new alignment (Lawful Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DEMCOR01"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "DEADDEM1"                                                            // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "GORBAT3"                                                             // enforced creature 3 (uses strict PnP values)
-      "enfc04"   = "TELCOR1"                                                             // enforced creature 4 (uses strict PnP values)
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HCORN"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "CORNUGON"                                                          // fourth AI script name
-"script05"   = "BPDEMON"                                                           // Big Picture Demon AI
-"script06"   = "DW#MELEE"                                                          // SCSII melee script
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "292" END                                               // mark opcode #292 (Protection from Backstab) for deletion
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "300"                                                                     // effect: #300 (NPC Bump)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter2 = "1"                                                                   // param2: 1 (constant value)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-  "effsource" = ""                                                                   // effsource: none
-  END
-END
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-    opcode = "206"                                                                     // effect: #206 (Protection from Spell)
-    target = "1"                                                                       // target: 1 (self)
-    timing = "9"                                                                       // timing mode: 9 (permanent after death)
-    "duration" = "0"                                                                   // duration: 0
-    "sectype" = "0"                                                                    // secondary type: none
-    probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-    "resource"  = "RR#WI308"                                                           // resref: RR#WI308.SPL (Cornugon's own Lightning Bolt)
-    "effsource" = ""                                                                   // effsource: none
-END
-WRITE_BYTE  0x2E "49"                                                              // major color (brown)
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_cornugon END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -543,123 +126,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~GORBAT1~                                                           // Ka'rashur (Watcher's Keep Baatezu leader)
                dempitsu                                                            //Summoned Pit Fiend  
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DPITF~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace generic attack with a Pit Fiend specific attack
-WRITE_LONG 0x14 21000
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "104"                                                                 // new hit point value
-      "newac"    = "-5"                                                                  // new Armor Class value
-      "newth"    = "7"                                                                   // new THAC0 value
-      "newapr"   = "5"                                                                   // new number of attacks per round
-      "newsvd"   = "5"                                                                   // new Save vs. Death
-      "newsvw"   = "7"                                                                   // new Save vs. Wand
-      "newsvp"   = "6"                                                                   // new Save vs. Polymorph
-      "newsvb"   = "5"                                                                   // new Save vs. Breath
-      "newsvs"   = "8"                                                                   // new Save vs. Spell
-      "newmr"    = "50"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "0"                                                                   // new Resist Electricity value
-      "newlvl1"  = "13"                                                                  // new level (first class)
-      "newstr"   = "18"                                                                  // new Strength value
-      "newstrx"  = "100"                                                                 // new Exceptional Strength value
-      "newint"   = "18"                                                                  // new Intelligence value
-      "newwis"   = "16"                                                                  // new Wisdom value
-      "newdex"   = "16"                                                                  // new Dexterity value
-      "newcon"   = "16"                                                                  // new Constitution value
-      "newchr"   = "25"                                                                  // new Charisma value
-      "newmor"   = "20"                                                                  // new morale value
-      "newmorb"  = "0"                                                                   // new morale break value
-      "newmorr"  = "1"                                                                   // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "179"                                                                 // new class (Imp)
-      "newalign" = "19"                                                                  // new alignment (Lawful Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DEMPIT"                                                              // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "DEMPIT01"                                                            // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "TELPIT1"                                                             // enforced creature 3 (uses strict PnP values)
-      "enfc04"   = "TELPIT2"                                                             // enforced creature 4 (uses strict PnP values)
-       enfc05    = dempitsu   
-  END                                                                                // ends FUNCTION call
-END
-PATCH_IF "%file%" STRING_COMPARE_CASE dempitsu BEGIN
-  LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-    STR_VAR                                                                            // Initialize strings
-      "newscript"  = "rr#hpitf"                                                          // new AI script
-      "script01"   = ""                                                                  // first AI script name
-      "script02"   = "None"                                                              // second AI script name
-      "script03"   = "WTASIGHT"                                                          // third AI script name
-      "script04"   = "DEMPIT"                                                            // fourth AI script name
-      "script05"   = "DEMPIT01"                                                          // fifth AI script name
-      "script06"   = "TELPIT1"                                                           // sixth AI script name
-      "script07"   = "DEMPTJ"                                                            // sixth AI script name
-      "script08"   = "BPDEMON"                                                           // Big Picture Demon AI
-      "script09"   = "BPDEMPIT"                                                          // Big Picture Pit Fiend AI
-      "script10"   = "DW#MELEE"                                                          // SCSII melee script
-      "skipfile01" = "GORBAT1"                                                           // skip script patching for a designated file
-  END                                                                                // ends FUNCTION call
-END
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "16" END                                                // mark opcode #16 (Haste) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "292" END                                               // mark opcode #292 (Protection from Backstab) for deletion
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "300"                                                                     // effect: #300 (NPC Bump)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter2 = "1"                                                                   // param2: 1 (constant value)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR                                                                            // initialize strings
-  "effsource" = ""                                                                   // effsource: none
-  END                                                                                // ends FUNCTION                                                                            // ends FUNCTION
-END
-WRITE_SHORT 0x28 "4352"                                                            // special case, Pit Fiends should use the TANARRI (winged demon) avatar
-PATCH_FOR_EACH ~spell~ IN                                                          // grant immunity to each of the following spells (prevents AI quirks)
-            ~SPIN561~                                                              // Fire Giant Lava Pit (FIRE_GIANT_LAVA)
-            ~SPIN819~                                                              // Lava Burst (LAVA_BURST)
-            ~SPWI022~                                                              // Lava Pit (TRAP_MUCK)
-            ~SPWI103~                                                              // Burning Hands
-            ~SPWI217~                                                              // Agannazar's Scorcher
-            ~SPWI304~                                                              // Fireball
-           ~RR#WI304~                                                              // Pit Fiend's own Fireball
-            ~SPWI502~                                                              // Cloudkill
-            ~SPWI523~                                                              // Sunfire
-            ~SPWI712~                                                              // Delayed Blast Fireball
-            ~SPWI810~                                                              // Incendiary Cloud
-            ~SPWI911~                                                              // Meteor Swarm
-            ~SPPR705~                                                              // Fire Storm
-BEGIN                                                                              // execute the following
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-INT_VAR                                                                            // initialize variables
-"opcode" = "206"                                                                   // effect: #101 (Protection from Opcode)
-"target" = "1"                                                                     // target: 1 (self)
-"timing" = "9"                                                                     // timing mode: 9 (permanent after death)
-"duration" = "0"                                                                   // duration: 0
-"sectype" = "0"                                                                    // secondary type: none
-"probability1" = "100"                                                             // probability1: 100%
-STR_VAR                                                                            // initialize strings
-"resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-"effsource" = ""                                                                   // effsource: none
-END                                                                                // ends FUNCTION
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_pit_fiend END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -674,80 +145,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~TELQUA1~                                                            // Quasit
               ~TELQUA2~                                                            // Quasit
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE re-indexer macros (needed for corrupt and v1 CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DQUAS~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
-REMOVE_CRE_ITEM ~RINGDEMN~                                                         // removes RINGDEMN.ITM (Imps are not actual Fiends in 2E)
-REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (regeneration now handled via equipped weapon)
-WRITE_LONG 0x14 1400
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "24"                                                                  // new hit point value
-      "newac"    = "2"                                                                   // new Armor Class value
-      "newth"    = "17"                                                                  // new THAC0 value
-      "newapr"   = "3"                                                                   // new number of attacks per round
-      "newsvd"   = "10"                                                                  // new Save vs. Death
-      "newsvw"   = "12"                                                                  // new Save vs. Wand
-      "newsvp"   = "11"                                                                  // new Save vs. Polymorph
-      "newsvb"   = "12"                                                                  // new Save vs. Breath
-      "newsvs"   = "13"                                                                  // new Save vs. Spell
-      "newmr"    = "25"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "100"                                                                 // new Resist Cold value
-      "newer"    = "100"                                                                 // new Resist Electricity value
-      "newlvl1"  = "3"                                                                   // new level (first class)
-      "newstr"   = "8"                                                                   // new Strength value
-      "newint"   = "7"                                                                   // new Intelligence value
-      "newwis"   = "9"                                                                   // new Wisdom value
-      "newdex"   = "17"                                                                  // new Dexterity value
-      "newcon"   = "10"                                                                  // new Constitution value
-      "newchr"   = "7"                                                                   // new Charisma value
-      "newmor"   = "10"                                                                  // new morale value
-      "newmorb"  = "5"                                                                   // new morale break value
-      "newmorr"  = "60"                                                                  // new morale recovery value
-      "newrace"  = "141"                                                                 // new race (Imp)
-      "newclass" = "160"                                                                 // new class (Tanari)
-      "newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DEADDEM2"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "DQUAS01"                                                             // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "GORTAN5"                                                             // enforced creature 3 (uses strict PnP values)
-      "enfc04"   = "IMPQUA01"                                                            // enforced creature 4 (uses strict PnP values)
-      "enfc05"   = "TELQUA1"                                                             // enforced creature 5 (uses strict PnP values)
-      "enfc06"   = "TELQUA2"                                                             // enforced creature 6 (uses strict PnP values)
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HQUAS"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "QUASIT"                                                            // fourth AI script name
-"script05"   = "QUASIT01"                                                          // 5th AI script name
-"script07"   = "BPWDASGT"                                                          // Big Picture script
-"script08"   = "DW#MELEE"                                                          // SCSII melee script
-"skipfile01" = "TELQUA1"                                                           // skip script patching for a designated file
-"skipfile02" = "TELQUA2"                                                           // skip script patching for a designated file
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "16" END                                                // mark opcode #16 (Haste) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "98" END                                                // mark opcode #98 (Regeneration) for deletion
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_quasit END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -765,108 +167,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~TELCAM1~                                                           // Cambion
                ~GORCAMB~                                                           // Aesgareth (Watcher's Keep Cambion)
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REMOVE_CRE_ITEM ~SEEINVIS~                                                         // removes SEEINVIS.ITM (no detect invisibility in PnP)
-REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
-ADD_CRE_ITEM ~DWDUST~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~ARMOR~                   // unequipp armor in order to enable arcane spellcasting
-WRITE_LONG 0x14 6000
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "48"                                                                  // new hit point value
-      "newac"    = "2"                                                                   // new Armor Class value
-      "newth"    = "15"                                                                  // new THAC0 value
-      "newapr"   = "2"                                                                   // new number of attacks per round
-      "newsvd"   = "11"                                                                  // new Save vs. Death
-      "newsvw"   = "9"                                                                   // new Save vs. Wand
-      "newsvp"   = "11"                                                                  // new Save vs. Polymorph
-      "newsvb"   = "13"                                                                  // new Save vs. Breath
-      "newsvs"   = "10"                                                                  // new Save vs. Spell
-      "newmr"    = "30"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "100"                                                                 // new Resist Electricity value
-      "newlvl1"  = "6"                                                                   // new level (first class)
-      "newstr"   = "19"                                                                  // new Strength value
-      "newint"   = "16"                                                                  // new Intelligence value
-      "newwis"   = "8"                                                                   // new Wisdom value
-      "newdex"   = "16"                                                                  // new Dexterity value
-      "newcon"   = "17"                                                                  // new Constitution value
-      "newchr"   = "6"                                                                   // new Charisma value
-      "newmor"   = "14"                                                                  // new morale value
-      "newmorb"  = "5"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "1"                                                                   // new class (Mage)
-      "newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-      "newhide"  = "80"                                                                  // new Hide in Shadows value
-      "newmsil"  = "80"                                                                  // new Move Silently value
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "CAMBION1"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "CAMBION2"                                                            // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "IDEMON01"                                                            // enforced creature 3 (uses strict PnP values)
-      "enfc04"   = "IDEMON02"                                                            // enforced creature 4 (uses strict PnP values)
-      "enfc05"   = "TELCAM1"                                                             // enforced creature 5 (uses strict PnP values)
-       enfc06    = illcamb
-       enfc07    = illcamb2
-       enfc08    = kdemon01 
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HCAMB"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "CTHIE20B"                                                          // fourth AI script name
-"script05"   = "BPDEMTHF"                                                          // Big Picture script
-"script06"   = "BPWTRSGT"                                                          // Big Picture script
-"script07"   = "BPDEMON"                                                           // Big Picture Demon script
-"script08"   = "DW#MELEE"                                                          // SCSII melee script
-"skipfile01" = "IDEMON01"                                                          // skip script patching for a designated file
-"skipfile02" = "KDEMON01"                                                          // skip script patching for a designated file
-"skipfile03" = "GORCAMB"                                                           // skip script patching for a designated file
-"skipfile04" = "ILLCAMB"                                                           // skip script patching for a designated file
-"skipfile05" = "ILLCAMB2"                                                          // skip script patching for a designated file
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "292" END                                               // mark opcode #292 (Protection from Backstab) for deletion (no dupl.)
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "292"                                                                     // effect: #292 (Protection from Backstab)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter2 = "1"                                                                   // param2: 1 (constant value)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-  "effsource" = ""                                                                   // effsource: none
-  END
-END
-REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
-REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
-ADD_MEMORIZED_SPELL ~SPWI106~ #0 ~wizard~                                          // adds 1x Blindness
-ADD_MEMORIZED_SPELL ~SPWI106~ #0 ~wizard~                                          // adds 1x Blindness
-ADD_MEMORIZED_SPELL ~SPWI112~ #0 ~wizard~                                          // adds 1x Magic Missile
-ADD_MEMORIZED_SPELL ~SPWI112~ #0 ~wizard~                                          // adds 1x Magic Missile
-ADD_MEMORIZED_SPELL ~SPWI206~ #1 ~wizard~                                          // adds 1x Invisibility
-ADD_MEMORIZED_SPELL ~SPWI212~ #1 ~wizard~                                          // adds 1x Mirror Image
-ADD_MEMORIZED_SPELL ~SPWI305~ #2 ~wizard~                                          // adds 1x Haste
-ADD_MEMORIZED_SPELL ~SPWI312~ #2 ~wizard~                                          // adds 1x Slow
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_cambion END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -879,118 +184,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~TELALU1~                                                           // Alu-Fiend
                ~TELSUC1~                                                           // Alu-Fiend
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-WRITE_SHORT 0x28 "25104"                                                           // Sets avatar to MAGE_FEMALE_HUMAN
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
-ADD_CRE_ITEM ~CLCK14~ #0 #0 #0 ~UNSTEALABLE~ ~ARMOR~                               // replace armor with a robe to enable arcane spellcasting
-WRITE_LONG 0x14 6000
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "48"                                                                  // new hit point value
-      "newac"    = "2"                                                                   // new Armor Class value
-      "newth"    = "17"                                                                  // new THAC0 value
-      "newapr"   = "1"                                                                   // new number of attacks per round
-      "newsvd"   = "11"                                                                  // new Save vs. Death
-      "newsvw"   = "7"                                                                   // new Save vs. Wand
-      "newsvp"   = "9"                                                                   // new Save vs. Polymorph
-      "newsvb"   = "11"                                                                  // new Save vs. Breath
-      "newsvs"   = "8"                                                                   // new Save vs. Spell
-      "newmr"    = "30"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "100"                                                                 // new Resist Electricity value
-      "newlvl1"  = "12"                                                                  // new level (first class)
-      "newstr"   = "15"                                                                  // new Strength value
-      "newint"   = "18"                                                                  // new Intelligence value
-      "newwis"   = "12"                                                                  // new Wisdom value
-      "newdex"   = "17"                                                                  // new Dexterity value
-      "newcon"   = "14"                                                                  // new Constitution value
-      "newchr"   = "16"                                                                  // new Charisma value
-      "newmor"   = "12"                                                                  // new morale value
-      "newmorb"  = "5"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "1"                                                                   // new class (Mage)
-      "newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "ALUFIE01"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "ALUFIE02"                                                            // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "GORALU01"                                                            // enforced creature 3 (uses strict PnP values)
-      "enfc04"   = "TELALU1"                                                             // enforced creature 4 (uses strict PnP values)
-      "enfc05"   = "TELSUC1"                                                             // enforced creature 5 (uses strict PnP values)
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HALUF"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "CFIGH20B"                                                          // fourth AI script name
-"script05"   = "CARCH20B"                                                          // fifth AI script name
-"script06"   = "DEMALU01"                                                          // sixth AI script name
-"script07"   = "BPCFIG2B"                                                          // Big Picture script
-"script07"   = "BPCARC2B"                                                          // Big Picture script
-"script08"   = "BPDEMON"                                                           // Big Picture demon script
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "292" END                                               // mark opcode #292 (Protection from Backstab) for deletion (no dupl.)
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "292"                                                                     // effect: #292 (Protection from Backstab)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter2 = "1"                                                                   // param2: 1 (constant value)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-  "effsource" = ""                                                                   // effsource: none
-  END
-END
-REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
-REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
-ADD_KNOWN_SPELL     ~SPWI201~ #1 ~wizard~                                          // add Blur as known
-ADD_KNOWN_SPELL     ~SPWI403~ #3 ~wizard~                                          // add Fire Shield (Blue) as known
-ADD_KNOWN_SPELL     ~SPWI420~ #3 ~wizard~                                          // add Minor Sequencer as known
-ADD_KNOWN_SPELL     ~SPWI522~ #4 ~wizard~                                          // add Minor Spell Turning as known
-ADD_KNOWN_SPELL     ~SPWI617~ #5 ~wizard~                                          // add Contingency as known
-ADD_MEMORIZED_SPELL ~SPWI106~ #0 ~wizard~                                          // adds 1x Blindness
-ADD_MEMORIZED_SPELL ~SPWI106~ #0 ~wizard~                                          // adds 1x Blindness
-ADD_MEMORIZED_SPELL ~SPWI112~ #0 ~wizard~                                          // adds 1x Magic Missile
-ADD_MEMORIZED_SPELL ~SPWI112~ #0 ~wizard~                                          // adds 1x Magic Missile
-ADD_MEMORIZED_SPELL ~SPWI212~ #1 ~wizard~                                          // adds 1x Mirror Image
-ADD_MEMORIZED_SPELL ~SPWI212~ #1 ~wizard~                                          // adds 1x Mirror Image
-ADD_MEMORIZED_SPELL ~SPWI212~ #1 ~wizard~                                          // adds 1x Mirror Image
-ADD_MEMORIZED_SPELL ~SPWI219~ #1 ~wizard~                                          // adds 1x Vocalize
-ADD_MEMORIZED_SPELL ~SPWI312~ #2 ~wizard~                                          // adds 1x Slow
-ADD_MEMORIZED_SPELL ~SPWI312~ #2 ~wizard~                                          // adds 1x Slow
-ADD_MEMORIZED_SPELL ~SPWI314~ #2 ~wizard~                                          // adds 1x Vampiric Touch
-ADD_MEMORIZED_SPELL ~SPWI314~ #2 ~wizard~                                          // adds 1x Vampiric Touch
-ADD_MEMORIZED_SPELL ~SPWI405~ #3 ~wizard~                                          // adds 1x Improved Invisibility
-ADD_MEMORIZED_SPELL ~SPWI405~ #3 ~wizard~                                          // adds 1x Improved Invisibility
-ADD_MEMORIZED_SPELL ~SPWI408~ #3 ~wizard~                                          // adds 1x Stoneskin
-ADD_MEMORIZED_SPELL ~SPWI408~ #3 ~wizard~                                          // adds 1x Stoneskin
-ADD_MEMORIZED_SPELL ~SPWI507~ #4 ~wizard~                                          // adds 1x Hold Monster
-ADD_MEMORIZED_SPELL ~SPWI507~ #4 ~wizard~                                          // adds 1x Hold Monster
-ADD_MEMORIZED_SPELL ~SPWI508~ #4 ~wizard~                                          // adds 1x Chaos
-ADD_MEMORIZED_SPELL ~SPWI508~ #4 ~wizard~                                          // adds 1x Chaos
-ADD_MEMORIZED_SPELL ~SPWI611~ #5 ~wizard~                                          // adds 1x Protection From Magical Weapons
-WRITE_BYTE 0x275 "2"                                                               // special case, set gender to female
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_alu-fiend END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -1001,88 +199,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~GORTAN6~                                                           // Maurezhi (Watcher's Keep Tanar'ri group)
               ~OBSDEM04~                                                           // Maurezhi (Planar Sphere)
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REMOVE_CRE_ITEM ~SEEINVIS~                                                         // removes SEEINVIS.ITM (no detect invisibility in PnP)
-REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
-REPLACE_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace undead immunities with fiend immunities 
-REPLACE_CRE_ITEM ~MAUREZHI~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-WRITE_LONG 0x14 6000                                                               //XP
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "45"                                                                  // new hit point value
-      "newac"    = "0"                                                                   // new Armor Class value
-      "newth"    = "15"                                                                  // new THAC0 value
-      "newapr"   = "3"                                                                   // new number of attacks per round
-      "newsvd"   = "8"                                                                   // new Save vs. Death
-      "newsvw"   = "10"                                                                  // new Save vs. Wand
-      "newsvp"   = "9"                                                                   // new Save vs. Polymorph
-      "newsvb"   = "9"                                                                   // new Save vs. Breath
-      "newsvs"   = "11"                                                                  // new Save vs. Spell
-      "newmr"    = "30"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "100"                                                                 // new Resist Electricity value
-      "newlvl1"  = "6"                                                                   // new level (first class)
-      "newstr"   = "15"                                                                  // new Strength value
-      "newint"   = "16"                                                                  // new Intelligence value
-      "newwis"   = "14"                                                                  // new Wisdom value
-      "newdex"   = "17"                                                                  // new Dexterity value
-      "newcon"   = "12"                                                                  // new Constitution value
-      "newchr"   = "18"                                                                  // new Charisma value
-      "newmor"   = "14"                                                                  // new morale value
-      "newmorb"  = "5"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "160"                                                                 // new class (Tanari)
-      "newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DEMMAU01"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "GORTAN6"                                                             // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "OBSDEM04"                                                            // enforced creature 3 (uses strict PnP values)
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HMAUR"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "OBSDEM04"                                                          // fourth AI script name
-"script05"   = "DEMMAU01"                                                          // fourth AI script name
-"script06"   = "BPPRI10A"                                                          // Big Picture script
-"script07"   = "BPDEMON"                                                           // Big Picture demon script
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "292" END                                               // mark opcode #292 (Protection from Backstab) for deletion
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "126"                                                                     // effect: #126 (Movement Modifier)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter1 = "200"                                                                 // param1: 200 (statistic modifier)
-  parameter2 = "2"                                                                   // param2: 2 (type: percentage modifier)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-  "effsource" = ""                                                                   // effsource: none
-  END
-END
-WRITE_SHORT 0x28 "30464"                                                           // special case, standardize Maurezhi apperance (use Ghoul avatar)
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_maurezhi END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -1096,82 +217,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                 ~KIRINH~                                                           // Kirinhale, the Succubus in Durlag's Tower (BGT)
                ~_KIRINH~                                                           // Kirinhale, the Succubus in Durlag's Tower (Tutu)
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-WRITE_LONG 0x14 11000                                                              //XP
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "48"                                                                  // new hit point value
-      "newac"    = "0"                                                                   // new Armor Class value
-      "newth"    = "15"                                                                  // new THAC0 value
-      "newapr"   = "2"                                                                   // new number of attacks per round
-      "newsvd"   = "10"                                                                  // new Save vs. Death
-      "newsvw"   = "12"                                                                  // new Save vs. Wand
-      "newsvp"   = "11"                                                                  // new Save vs. Polymorph
-      "newsvb"   = "12"                                                                  // new Save vs. Breath
-      "newsvs"   = "13"                                                                  // new Save vs. Spell
-      "newmr"    = "30"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "100"                                                                 // new Resist Electricity value
-      "newlvl1"  = "6"                                                                   // new level (first class)
-      "newstr"   = "15"                                                                  // new Strength value
-      "newint"   = "16"                                                                  // new Intelligence value
-      "newwis"   = "14"                                                                  // new Wisdom value
-      "newdex"   = "17"                                                                  // new Dexterity value
-      "newcon"   = "12"                                                                  // new Constitution value
-      "newchr"   = "18"                                                                  // new Charisma value
-      "newmor"   = "14"                                                                  // new morale value
-      "newmorb"  = "5"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "160"                                                                 // new class (Tanari)
-      "newgendr" = "2"                                                                   // new gender (Female)
-      "newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DEMSUC01"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "GORSUC01"                                                            // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "GORTAN2"                                                             // enforced creature 3 (uses strict PnP values)
-      "enfc04"   = "KIRINH"                                                              // enforced creature 4 (uses strict PnP values)
-      "enfc05"   = "_KIRINH"                                                             // enforced creature 5 (uses strict PnP values)
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HSUCC"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "DEMSUC"                                                            // fourth AI script name
-"script05"   = "KIRINH"                                                            // 5th AI script name
-"script06"   = "_KIRINH"                                                           // 6th AI script name
-"script07"   = "_TASIGHT"                                                          // 7th AI script name
-"script08"   = "NALMISS"                                                           // 8th AI script name
-"script09"   = "BPDEMON"                                                           // Big Picture demon script
-"script10"   = "INITDLG"                                                           // dialogue initialization script (BGT Kirinhale)
-"script11"   = "_INITDLG"                                                          // dialogue initialization script (Tutu Kirinhale)
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-END
-PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~_KIRINH~) BEGIN                        // special case, Tutu's Kirinhale needs a proper immunity item
-  REPLACE_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~LRING~           // replace the Tutu fiend immunty ring with the BG2 version
-  ADD_CRE_ITEM ~IMMUNE2~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~RRING~                // add immunity to +1 weapons and below
-END
-PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~KIRINH~) BEGIN                         // special case, BGT's Kirinhale needs a proper immunity item
-  ADD_CRE_ITEM ~IMMUNE2~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~RRING~                // add immunity to +1 weapons and below
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_succubus END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -1196,130 +246,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                 ~_TANAR~                                                           // Aec'Letec (Tutu)
                 demnabsu                                                           //Summoned Nabassu  
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DNABA~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-WRITE_LONG 0x14 16000                                                              //XP
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "76"                                                                  // new hit point value
-      "newac"    = "-5"                                                                  // new Armor Class value
-      "newth"    = "13"                                                                  // new THAC0 value
-      "newapr"   = "3"                                                                   // new number of attacks per round
-      "newsvd"   = "10"                                                                  // new Save vs. Death
-      "newsvw"   = "12"                                                                  // new Save vs. Wand
-      "newsvp"   = "11"                                                                  // new Save vs. Polymorph
-      "newsvb"   = "12"                                                                  // new Save vs. Breath
-      "newsvs"   = "13"                                                                  // new Save vs. Spell
-      "newmr"    = "50"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "100"                                                                 // new Resist Electricity value
-      "newlvl1"  = "7"                                                                   // new level (first class)
-      "newstr"   = "19"                                                                  // new Strength value
-      "newint"   = "14"                                                                  // new Intelligence value
-      "newwis"   = "15"                                                                  // new Wisdom value
-      "newdex"   = "14"                                                                  // new Dexterity value
-      "newcon"   = "19"                                                                  // new Constitution value
-      "newchr"   = "18"                                                                  // new Charisma value
-      "newmor"   = "16"                                                                  // new morale value
-      "newmorb"  = "4"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "160"                                                                 // new class (Tanari)
-      "newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DEMNAB01"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "DEMNAB02"                                                            // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "UDNABA"                                                              // enforced creature 3 (uses strict PnP values)
-       enfc04    =  demnabsu
-       enfc05    = rumar02
-       enfc06    = obsdem05
-       enfc07    = abydem01
-       enfc08    = tanari01
-  END                                                                                // ends FUNCTION call
-END
-PATCH_IF "%file%" STRING_COMPARE_CASE demnabsu BEGIN
-  LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-    STR_VAR                                                                            // Initialize strings
-      "newscript"  = "rr#hnaba"                                                          // new AI script
-      "script01"   = ""                                                                  // first AI script name
-      "script02"   = "None"                                                              // second AI script name
-      "script03"   = "WTASIGHT"                                                          // third AI script name
-      "script04"   = "SUMTAN01"                                                          // fourth AI script name
-      "script05"   = "TANARI2"                                                           // fifth AI script name
-      "script06"   = "TANARI"                                                            // sixth AI script name
-      "script07"   = "DEMNAB02"                                                          // seventh AI script name
-      "script08"   = "_TANARI"                                                           // 8th AI script name
-      "script09"   = "_TASIGHT"                                                          // 9th AI script name
-      "script10"   = "BGTANARI"                                                          // 10th AI script name
-      "script11"   = "BPDEMON"                                                           // Big Picture demon script
-      "script12"   = "BPTANARI"                                                          // Big Picture script
-      "script13"   = "DW#MELEE"                                                          // SCSII melee script
-  END                                                                                // ends FUNCTION call
-END
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "300"                                                                     // effect: #300 (NPC Bump)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter2 = "1"                                                                   // param2: 1 (constant value)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-  "effsource" = ""                                                                   // effsource: none
-  END
-END
-PATCH_FOR_EACH ~spell~ IN                                                          // grant immunity to each of the following spells (prevents AI quirks)
-            ~SPIN561~                                                              // Fire Giant Lava Pit (FIRE_GIANT_LAVA)
-            ~SPIN819~                                                              // Lava Burst (LAVA_BURST)
-            ~SPWI022~                                                              // Lava Pit (TRAP_MUCK)
-            ~SPWI103~                                                              // Burning Hands
-            ~SPWI217~                                                              // Agannazar's Scorcher
-            ~SPWI304~                                                              // Fireball
-            ~SPWI308~                                                              // Lightning Bolt (Tanar'ri only)
-            ~SPWI502~                                                              // Cloudkill
-            ~SPWI523~                                                              // Sunfire
-            ~SPWI712~                                                              // Delayed Blast Fireball
-            ~SPWI810~                                                              // Incendiary Cloud
-            ~SPWI911~                                                              // Meteor Swarm
-            ~SPPR705~                                                              // Fire Storm
-            ~RR#PR211~                                                             // Nabassu's own Silence 15' Radius
-BEGIN                                                                              // execute the following
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-INT_VAR                                                                            // initialize variables
-"opcode" = "206"                                                                   // effect: #101 (Protection from Opcode)
-"target" = "1"                                                                     // target: 1 (self)
-"timing" = "9"                                                                     // timing mode: 9 (permanent after death)
-"duration" = "0"                                                                   // duration: 0
-"sectype" = "0"                                                                    // secondary type: none
-"probability1" = "100"                                                             // probability1: 100%
-STR_VAR                                                                            // initialize strings
-"resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-"effsource" = ""                                                                   // effsource: none
-END                                                                                // ends FUNCTION
-END
-PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~_TANAR~) BEGIN                         // special case, Tutu's Aec'Letec needs a proper immunity item
-  REPLACE_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~LRING~           // replace the Tutu fiend immunty ring with the BG2 version
-  WRITE_LONG 0x14 0                                                                // XP value nulled as it's handled via script for Aec'Letec
-END
-PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~TANAR~) BEGIN                          // special case, Aec'Letec's XP value on BGT
-  WRITE_LONG 0x14 0                                                                // XP value nulled as it's handled via script for Aec'Letec
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_nabassu END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -1343,128 +274,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~TELTAN2~                                                           // Glabrezu
                demglasu                                                            //Summoned Glabrezu
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DGLAB~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-WRITE_LONG 0x14 12000                                                              //XP
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "80"                                                                  // new hit point value
-      "newac"    = "-7"                                                                  // new Armor Class value
-      "newth"    = "11"                                                                  // new THAC0 value
-      "newapr"   = "5"                                                                   // new number of attacks per round
-      "newsvd"   = "8"                                                                   // new Save vs. Death
-      "newsvw"   = "10"                                                                  // new Save vs. Wand
-      "newsvp"   = "9"                                                                   // new Save vs. Polymorph
-      "newsvb"   = "9"                                                                   // new Save vs. Breath
-      "newsvs"   = "11"                                                                  // new Save vs. Spell
-      "newmr"    = "50"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "100"                                                                 // new Resist Electricity value
-      "newar"    = "100"                                                                 // new Resist Acid value
-      "newlvl1"  = "10"                                                                  // new level (first class)
-      "newstr"   = "20"                                                                  // new Strength value
-      "newint"   = "16"                                                                  // new Intelligence value
-      "newwis"   = "13"                                                                  // new Wisdom value
-      "newdex"   = "18"                                                                  // new Dexterity value
-      "newcon"   = "20"                                                                  // new Constitution value
-      "newchr"   = "22"                                                                  // new Charisma value
-      "newmor"   = "18"                                                                  // new morale value
-      "newmorb"  = "3"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "160"                                                                 // new class (Tanari)
-      "newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DEMGLA01"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "DEMGLAB"                                                             // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "DGLAB01"                                                             // enforced creature 3 (uses strict PnP values)
-      "enfc04"   = "TELTAN1"                                                             // enforced creature 4 (uses strict PnP values)
-      "enfc05"   = "TELTAN2"                                                             // enforced creature 5 (uses strict PnP values)
-       enfc06    =  demglasu 
-       enfc07    = demglab2
-       enfc08    = gortan4
-       emfc09    = jondem01
-       emfc10    = jondem03
-       enfc11    = jondem05  
-  END                                                                                // ends FUNCTION call
-END
-PATCH_IF "%file%" STRING_COMPARE_CASE demglasu BEGIN
-  LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-    STR_VAR                                                                            // Initialize strings
-      "newscript"  = "rr#hglab"                                                          // new AI script
-      "script01"   = ""                                                                  // 1st AI script name
-      "script02"   = "None"                                                              // 2nd AI script name
-      "script03"   = "WTASIGHT"                                                          // 3rd AI script name
-      "script04"   = "MELGLAB"                                                           // 4th AI script name
-      "script05"   = "DEMGLAB"                                                           // 5th AI script name
-      "script06"   = "DEMGLAB2"                                                          // 6th AI script name
-      "script07"   = "GLABREZ"                                                           // 7th AI script name
-      "script08"   = "DEMGAJ"                                                            // 8th AI script name
-      "script09"   = "TELTAN1"                                                           // 9th AI script name
-      "script10"   = "TELTAN2"                                                           // 10th AI script name
-      "script11"   = "TANARI"                                                            // 11th AI script name
-      "script12"   = "BPDEMON"                                                           // Big Picture demon script
-      "script13"   = "DW#MELEE"                                                          // SCSII melee script
-  END                                                                                // ends FUNCTION call
-END
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "16" END                                                // mark opcode #16 (Haste) for deletion
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "300"                                                                     // effect: #300 (NPC Bump)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter2 = "1"                                                                   // param2: 1 (constant value)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-  "effsource" = ""                                                                   // effsource: none
-  END
-END
-WRITE_SHORT 0x28 "57585"                                                           // special case, Glabrezu should use the IC_GLAB avatar
-PATCH_FOR_EACH ~spell~ IN                                                          // grant immunity to each of the following spells (prevents AI quirks)
-            ~SPIN561~                                                              // Fire Giant Lava Pit (FIRE_GIANT_LAVA)
-            ~SPIN819~                                                              // Lava Burst (LAVA_BURST)
-            ~SPWI022~                                                              // Lava Pit (TRAP_MUCK)
-            ~SPWI103~                                                              // Burning Hands
-            ~SPWI217~                                                              // Agannazar's Scorcher
-            ~SPWI304~                                                              // Fireball
-            ~SPWI308~                                                              // Lightning Bolt (Tanar'ri only)
-            ~SPWI502~                                                              // Cloudkill
-            ~SPWI523~                                                              // Sunfire
-            ~SPWI614~                                                              // Death Fog (Glabrezu only)
-            ~SPWI712~                                                              // Delayed Blast Fireball
-            ~SPWI810~                                                              // Incendiary Cloud
-            ~SPWI911~                                                              // Meteor Swarm
-            ~SPPR705~                                                              // Fire Storm
-BEGIN                                                                              // execute the following
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-INT_VAR                                                                            // initialize variables
-"opcode" = "206"                                                                   // effect: #101 (Protection from Opcode)
-"target" = "1"                                                                     // target: 1 (self)
-"timing" = "9"                                                                     // timing mode: 9 (permanent after death)
-"duration" = "0"                                                                   // duration: 0
-"sectype" = "0"                                                                    // secondary type: none
-"probability1" = "100"                                                             // probability1: 100%
-STR_VAR                                                                            // initialize strings
-"resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-"effsource" = ""                                                                   // effsource: none
-END                                                                                // ends FUNCTION
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_glabrezu END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -1476,98 +290,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~MELSUM05~                                                           // Marilith
               ~GORWOM03~                                                           // Y'tossi (Watcher's Keep final seal Huntress' party)
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DMARI~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-ADD_CRE_ITEM ~IPSION~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                              // add protection from all mind-affecting spells
-WRITE_LONG 0x14 23000                                                              //XP
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "96"                                                                  // new hit point value
-      "newac"    = "-9"                                                                  // new Armor Class value
-      "newapr"   = "1"                                                                   // new number of attacks per round
-      "newsvd"   = "5"                                                                   // new Save vs. Death
-      "newsvw"   = "7"                                                                   // new Save vs. Wand
-      "newsvp"   = "6"                                                                   // new Save vs. Polymorph
-      "newsvb"   = "5"                                                                   // new Save vs. Breath
-      "newsvs"   = "8"                                                                   // new Save vs. Spell
-      "newmr"    = "70"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "100"                                                                 // new Resist Electricity value
-      "newlvl1"  = "13"                                                                  // new level (first class)
-      "newstr"   = "19"                                                                  // new Strength value
-      "newint"   = "18"                                                                  // new Intelligence value
-      "newwis"   = "15"                                                                  // new Wisdom value
-      "newdex"   = "18"                                                                  // new Dexterity value
-      "newcon"   = "12"                                                                  // new Constitution value
-      "newchr"   = "20"                                                                  // new Charisma value
-      "newmor"   = "18"                                                                  // new morale value
-      "newmorb"  = "3"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "160"                                                                 // new class (Tanari)
-      "newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "DEMOSUM1"                                                            // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "ICMARILI"                                                            // enforced creature 2 (uses strict PnP values)
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HMARI"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "ICMARILI"                                                          // fourth AI script name
-"script05"   = "MELMARI"                                                           // fifth AI script name
-"script06"   = "MARILITH"                                                          // sixth AI script name
-"script07"   = "YTOSSI"                                                            // seventh AI script name
-"script08"   = "BPDEMON"                                                           // Big Picture demon script
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "1" END                                                 // mark opcode #1 (Attacks Per Round Modifier) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "16" END                                                // mark opcode #16 (Haste) for deletion
-  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
-  INT_VAR opcode_to_delete = "98" END                                                // mark opcode #98 (Regeneration) for deletion
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "300"                                                                     // effect: #300 (NPC Bump)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter2 = "1"                                                                   // param2: 1 (constant value)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-  "effsource" = ""                                                                   // effsource: none
-  END
-END
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-INT_VAR
-opcode = "206"                                                                     // effect: #206 (Protection from Spell)
-target = "1"                                                                       // target: 1 (self)
-timing = "9"                                                                       // timing mode: 9 (permanent after death)
-"duration" = "0"                                                                   // duration: 0
-"sectype" = "0"                                                                    // secondary type: none
-probability1 = "100"                                                               // probability1: 100%
-STR_VAR
-"resource"  = "RR#WI502"                                                           // resref: RR#WI302.SPL (Marilith's own Cloudkill)
-"effsource" = ""                                                                   // effsource: none
-END
-WRITE_BYTE  0x2E "26"                                                              // major color (wood)
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_marilith END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -1596,108 +323,11 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~UDBALOR~                                                           // Balor
                ~GORTAN1~                                                           // Tahazzar (Watcher's Keep Tanar'ri leader)
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
-REPLACE_CRE_ITEM ~RR#DBALR~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-WRITE_LONG 0x14 26000                                                              //XP
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
-    INT_VAR                                                                            // Initialize variables
-      "newhp"    = "104"                                                                 // new hit point value
-      "newac"    = "-8"                                                                  // new Armor Class value
-      "newapr"   = "2"                                                                   // new number of attacks per round
-      "newsvd"   = "5"                                                                   // new Save vs. Death
-      "newsvw"   = "7"                                                                   // new Save vs. Wand
-      "newsvp"   = "6"                                                                   // new Save vs. Polymorph
-      "newsvb"   = "5"                                                                   // new Save vs. Breath
-      "newsvs"   = "8"                                                                   // new Save vs. Spell
-      "newmr"    = "70"                                                                  // new Magic Resistance value
-      "newfr"    = "100"                                                                 // new Resist Fire value
-      "newcr"    = "50"                                                                  // new Resist Cold value
-      "newer"    = "100"                                                                 // new Resist Electricity value
-      "newlvl1"  = "20"                                                                  // new level (first class)
-      "newstr"   = "21"                                                                  // new Strength value
-      "newint"   = "20"                                                                  // new Intelligence value
-      "newwis"   = "16"                                                                  // new Wisdom value
-      "newdex"   = "18"                                                                  // new Dexterity value
-      "newcon"   = "20"                                                                  // new Constitution value
-      "newchr"   = "25"                                                                  // new Charisma value
-      "newmor"   = "18"                                                                  // new morale value
-      "newmorb"  = "3"                                                                   // new morale break value
-      "newmorr"  = "15"                                                                  // new morale recovery value
-      "newrace"  = "121"                                                                 // new race (Demonic)
-      "newclass" = "160"                                                                 // new class (Tanari)
-      "newalign" = "51"                                                                  // new alignment (Chaotic Evil)
-    STR_VAR                                                                            // initialize strings
-      "enfc01"   = "BALOR01"                                                             // enforced creature 1 (uses strict PnP values)
-      "enfc02"   = "DEMBAL01"                                                            // enforced creature 2 (uses strict PnP values)
-      "enfc03"   = "DEMBAL02"                                                            // enforced creature 3 (uses strict PnP values)
-      "enfc04"   = "UDBALOR"                                                             // enforced creature 4 (uses strict PnP values)
-       enfc05    = telbal1
-       enfc06    = telbal2 
-       enfc07    = gordem
-       enfc08    = gordemc1
-       enfc09    = jondem02
-       enfc10    = jondem04 
-       enfc11    = sudemon
-       enfc12    = sudemon2
-       enfc13    = sudemde1
-       enfc14    = sudemde2
-       enfc15    = sudemw1
-  END                                                                                // ends FUNCTION call
-END
-LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
-STR_VAR                                                                            // Initialize strings
-"newscript"  = "RR#HBALR"                                                          // new AI script
-"script01"   = ""                                                                  // first AI script name
-"script02"   = "None"                                                              // second AI script name
-"script03"   = "WTASIGHT"                                                          // third AI script name
-"script04"   = "BALOR01"                                                           // fourth AI script name
-"script05"   = "DEMBAL01"                                                          // fifth AI script name
-"script06"   = "DEMBAL02"                                                          // sixth AI script name
-"script07"   = "DEMOSUM2"                                                          // seventh AI script name
-"script08"   = "ROCKROOM"                                                          // 8th AI script name
-"script09"   = "TELBAL01"                                                          // 9th AI script name
-"script10"   = "MELBALOR"                                                          // 10th AI script name
-"script11"   = "SUDEMON"                                                           // 11th AI script name
-"script12"   = "ATTKNEU2"                                                          // 12th AI script name
-"script13"   = "DEMPTJ"                                                            // 13th AI script name
-"script14"   = "TANARI"                                                            // 14th AI script name
-"script15"   = "BPDEMON"                                                           // Big Picture demon script
-"script16"   = "DW#MELEE"                                                          // SCSII melee script
-"skipfile01" = "GORTAN1"                                                           // skip script patching for a designated file
-"skipfile02" = "M05DEMON"                                                          // skip script patching for a designated file
-"skipfile03" = "GORDEMC1"                                                          // skip script patching for a designated file
-END                                                                                // ends FUNCTION call
-PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
-  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR
-  opcode = "300"                                                                     // effect: #300 (NPC Bump)
-  target = "1"                                                                       // target: 1 (self)
-  timing = "9"                                                                       // timing mode: 9 (permanent after death)
-  "duration" = "0"                                                                   // duration: 0
-  "sectype" = "0"                                                                    // secondary type: none
-  parameter2 = "1"                                                                   // param2: 1 (constant value)
-  probability1 = "100"                                                               // probability1: 100%
-  STR_VAR
-  "effsource" = ""                                                                   // effsource: none
-  END
-END
-PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~BALOR01~) BEGIN                        // special case, an (unused?) Balor should be flagged as hostile
-WRITE_BYTE  0x270 "255"                                                            // set initial allegiance to ENEMY
-END
-PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~DEMBAL01~) BEGIN                       // special case, an (unused?) Balor should be flagged as hostile
-WRITE_BYTE  0x270 "255"                                                            // set initial allegiance to ENEMY
-END
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_balor END
+    BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -1738,161 +368,15 @@ BUT_ONLY_IF_IT_CHANGES
 
 //Ultroloth
 COPY_EXISTING telbal1.cre "override/fl#sultr.cre"
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-// =============================================================================== // the actual work starts from here
-  SAY NAME1 @733 SAY NAME2 @733                                                    //Ultroloth
-  WRITE_LONG 0x14 26000
-  WRITE_LONG 0x28 25088                                                            //MAGE_MALE_HUMAN
-  WRITE_BYTE 0x2c 30                                                               //Metal color, standard
-  WRITE_BYTE 0x2d 19                                                               //Minor, red
-  WRITE_BYTE 0x2e 65                                                               //Major, black
-  WRITE_BYTE 0x2f 63                                                               //Skin, a sort of grey-purple
-  WRITE_BYTE 0x30 65                                                               //Leather, black
-  WRITE_BYTE 0x31 28                                                               //Armour, standard
-  WRITE_BYTE 0x32 63                                                               //Hair, grey-purple
-  REPLACE_CRE_ITEM fl#ultr #0 #0 #0 none weapon1 EQUIP
-  REPLACE_CRE_ITEM fl#yugro #0 #0 #0 none armor
-  LAUNCH_PATCH_FUNCTION RR#MDCRE
-    INT_VAR
-      newhp        = 130
-      newac        = "-8"
-      newth        = 7
-      mewapr       = 2
-      newsvd       = 5
-      newsvw       = 7
-      newsvp       = 6
-      newsvb       = 5
-      newsvs       = 8
-      newlvl1      = 15
-      newmr        = 60
-      newfr        = 100
-      newcr        = "-100"
-      newer        = 0
-      newar        = 100
-      newstr       = 21
-      newdex       = 18 
-      newcon       = 18
-      newint       = 20
-      newwis       = 20
-      newchr       = 25
-      newmor       = 16
-      newalign     = 35 //NE
-      newclass     = 255                                                           //NO_CLASS
-      
-      enforce      = 1
-  END
-END 
+  LPF make_ultroloth END
     
 //Nycaloth
 COPY_EXISTING telbal1.cre "override/fl#snyca.cre"
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-// =============================================================================== // the actual work starts from here
-  SAY NAME1 @734 SAY NAME2 @734                                                    //Nycaloth   
-  WRITE_LONG 0x14 25000
-  REPLACE_CRE_ITEM fl#nyca #0 #0 #0 none weapon1 EQUIP
-  REPLACE_TEXTUALLY CASE_INSENSITIVE immune3 immune2
-  LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 292 END                         //Immunity to backstab 
-  LAUNCH_PATCH_FUNCTION RR#MDCRE
-    INT_VAR
-      newhp        = 110
-      newac        = "-6"
-      newth        = 9
-      newapr       = 1
-      newsvd       = 8
-      newsvw       = 10
-      newsvp       = 9
-      newsvb       = 9
-      newsvs       = 11
-      newlvl1      = 12
-      newmr        = 70
-      newfr        = 100
-      newcr        = "-100"
-      newer        = 0
-      newar        = 100 
-      newstr       = 20
-      newdex       = 18
-      newcon       = 18
-      newint       = 18 
-      newwis       = 18
-      newchr       = 16
-      newmor       = 16
-      newalign     = 35 //NE
-      newclass     = 255 //NO_CLASS 
-      
-      enforce      = 1
-  END
-END
-    
+  LPF make_nycaloth END
 
 //Arcanaloth
 COPY_EXISTING telbal1.cre "override/fl#sarca.cre"
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-// =============================================================================== // the actual work starts from here
-  SAY NAME1 @735 SAY NAME2 @735                                                    //Arcanaloth 
-  WRITE_LONG 0x14 20000
-  WRITE_LONG 0x28 25088                                                            //MAGE_MALE_HUMAN
-  WRITE_BYTE 0x2c 30                                                               //Metal color, standard
-  WRITE_BYTE 0x2d 60                                                               //Minor, purple
-  WRITE_BYTE 0x2e 58                                                               //Major, blue
-  WRITE_BYTE 0x2f 8                                                                //Skin, a sort of brown
-  WRITE_BYTE 0x30 58                                                               //Leather, blue
-  WRITE_BYTE 0x31 28                                                               //Armour, standard
-  WRITE_BYTE 0x32 8                                                                //Hair, brown
-  REPLACE_CRE_ITEM fl#arca #0 #0 #0 none weapon1 EQUIP
-  REPLACE_CRE_ITEM fl#yugro #0 #0 #0 none armor
-  REPLACE_TEXTUALLY CASE_INSENSITIVE immune3 immune2
-  LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 292 END                         //Immunity to backstab
-  LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END                         //Invisibility detection
-  LAUNCH_PATCH_FUNCTION RR#MDCRE
-    INT_VAR
-      newhp        = 120
-      newac        = "-8"
-      newth        = 9
-      newapr       = 3
-      newsvd       = 10
-      newsvw       = 12
-      newsvp       = 11
-      newsvb       = 12
-      newsvs       = 13
-      newlvl1      = 12
-      newmr        = 60
-      newfr        = 100
-      newcr        = "-100"
-      newer        = 0
-      newar        = 100 
-      newstr       = 17
-      newdex       = 15
-      newcon       = 15
-      newint       = 20
-      newwis       = 18
-      newchr       = 19 
-      newmor       = 16
-      newalign     = 35 //NE
-      newclass     = 1 //Mage
-      
-      enforce      = 1
-  END
-  ADD_MEMORIZED_SPELL spwi118 #0 wizard      //Chromatic Orb
-  ADD_MEMORIZED_SPELL spwi106 #0 wizard (2)  //Blindness
-  ADD_MEMORIZED_SPELL spwi125 #0 wizard      //Spook
-  ADD_MEMORIZED_SPELL spwi212 #1 wizard      //Mirror Image 
-  ADD_MEMORIZED_SPELL spwi211 #1 wizard (2)  //Melf's Acid Arrow
-  ADD_MEMORIZED_SPELL spwi205 #1 wizard      //Horror
-  ADD_MEMORIZED_SPELL spwi303 #2 wizard      //Flame Arrow
-  ADD_MEMORIZED_SPELL spwi308 #2 wizard      //Lightning Bolt
-  ADD_MEMORIZED_SPELL spwi325 #2 wizard (2)  //Melf's Minute Meteors
-  ADD_MEMORIZED_SPELL spwi408 #3 wizard      //Stoneskin
-  ADD_MEMORIZED_SPELL spwi419 #3 wizard (2)  //Secret Word
-  ADD_MEMORIZED_SPELL spwi412 #3 wizard      //Greater Malison
-  ADD_MEMORIZED_SPELL spwi507 #4 wizard      //Hold Monster
-  ADD_MEMORIZED_SPELL spwi506 #4 wizard      //Domination
-  ADD_MEMORIZED_SPELL spwi513 #4 wizard      //Breach
-  ADD_MEMORIZED_SPELL spwi508 #4 wizard      //Chaos
-  ADD_MEMORIZED_SPELL spwi615 #5 wizard      //Chain Lightning
-END
+  LPF make_arcanaloth END
 
 
 //Create scripts and creatures outside the ACTION_IF in case SCSII is installed after 
