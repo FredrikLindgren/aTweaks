@@ -107,6 +107,50 @@ OUTER_SPRINT SpellPackL6 ~~
 OUTER_SPRINT SpellPackL7 ~~
 OUTER_SPRINT SpellPackL8 ~~
 OUTER_SPRINT SpellPackL9 ~~
+
+ACTION_IF FILE_EXISTS_IN_GAME lclist_scrolls.2da BEGIN //Galactycon's Spell Pack
+
+  ACTION_DEFINE_ARRAY SPGold BEGIN 0 50 100 150 250 500 1000 1500 2500 5000 END
+
+  COPY_EXISTING lclist_scrolls.2da override
+    READ_2DA_ENTRIES_NOW r2en_lclist_scrolls 6
+    FOR (i = 0; i < r2en_lclist_scrolls; ++i) BEGIN
+      READ_2DA_ENTRY_FORMER r2en_lclist_scrolls i 0 symbol
+      READ_2DA_ENTRY_FORMER r2en_lclist_scrolls i 1 scroll
+      ids = IDS_OF_SYMBOL (spell "%symbol%")
+      INNER_PATCH "%ids%" BEGIN
+        READ_ASCII 0 type (1)
+        READ_ASCII 1 res (3)
+      END
+      SPRINT spell ""
+      PATCH_MATCH type WITH
+        1 BEGIN SPRINT spell "sppr%res%" END
+        2 BEGIN SPRINT spell "spwi%res%" END
+        DEFAULT END
+      PATCH_IF FILE_EXISTS_IN_GAME "%spell%.spl" AND FILE_EXISTS_IN_GAME "%scroll%.itm" BEGIN
+        INNER_ACTION BEGIN
+          COPY_EXISTING "%spell%.spl" override
+            READ_LONG 0x8 name
+            READ_LONG 0x34 level
+          BUT_ONLY
+        END
+        SPRINT gold $SPGold("%level%")
+        PATCH_MATCH level WITH
+          1 BEGIN SPRINT SpellPackL1 ~~~~~%SpellPackL1% + ~HaveSpell(%symbol%)~ + #%name% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpell(%symbol%) GiveItemCreate("%scroll%",Myself,1,1,1)~ EXIT~~~~~ END
+          2 BEGIN SPRINT SpellPackL2 ~~~~~%SpellPackL2% + ~HaveSpell(%symbol%)~ + #%name% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpell(%symbol%) GiveItemCreate("%scroll%",Myself,1,1,1)~ EXIT~~~~~ END
+          3 BEGIN SPRINT SpellPackL3 ~~~~~%SpellPackL3% + ~HaveSpell(%symbol%)~ + #%name% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpell(%symbol%) GiveItemCreate("%scroll%",Myself,1,1,1)~ EXIT~~~~~ END
+          4 BEGIN SPRINT SpellPackL4 ~~~~~%SpellPackL4% + ~HaveSpell(%symbol%)~ + #%name% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpell(%symbol%) GiveItemCreate("%scroll%",Myself,1,1,1)~ EXIT~~~~~ END
+          5 BEGIN SPRINT SpellPackL5 ~~~~~%SpellPackL5% + ~HaveSpell(%symbol%)~ + #%name% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpell(%symbol%) GiveItemCreate("%scroll%",Myself,1,1,1)~ EXIT~~~~~ END
+          6 BEGIN SPRINT SpellPackL6 ~~~~~%SpellPackL6% + ~HaveSpell(%symbol%)~ + #%name% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpell(%symbol%) GiveItemCreate("%scroll%",Myself,1,1,1)~ EXIT~~~~~ END
+          7 BEGIN SPRINT SpellPackL7 ~~~~~%SpellPackL7% + ~HaveSpell(%symbol%)~ + #%name% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpell(%symbol%) GiveItemCreate("%scroll%",Myself,1,1,1)~ EXIT~~~~~ END
+          8 BEGIN SPRINT SpellPackL8 ~~~~~%SpellPackL8% + ~HaveSpell(%symbol%)~ + #%name% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpell(%symbol%) GiveItemCreate("%scroll%",Myself,1,1,1)~ EXIT~~~~~ END
+          9 BEGIN SPRINT SpellPackL9 ~~~~~%SpellPackL9% + ~HaveSpell(%symbol%)~ + #%name% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpell(%symbol%) GiveItemCreate("%scroll%",Myself,1,1,1)~ EXIT~~~~~ END
+          DEFAULT END
+      END
+    END
+  BUT_ONLY
+END
+
 /*
 ACTION_IF FILE_EXISTS_IN_GAME lclist_spells.2da BEGIN
 <<<<<<<< ...atweaks/inlined/spellpack
