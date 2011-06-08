@@ -1660,7 +1660,6 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~riattan1~ 
                ~riattan2~ 
                ~riattan3~ 
-               ~riftcr04~ 
                ~rr#sbalr~ 
                ~sudemde1~ 
                ~sumtan01~ 
@@ -1915,6 +1914,74 @@ WRITE_BYTE  0x2E "5"                                                            
   END                                                                              // ends FUNCTION call
 // =============================================================================== // the actual work ends here
 END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Special transparency and coloring effects for the Emphatic Manifestation in the Unseeing Eye quest
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~RIFTCR04~                                                           // Emphatic Manifestation
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "8" END                                               // mark opcode #8 (Colour: Change by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "9" END                                               // mark opcode #9 (Colour Glow Pulse) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "66" END                                              // mark opcode #66 (transparency fade) for deletion
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "8"                                                                   // effect: #8 (Colour: Change by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "64000"                                                           // param1: (RGB colour)
+  "parameter2" = "2"                                                               // param2: (location)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+END
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "65"                                                                  // effect: #65 (blur)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "0"                                                               // param1: 0
+  "parameter2" = "0"                                                               // param2: 0
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+END
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "66"                                                                  // effect: #66 (transparency fade)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "240"                                                             // param1: (fade amount)
+  "parameter2" = "0"                                                               // param2: 0
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+END                                                                                // ends FUNCTION call
+WRITE_SHORT 0x28 "4352"                                                            // Sets avatar to TANARRI (winged demon)
+WRITE_BYTE  0x2E "47"                                                              // major color (dark red)
+// =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block

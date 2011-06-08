@@ -770,6 +770,23 @@ BUT_ONLY_IF_IT_CHANGES
 END // ends Tutu check
 
 
+// The Emphatic Manifestation in the Unseeing Eye quest should not be flagged as a demon since extraplanar creatures aren't affected by healing spells
+// Note: this actually undoes a change introduced by the G3 BG2 Fixpack. The creature was already flagged as "No Race" in the unmodded game
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~RIFTCR04~                                                           // Emphatic Manifestation
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
+ INT_VAR do_message = 1
+END
+WRITE_BYTE  0x0272 255                                                             // race: No Race
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
 
 
 // ************************************************************** Subcomponent Marker **********************************
