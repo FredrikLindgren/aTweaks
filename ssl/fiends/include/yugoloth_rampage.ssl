@@ -1,0 +1,38 @@
+//Rampage
+
+IF
+  !GlobalTimerNotExpired("fl#Taunt","LOCALS")
+  !GlobalTimerNotExpired("flCast","LOCALS")
+  !StateCheck(Myself,STATE_INVISIBLE)
+  !See(NearestEnemyOf(Myself))
+  See([0.HUMANOID.0.INNOCENT])
+  !Range(LastSeenBy(Myself),8)
+THEN
+  RESPONSE #40
+    SetInterrupt(FALSE)
+    SetGlobalTimer("fl#Taunt","LOCALS",12)
+    ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
+    SetGlobalTimer("flCast","LOCALS",6)
+    DisplayStringHead(Myself,@739) // Mortal, your soul is mine! 
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
+    DisplayStringHead(LastSeenBy(Myself),@740) // Aaaaiiiieeee!
+    SetInterrupt(TRUE)
+  RESPONSE #30
+    SetInterrupt(FALSE)
+    SetGlobalTimer("fl#Taunt","LOCALS",12)
+    ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
+    SetGlobalTimer("flCast","LOCALS",6)
+    DisplayStringHead(Myself,@741) // Your existence has come to an end, mortal.
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
+    DisplayStringHead(LastSeenBy(Myself),@742) // N-No, don't harm me, please!
+    SetInterrupt(TRUE)
+  RESPONSE #30
+    SetInterrupt(FALSE)
+    SetGlobalTimer("fl#Taunt","LOCALS",12)
+    ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
+    SetGlobalTimer("flCast","LOCALS",6)
+    DisplayStringHead(Myself,@743) // Delicious mortal, your suffering will be beyond your wildest imagination.
+    ApplySpellRES("RR#FEAR",LastSeenBy(Myself))
+    DisplayStringHead(LastSeenBy(Myself),@744) // Gods...No, please!
+    SetInterrupt(TRUE)
+END

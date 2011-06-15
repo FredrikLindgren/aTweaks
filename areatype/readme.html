@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-us">
+<head>
+<title>MODNAME</title>
+</head>
+
+<body>
+
+<h1>Introduction</h1>
+<p>This modder's resource defines two new area types for the Baldur's Gate II engine. The area type FL_INN encompasses interior inn areas and the area type FL_STRONGHOLD encompasses interior stronghold areas, analogously to how the standard area types CITY and FOREST encompass outdoor city areas and forest areas, respectively. The new areas types can be used the same way the standard area types can be used, with the AreaType() trigger or the AddAreaType() action. This allows for easy detection of inn and stronghold areas in scripts and dialogues, instead of having to use long lists of AreaCheck() triggers.</p>
+
+<h1>Common details</h1>
+<p>The unmodified BG2 engine has X area types defined. However, the engine allows for up to Y area types. MODNAME makes use of this empty space to define the its new area types. The area types are added dynamically and non-cumulatively. This means the exact, numerical value of the area types can vary from installation to installation, but never between different mods on the same installation. It also means one or both of the area types can safely be installed multiple times on top of each other or on top of other instances of the same area type.<br /><br />
+
+The implementations of both area types are completely self-contained  and independent. They are each available in the <a href="http://weidu.org/main.html#weidu">WeiDU</a> TP2 file format and can be included in any WeiDU mod through the INCLUDE action. The FL_INN area type is contained within the file fl_inn.tpa and, analogously, FL_STRONGHOLD is contained within the file fl_stronghold.tpa.<br /><br />
+
+To be included in a mod, the relevant .tpa file simply needs to be copied to somewhere within the mod folder and invoked with the INCLUDE action. As an example, FL_INN could be included in the mod MyMod by copying the file fl_inn.tpa to the location MyMod/lib/fl_inn.tpa and by including the line <pre>INCLUDE ~MyMod/lib/fl_inn.tpa~</pre> in the mod's .tp2 file. After that, any scripts or dialogues containing the area type FL_INN can be compiled and used.<br /><br /></p>
+
+<h1>Details of FL_INN</h1>
+<p>An inn is approximately defined as a locale where you can rent a bed and buy a drink. FL_INN covers BG1 and BG2, as well as a wide range of mods. Most of the inns covered by FL_INN are located in a city or village, but there are a handful of exceptions. A full list of which areas are covered by FL_INN is available <a href="">here</a>. All areas are flagged at install time.<br /><br />
+
+<b>Compatibility</b><br />
+Since FL_INN flags areas at install time, it is not able to affect mod-added areas that are installed afterwards.</p>
+
+<h1>Details of FL_STRONGHOLD</h1>
+<p>FL_STRONGHOLD provides an area type for the strongholds of BG2, including the ToB pocket plane. Stronghold areas you can not reach until you've obtained the stronghold (such as the de'Arnise keep) are flagged at install time. Areas which later become part of the stronghold (such as the Planar Sphere) are flagged when the stronghold is obtained.<br /><br />
+
+Due to technical limitations, the FL_STRONGHOLD area type will continue to return true even if the player has lost the stronghold. The WeiDU variable fl#StrongholdKickedOut is defined as a complement intended to mitigate this shortcoming. Please note that the variable fl#StrongholdKickedOut can not be used inside an OR trigger, as it itself contains OR triggers. To use the WeiDU variable fl#StrongholdKickedOut in a script or dialogue, it needs to be enclosed in percentage signs and placed in the trigger of a dialogue state or script. The script or dialogue then needs to be compiled with the EVAL (EVALUATE_BUFFER) WeiDU option.<br /><br />
+
+<b>Compatibility</b><br />
+FL_STRONGHOLD is compatible with multiple-stronghold tweaks, provided they set the main stronghold variable. Specifically, FL_STRONGHOLD is compatible with the multiple-stronghold tweaks of the G3 BG2 Tweakpack and Sword Coast Stratagems II. check QP</p>
+
+<h1>Examples</h1>
+
+<p>
+Script being compiled with the FL_STRONGHOLD area type and the fl#StrongholdKickedOut variable:</p>
+<pre>
+<<<<<<<< flscript.baf
+IF
+  Global("flCommentOnStronghold","LOCALS",0)
+  AreaType(FL_STRONGHOLD)
+  !AreaCheck("AR4500")
+  %fl#StrongholdKickedOut%
+THEN
+  RESPONSE #100
+    SetGlobal("flCommentOnStronghold","LOCALS",1)
+    Interact(Player1)
+END
+>>>>>>>>
+
+COMPILE flscript.baf EVAL
+</pre><br />
+
+</body>
+</html>
+
+

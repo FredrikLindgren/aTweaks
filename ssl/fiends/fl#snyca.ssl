@@ -1,0 +1,192 @@
+//Command, 3x/day
+//detect invisibility, always active
+//dispel magic (not implemented)
+//fear, by touch
+//invisibility
+//mirror image, 3x/day
+//They all have this:
+//animate dead
+//cause disease
+//charm person
+//produce flame
+//teleport without error
+
+INCLUDE FILE(fiends/definitions.ssl)
+
+IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
+END
+
+IF
+  Die()
+  Global("fl#EACheck","LOCALS",1) // Fiend was summoned by an enemy
+  Global("fl#XP","LOCALS",0)
+THEN
+  RESPONSE #100
+    SetGlobal("fl#XP","LOCALS",1)
+    AddexperienceParty(25000) //Nycaloth XP value
+END
+
+INCLUDE FILE(fiends/include/summoned_check.ssl)
+
+INCLUDE FILE(fiends/include/get_mad_at_summoner.ssl)
+
+IF
+  StateCheck(Myself,STATE_REALLY_DEAD)
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+IF 
+  !InActiveArea(Myself)
+  !See([ANYONE])
+THEN
+  RESPONSE #100
+    NoAction()
+END
+
+IF
+  !GlobalTimerNotExpired("flCast","LOCALS")
+  OR(2)
+    AreaCheck("AR3004")
+    AreaCheck("AR3008")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flCast","LOCALS",600) //No casting in dead-magic areas
+END
+
+INCLUDE FILE(fiends/include/teleport_away.ssl)
+//Do we need behaviour for hostile demons being attacked by someone under ProEvil?
+//Do we need behaviour for demons being attacked by EVILCUTOFF under ProEvil?
+
+INCLUDE FILE(fiends/include/high_porting.ssl)
+
+INCLUDE FILE(fiends/include/yugoloth_rampage.ssl)
+
+//Animate Dead if the enemy isn't too close
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  !Range(scstarget,5)
+THEN DO
+  Action(ForceSpellRES,"fl#adead"|50|100)
+END
+
+//Mirror Image if there's no True Sight
+IF TRIGGER
+  Target(NearestEnemyOf(Myself))
+  TriggerBlock(NoEnemyTrueSight)
+  !StateCheck(Myself,STATE_MIRRORIMAGE)
+  !Class(LastSeenBy(Myself),INNOCENT) //Don't mirror image just because some stinking peasant went enemy
+  GlobalLT("flMirrorImage","LOCALS",3)
+THEN DO
+  Action(ForceSpellRESMyself,"RR#WI212")
+  IncrementGlobal("flMirrorImage","LOCALS",1)
+END
+
+//Fear, by touch
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,10)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|Fear|MR75|SIIll)
+  !Race(scstarget,RAKSHASA)
+THEN DO
+  Action(ForceSpellRES,"fl#tchfr"|50|100)
+END
+
+//Cause disease, also by touch
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,10)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|Disease|MR75|SIAbj)
+  !Race(scstarget,RAKSHASA)
+THEN DO
+  Action(ForceSpellRES,"fl#csdis"|50|100)
+END 
+
+//Charm person
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  General(scstarget,HUMANOID)
+  !Race(scstarget,RAKSHASA)
+  CheckStatGT(scstarget,5,SAVEVSSPELL) 
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|Charm|SIEnc|MR50)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#WI104"|50|100)
+END  
+  
+//Toss fire at targets low on HP
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  HPLT(scstarget,10)
+  !Race(scstarget,LICH)
+  !Race(scstarget,RAKSHASA)
+  TriggerBlock(MinorGlobe|SpellTurning|FireResFull|MR75|SIEvo)
+  !HasItemEquiped("clck26",scstarget)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#PFLAM"|100|100)
+END
+
+//Command
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,6)
+  LevelLT(scstarget,6)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|SIEnc|Sleep|MR50|Stoneskin|MirrorImage)
+  GlobalLT("flCommand","LOCALS",3)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#PR102"|100|100)
+  IncrementGlobal("flCommand","LOCALS",1)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,6)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|SIEnc|Sleep|MR50|Stoneskin|MirrorImage)
+  GlobalLT("flCommand","LOCALS",3)
+  !Race(scstarget,RAKSHASA)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#PR102"|50|100)
+  IncrementGlobal("flCommand","LOCALS",1)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  !Race(scstarget,LICH)
+  !Race(scstarget,RAKSHASA)
+  TriggerBlock(MRFull|FireResFull|SpellTurning|MinorGlobe|SIEvo)
+  !HasItemEquiped("clck26",scstarget)
+  Range(NearestEnemyOf(Myself),5)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#PFLAM"|100|100)
+END 
+
+INCLUDE FILE(fiends/include/standard_attack.ssl)
+
+//Inviso-up if there's nothing better to do
+IF TRIGGER
+  !StateCheck(Myself,STATE_INVISIBLE)
+  TriggerBlock(NoEnemyTrueSight)
+  !Global("dvgldust","LOCALS",1)
+THEN DO
+  Action(ForceSpellRESMyself,"RR#WI206"|100|25)
+END
+
+INCLUDE FILE(fiends/include/end_attack.ssl)
+
+IF
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+    

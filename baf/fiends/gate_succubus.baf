@@ -1,0 +1,28 @@
+IF
+  Global("flNoGating","LOCALS",0)
+  OR(2)
+    !GlobalTimerNotExpired("flGatingTimer","LOCALS")
+    G("flGatingTrue",1)
+  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+  Global("RR#ETHPL","LOCALS",0) //Only Gate if we are not ethereal
+  OR(2)
+    HPPercentLT(Myself,30)
+    G("flGatingTrue",1)
+  InActiveArea(Myself)
+  RandomNum(2,1)
+THEN
+  RESPONSE #40
+    SetInterrupt(FALSE)
+    DisplayStringHead(Myself,10000758) //Attempts to open a gate to the Abyss
+    Wait(5)
+    ReallyForceSpellRES("fl#gtsuc",Myself)
+    SetGlobalTimer("flGatingTimer","LOCALS",7200)
+    SetInterrupt(TRUE)
+  RESPONSE #60
+    SetInterrupt(FALSE)
+    DisplayStringHead(Myself,10000758) //Attempts to open a gate to the Abyss
+    Wait(5)
+    DisplayStringHead(Myself,10000760) //The attempt fails
+    SetGlobalTimer("flGatingTimer","LOCALS",7200)
+    SetInterrupt(TRUE)
+END

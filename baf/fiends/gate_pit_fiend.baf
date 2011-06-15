@@ -1,0 +1,20 @@
+IF
+  Global("flNoGating","LOCALS",0)
+  OR(2)
+    !GlobalTimerNotExpired("flGatingTimer","LOCALS")
+    G("flGatingTrue",1)
+  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+  OR(2)
+    HPPercentLT(Myself,50)
+    G("flGatingTrue",1)
+  InActiveArea(Myself)
+  RandomNum(3,1)
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    DisplayStringHead(Myself,10000759) //Attempts to open a gate to Baator
+    Wait(5)
+    ReallyForceSpellRES("fl#gtpit",Myself)
+    SetGlobalTimer("flGatingTimer","LOCALS",6) //Being the rulers of hell evidently has its perks
+    SetInterrupt(TRUE)
+END

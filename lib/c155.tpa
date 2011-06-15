@@ -1,0 +1,223 @@
+
+COPY "atweaks/bam/fl#cacoc.bam" "override/fl#707cb.bam" //apparently the stinkin' game doesn't like it when the resref at 0x3a in a .spl doesn't end with "c"
+     "atweaks/bam/fl#cacol.bam" "override/fl#707lb.bam"
+     "atweaks/bam/fl#fienc.bam" "override/fl#807cb.bam"
+     "atweaks/bam/fl#fienl.bam" "override/fl#807lb.bam"
+     "atweaks/bam/fl#gatec.bam" "override/fl#905cb.bam"
+     "atweaks/bam/fl#gatel.bam" "override/fl#905lb.bam"
+
+COPY "atweaks/2da/spwi510.2da" "override/fl#cacoc.2da"
+     "atweaks/2da/spwi510.2da" "override/fl#cacon.2da"
+     "atweaks/2da/spwi510.2da" "override/fl#cacol.2da"
+     "atweaks/2da/spwi510.2da" "override/fl#fienc.2da"
+     "atweaks/2da/spwi510.2da" "override/fl#fienn.2da"
+     "atweaks/2da/spwi510.2da" "override/fl#fienl.2da"
+     "atweaks/2da/spwi510.2da" "override/fl#gatec.2da"
+     "atweaks/2da/spwi510.2da" "override/fl#gaten.2da"
+     "atweaks/2da/spwi510.2da" "override/fl#gatel.2da"
+   
+APPEND fl#cacoc.2da "TANARRI fl#cacoc 3"
+APPEND fl#cacoc.2da "YUGOLOTH fl#cacon 3"
+APPEND fl#cacon.2da "TANARRI fl#cacoc 3"
+APPEND fl#cacon.2da "YUGOLOTH fl#cacon 3"
+APPEND fl#cacon.2da "BAATEZU fl#cacol 3"
+APPEND fl#cacol.2da "YUGOLOTH fl#cacon 3"
+APPEND fl#cacol.2da "BAATEZU fl#cacol 3"
+
+APPEND fl#fienc.2da "TANARRI fl#fienc 3"
+APPEND fl#fienc.2da "YUGOLOTH fl#fienn 3"
+APPEND fl#fienn.2da "TANARRI fl#fienc 3"
+APPEND fl#fienn.2da "YUGOLOTH fl#fienn 3"
+APPEND fl#fienn.2da "BAATEZU fl#fienl 3"
+APPEND fl#fienl.2da "YUGOLOTH fl#fienn 3"
+APPEND fl#fienl.2da "BAATEZU fl#fienl 3"
+
+APPEND fl#gatec.2da "TANARRI fl#gatec 3"
+APPEND fl#gatec.2da "YUGOLOTH fl#gaten 3"
+APPEND fl#gaten.2da "TANARRI fl#gatec 3"
+APPEND fl#gaten.2da "YUGOLOTH fl#gaten 3"
+APPEND fl#gaten.2da "BAATEZU fl#gatel 3"
+APPEND fl#gatel.2da "YUGOLOTH fl#gaten 3"
+APPEND fl#gatel.2da "BAATEZU fl#gatel 3"
+     
+COPY_EXISTING spcaco.eff "override/fl#cacoc.eff"
+              spcaco.eff "override/fl#cacon.eff"
+              spcaco.eff "override/fl#cacol.eff"
+              spcaco.eff "override/fl#fienc.eff"
+              spcaco.eff "override/fl#fienn.eff"
+              spcaco.eff "override/fl#fienl.eff"
+              spcaco.eff "override/fl#gatec.eff"
+              spcaco.eff "override/fl#gaten.eff"
+              spcaco.eff "override/fl#gatel.eff"
+  WRITE_LONG   0x10 214 //opcode (select spell)
+  WRITE_LONG   0x14 1 //target (self)
+  WRITE_LONG   0x18 0 //power
+  WRITE_LONG   0x1c 0 //p1
+  WRITE_LONG   0x20 0 //p2
+  WRITE_SHORT  0x24 1 //timing (instant)
+  WRITE_LONG   0x28 0 //duration
+  WRITE_SHORT  0x2c 100 //prob1
+  WRITE_SHORT  0x2e 0 //prob2
+  WRITE_ASCIIE 0x30 "%DEST_RES%" #8 //resource
+  FOR (i=0x38;i<0x65;i+=0x4) BEGIN
+    WRITE_LONG i 0 
+  END
+  
+OUTER_SPRINT $icon(fl#cacoc) fl#707cb
+OUTER_SPRINT $icon(fl#cacon) spwi707b
+OUTER_SPRINT $icon(fl#cacol) fl#707lb
+OUTER_SPRINT $icon(fl#fienc) fl#807cb
+OUTER_SPRINT $icon(fl#fienn) spwi807b
+OUTER_SPRINT $icon(fl#fienl) fl#807lb
+OUTER_SPRINT $icon(fl#gatec) fl#905cb
+OUTER_SPRINT $icon(fl#gaten) fl#905b
+OUTER_SPRINT $icon(fl#gatel) fl#905lb  
+
+//Create spells that summon a specific type of fiend with certainty
+COPY_EXISTING spwi707.spl "override/fl#cacoc.spl"
+              spwi707.spl "override/fl#cacon.spl"
+              spwi707.spl "override/fl#cacol.spl"
+              spwi807.spl "override/fl#fienc.spl"
+              spwi807.spl "override/fl#fienn.spl"
+              spwi807.spl "override/fl#fienl.spl"
+              spwi905.spl "override/fl#gatec.spl"
+              spwi905.spl "override/fl#gaten.spl"
+              spwi905.spl "override/fl#gatel.spl"
+  PATCH_IF "%DEST_RES%" STRING_MATCHES_REGEXP "fl#.+c$" = 0 BEGIN
+    SAY NAME1 @755
+    alignment = 48
+  END ELSE PATCH_IF "%DEST_RES%" STRING_MATCHES_REGEXP "fl#.+l$" = 0 BEGIN
+    SAY NAME1 @756
+    alignment = 16
+  END ELSE PATCH_IF "%DEST_RES%" STRING_MATCHES_REGEXP "fl#.+n$" = 0 BEGIN
+    SAY NAME1 @757
+    alignment = 32
+  END
+  READ_LONG  0x64 ao
+  READ_LONG  0x6a eo
+  READ_SHORT 0x70 ei
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    WRITE_ASCIIE ao + 0x28*i + 0x4  $icon("%DEST_RES%") #8 //ability icon
+    WRITE_SHORT ao + 0x28*i + 0x20 ei
+    READ_SHORT  ao + 0x28*i + 0x1e ne
+    FOR (j=0;j<ne;++j) BEGIN
+      READ_SHORT eo + 0x30*(j + ei)       type
+      READ_LONG  eo + 0x30*(j + ei) + 0x4 p1
+      PATCH_IF type != 177 OR (type = 177 AND p1 != alignment) BEGIN
+        DELETE_BYTES eo + 0x30*(j + ei) 0x30
+        --j
+        --ne
+      END
+      PATCH_IF type = 177 AND p1 = alignment BEGIN
+        WRITE_LONG eo + 0x30*(j + ei) + 0x4 0 //don't filter by IDS
+        WRITE_LONG eo + 0x30*(j + ei) + 0x8 2
+      END  
+    END
+    WRITE_SHORT ao + 0x28*i + 0x1e ne
+    ei += ne
+  END
+
+OUTER_SPRINT $array(spwi707 16) fl#cacol
+OUTER_SPRINT $array(spwi707 32) fl#cacon
+OUTER_SPRINT $array(spwi707 48) fl#cacoc
+OUTER_SPRINT $array(spwi807 16) fl#fienl
+OUTER_SPRINT $array(spwi807 32) fl#fienn
+OUTER_SPRINT $array(spwi807 48) fl#fienc
+ACTION_FOR_EACH spell IN spwi905 sppr703 BEGIN
+  OUTER_SPRINT $array("%spell%" 16) fl#gatel
+  OUTER_SPRINT $array("%spell%" 32) fl#gaten
+  OUTER_SPRINT $array("%spell%" 48) fl#gatec
+END
+
+//Create fiend-summoning spells for NPCs to use
+COPY_EXISTING spwi707.spl "override/fl#canpc.spl"
+              spwi807.spl "override/fl#finpc.spl"
+              spwi905.spl "override/fl#ganpc.spl"
+
+//Alter fiend-summoning spells to the bring up the selection screen
+COPY_EXISTING spwi707.spl override
+              spwi807.spl override
+              spwi905.spl override
+              sppr703.spl override
+  PATCH_MATCH ~%SOURCE_RES%~ WITH
+    spwi707 BEGIN SAY 0x50 @761 END
+    spwi807 BEGIN SAY 0x50 @762 END
+    spwi905 BEGIN SAY 0x50 @763 END
+    sppr703 BEGIN SAY 0x50 @764 END
+    DEFAULT
+  END
+  READ_LONG  0x64 ao
+  READ_LONG  0x6a eo
+  READ_SHORT 0x70 ei
+  FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
+    WRITE_BYTE  ao + 0x28*i + 0xc  5 //target (caster)
+    WRITE_BYTE  ao + 0x28*i + 0x12 0 //casting speed
+    WRITE_SHORT ao + 0x28*i + 0x20 ei
+    READ_SHORT  ao + 0x28*i + 0x1e ne
+    remove_neutral = 0
+    FOR (j=0;j<ne;++j) BEGIN
+      READ_SHORT eo + 0x30*(ei + j)       type
+      READ_LONG  eo + 0x30*(ei + j) + 0x4 p1
+      PATCH_IF type != 177 OR !VARIABLE_IS_SET $array("%SOURCE_RES%" "%p1%") BEGIN
+        DELETE_BYTES eo + 0x30*(ei + j) 0x30
+        --j
+        --ne
+      END
+      PATCH_IF type = 177 AND VARIABLE_IS_SET $array("%SOURCE_RES%" "%p1%") BEGIN
+        WRITE_BYTE   eo + 0x30*(ei + j) + 0x12 100 //prob1
+        WRITE_BYTE   eo + 0x30*(ei + j) + 0x13 0 //prob2
+        WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 $array("%SOURCE_RES%" "%p1%") #8
+      END
+    END
+    WRITE_SHORT ao + 0x28*i + 0x1e ne
+    ei += ne
+  END
+BUT_ONLY
+
+COPY_EXISTING scrl81.itm override
+              scrl9b.itm override
+              scrl9n.itm override
+  PATCH_MATCH "%SOURCE_RES%" WITH
+    scrl8i BEGIN SAY 0x54 @761 END
+    scrl9b BEGIN SAY 0x54 @762 END
+    scrl9n BEGIN SAY 0x54 @763 END
+    DEFAULT
+  END
+BUT_ONLY
+
+DEFINE_PATCH_MACRO ReplaceFiendSpells BEGIN
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~\1Spell\2RES("fl#ganpc",\3)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),WIZARD_SUMMON_FIEND)~ ~\1Spell\2RES("fl#finpc",\3)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(ReallyForce\|Force\|Apply\)Spell\(Dead\|Point\|Range\|PointRange\|\)(\(.+\),WIZARD_CACOFIEND)~ ~\1Spell\2RES("fl#canpc",\3)~
+    
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~Spell\1NoDecRES("fl#ganpc",\2) RemoveSpell(\3)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_SUMMON_FIEND\))~ ~Spell\1NoDecRES("fl#finpc",\2) RemoveSpell(\3)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)(\(.+\),\(WIZARD_CACOFIEND\))~ ~Spell\1NoDecRES("fl#canpc",\2) RemoveSpell(\3)~
+
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),\(WIZARD_GATE\|CLERIC_GATE\))~ ~Spell\1NoDecRES("fl#ganpc",\2)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),WIZARD_SUMMON_FIEND)~ ~Spell\1NoDecRES("fl#finpc",\2)~
+  REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~Spell\(Point\|\)NoDec(\(.+\),WIZARD_CACOFIEND)~ ~Spell\1NoDecRES("fl#canpc",\2)~
+END
+
+//Fix NPC scripts so they use the old-style spells
+COPY_EXISTING_REGEXP GLOB ".*\.bcs$" override
+  DECOMPILE_BCS_TO_BAF
+    LPM ReplaceFiendSpells
+  COMPILE_BAF_TO_BCS
+BUT_ONLY
+IF ~^\(2707\|2807\|2905\|1703\)~ //If there's something that could be an IDS label for a fiend-summoning spell
+
+//In case someone had the bright idea of sticking fiend-summoning spells into their dialogue
+COPY_EXISTING_REGEXP GLOB ".*\dlg$" override
+  DECOMPILE_DLG_TO_D
+    LPM ReplaceFiendSpells
+  COMPILE_D_TO_DLG
+BUT_ONLY
+IF ~WIZARD_GATE\|CLERIC_GATE\|WIZARD_SUMMON_FIEND\|WIZARD_CACOFIEND~
+
+
+
+
+      
+      
+    

@@ -4,11 +4,26 @@ TRIGGER=MagicSafeArea
  !AreaCheck("ar3008")
  !AreaCheck("ar3009")
 
-TRIGGER=FireRes
+TRIGGER=MR50
+ !CheckStatGT(scstarget,50,RESISTMAGIC)
+
+TRIGGER=FireRes50
  !CheckStatGT(scstarget,50,RESISTFIRE)
  
-TRIGGER=ColdRes
+TRIGGER=ColdRes50
  !CheckStatGT(scstarget,50,RESISTCOLD)
+ 
+TRIGGER=ElecRes50
+ !CheckStatGT(scstarget,50,RESISTELECTRICITY)
+ 
+TRIGGER=AcidRes50
+ !CheckStatGT(scstarget,50,RESISTACID)
+ 
+TRIGGER=MagicDamage50
+ !CheckStatGT(scstarget,50,MAGICDAMAGERESISTANCE)
+ 
+TRIGGER=MR75
+ !CheckStatGT(scstarget,75,RESISTMAGIC)
 
 TRIGGER=FireRes75
  !CheckStatGT(scstarget,75,RESISTFIRE)
@@ -18,12 +33,24 @@ TRIGGER=ColdRes75
  
 TRIGGER=ElecRes75
  !CheckStatGT(scstarget,75,RESISTELECTRICITY)
+ 
+TRIGGER=AcidRes75
+ !CheckStatGT(scstarget,75,RESISTACID)
+ 
+TRIGGER=MagicDamage75
+ !CheckStatGT(scstarget,75,MAGICDAMAGERESISTANCE)
+ 
+TRIGGER=MRFull
+ !CheckStatGT(scstarget,99,RESISTMAGIC)
+ 
+TRIGGER=FireResFull
+ !CheckStatGT(scstarget,99,RESISTFIRE)
+ 
+TRIGGER=ElecResFull
+ !CheckStatGT(scstarget,99,RESISTELECTRICITY)
 
-TRIGGER=MR50
- !CheckStatGT(scstarget,50,RESISTMAGIC)
-
-TRIGGER=MR75
- !CheckStatGT(scstarget,75,RESISTMAGIC)
+TRIGGER=MagicDamageFull
+ !CheckStatGT(scstarget,99,MAGICDAMAGERESISTANCE)
 
 TRIGGER=SIAbj
  !CheckStat(scstarget,1,WIZARD_SPELL_IMMUNITY)
@@ -59,16 +86,21 @@ TRIGGER=SpellTurning
  !CheckStat(scstarget,1,CLERIC_SHIELD_OF_THE_ARCHONS)
  
 TRIGGER=Slayable
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,SLIME)
  !CheckStatGT(scstarget,0,SCRIPTINGSTATE2)
  !HasItemEquiped("clck26",scstarget)
  !HasItemEquiped("sw1h71",scstarget)
  
 TRIGGER=Fear
- !CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
- !Kit(scstarget,CAVALIER)
  !General(scstarget,UNDEAD)
  !Race(scstarget,SLIME)
  !Race(scstarget,GOLEM)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,TROLL)
+ !Kit(scstarget,CAVALIER)
+ !CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
  !HasItemEquiped("CLCK30",scstarget) // Cloak of Bravery
  !HasItemEquipedReal("SW1H32",scstarget) // Dragonslayer
  !HasItemEquipedReal("MISCBC",scstarget) // Blackrazor
@@ -86,7 +118,9 @@ TRIGGER=Stun
  !Race(scstarget,SLIME)
  !Race(scstarget,DEMONIC)
  !Race(scstarget,GOLEM)
+ !Race(scstarget,TROLL)
  !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
 
 TRIGGER=Stoneskin
  !CheckStatGT(scstarget,0,STONESKINS)
@@ -111,6 +145,23 @@ TRIGGER=WeaponImmunity
    CheckStatGT(Myself,5,CLERIC_HALLOW) //You need +6 or better to bypass Absolute Immunity
    !CheckStat(scstarget,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Absolute Immunity
  !HasItem("MORSWORD",scstarget)
+ 
+TRIGGER=WeaponImmunityUltroloth
+ OR(2)
+   CheckStatGT(Myself,0,CLERIC_HALLOW) //You need magical weapons to bypass PfNW
+   CheckStat(scstarget,0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS) //PfNW
+ OR(2)
+   CheckStat(Myself,0,CLERIC_HALLOW) //You need normal weapons to bypass PfMW
+   !CheckStat(scstarget,4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //PfMW
+ OR(2)
+   CheckStatGT(Myself,2,CLERIC_HALLOW) //You need +3 or better to bypass Mantle
+   !CheckStat(scstarget,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Mantle
+ OR(2)
+   CheckStatGT(Myself,3,CLERIC_HALLOW) //You need +4 or better to bypass Improved Mantle
+   !CheckStat(scstarget,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Improved Mantle
+ OR(2)
+   CheckStatGT(Myself,5,CLERIC_HALLOW) //You need +6 or better to bypass Absolute Immunity
+   !CheckStat(scstarget,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS) //Absolute Immunity
 
 TRIGGER=SlashRes
  CheckStatLT(scstarget,50,RESISTSLASHING)
@@ -167,11 +218,21 @@ TRIGGER=CanCastPriest
 
 TRIGGER=ProEvil
  !CheckStatGT(scstarget,0,PROTECTION_FROM_EVIL)
+ !HasItemEquipedReal("staf11",scstarget)
+ !HasItemEquiped("wa2amu",scstarget)
  
 TRIGGER=Charm
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,ELF)
+ !Race(scstarget,GOLEM)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,TROLL)
  !Class(scstarget,MONK)
  !Kit(scstarget,INQUISITOR)
  !Kit(scstarget,CAVALIER)
+ !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
  !HasItemEquiped("helm06",scstarget) //charm protection
  !HasItemEquiped("ipsion",scstarget) //mordy sword
  !HasItemEquipedReal("miscbc",scstarget) //Blackrazor
@@ -182,21 +243,23 @@ TRIGGER=Charm
  !HasItemEquipedReal("sw1h35",scstarget) //Adjatha
  !HasItemEquipedReal("sw1h54",scstarget) //Equalizer
  !HasItemEquipedReal("sw2h14",scstarget) //Lilarcor
- !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
- !Race(scstarget,ELF)
- !General(scstarget,UNDEAD)
  
 TRIGGER=Petrify
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,SLIME)
  !CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_PETRIFICATION)
  !HasItemEquiped("clck26",scstarget)
  
 TRIGGER=Hold
- !Kit(scstarget,UNDEADHUNTER)
- !Kit(scstarget,INQUISITOR)
  !General(scstarget,UNDEAD)
  !Race(scstarget,GOLEM)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,TROLL)
+ !Kit(scstarget,UNDEADHUNTER)
+ !Kit(scstarget,INQUISITOR)
  !CheckStatGT(scstarget,0,CLERIC_FREE_ACTION)
  !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
  !HasItemEquiped("shld25",scstarget) //harmony
  !HasItemEquipedReal("blun30",scstarget) //FoA
  !HasItemEquiped("ipsion",scstarget) //mordy sword
@@ -206,14 +269,21 @@ TRIGGER=Hold
  !HasItemEquipedReal("sw1h27",scstarget) //Arbane's sword
  
 TRIGGER=Sleep
- !Race(scstarget,ELF)
- !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
- !HasItemEquiped("ipsion",scstarget)
  !General(scstarget,UNDEAD)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,ELF)
+ !Race(scstarget,GOLEM)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,TROLL)
+ !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
+ !HasItemEquiped("ipsion",scstarget)
  
 TRIGGER=LevelDrain
  !General(scstarget,UNDEAD)
+ !Race(scstarget,SLIME)
  !CheckStatGT(scstarget,0,SCRIPTINGSTATE3)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
  !HasItemEquiped("amul21",scstarget)
  !HasItemEquipedReal("blun25",scstarget)
  !HasItemEquipedReal("hamm10",scstarget)
@@ -244,6 +314,7 @@ TRIGGER=Poison
  !Race(scstarget,DEMONIC)
  !Race(scstarget,GOLEM)
  !Race(scstarget,ELEMENTAL)
+ !Race(scstarget,SLIME)
  !StateCheck(scstarget,STATE_POISON)
  !CheckStatGT(scstarget,50,RESISTPOISON)
  !HasItemEquiped("amul22",scstarget)
@@ -251,6 +322,64 @@ TRIGGER=Poison
  !HasItemEquiped("ring39",scstarget)
  !HasItemEquiped("ring46",scstarget)
  !HasItemEquipedReal("sw1h34",scstarget)
+ 
+TRIGGER=Disease
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,GOLEM)
+ !Race(scstarget,ELEMENTAL)
+ !Race(scstarget,SLIME)
+ !StateCheck(scstarget,STATE_DISEASED)
+ !HasItemEquiped("ring39",scstarget)
+ !HasItemEquiped("misc8j",scstarget)
+ 
+TRIGGER=Confusion
+ !General(scstarget,UNDEAD)
+ !Race(scstarget,SLIME)
+ !Race(scstarget,DEMONIC)
+ !Race(scstarget,TROLL)
+ !Race(scstarget,UMBERHULK)
+ !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+ !CheckStat(scstarget,1,SCRIPTINGSTATE4) //Rage and Enrage
+ !HasItem("ipsion",scstarget)
+ !HasItemEquiped("leat20",scstarget)
+ !HasItemEquiped("shld25",scstarget)
+ !HasItemEquipedReal("sw1h54",scstarget)
+ !HasItemEquipedReal("sw2h14",scstarget)
+ !HasItemEquipedReal("sw2h21",scstarget)
+ 
+TRIGGER=NoEnemyTrueSight
+ !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(FifthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+ !CheckStatGT(NearestEnemyOfType([0.0.0.MAGE_ALL]),0,TRUE_SIGHT)
+ !CheckStatGT(SecondNearestEnemyOfType([0.0.0.MAGE_ALL]),0,TRUE_SIGHT)
+ !CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_ALL]),0,TRUE_SIGHT)
+ !CheckStatGT(SecondNearestEnemyOfType([0.0.0.CLERIC_ALL]),0,TRUE_SIGHT)
+ !CheckStatGT(NearestEnemyOfType([0.0.0.BARD_ALL]),0,TRUE_SIGHT)
+ !CheckStatGT(NearestEnemyOfType([0.0.0.CLERIC_RANGER]),0,TRUE_SIGHT)
+ !CheckStatGT(NearestEnemyOfType([0.0.0.DRUID_ALL]),0,TRUE_SIGHT)
+ !CheckStatGT(SecondNearestEnemyOfType([0.0.0.DRUID_ALL]),0,TRUE_SIGHT)
+
+TRIGGER=NotSummoned
+ OR(2)
+  !Gender(scstarget,SUMMONED)
+  !Gender(scstarget,20)
+
+
+
+
+
+
+
+
 
 TARGET=PlayersReverse
  Player6
@@ -298,16 +427,11 @@ TARGET=PCArchers
  [PC.0.0.THIEF_ALL]
  [PC.0.0.FIGHTER_ALL]
 
-TARGET=Squishy
+TARGET=PCSquishy
  [PC.0.0.MAGE]
  [PC.0.0.MAGE_THIEF]
  [PC.0.0.THIEF]
  [PC.0.0.BARD]
-
-TARGET=CloseEnemies
- NearestEnemyOf(Myself)
- SecondNearestEnemyOf(Myself)
- ThirdNearestEnemyOf(Myself)
 
 TARGET=EnemiesReverseFar
  SixthNearestEnemyOf(Myself)
@@ -336,11 +460,11 @@ TARGET=EnemiesInOrder
  SixthNearestEnemyOf(Myself)
  
 TARGET=EnemiesInOrderShort
-  NearestEnemyOf(Myself)
-  SecondNearestEnemyOf(Myself)
-  ThirdNearestEnemyOf(Myself)
+ NearestEnemyOf(Myself)
+ SecondNearestEnemyOf(Myself)
+ ThirdNearestEnemyOf(Myself)
  
-TARGET=HumanoidsPreferringStrong
+TARGET=GoodHumanoidsPreferringStrong
  [GOODCUTOFF.HUMANOID.0.FIGHTER]
  [GOODCUTOFF.HUMANOID.0.PALADIN]
  [GOODCUTOFF.HUMANOID.0.RANGER]
@@ -381,7 +505,7 @@ TARGET=PCsInOrderShort
  SecondNearest([PC])
  ThirdNearest([PC])
  
-TARGET=SpellCasters
+TARGET=GoodSpellCasters
  [GOODCUTOFF.0.0.MAGE]
  [GOODCUTOFF.0.0.CLERIC_MAGE]
  [GOODCUTOFF.0.0.MAGE_ALL]
@@ -389,9 +513,10 @@ TARGET=SpellCasters
  [GOODCUTOFF.0.0.CLERIC]
  [GOODCUTOFF.0.0.BARD]
  [GOODCUTOFF.0.0.FIGHTER_DRUID]
+ [GOODCUTOFF.0.0.CLERIC_RANGER]
  [GOODCUTOFF.0.0.CLERIC_ALL]
  
-TARGET=PureCasters
+TARGET=GoodPureCasters
  [GOODCUTOFF.0.0.MAGE]
  [GOODCUTOFF.0.0.CLERIC_MAGE]
  [GOODCUTOFF.0.0.MAGE_THIEF]
@@ -400,7 +525,7 @@ TARGET=PureCasters
  [GOODCUTOFF.0.0.BARD]
  [GOODCUTOFF.0.0.CLERIC_THIEF]
  
-TARGET=FighterCasters
+TARGET=GoodFighterCasters
  [GOODCUTOFF.0.0.FIGHTER_MAGE]
  [GOODCUTOFF.0.0.FIGHTER_DRUID]
  [GOODCUTOFF.0.0.FIGHTER_CLERIC]
@@ -413,18 +538,19 @@ TARGET=Beholders
  FifthNearest([0.0.BEHOLDER])
  SixthNearest([0.0.BEHOLDER])
  
-TARGET=Summons
- [GOODCUTOFF.0.0.0.0.SUMMONED]
- SecondNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
- ThirdNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
- FourthNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
- FifthNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
- SixthNearest([GOODCUTOFF.0.0.0.0.SUMMONED])
+TARGET=GoodSummons
+ [GOODCUTOFF.0.0.0.0.%SUMMONED%]
+ SecondNearest([GOODCUTOFF.0.0.0.0.%SUMMONED%])
+ ThirdNearest([GOODCUTOFF.0.0.0.0.%SUMMONED%])
+ FourthNearest([GOODCUTOFF.0.0.0.0.%SUMMONED%])
+ FifthNearest([GOODCUTOFF.0.0.0.0.%SUMMONED%])
+ SixthNearest([GOODCUTOFF.0.0.0.0.%SUMMONED%])
  
 TARGET=PCCasters
  [PC.0.0.MAGE_ALL]
  [PC.0.0.DRUID_ALL]
- [PC.0.0.CLERIC_ALL]
+ [PC.0.0.CLERIC_RANGER]
+ [PC.0.0.CLERIC_ALL] 
  [PC.0.0.BARD]
  
 TARGET=GoodUndeadInOrder
@@ -448,7 +574,7 @@ TARGET=EvilInOrderShort
  SecondNearest([EVILCUTOFF])
  ThirdNearest([EVILCUTOFF])
  
-TARGET=BoltOfGlory
+TARGET=GoodBoltOfGlory
  [GOODCUTOFF.DEMONIC]
  SecondNearest([GOODCUTOFF.DEMONIC])
  ThirdNearest([GOODCUTOFF.DEMONIC])
@@ -461,6 +587,38 @@ TARGET=BoltOfGlory
  FourthNearestEnemyOf(Myself)
  FifthNearestEnemyOf(Myself)
  SixthNearestEnemyOf(Myself)
-
+ 
+TARGET=EnemyMagesInOrder
+ NearestEnemyOfType([0.0.0.MAGE])
+ SecondNearestEnemyOfType([0.0.0.MAGE])
+ NearestEnemyOfType([0.0.0.MAGE_ALL])
+ SecondNearestEnemyOfType([0.0.0.MAGE_ALL])
+ NearestEnemyOfType([0.0.0.BARD_ALL])
+ NearestEnemyOf(Myself)
+ SecondNearestEnemyOf(Myself)
+ ThirdNearestEnemyOf(Myself)
+ 
+TARGET=EnemyMagesAndPriests
+ NearestEnemyOfType([0.0.0.MAGE_ALL])
+ NearestEnemyOfType([0.0.0.CLERIC_ALL])
+ NearestEnemyOfType([0.0.0.CLERIC_RANGER])
+ NearestEnemyOfType([0.0.0.DRUID_ALL])
+ SecondNearestEnemyOfType([0.0.0.MAGE_ALL])
+ SecondNearestEnemyOfType([0.0.0.CLERIC_ALL])
+ SecondNearestEnemyOfType([0.0.0.CLERIC_RANGER])
+ SecondNearestEnemyOfType([0.0.0.DRUID_ALL])
+ ThirdNearestEnemyOfType([0.0.0.MAGE_ALL])
+ ThirdNearestEnemyOfType([0.0.0.CLERIC_ALL])
+ ThirdNearestEnemyOfType([0.0.0.CLERIC_RANGER])
+ ThirdNearestEnemyOfType([0.0.0.DRUID_ALL])
+ NearestEnemyOf(Myself)
+ 
+TARGET=EnemyTroll
+ NearestEnemyOfType([0.0.TROLL])
+ SecondNearestEnemyOfType([0.0.TROLL])
+ ThirdNearestEnemyOfType([0.0.TROLL])
+ FourthNearestEnemyOfType([0.0.TROLL])
+ FifthNearestEnemyOfType([0.0.TROLL])
+ SixthNearestEnemyOfType([0.0.TROLL])
 
 

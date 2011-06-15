@@ -1,0 +1,69 @@
+//This is for that mean-spirited behaviour
+
+IF
+  See([ANYONE])
+  False()
+THEN
+  RESPONSE #100
+    Continue()
+END
+
+IF
+  Race(LastSeenBy(Myself),DEMONIC)
+  Alignment(LastSeenBy(Myself),MASK_EVIL)
+  Allegiance(Myself,GOODCUTOFF)
+  !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
+  Race(LastSeenBy(Myself),DEMONIC)
+  Alignment(LastSeenBy(Myself),MASK_EVIL)
+  Allegiance(Myself,EVILCUTOFF)
+  !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
+  OR(2)
+    Name("fl#propertyoftheyugoloth1",LastSeenBy(Myself))
+    Name("fl#propertyoftheyugoloth2",LastSeenBy(Myself))
+  Allegiance(Myself,GOODCUTOFF)
+  !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
+  OR(2)
+    Name("fl#propertyoftheyugoloth1",LastSeenBy(Myself))
+    Name("fl#propertyoftheyugoloth2",LastSeenBy(Myself))
+  Allegiance(Myself,EVILCUTOFF)
+  !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+THEN
+  RESPONSE #100
+    RandomWalkContinuous()
+END
+
+IF
+  !Range(LastSeenBy(Myself),6)
+  !GlobalTimerNotExpired("flCast","LOCALS")
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    ForceSpellRES("RR#TELWE",LastSeenBy(Myself))
+    SetGlobalTimer("flCast","LOCALS",6)
+END
+
+IF
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    AttackOneRound(LastSeenBy(Myself))
+END
+
