@@ -1,0 +1,1324 @@
+IF
+	Global("RR#Active","LOCALS",0)
+	OR(5)
+	  AttackedBy([ANYONE],DEFAULT)
+	  TookDamage()
+	  Help([EVILCUTOFF.0.MEPHIT])
+	  See([GOODCUTOFF])
+	  Gender(Myself,3) // gated mephit
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	OR(4)
+	  Global("RR#Active","LOCALS",0)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+
+	StateCheck(Myself,STATE_PANIC)  // needed because the AI can perform script actions (i.e. drink potions) while panicked, unlike the player
+THEN
+	RESPONSE #100
+		RandomWalkContinuous() // using this instead of NoAction() because otherwise panicked characters would stand in place
+END
+
+IF
+	Global("RR#Active","LOCALS",1)
+	!InActiveArea(Myself)
+	!See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		SetGlobal("RR#Gform","LOCALS",0) // reset Gaseous Form variable
+		SetGlobal("RR#Wfog","LOCALS",0) // reset Wall of Fog variable
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+                Rest()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other mephits may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+		Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Hour","LOCALS") // breath weapon should recharge every hour
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Hour","LOCALS",300)
+		SetGlobal("RR#MBall","LOCALS",0) // reset Mist Ball variable
+                Continue()
+END
+
+IF
+	CheckStatGT(Myself,55,MAGICDAMAGERESISTANCE) // indicates that the creature is in gaseous form
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		RandomWalkContinuous() // run away from enemies
+END
+
+IF
+	CheckStatGT(Myself,55,MAGICDAMAGERESISTANCE) // indicates that the creature is in gaseous form
+THEN
+	RESPONSE #100
+		NoAction() // do nothing else while in gaseous form
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Gform","LOCALS",0) // 1x per day
+	HPPercentLT(Myself,76)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Gform","LOCALS",1)
+		ForceSpellRES("RR#MMSGF",Myself) // Gaseous Form
+END
+
+IF
+	!Gender(Myself,3) // the mephit has not been gated
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        OR(3)
+          RandomNum(7,1)
+	  HPPercentLT(Myself,31)
+	  !See([GOODCUTOFF])
+THEN
+	RESPONSE #25
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1800) // attempts to open an interplanar gate
+		ForceSpellRES("RR#MMSGT",Myself) // Gate (Mist Mephit version)
+	RESPONSE #75
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1801) // fails to open an interplanar gate
+		SpellNoDec(Myself,DO_NOTHING)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See([PC.0.0.RANGER]) // single-class ranger
+        Kit(LastSeenBy(Myself),FERALAN) // archer kit, highest priority
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(SecondNearest([PC.0.0.RANGER])) // single-class ranger
+        Kit(LastSeenBy(Myself),FERALAN) // archer kit, highest priority
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(ThirdNearest([PC.0.0.RANGER])) // single-class ranger
+        Kit(LastSeenBy(Myself),FERALAN) // archer kit, highest priority
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(StrongestOf([PC])) // try to blind the strongest party member
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL) // if it's a warrior
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See([PC.0.0.FIGHTER_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(SecondNearest([PC.0.0.FIGHTER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(ThirdNearest([PC.0.0.FIGHTER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See([PC.0.0.RANGER_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(SecondNearest([PC.0.0.RANGER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(ThirdNearest([PC.0.0.RANGER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See([PC.0.0.PALADIN_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(SecondNearest([PC.0.0.PALADIN_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(ThirdNearest([PC.0.0.PALADIN_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(StrongestOf([PC])) // try to blind the strongest party member
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	Range(SecondNearest([GOODCUTOFF]),10)
+	Range([GOODCUTOFF],10) // at least two party members are nearby
+	See([GOODCUTOFF])
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],10) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	Range(SecondNearest([GOODCUTOFF]),10)
+	Range([GOODCUTOFF],10) // at least two party members are nearby
+	See(SecondNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See([GOODCUTOFF])
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(SecondNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(ThirdNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(FourthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(FifthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !Range([EVILCUTOFF],15) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Wfog","LOCALS",0) // 1x per day
+	See(SixthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+        OR(5)
+	  !See([EVILCUTOFF]) // try to avoid using cloud spells near allies
+	  CheckStatGT([EVILCUTOFF],0,MINORGLOBE) // minor globe protects from wall of fog
+	  HasItemEquiped("RR#MMSW1",[EVILCUTOFF]) // Mist Mephits can see throgh fog
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephits are immune to blindness
+	  HasItemEquiped("RR#MGASI",[EVILCUTOFF]) // some mephits are immune to gas spells
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Wfog","LOCALS",1)
+		ForceSpellRES("RR#MMSWF",LastSeenBy(Myself)) // Wall of Fog
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See([PC.0.0.THIEF]) // generally have poor saves. vs death
+	CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(SecondNearest([PC.0.0.THIEF])) // generally have poor saves. vs death
+	CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(ThirdNearest([PC.0.0.THIEF])) // generally have poor saves. vs death
+	CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See([PC.0.0.MAGE_THIEF]) // generally have poor saves. vs death
+	CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(SecondNearest([PC.0.0.MAGE_THIEF])) // generally have poor saves. vs death
+	CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(ThirdNearest([PC.0.0.MAGE_THIEF])) // generally have poor saves. vs death
+	CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See([PC.0.0.MAGE]) // generally have poor saves. vs death
+	CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(SecondNearest([PC.0.0.MAGE])) // generally have poor saves. vs death
+	CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(ThirdNearest([PC.0.0.MAGE])) // generally have poor saves. vs death
+	CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See([GOODCUTOFF])
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(SecondNearest([GOODCUTOFF]))
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(ThirdNearest([GOODCUTOFF]))
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(FourthNearest([GOODCUTOFF]))
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(FifthNearest([GOODCUTOFF]))
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	GlobalLT("RR#MBall","LOCALS",3) // 3x per hour
+	See(SixthNearest([GOODCUTOFF]))
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+                IncrementGlobal("RR#MBall","LOCALS",1)
+		ForceSpellRES("RR#MMSMB",LastSeenBy(Myself)) // Mist Ball
+END
+
+IF
+	!Gender(Myself,3) // the mephit has not been gated
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // open a gate if all other abilities are unavailable
+	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+THEN
+	RESPONSE #25
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1800) // attempts to open an interplanar gate
+		ForceSpellRES("RR#MMSGT",Myself) // Gate (Mist Mephit version)
+	RESPONSE #75
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1801) // fails to open an interplanar gate
+		SpellNoDec(Myself,DO_NOTHING)
+END
+
+IF
+	OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
+	  See(Player1)
+	  See(Player2)
+	  See(Player3)
+	  See(Player4)
+	  See(Player5)
+	  See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        CheckStatLT([GOODCUTOFF],100,RESISTCRUSHING)
+	See([GOODCUTOFF]) // note: this block is intended to check for opponents who may be panicked
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SixthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTCRUSHING)
+	!StateCheck(SixthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(SixthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(FifthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTCRUSHING)
+	!StateCheck(FifthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(FifthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(FourthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTCRUSHING)
+	!StateCheck(FourthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(FourthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(ThirdNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTCRUSHING)
+	!StateCheck(ThirdNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),1,STONESKINS)
+	See(ThirdNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTCRUSHING)
+	!StateCheck(SecondNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),1,STONESKINS)
+	See(SecondNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([GOODCUTOFF],STATE_PANIC)
+        CheckStatLT([GOODCUTOFF],100,RESISTCRUSHING)
+	!StateCheck([GOODCUTOFF],STATE_MIRRORIMAGE)
+        CheckStatLT([GOODCUTOFF],1,STONESKINS)
+	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([PC.0.0.MAGE]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([PC.0.0.MAGE]),STATE_PANIC)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE]),100,RESISTCRUSHING)
+	!StateCheck(SecondNearest([PC.0.0.MAGE]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE]),1,STONESKINS)
+	See(SecondNearest([PC.0.0.MAGE])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([PC.0.0.MAGE],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([PC.0.0.MAGE],STATE_PANIC)
+        CheckStatLT([PC.0.0.MAGE],100,RESISTCRUSHING)
+	!StateCheck([PC.0.0.MAGE],STATE_MIRRORIMAGE)
+        CheckStatLT([PC.0.0.MAGE],1,STONESKINS)
+	See([PC.0.0.MAGE]) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([PC.0.0.MAGE_THIEF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([PC.0.0.MAGE_THIEF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE_THIEF]),100,RESISTCRUSHING)
+	!StateCheck(SecondNearest([PC.0.0.MAGE_THIEF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE_THIEF]),1,STONESKINS)
+	See(SecondNearest([PC.0.0.MAGE_THIEF])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([PC.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([PC.0.0.MAGE_THIEF],STATE_PANIC)
+        CheckStatLT([PC.0.0.MAGE_THIEF],100,RESISTCRUSHING)
+	!StateCheck([PC.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
+        CheckStatLT([PC.0.0.MAGE_THIEF],1,STONESKINS)
+	See([PC.0.0.MAGE_THIEF]) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(WorstAC([PC]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(WorstAC([PC]),STATE_PANIC)
+        CheckStatLT(WorstAC([PC]),100,RESISTCRUSHING)
+	!StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
+        CheckStatLT(WorstAC([PC]),1,STONESKINS)
+	See(WorstAC([PC])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTCRUSHING)
+	Range(LastAttackerOf(Myself),8)
+	RandomNum(3,1)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTCRUSHING)
+	Range(LastAttackerOf(Myself),4)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(SixthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTCRUSHING)
+	See(SixthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(FifthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTCRUSHING)
+	See(FifthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(FourthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTCRUSHING)
+	See(FourthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(ThirdNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTCRUSHING)
+	See(ThirdNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(SecondNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTCRUSHING)
+	See(SecondNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck([GOODCUTOFF],STATE_IMMOBILE)
+        CheckStatLT([GOODCUTOFF],100,RESISTCRUSHING)
+	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player6,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTCRUSHING)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTCRUSHING)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTCRUSHING)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTCRUSHING)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTCRUSHING)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTCRUSHING)
+	See(Player1)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+        !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
+        OR(2)
+	  !StateCheck(Myself,STATE_BLIND) // don't attack when blinded
+	  Range(LastSeenBy(Myself),2) // unless the target is extremely close by
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle or higher
+        CheckStatLT(LastSeenBy(Myself),100,RESISTCRUSHING)
+THEN
+	RESPONSE #100
+		AttackReevaluate(LastSeenBy(Myself),30)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+	Help([EVILCUTOFF.0.MEPHIT])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Move","LOCALS",6)
+		MoveToObject(LastHelp(Myself))
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS")
+THEN
+	RESPONSE #100
+		RandomWalkContinuous()
+END

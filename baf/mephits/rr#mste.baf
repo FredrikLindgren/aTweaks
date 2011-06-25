@@ -1,0 +1,1392 @@
+IF
+	Global("RR#Active","LOCALS",0)
+	OR(5)
+	  AttackedBy([ANYONE],DEFAULT)
+	  TookDamage()
+	  Help([EVILCUTOFF.0.MEPHIT])
+	  See([GOODCUTOFF])
+	  Gender(Myself,3) // gated mephit
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	OR(4)
+	  Global("RR#Active","LOCALS",0)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+
+	StateCheck(Myself,STATE_PANIC)  // needed because the AI can perform script actions (i.e. drink potions) while panicked, unlike the player
+THEN
+	RESPONSE #100
+		RandomWalkContinuous() // using this instead of NoAction() because otherwise panicked characters would stand in place
+END
+
+IF
+	Global("RR#Active","LOCALS",1)
+	!InActiveArea(Myself)
+	!See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		SetGlobal("RR#Brs","LOCALS",0) // reset Boiling Rain Storm variable
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+                Rest()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other mephits may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+		Continue()
+END
+
+IF
+	!Gender(Myself,3) // the mephit has not been gated
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        OR(3)
+          RandomNum(7,1)
+	  HPPercentLT(Myself,31)
+	  !See([GOODCUTOFF])
+THEN
+	RESPONSE #25
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1800) // attempts to open an interplanar gate
+		ForceSpellRES("RR#MSTGT",Myself) // Gate (Steam Mephit version)
+	RESPONSE #75
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1801) // fails to open an interplanar gate
+		SpellNoDec(Myself,DO_NOTHING)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([PC.HUMANOID.0.MAGE_ALL]) // prioritize nearest mage (not very efficient, but it's per PnP rules)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([PC.HUMANOID.0.CLERIC_ALL]) // prioritize nearest cleric (not very efficient, but it's per PnP rules)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([PC.HUMANOID.0.DRUID_ALL]) // prioritize nearest druid (not very efficient, but it's per PnP rules)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(StrongestOf([PC])) // try to stun the strongest warrior in the party
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([PC.HUMANOID.0.FIGHTER_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SecondNearest([PC.HUMANOID.0.FIGHTER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(ThirdNearest([PC.HUMANOID.0.FIGHTER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([PC.HUMANOID.0.RANGER_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SecondNearest([PC.HUMANOID.0.RANGER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(ThirdNearest([PC.HUMANOID.0.RANGER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([PC.HUMANOID.0.PALADIN_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SecondNearest([PC.HUMANOID.0.PALADIN_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(ThirdNearest([PC.HUMANOID.0.PALADIN_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player1) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player2) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player3) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player4) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player5) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player6) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([GOODCUTOFF])
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+        !Race(LastSeenBy(Myself),GOLEM)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SecondNearest([GOODCUTOFF]))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+        !Race(LastSeenBy(Myself),GOLEM)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(ThirdNearest([GOODCUTOFF]))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+        !Race(LastSeenBy(Myself),GOLEM)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(FourthNearest([GOODCUTOFF]))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+        !Race(LastSeenBy(Myself),GOLEM)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(FifthNearest([GOODCUTOFF]))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+        !Race(LastSeenBy(Myself),GOLEM)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SixthNearest([GOODCUTOFF]))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+        !Race(LastSeenBy(Myself),GOLEM)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSTWJ",LastSeenBy(Myself)) // Water Jet
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	Range([GOODCUTOFF.0.0.MAGE_ALL],12) // prioritize spellcasters
+	Range(SecondNearest([GOODCUTOFF]),12)
+	Range(ThirdNearest([GOODCUTOFF]),12) 
+	CheckStatLT([GOODCUTOFF.0.0.MAGE_ALL],50,RESISTFIRE)
+	CheckStatLT(SecondNearest([GOODCUTOFF]),50,RESISTFIRE)
+	CheckStatLT(ThirdNearest([GOODCUTOFF]),50,RESISTFIRE) // ideal case, three enemies are nearby and they are not fire resistant
+	See([GOODCUTOFF.0.0.MAGE_ALL])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	Range([GOODCUTOFF.0.0.MAGE_ALL],12) // prioritize spellcasters
+	Range(SecondNearest([GOODCUTOFF]),12)
+	CheckStatLT([GOODCUTOFF.0.0.MAGE_ALL],50,RESISTFIRE)
+	CheckStatLT(SecondNearest([GOODCUTOFF]),50,RESISTFIRE) // still good, two enemies are nearby and they are not fire resistant
+	See([GOODCUTOFF.0.0.MAGE_ALL])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	Range([GOODCUTOFF.0.0.BARD_ALL],12) // prioritize spellcasters
+	Range(SecondNearest([GOODCUTOFF]),12)
+	Range(ThirdNearest([GOODCUTOFF]),12) 
+	CheckStatLT([GOODCUTOFF.0.0.BARD_ALL],50,RESISTFIRE)
+	CheckStatLT(SecondNearest([GOODCUTOFF]),50,RESISTFIRE)
+	CheckStatLT(ThirdNearest([GOODCUTOFF]),50,RESISTFIRE) // ideal case, three enemies are nearby and they are not fire resistant
+	See([GOODCUTOFF.0.0.BARD_ALL])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	Range([GOODCUTOFF.0.0.BARD_ALL],12) // prioritize spellcasters
+	Range(SecondNearest([GOODCUTOFF]),12)
+	CheckStatLT([GOODCUTOFF.0.0.BARD_ALL],50,RESISTFIRE)
+	CheckStatLT(SecondNearest([GOODCUTOFF]),50,RESISTFIRE) // still good, two enemies are nearby and they are not fire resistant
+	See([GOODCUTOFF.0.0.BARD_ALL])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	Range([GOODCUTOFF.0.0.CLERIC_ALL],12) // prioritize spellcasters
+	Range(SecondNearest([GOODCUTOFF]),12)
+	Range(ThirdNearest([GOODCUTOFF]),12) 
+	CheckStatLT([GOODCUTOFF.0.0.CLERIC_ALL],50,RESISTFIRE)
+	CheckStatLT(SecondNearest([GOODCUTOFF]),50,RESISTFIRE)
+	CheckStatLT(ThirdNearest([GOODCUTOFF]),50,RESISTFIRE) // ideal case, three enemies are nearby and they are not fire resistant
+	See([GOODCUTOFF.0.0.CLERIC_ALL])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	Range([GOODCUTOFF.0.0.CLERIC_ALL],12) // prioritize spellcasters
+	Range(SecondNearest([GOODCUTOFF]),12)
+	CheckStatLT([GOODCUTOFF.0.0.CLERIC_ALL],50,RESISTFIRE)
+	CheckStatLT(SecondNearest([GOODCUTOFF]),50,RESISTFIRE) // still good, two enemies are nearby and they are not fire resistant
+	See([GOODCUTOFF.0.0.CLERIC_ALL])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	Range([GOODCUTOFF.0.0.DRUID_ALL],12) // prioritize spellcasters
+	Range(SecondNearest([GOODCUTOFF]),12)
+	Range(ThirdNearest([GOODCUTOFF]),12) 
+	CheckStatLT([GOODCUTOFF.0.0.DRUID_ALL],50,RESISTFIRE)
+	CheckStatLT(SecondNearest([GOODCUTOFF]),50,RESISTFIRE)
+	CheckStatLT(ThirdNearest([GOODCUTOFF]),50,RESISTFIRE) // ideal case, three enemies are nearby and they are not fire resistant
+	See([GOODCUTOFF.0.0.DRUID_ALL])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	Range([GOODCUTOFF.0.0.DRUID_ALL],12) // prioritize spellcasters
+	Range(SecondNearest([GOODCUTOFF]),12)
+	CheckStatLT([GOODCUTOFF.0.0.DRUID_ALL],50,RESISTFIRE)
+	CheckStatLT(SecondNearest([GOODCUTOFF]),50,RESISTFIRE) // still good, two enemies are nearby and they are not fire resistant
+	See([GOODCUTOFF.0.0.DRUID_ALL])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	Range([GOODCUTOFF],12)
+	Range(SecondNearest([GOODCUTOFF]),12)
+	Range(ThirdNearest([GOODCUTOFF]),12) 
+	CheckStatLT([GOODCUTOFF],50,RESISTFIRE)
+	CheckStatLT(SecondNearest([GOODCUTOFF]),50,RESISTFIRE)
+	CheckStatLT(ThirdNearest([GOODCUTOFF]),50,RESISTFIRE) // ideal case, three enemies are nearby and they are not fire resistant
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	Range([GOODCUTOFF],12)
+	Range(SecondNearest([GOODCUTOFF]),12)
+	CheckStatLT([GOODCUTOFF],50,RESISTFIRE)
+	CheckStatLT(SecondNearest([GOODCUTOFF]),50,RESISTFIRE) // still good, two enemies are nearby and they are not fire resistant
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See([GOODCUTOFF.0.0.MAGE_ALL]) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL])) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL])) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See([GOODCUTOFF.0.0.BARD_ALL]) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(SecondNearest([GOODCUTOFF.0.0.BARD_ALL])) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(ThirdNearest([GOODCUTOFF.0.0.BARD_ALL])) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See([GOODCUTOFF.0.0.CLERIC_ALL]) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL])) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(ThirdNearest([GOODCUTOFF.0.0.CLERIC_ALL])) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See([GOODCUTOFF.0.0.DRUID_ALL]) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(SecondNearest([GOODCUTOFF.0.0.DRUID_ALL])) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(ThirdNearest([GOODCUTOFF.0.0.DRUID_ALL])) // prioritize spellcasters
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See([GOODCUTOFF])
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(SecondNearest([GOODCUTOFF]))
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(ThirdNearest([GOODCUTOFF]))
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(FourthNearest([GOODCUTOFF]))
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(FifthNearest([GOODCUTOFF]))
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Brs","LOCALS",0) // 1x per day
+	See(SixthNearest([GOODCUTOFF]))
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Brs","LOCALS",1)
+		ForceSpellRES("RR#MSTBR",LastSeenBy(Myself)) // Boiling Rain Storm
+END
+
+IF
+	!Gender(Myself,3) // the mephit has not been gated
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // open a gate if all other abilities are unavailable
+	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+THEN
+	RESPONSE #25
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1800) // attempts to open an interplanar gate
+		ForceSpellRES("RR#MSTGT",Myself) // Gate (Steam Mephit version)
+	RESPONSE #75
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1801) // fails to open an interplanar gate
+		SpellNoDec(Myself,DO_NOTHING)
+END
+
+IF
+	OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
+	  See(Player1)
+	  See(Player2)
+	  See(Player3)
+	  See(Player4)
+	  See(Player5)
+	  See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
+	See([GOODCUTOFF]) // note: this block is intended to check for opponents who may be panicked
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SixthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(SixthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(SixthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(FifthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(FifthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(FifthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(FourthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(FourthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(FourthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(ThirdNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(ThirdNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),1,STONESKINS)
+	See(ThirdNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(SecondNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),1,STONESKINS)
+	See(SecondNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([GOODCUTOFF],STATE_PANIC)
+        CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
+	!StateCheck([GOODCUTOFF],STATE_MIRRORIMAGE)
+        CheckStatLT([GOODCUTOFF],1,STONESKINS)
+	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([PC.0.0.MAGE]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([PC.0.0.MAGE]),STATE_PANIC)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE]),100,RESISTSLASHING)
+	!StateCheck(SecondNearest([PC.0.0.MAGE]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE]),1,STONESKINS)
+	See(SecondNearest([PC.0.0.MAGE])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([PC.0.0.MAGE],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([PC.0.0.MAGE],STATE_PANIC)
+        CheckStatLT([PC.0.0.MAGE],100,RESISTSLASHING)
+	!StateCheck([PC.0.0.MAGE],STATE_MIRRORIMAGE)
+        CheckStatLT([PC.0.0.MAGE],1,STONESKINS)
+	See([PC.0.0.MAGE]) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([PC.0.0.MAGE_THIEF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([PC.0.0.MAGE_THIEF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE_THIEF]),100,RESISTSLASHING)
+	!StateCheck(SecondNearest([PC.0.0.MAGE_THIEF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE_THIEF]),1,STONESKINS)
+	See(SecondNearest([PC.0.0.MAGE_THIEF])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([PC.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([PC.0.0.MAGE_THIEF],STATE_PANIC)
+        CheckStatLT([PC.0.0.MAGE_THIEF],100,RESISTSLASHING)
+	!StateCheck([PC.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
+        CheckStatLT([PC.0.0.MAGE_THIEF],1,STONESKINS)
+	See([PC.0.0.MAGE_THIEF]) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(WorstAC([PC]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(WorstAC([PC]),STATE_PANIC)
+        CheckStatLT(WorstAC([PC]),100,RESISTSLASHING)
+	!StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
+        CheckStatLT(WorstAC([PC]),1,STONESKINS)
+	See(WorstAC([PC])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
+	Range(LastAttackerOf(Myself),12)
+	RandomNum(3,1)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
+	Range(LastAttackerOf(Myself),4)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(SixthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(SixthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(FifthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(FifthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(FourthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(FourthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(ThirdNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(ThirdNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(SecondNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(SecondNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck([GOODCUTOFF],STATE_IMMOBILE)
+        CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
+	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player6,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTSLASHING)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTSLASHING)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTSLASHING)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTSLASHING)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTSLASHING)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTSLASHING)
+	See(Player1)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+        !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
+        OR(2)
+	  !StateCheck(Myself,STATE_BLIND) // don't attack when blinded
+	  Range(LastSeenBy(Myself),2) // unless the target is extremely close by
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle or higher
+        CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
+THEN
+	RESPONSE #100
+		AttackReevaluate(LastSeenBy(Myself),30)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+	Help([EVILCUTOFF.0.MEPHIT])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Move","LOCALS",6)
+		MoveToObject(LastHelp(Myself))
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS")
+THEN
+	RESPONSE #100
+		RandomWalkContinuous()
+END

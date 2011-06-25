@@ -1,14 +1,14 @@
 /*************************************************************************
- *               aVENGER's Tweak Pack (aTweaks) version 3.10
+ *               aVENGER's Tweak Pack (aTweaks) version 3.60
  *                            -=by aVENGER=-
  *                http://www.spellholdstudios.net/ie/atweaks
  *************************************************************************/
 
 
 
-BACKUP ~aTweaks/BACKUP~
+BACKUP ~atweaks/backup~
 AUTHOR "Wisp, shsforums.net"                                                       // Author and e-mail address
-VERSION ~v3.54~                                                                    // Mod version
+VERSION ~v3.60~                                                                    // Mod version
 ALWAYS                                                                             // Always do this block
   INCLUDE ~aTweaks/LIB/RR#AGLEF.TPH~                                               // Include my custom "Add Global Effect" function
   INCLUDE ~aTweaks/LIB/RR#SP2IN.TPH~                                               // Include my custom "Spell to Innate" function
@@ -32,7 +32,7 @@ ALWAYS                                                                          
 >>>>>>>>
 END                                                                                // End the ALWAYS block
 
-README ~aTweaks/README_aTweaks.HTML~                                               // Offer to display the main readme
+README ~atweaks/readme_atweaks.html~                                               // Offer to display the main readme
 ASK_EVERY_COMPONENT                                                                // Disallow installing all components at once
 
 
@@ -194,6 +194,19 @@ BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
+
+
+///////////////////
+// PnP Color Spray
+///////////////////
+
+BEGIN @104 DESIGNATED 104 // PnP Color Spray
+GROUP @1   // PnP tweaks
+
+COPY ~atweaks/spl/spwi105.spl~ ~override~                                         // Color Spray
+  SAY UNIDENTIFIED_DESC @1890 SAY DESC @1890
+COPY ~atweaks/spl/mephits/rr#mracs.spl~ ~override/spin937.spl~                    // Color Spray (Radiant Mephit version)
+  SAY UNIDENTIFIED_DESC @1890 SAY DESC @1890
 
 
 
@@ -499,6 +512,20 @@ REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
 
 INCLUDE "atweaks/lib/c160.tpa"
 */
+
+
+
+////////////////
+// PnP Mephits
+////////////////
+
+
+BEGIN @180 DESIGNATED 180 // PnP Mephits
+GROUP @1
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+
+INCLUDE "atweaks/lib/c180.tpa"
+
 
 
 
@@ -1052,6 +1079,59 @@ REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                           
 
 
 INCLUDE "atweaks/lib/c212.tpa"
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////
+// Expanded saving throw bonus tables for Dwarves, Gnomes and Halflings
+////////////////////////////////////////////////////////////////////////
+
+BEGIN @213 DESIGNATED 213 // Expanded saving throw bonus tables for Dwarves, Gnomes and Halflings
+GROUP @2 // Gameplay tweaks
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+
+// Dwarf and Halfling table
+
+COPY_EXISTING ~SAVECNDH.2DA~ ~override~                             // Dwarf and Halfling saving throw bonus table
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 1 21 ~6~                          // Set poison save bonus to 6 at level 21
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 2 21 ~6~                          // Set wand save bonus to 6 at level 21
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 5 21 ~6~                          // Set spell save bonus to 6 at level 21
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 1 22 ~6~                          // Set poison save bonus to 6 at level 22
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 2 22 ~6~                          // Set wand save bonus to 6 at level 22
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 5 22 ~6~                          // Set spell save bonus to 6 at level 22
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 1 23 ~6~                          // Set poison save bonus to 6 at level 23
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 2 23 ~6~                          // Set wand save bonus to 6 at level 23
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 5 23 ~6~                          // Set spell save bonus to 6 at level 23
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 1 24 ~6~                          // Set poison save bonus to 6 at level 24
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 2 24 ~6~                          // Set wand save bonus to 6 at level 24
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 5 24 ~6~                          // Set spell save bonus to 6 at level 24
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 1 25 ~7~                          // Set poison save bonus to 7 at level 25
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 2 25 ~7~                          // Set wand save bonus to 7 at level 25
+SET_2DA_ENTRY_LATER ~RR#SAVECNDH~ 5 25 ~7~                          // Set spell save bonus to 7 at level 25
+SET_2DA_ENTRIES_NOW ~RR#SAVECNDH~ 20                                // Actually make the changes
+PRETTY_PRINT_2DA
+BUT_ONLY_IF_IT_CHANGES
+
+// Gnome table
+
+COPY_EXISTING ~SAVECNG.2DA~ ~override~                               // Gnome saving throw bonus table
+SET_2DA_ENTRY_LATER ~RR#SAVECNG~ 2 21 ~6~                            // Set wand save bonus to 6 at level 21
+SET_2DA_ENTRY_LATER ~RR#SAVECNG~ 5 21 ~6~                            // Set spell save bonus to 6 at level 21
+SET_2DA_ENTRY_LATER ~RR#SAVECNG~ 2 22 ~6~                            // Set wand save bonus to 6 at level 22
+SET_2DA_ENTRY_LATER ~RR#SAVECNG~ 5 22 ~6~                            // Set spell save bonus to 6 at level 22
+SET_2DA_ENTRY_LATER ~RR#SAVECNG~ 2 23 ~6~                            // Set wand save bonus to 6 at level 23
+SET_2DA_ENTRY_LATER ~RR#SAVECNG~ 5 23 ~6~                            // Set spell save bonus to 6 at level 23
+SET_2DA_ENTRY_LATER ~RR#SAVECNG~ 2 24 ~6~                            // Set wand save bonus to 6 at level 24
+SET_2DA_ENTRY_LATER ~RR#SAVECNG~ 5 24 ~6~                            // Set spell save bonus to 6 at level 24
+SET_2DA_ENTRY_LATER ~RR#SAVECNG~ 2 25 ~7~                            // Set wand save bonus to 7 at level 25
+SET_2DA_ENTRY_LATER ~RR#SAVECNG~ 5 25 ~7~                            // Set spell save bonus to 7 at level 25
+SET_2DA_ENTRIES_NOW ~RR#SAVECNG~ 20                                  // Actually make the changes
+PRETTY_PRINT_2DA
+BUT_ONLY_IF_IT_CHANGES
+
+
 
 
 /////////////////////////////////

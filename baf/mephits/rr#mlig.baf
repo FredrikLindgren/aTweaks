@@ -1,0 +1,834 @@
+IF
+	Global("RR#Active","LOCALS",0)
+	OR(5)
+	  AttackedBy([ANYONE],DEFAULT)
+	  TookDamage()
+	  Help([EVILCUTOFF.0.MEPHIT])
+	  See([GOODCUTOFF])
+	  Gender(Myself,3) // gated mephit
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	OR(4)
+	  Global("RR#Active","LOCALS",0)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+
+	StateCheck(Myself,STATE_PANIC)  // needed because the AI can perform script actions (i.e. drink potions) while panicked, unlike the player
+THEN
+	RESPONSE #100
+		RandomWalkContinuous() // using this instead of NoAction() because otherwise panicked characters would stand in place
+END
+
+IF
+	Global("RR#Active","LOCALS",1)
+	!InActiveArea(Myself)
+	!See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		SetGlobal("RR#Bwpn","LOCALS",0) // reset Breath Weapon variable
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+                Rest()
+END
+
+IF
+	HitBy([ANYONE],ELECTRICITY)
+THEN
+	RESPONSE #100
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // electrical damage fully heals Lightning Mephits
+                CreateVisualEffectObject("SPHEALIN",Myself)
+                DisplayString(Myself,14022) // Healed
+                Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other mephits may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+		Continue()
+END
+
+IF
+	!Gender(Myself,3) // the mephit has not been gated
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        OR(3)
+          RandomNum(4,1) // Lightning Mephits prioritize gating
+	  HPPercentLT(Myself,31)
+	  !See([GOODCUTOFF])
+THEN
+	RESPONSE #25
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1800) // attempts to open an interplanar gate
+		ForceSpellRES("RR#MLIGT",Myself) // Gate (Lightning Mephit version)
+	RESPONSE #75
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1801) // fails to open an interplanar gate
+		SpellNoDec(Myself,DO_NOTHING)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	HPPercentLT([EVILCUTOFF.0.MEPHIT],51) // heal fellow Lightning Mephits with electrical damage
+	HasItemEquiped("RR#MLIW1",[EVILCUTOFF.0.MEPHIT]) // indicates a Lightning Mephit
+	See([EVILCUTOFF.0.MEPHIT])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	HPPercentLT(SecondNearest([EVILCUTOFF.0.MEPHIT]),51) // heal fellow Lightning Mephits with electrical damage
+	HasItemEquiped("RR#MLIW1",SecondNearest([EVILCUTOFF.0.MEPHIT])) // indicates a Lightning Mephit
+	See(SecondNearest([EVILCUTOFF.0.MEPHIT]))
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	HPPercentLT(ThirdNearest([EVILCUTOFF.0.MEPHIT]),51) // heal fellow Lightning Mephits with electrical damage
+	HasItemEquiped("RR#MLIW1",ThirdNearest([EVILCUTOFF.0.MEPHIT])) // indicates a Lightning Mephit
+	See(ThirdNearest([EVILCUTOFF.0.MEPHIT]))
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	HPPercentLT(FourthNearest([EVILCUTOFF.0.MEPHIT]),51) // heal fellow Lightning Mephits with electrical damage
+	HasItemEquiped("RR#MLIW1",FourthNearest([EVILCUTOFF.0.MEPHIT])) // indicates a Lightning Mephit
+	See(FourthNearest([EVILCUTOFF.0.MEPHIT]))
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	HPPercentLT(FifthNearest([EVILCUTOFF.0.MEPHIT]),51) // heal fellow Lightning Mephits with electrical damage
+	HasItemEquiped("RR#MLIW1",FifthNearest([EVILCUTOFF.0.MEPHIT])) // indicates a Lightning Mephit
+	See(FifthNearest([EVILCUTOFF.0.MEPHIT]))
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	HPPercentLT(SixthNearest([EVILCUTOFF.0.MEPHIT]),51) // heal fellow Lightning Mephits with electrical damage
+	HasItemEquiped("RR#MLIW1",SixthNearest([EVILCUTOFF.0.MEPHIT])) // indicates a Lightning Mephit
+	See(SixthNearest([EVILCUTOFF.0.MEPHIT]))
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See([GOODCUTOFF.0.0.MAGE_ALL])
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]))
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See([GOODCUTOFF.0.0.BARD_ALL])
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See(SecondNearest([GOODCUTOFF.0.0.BARD_ALL]))
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See([GOODCUTOFF.0.0.CLERIC_ALL])
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]))
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See([GOODCUTOFF.0.0.DRUID_ALL])
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See(SecondNearest([GOODCUTOFF.0.0.DRUID_ALL]))
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See(MostDamagedOf([PC]))
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See([GOODCUTOFF])
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See(SecondNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See(ThirdNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See(FourthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See(FifthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	GlobalLT("RR#Bwpn","LOCALS",3) // 3x per day
+	See(SixthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTELECTRICITY)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Bwpn","LOCALS",1)
+		ForceSpellRES("RR#MLILB",LastSeenBy(Myself)) // Lightning Bolt
+END
+
+IF
+	!Gender(Myself,3) // the mephit has not been gated
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // open a gate if all other abilities are unavailable
+	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+THEN
+	RESPONSE #25
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1800) // attempts to open an interplanar gate
+		ForceSpellRES("RR#MLIGT",Myself) // Gate (Lightning Mephit version)
+	RESPONSE #75
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1801) // fails to open an interplanar gate
+		SpellNoDec(Myself,DO_NOTHING)
+END
+
+IF
+	OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
+	  See(Player1)
+	  See(Player2)
+	  See(Player3)
+	  See(Player4)
+	  See(Player5)
+	  See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        CheckStatLT([GOODCUTOFF],100,RESISTELECTRICITY)
+	See([GOODCUTOFF]) // note: this block is intended to check for opponents who may be panicked
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SixthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTELECTRICITY)
+	!StateCheck(SixthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+	See(SixthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(FifthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTELECTRICITY)
+	!StateCheck(FifthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+	See(FifthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(FourthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTELECTRICITY)
+	!StateCheck(FourthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+	See(FourthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(ThirdNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTELECTRICITY)
+	!StateCheck(ThirdNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+	See(ThirdNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTELECTRICITY)
+	!StateCheck(SecondNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+	See(SecondNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([GOODCUTOFF],STATE_PANIC)
+        CheckStatLT([GOODCUTOFF],100,RESISTELECTRICITY)
+	!StateCheck([GOODCUTOFF],STATE_MIRRORIMAGE)
+	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([PC.0.0.MAGE]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([PC.0.0.MAGE]),STATE_PANIC)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE]),100,RESISTELECTRICITY)
+	!StateCheck(SecondNearest([PC.0.0.MAGE]),STATE_MIRRORIMAGE)
+	See(SecondNearest([PC.0.0.MAGE])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([PC.0.0.MAGE],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([PC.0.0.MAGE],STATE_PANIC)
+        CheckStatLT([PC.0.0.MAGE],100,RESISTELECTRICITY)
+	!StateCheck([PC.0.0.MAGE],STATE_MIRRORIMAGE)
+	See([PC.0.0.MAGE]) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([PC.0.0.MAGE_THIEF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([PC.0.0.MAGE_THIEF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE_THIEF]),100,RESISTELECTRICITY)
+	!StateCheck(SecondNearest([PC.0.0.MAGE_THIEF]),STATE_MIRRORIMAGE)
+	See(SecondNearest([PC.0.0.MAGE_THIEF])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([PC.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([PC.0.0.MAGE_THIEF],STATE_PANIC)
+        CheckStatLT([PC.0.0.MAGE_THIEF],100,RESISTELECTRICITY)
+	!StateCheck([PC.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
+	See([PC.0.0.MAGE_THIEF]) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(WorstAC([PC]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(WorstAC([PC]),STATE_PANIC)
+        CheckStatLT(WorstAC([PC]),100,RESISTELECTRICITY)
+	!StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
+	See(WorstAC([PC])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTELECTRICITY)
+	Range(LastAttackerOf(Myself),8)
+	RandomNum(3,1)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTELECTRICITY)
+	Range(LastAttackerOf(Myself),4)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(SixthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTELECTRICITY)
+	See(SixthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(FifthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTELECTRICITY)
+	See(FifthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(FourthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTELECTRICITY)
+	See(FourthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(ThirdNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTELECTRICITY)
+	See(ThirdNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(SecondNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTELECTRICITY)
+	See(SecondNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck([GOODCUTOFF],STATE_IMMOBILE)
+        CheckStatLT([GOODCUTOFF],100,RESISTELECTRICITY)
+	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player6,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTELECTRICITY)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTELECTRICITY)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTELECTRICITY)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTELECTRICITY)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTELECTRICITY)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTELECTRICITY)
+	See(Player1)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+        !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
+        OR(2)
+	  !StateCheck(Myself,STATE_BLIND) // don't attack when blinded
+	  Range(LastSeenBy(Myself),2) // unless the target is extremely close by
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle or higher
+        CheckStatLT(LastSeenBy(Myself),100,RESISTELECTRICITY)
+THEN
+	RESPONSE #100
+		AttackReevaluate(LastSeenBy(Myself),30)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+	Help([EVILCUTOFF.0.MEPHIT])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Move","LOCALS",6)
+		MoveToObject(LastHelp(Myself))
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS")
+THEN
+	RESPONSE #100
+		RandomWalkContinuous()
+END
