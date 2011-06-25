@@ -253,7 +253,7 @@ DEFINE_ACTION_FUNCTION integrate_sectypes BEGIN
       END
 
       WRITE_SHORT 0x70 gne
-      ei = ei1 + gne
+      ei = gne = 0 ? 0 : ei1 + gne //Some files have illegal values for ei1, but the engine disregards the illegal value because gne is 0; we do the same 
       ne = 0
       al = "%SOURCE_EXT%" STRING_EQUAL_CASE itm ? 0x38 : 0x28
 
