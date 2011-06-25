@@ -1,3 +1,12 @@
+IF
+	Die() // blocks using the Die trigger must be on top of a script
+        Name("GorWom01",Myself) // Nalmissra
+THEN
+	RESPONSE #100
+		ReallyForceSpellDead(Myself,ILLUSION_DEATH)
+		Wait(1)
+		DestroySelf()
+END
 
 IF
   HasItem("dw#sumfi",Myself)
@@ -8,24 +17,15 @@ THEN
 END
 
 IF
-  OR(3)
+  Global("flNoGating","LOCALS",0)
+  OR(4)
     Exists(LastSummonerOf(Myself))
     Name("RR#HSSUC",Myself)
     Name("KIRINHALE",Myself)
-  Global("flNoGating","LOCALS",0)
+    Name("x#amelia",Myself) // Amelia from BG1 NPCs' Coran quest
 THEN
   RESPONSE #100
     SetGlobal("flNoGating","LOCALS",1)
-END
-
-IF
-	Die()
-        Name("GorWom01",Myself) // Nalmissra
-THEN
-	RESPONSE #100
-		ReallyForceSpellDead(Myself,ILLUSION_DEATH)
-		Wait(1)
-		DestroySelf()
 END
 
 IF

@@ -1,11 +1,23 @@
 IF
 	Global("RR#Active","LOCALS",0)
-	OR(5)
+	OR(4)
 	  AttackedBy([ANYONE],DEFAULT)
 	  TookDamage()
 	  Help([EVILCUTOFF.0.MEPHIT])
-	  See([GOODCUTOFF])
 	  Gender(Myself,3) // gated mephit
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	Global("RR#Active","LOCALS",0)
+        Allegiance(Myself,EVILCUTOFF)
+	See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Active","LOCALS",1)
@@ -67,6 +79,7 @@ IF
 	!Gender(Myself,3) // the mephit has not been gated
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
         OR(3)
           RandomNum(7,1)
 	  HPPercentLT(Myself,31)
@@ -710,6 +723,7 @@ IF
 	!Gender(Myself,3) // the mephit has not been gated
 	!GlobalTimerNotExpired("RR#Cast","LOCALS") // open a gate if all other abilities are unavailable
 	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
 THEN
 	RESPONSE #25
 		SetGlobalTimer("RR#Cast","LOCALS",8)

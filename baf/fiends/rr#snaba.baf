@@ -1,14 +1,5 @@
-
 IF
-  HasItem("dw#sumfi",Myself)
-THEN
-  RESPONSE #100
-    DestroyItem("dw#sumfi")
-    Continue()
-END
-
-IF
-	Die()
+	Die() // blocks using the Die trigger must be on top of a script
         Global("RR#DGaze","LOCALS",1)
         Global("RR#EACheck","LOCALS",1) // Fiend was summoned by an enemy
         Global("RR#XP","LOCALS",0)
@@ -26,13 +17,22 @@ THEN
 END
 
 IF
-	Die()
+	Die() // blocks using the Die trigger must be on top of a script
         Global("RR#EACheck","LOCALS",1) // Fiend was summoned by an enemy
         Global("RR#XP","LOCALS",0)
 THEN
 	RESPONSE #100
                 SetGlobal("RR#XP","LOCALS",1)
                 AddexperienceParty(16000) // Nabassu XP value
+END
+
+
+IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
 END
 
 IF

@@ -228,12 +228,13 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~GORWOM01~                                                           // Nalmissra
                 ~KIRINH~                                                           // Kirinhale, the Succubus in Durlag's Tower (BGT)
                ~_KIRINH~                                                           // Kirinhale, the Succubus in Durlag's Tower (Tutu)
+              ~x#amelia~                                                           // Amelia, the Succubus added by BG1 NPCs during Coran's quest
 BEGIN                                                                              // execute the following
-  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                 // if the file exists
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_succubus END
     BUT_ONLY_IF_IT_CHANGES
-  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+  END                                                                              // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
@@ -467,6 +468,14 @@ ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.spl AND !FiendsOriginal BEGIN //FiendsOri
     WRITE_ASCIIE 0x30 $crefile("%SOURCE_RES%") #8
   BUT_ONLY
 END 
+
+
+// New dialogue
+
+ACTION_IF FILE_EXISTS_IN_GAME ~x#amelia.dlg~ BEGIN                                        // if the file exists
+  COMPILE ~atweaks/dlg/x#amelia.d~                                                        // Make Amelia change into a Sirine instead of a Fire Elemental (BG1 NPCs)
+END                                                                                       // ends ACTION_IF FILE_EXIS
+
 
 
 // New AI Scripts

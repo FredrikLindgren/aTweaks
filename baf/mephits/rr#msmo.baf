@@ -1,5 +1,5 @@
 IF
-	Die()
+	Die() // blocks using the Die trigger must be on top of a script
         Global("RR#MSFF","LOCALS",0) // A Smoke Mephit dissapears in a flash when slain
 THEN
 	RESPONSE #100
@@ -18,12 +18,24 @@ END
 
 IF
 	Global("RR#Active","LOCALS",0)
-	OR(5)
+	OR(4)
 	  AttackedBy([ANYONE],DEFAULT)
 	  TookDamage()
 	  Help([EVILCUTOFF.0.MEPHIT])
-	  See([GOODCUTOFF])
 	  Gender(Myself,3) // gated mephit
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	Global("RR#Active","LOCALS",0)
+        Allegiance(Myself,EVILCUTOFF)
+	See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Active","LOCALS",1)
@@ -105,6 +117,7 @@ IF
 	StateCheck(Myself,STATE_INVISIBLE) // if invisible
 	Range([GOODCUTOFF],4) // and enemies are nearby
 	!GlobalTimerNotExpired("RR#Gate","LOCALS") // and can gate in other mephits
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
 	!Gender(Myself,3) // and the mephit has not been gated
 THEN
 	RESPONSE #100
@@ -115,6 +128,7 @@ IF
 	!Gender(Myself,3) // the mephit has not been gated
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
         OR(4)
           RandomNum(7,1)
 	  HPPercentLT(Myself,31)
@@ -136,6 +150,7 @@ END
 IF
 	StateCheck(Myself,STATE_INVISIBLE) // if invisible
 	!GlobalTimerNotExpired("RR#Gate","LOCALS") // and can gate in other mephits
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
 	!Gender(Myself,3) // and the mephit has not been gated
 THEN
 	RESPONSE #100
@@ -553,6 +568,7 @@ IF
 	!Gender(Myself,3) // the mephit has not been gated
 	!GlobalTimerNotExpired("RR#Cast","LOCALS") // open a gate if all other abilities are unavailable
 	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
 THEN
 	RESPONSE #25
 		SetGlobalTimer("RR#Cast","LOCALS",6)
