@@ -1,14 +1,5 @@
-
 IF
-  HasItem("dw#sumfi",Myself)
-THEN
-  RESPONSE #100
-    DestroyItem("dw#sumfi")
-    Continue()
-END
-
-IF
-	Die()
+	Die() // blocks using the Die trigger must be on top of a script
         Global("RR#EACheck","LOCALS",1) // Fiend was summoned by an enemy
         Global("RR#XP","LOCALS",0)
 THEN
@@ -19,7 +10,7 @@ THEN
 END
 
 IF
-	Die()
+	Die() // blocks using the Die trigger must be on top of a script
         Global("RR#DBFLE","LOCALS",0) // A Balor explodes if slain in the Abyss
 	OR(10)
 	  AreaCheck("AR0414") // Planar Sphere: Abyssal Pocket
@@ -36,6 +27,15 @@ THEN
 	RESPONSE #100
                 SetGlobal("RR#DBFLE","LOCALS",1)
                 ReallyForceSpellDeadRES("RR#DBFLE",Myself) // Death Throes
+END
+
+
+IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
 END
 
 IF

@@ -1,0 +1,938 @@
+IF
+	Die() // blocks using the Die trigger must be on top of a script
+        Global("RR#MSFF","LOCALS",0) // A Smoke Mephit dissapears in a flash when slain
+THEN
+	RESPONSE #100
+                SetGlobal("RR#MSFF","LOCALS",1)
+                ReallyForceSpellDeadRES("RR#MSMFF",Myself) // Flash of Flame
+END
+
+IF
+	HasItemEquiped("RR#MRG1T",Myself) // aTweaks' mephit regeneration ring (1hp/turn)
+	!AreaType(DUNGEON)
+THEN
+	RESPONSE #100
+		DestroyItem("RR#MRG1T") // no regeneration outside of dungeons (smoke from torches)
+		Continue()
+END
+
+IF
+	Global("RR#Active","LOCALS",0)
+	OR(4)
+	  AttackedBy([ANYONE],DEFAULT)
+	  TookDamage()
+	  Help([EVILCUTOFF.0.MEPHIT])
+	  Gender(Myself,3) // gated mephit
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	Global("RR#Active","LOCALS",0)
+        Allegiance(Myself,EVILCUTOFF)
+	See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	OR(4)
+	  Global("RR#Active","LOCALS",0)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+
+	StateCheck(Myself,STATE_PANIC)  // needed because the AI can perform script actions (i.e. drink potions) while panicked, unlike the player
+THEN
+	RESPONSE #100
+		RandomWalkContinuous() // using this instead of NoAction() because otherwise panicked characters would stand in place
+END
+
+IF
+	Global("RR#Active","LOCALS",1)
+	!InActiveArea(Myself)
+	!See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		SetGlobal("RR#Invs","LOCALS",0) // reset Invisibility variable
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+                Rest()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other mephits may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+		Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Invs","LOCALS",0) // 1x per day
+	!StateCheck(Myself,STATE_INVISIBLE)
+	!Global("dvgldust","LOCALS",1)
+	!CheckStatGT(Player1,0,TRUE_SIGHT)
+	!CheckStatGT(Player2,0,TRUE_SIGHT)
+	!CheckStatGT(Player3,0,TRUE_SIGHT)
+	!CheckStatGT(Player4,0,TRUE_SIGHT)
+	!CheckStatGT(Player5,0,TRUE_SIGHT)
+	!CheckStatGT(Player6,0,TRUE_SIGHT)
+	!CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+	!CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#Invs","LOCALS",1)
+                ForceSpellRES("RR#WI206",Myself) // Invisibility
+END
+
+IF
+	StateCheck(Myself,STATE_INVISIBLE) // if invisible
+	Range([GOODCUTOFF],4) // and enemies are nearby
+	!GlobalTimerNotExpired("RR#Gate","LOCALS") // and can gate in other mephits
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
+	!Gender(Myself,3) // and the mephit has not been gated
+THEN
+	RESPONSE #100
+		RandomWalkContinuous() // run away from enemies and cast gate in safety
+END
+
+IF
+	!Gender(Myself,3) // the mephit has not been gated
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
+        OR(4)
+          RandomNum(7,1)
+	  HPPercentLT(Myself,31)
+	  !See([GOODCUTOFF])
+	  StateCheck(Myself,STATE_INVISIBLE) // if invisible
+THEN
+	RESPONSE #25
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1800) // attempts to open an interplanar gate
+		ForceSpellRES("RR#MSMGT",Myself) // Gate (Smoke Mephit version)
+	RESPONSE #75
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1801) // fails to open an interplanar gate
+		SpellNoDec(Myself,DO_NOTHING)
+END
+
+IF
+	StateCheck(Myself,STATE_INVISIBLE) // if invisible
+	!GlobalTimerNotExpired("RR#Gate","LOCALS") // and can gate in other mephits
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
+	!Gender(Myself,3) // and the mephit has not been gated
+THEN
+	RESPONSE #100
+		NoAction() // do nothing else before casting gate
+END
+
+IF
+	StateCheck(Myself,STATE_INVISIBLE) // if invisible
+	OR(2)
+	  GlobalTimerNotExpired("RR#Cast","LOCALS") // and cannot cast spells in the current round
+	  GlobalTimerNotExpired("RR#Bwpn","LOCALS") // and the breath weapon isn't ready
+THEN
+	RESPONSE #100
+		NoAction() // do nothing
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([PC.0.0.RANGER]) // single-class ranger
+        Kit(LastSeenBy(Myself),FERALAN) // archer kit, highest priority
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SecondNearest([PC.0.0.RANGER])) // single-class ranger
+        Kit(LastSeenBy(Myself),FERALAN) // archer kit, highest priority
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(ThirdNearest([PC.0.0.RANGER])) // single-class ranger
+        Kit(LastSeenBy(Myself),FERALAN) // archer kit, highest priority
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(StrongestOf([PC])) // try to blind the strongest party member
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL) // if it's a warrior
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([PC.0.0.FIGHTER_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SecondNearest([PC.0.0.FIGHTER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(ThirdNearest([PC.0.0.FIGHTER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([PC.0.0.RANGER_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SecondNearest([PC.0.0.RANGER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(ThirdNearest([PC.0.0.RANGER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([PC.0.0.PALADIN_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SecondNearest([PC.0.0.PALADIN_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(ThirdNearest([PC.0.0.PALADIN_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(StrongestOf([PC])) // try to blind the strongest party member
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player1) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player2) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player3) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player4) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player5) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(Player6) // prioritize PCs
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See([GOODCUTOFF])
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SecondNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(ThirdNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(FourthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(FifthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Bwpn","LOCALS")
+	See(SixthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Bwpn","LOCALS",12) // breath weapon may be used once per 2 rounds
+		ForceSpellRES("RR#MSMSB",LastSeenBy(Myself)) // Sooty Ball
+END
+
+IF
+	!Gender(Myself,3) // the mephit has not been gated
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // open a gate if all other abilities are unavailable
+	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
+THEN
+	RESPONSE #25
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1800) // attempts to open an interplanar gate
+		ForceSpellRES("RR#MSMGT",Myself) // Gate (Smoke Mephit version)
+	RESPONSE #75
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1801) // fails to open an interplanar gate
+		SpellNoDec(Myself,DO_NOTHING)
+END
+
+IF
+	OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
+	  See(Player1)
+	  See(Player2)
+	  See(Player3)
+	  See(Player4)
+	  See(Player5)
+	  See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
+	See([GOODCUTOFF]) // note: this block is intended to check for opponents who may be panicked
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SixthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(SixthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(SixthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(FifthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(FifthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(FifthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(FourthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(FourthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(FourthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(ThirdNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(ThirdNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),1,STONESKINS)
+	See(ThirdNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(SecondNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),1,STONESKINS)
+	See(SecondNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([GOODCUTOFF],STATE_PANIC)
+        CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
+	!StateCheck([GOODCUTOFF],STATE_MIRRORIMAGE)
+        CheckStatLT([GOODCUTOFF],1,STONESKINS)
+	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([PC.0.0.MAGE]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([PC.0.0.MAGE]),STATE_PANIC)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE]),100,RESISTSLASHING)
+	!StateCheck(SecondNearest([PC.0.0.MAGE]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE]),1,STONESKINS)
+	See(SecondNearest([PC.0.0.MAGE])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([PC.0.0.MAGE],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([PC.0.0.MAGE],STATE_PANIC)
+        CheckStatLT([PC.0.0.MAGE],100,RESISTSLASHING)
+	!StateCheck([PC.0.0.MAGE],STATE_MIRRORIMAGE)
+        CheckStatLT([PC.0.0.MAGE],1,STONESKINS)
+	See([PC.0.0.MAGE]) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([PC.0.0.MAGE_THIEF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([PC.0.0.MAGE_THIEF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE_THIEF]),100,RESISTSLASHING)
+	!StateCheck(SecondNearest([PC.0.0.MAGE_THIEF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE_THIEF]),1,STONESKINS)
+	See(SecondNearest([PC.0.0.MAGE_THIEF])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([PC.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([PC.0.0.MAGE_THIEF],STATE_PANIC)
+        CheckStatLT([PC.0.0.MAGE_THIEF],100,RESISTSLASHING)
+	!StateCheck([PC.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
+        CheckStatLT([PC.0.0.MAGE_THIEF],1,STONESKINS)
+	See([PC.0.0.MAGE_THIEF]) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(WorstAC([PC]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(WorstAC([PC]),STATE_PANIC)
+        CheckStatLT(WorstAC([PC]),100,RESISTSLASHING)
+	!StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
+        CheckStatLT(WorstAC([PC]),1,STONESKINS)
+	See(WorstAC([PC])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
+	Range(LastAttackerOf(Myself),8)
+	RandomNum(3,1)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
+	Range(LastAttackerOf(Myself),4)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(SixthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(SixthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(FifthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(FifthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(FourthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(FourthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(ThirdNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(ThirdNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(SecondNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(SecondNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck([GOODCUTOFF],STATE_IMMOBILE)
+        CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
+	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player6,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTSLASHING)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTSLASHING)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTSLASHING)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTSLASHING)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTSLASHING)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTSLASHING)
+	See(Player1)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+        !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
+        OR(2)
+	  !StateCheck(Myself,STATE_BLIND) // don't attack when blinded
+	  Range(LastSeenBy(Myself),2) // unless the target is extremely close by
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle or higher
+        CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
+THEN
+	RESPONSE #100
+		AttackReevaluate(LastSeenBy(Myself),30)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+	Help([EVILCUTOFF.0.MEPHIT])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Move","LOCALS",6)
+		MoveToObject(LastHelp(Myself))
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS")
+THEN
+	RESPONSE #100
+		RandomWalkContinuous()
+END

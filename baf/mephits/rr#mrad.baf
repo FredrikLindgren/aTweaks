@@ -1,0 +1,1664 @@
+IF
+	HasItemEquiped("RR#MRG1T",Myself) // aTweaks' mephit regeneration ring (1hp/turn)
+	!AreaType(OUTDOOR)
+THEN
+	RESPONSE #100
+		DestroyItem("RR#MRG1T") // only regenerate outdoors
+		Continue()
+END
+
+IF
+	HasItemEquiped("RR#MRG1T",Myself) // aTweaks' mephit regeneration ring (1hp/turn)
+        TimeGT(DUSK_START)
+        TimeLT(DAWN_START)
+THEN
+	RESPONSE #100
+		DestroyItem("RR#MRG1T") // don't regenerate during the night
+END
+
+IF
+	Global("RR#Active","LOCALS",0)
+	OR(4)
+	  AttackedBy([ANYONE],DEFAULT)
+	  TookDamage()
+	  Help([EVILCUTOFF.0.MEPHIT])
+	  Gender(Myself,3) // gated mephit
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	Global("RR#Active","LOCALS",0)
+        Allegiance(Myself,EVILCUTOFF)
+	See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	OR(4)
+	  Global("RR#Active","LOCALS",0)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+
+	StateCheck(Myself,STATE_PANIC)  // needed because the AI can perform script actions (i.e. drink potions) while panicked, unlike the player
+THEN
+	RESPONSE #100
+		RandomWalkContinuous() // using this instead of NoAction() because otherwise panicked characters would stand in place
+END
+
+IF
+	Global("RR#Active","LOCALS",1)
+	!InActiveArea(Myself)
+	!See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		SetGlobal("RR#Cspr","LOCALS",0) // reset Color Spray variable
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+                Rest()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Turn","LOCALS") // breath weapon should recharge every turn
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Turn","LOCALS",60)
+		SetGlobal("RR#Cspr","LOCALS",0) // reset Color Spray variable
+                Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other mephits may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+		Continue()
+END
+
+IF
+	OR(11)
+	  StateCheck([GOODCUTOFF],STATE_ILLUSIONS)
+	  StateCheck(SecondNearest([GOODCUTOFF]),STATE_ILLUSIONS)
+	  StateCheck(ThirdNearest([GOODCUTOFF]),STATE_ILLUSIONS)
+	  StateCheck(FourthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
+	  StateCheck(FifthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
+	  StateCheck(SixthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
+	  StateCheck(SeventhNearest([GOODCUTOFF]),STATE_ILLUSIONS)
+	  StateCheck(EighthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
+	  StateCheck(NinthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
+	  StateCheck(TenthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
+	  See([GOODCUTOFF.0.0.0.0.ILLUSIONARY])
+THEN
+	RESPONSE #100
+		ReallyForceSpellRES("RR#DDETI",Myself) // Detect Illusion
+		DisplayStringHead(Myself,31858) // Detects Illusion
+END
+
+IF
+	!Gender(Myself,3) // the mephit has not been gated
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
+        OR(3)
+          RandomNum(7,1)
+	  HPPercentLT(Myself,31)
+	  !See([GOODCUTOFF])
+THEN
+	RESPONSE #25
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1800) // attempts to open an interplanar gate
+		ForceSpellRES("RR#MRAGT",Myself) // Gate (Radiant Mephit version)
+	RESPONSE #75
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1801) // fails to open an interplanar gate
+		SpellNoDec(Myself,DO_NOTHING)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID],8)
+	See([GOODCUTOFF.HUMANOID]) // prioritize humanoids
+	!Race(LastSeenBy(Myself),ELF)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL) // low level characters (unconsciousness)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL3)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+	!Race(LastSeenBy(Myself),ELF)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL) // low level characters (unconsciousness)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL3)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(ThirdNearest([GOODCUTOFF.HUMANOID]),8)
+	See(ThirdNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+	!Race(LastSeenBy(Myself),ELF)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL) // low level characters (unconsciousness)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL3)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(FourthNearest([GOODCUTOFF.HUMANOID]),8)
+	See(FourthNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+	!Race(LastSeenBy(Myself),ELF)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL) // low level characters (unconsciousness)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL3)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(FifthNearest([GOODCUTOFF.HUMANOID]),8)
+	See(FifthNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+	!Race(LastSeenBy(Myself),ELF)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL) // low level characters (unconsciousness)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL3)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SixthNearest([GOODCUTOFF.HUMANOID]),8)
+	See(SixthNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+	!Race(LastSeenBy(Myself),ELF)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL) // low level characters (unconsciousness)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),7,LEVEL3)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID.0.FIGHTER],8)
+	See([GOODCUTOFF.HUMANOID.0.FIGHTER]) // single class fighters are ideal targets for this tier
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	CheckStatGT(LastSeenBy(Myself),6,LEVEL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER])) // single class fighters are ideal targets for this tier
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL],8)
+	See([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL]) // prioritize warriors
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL])) // prioritize warriors
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID.0.RANGER_ALL],8)
+	See([GOODCUTOFF.HUMANOID.0.RANGER_ALL]) // prioritize warriors
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL])) // prioritize warriors
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID.0.PALADIN_ALL],8)
+	See([GOODCUTOFF.HUMANOID.0.PALADIN_ALL]) // prioritize warriors
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID.0.PALADIN_ALL]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.PALADIN_ALL])) // prioritize warriors
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID],8)
+	See([GOODCUTOFF.HUMANOID]) // prioritize humanoids
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself))  // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself))  // Cowl of Acuity
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself))  // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself))  // Cowl of Acuity
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(ThirdNearest([GOODCUTOFF.HUMANOID]),8)
+	See(ThirdNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself))  // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself))  // Cowl of Acuity
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(FourthNearest([GOODCUTOFF.HUMANOID]),8)
+	See(FourthNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself))  // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself))  // Cowl of Acuity
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(FifthNearest([GOODCUTOFF.HUMANOID]),8)
+	See(FifthNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself))  // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself))  // Cowl of Acuity
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SixthNearest([GOODCUTOFF.HUMANOID]),8)
+	See(SixthNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+        LevelLT(LastSeenBy(Myself),9) // mid level characters (blindness)
+        LevelGT(LastSeenBy(Myself),6)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself))  // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself))  // Cowl of Acuity
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID.0.FIGHTER],8)
+	See([GOODCUTOFF.HUMANOID.0.FIGHTER]) // single class fighters are ideal targets for this tier
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER])) // single class fighters are ideal targets for this tier
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL],8)
+	See([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL]) // prioritize warriors
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL])) // prioritize warriors
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID.0.RANGER_ALL],8)
+	See([GOODCUTOFF.HUMANOID.0.RANGER_ALL]) // prioritize warriors
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL])) // prioritize warriors
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID.0.PALADIN_ALL],8)
+	See([GOODCUTOFF.HUMANOID.0.PALADIN_ALL]) // prioritize warriors
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID.0.PALADIN_ALL]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.PALADIN_ALL])) // prioritize warriors
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF.HUMANOID],8)
+	See([GOODCUTOFF.HUMANOID]) // prioritize humanoids
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF.HUMANOID]),8)
+	See(SecondNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(ThirdNearest([GOODCUTOFF.HUMANOID]),8)
+	See(ThirdNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(FourthNearest([GOODCUTOFF.HUMANOID]),8)
+	See(FourthNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(FifthNearest([GOODCUTOFF.HUMANOID]),8)
+	See(FifthNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SixthNearest([GOODCUTOFF.HUMANOID]),8)
+	See(SixthNearest([GOODCUTOFF.HUMANOID])) // prioritize humanoids
+	CheckStatGT(LastSeenBy(Myself),8,LEVEL) // high level characters (confusion)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range([GOODCUTOFF],8)
+	See([GOODCUTOFF]) // low priority targets
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SecondNearest([GOODCUTOFF]),8)
+	See(SecondNearest([GOODCUTOFF])) // low priority targets
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(ThirdNearest([GOODCUTOFF]),8)
+	See(ThirdNearest([GOODCUTOFF])) // low priority targets
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(FourthNearest([GOODCUTOFF]),8)
+	See(FourthNearest([GOODCUTOFF])) // low priority targets
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(FifthNearest([GOODCUTOFF]),8)
+	See(FifthNearest([GOODCUTOFF])) // low priority targets
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Global("RR#Cspr","LOCALS",0) // 1x per turn
+	Range(SixthNearest([GOODCUTOFF]),8)
+	See(SixthNearest([GOODCUTOFF])) // low priority targets
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND) // don't target blinded characters with Color Spray
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	OR(2)
+	  !Range([EVILCUTOFF],8) // try to avoid hitting allies
+	  HasItemEquiped("RR#MRAW1",[EVILCUTOFF]) // Radiant Mephit
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+                IncrementGlobal("RR#Cspr","LOCALS",1)
+		ForceSpellRES("RR#MRACS",LastSeenBy(Myself)) // Color Spray
+END
+
+IF
+	!Gender(Myself,3) // the mephit has not been gated
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // open a gate if all other abilities are unavailable
+	!GlobalTimerNotExpired("RR#Gate","LOCALS")
+        Global("RR#MNOGT","GLOBAL",0) // gating is allowed
+THEN
+	RESPONSE #25
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1800) // attempts to open an interplanar gate
+		ForceSpellRES("RR#MRAGT",Myself) // Gate (Radiant Mephit version)
+	RESPONSE #75
+		SetGlobalTimer("RR#Cast","LOCALS",8)
+		SetGlobalTimer("RR#Gate","LOCALS",300) // a gate can be opened only once per hour
+                DisplayStringHead(Myself,@1801) // fails to open an interplanar gate
+		SpellNoDec(Myself,DO_NOTHING)
+END
+
+IF
+	OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
+	  See(Player1)
+	  See(Player2)
+	  See(Player3)
+	  See(Player4)
+	  See(Player5)
+	  See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
+	See([GOODCUTOFF]) // note: this block is intended to check for opponents who may be panicked
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SixthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(SixthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(SixthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(FifthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(FifthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(FifthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(FourthNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(FourthNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),1,STONESKINS)
+	See(FourthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(ThirdNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(ThirdNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),1,STONESKINS)
+	See(ThirdNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([GOODCUTOFF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	!StateCheck(SecondNearest([GOODCUTOFF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),1,STONESKINS)
+	See(SecondNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([GOODCUTOFF],STATE_PANIC)
+        CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
+	!StateCheck([GOODCUTOFF],STATE_MIRRORIMAGE)
+        CheckStatLT([GOODCUTOFF],1,STONESKINS)
+	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([PC.0.0.MAGE]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([PC.0.0.MAGE]),STATE_PANIC)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE]),100,RESISTSLASHING)
+	!StateCheck(SecondNearest([PC.0.0.MAGE]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE]),1,STONESKINS)
+	See(SecondNearest([PC.0.0.MAGE])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([PC.0.0.MAGE],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([PC.0.0.MAGE],STATE_PANIC)
+        CheckStatLT([PC.0.0.MAGE],100,RESISTSLASHING)
+	!StateCheck([PC.0.0.MAGE],STATE_MIRRORIMAGE)
+        CheckStatLT([PC.0.0.MAGE],1,STONESKINS)
+	See([PC.0.0.MAGE]) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([PC.0.0.MAGE_THIEF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(SecondNearest([PC.0.0.MAGE_THIEF]),STATE_PANIC)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE_THIEF]),100,RESISTSLASHING)
+	!StateCheck(SecondNearest([PC.0.0.MAGE_THIEF]),STATE_MIRRORIMAGE)
+        CheckStatLT(SecondNearest([PC.0.0.MAGE_THIEF]),1,STONESKINS)
+	See(SecondNearest([PC.0.0.MAGE_THIEF])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([PC.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck([PC.0.0.MAGE_THIEF],STATE_PANIC)
+        CheckStatLT([PC.0.0.MAGE_THIEF],100,RESISTSLASHING)
+	!StateCheck([PC.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
+        CheckStatLT([PC.0.0.MAGE_THIEF],1,STONESKINS)
+	See([PC.0.0.MAGE_THIEF]) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(WorstAC([PC]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	!StateCheck(WorstAC([PC]),STATE_PANIC)
+        CheckStatLT(WorstAC([PC]),100,RESISTSLASHING)
+	!StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
+        CheckStatLT(WorstAC([PC]),1,STONESKINS)
+	See(WorstAC([PC])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
+	Range(LastAttackerOf(Myself),8)
+	RandomNum(3,1)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
+	Range(LastAttackerOf(Myself),4)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SixthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(SixthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(SixthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FifthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(FifthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(FifthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(FourthNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(FourthNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(FourthNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(ThirdNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(ThirdNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(ThirdNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(SecondNearest([GOODCUTOFF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(SecondNearest([GOODCUTOFF]),STATE_IMMOBILE)
+        CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTSLASHING)
+	See(SecondNearest([GOODCUTOFF]))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT([GOODCUTOFF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck([GOODCUTOFF],STATE_IMMOBILE)
+        CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
+	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player6,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTSLASHING)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTSLASHING)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTSLASHING)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTSLASHING)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTSLASHING)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTSLASHING)
+	See(Player1)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+        !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
+        OR(2)
+	  !StateCheck(Myself,STATE_BLIND) // don't attack when blinded
+	  Range(LastSeenBy(Myself),2) // unless the target is extremely close by
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle or higher
+        CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
+THEN
+	RESPONSE #100
+		AttackReevaluate(LastSeenBy(Myself),30)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+	Help([EVILCUTOFF.0.MEPHIT])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Move","LOCALS",6)
+		MoveToObject(LastHelp(Myself))
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS")
+THEN
+	RESPONSE #100
+		RandomWalkContinuous()
+END
