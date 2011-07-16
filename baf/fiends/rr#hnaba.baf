@@ -1,12 +1,3 @@
-
-IF
-  HasItem("dw#sumfi",Myself)
-THEN
-  RESPONSE #100
-    DestroyItem("dw#sumfi")
-    Continue()
-END
-
 IF
 	Die()
         Global("RR#DGaze","LOCALS",1)
@@ -22,32 +13,68 @@ THEN
 END
 
 IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
+END
+
+IF
+  Global("flNoGating","LOCALS",0)
+  OR(3)
+    Exists(LastSummonerOf(Myself))
+    Name("TANAR",Myself) // Aec'Letec
+    Name("RR#HSNAB",Myself)
+THEN
+  RESPONSE #100
+    SetGlobal("flNoGating","LOCALS",1)
+END
+
+IF
+  HasItem("MAGE01",Myself) // invisibility item which prevents the party from targeting not-yet-gated fiends
+THEN
+  RESPONSE #100
+    DestroyItem("MAGE01")
+    Continue()
+END
+
+IF
 	Global("RR#Active","LOCALS",0)
-	OR(2)
+	OR(5)
 	  AttackedBy([ANYONE],DEFAULT)
 	  TookDamage()
+	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_CHAOTIC]) // Quasits
+	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // Tanar'ri fiends
+          Name("RR#HSNAB",Myself) // indicates gated fiend
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
 		Enemy()
+		Help()
 		Continue()
 END
 
 IF
 	Global("RR#Active","LOCALS",0)
         Allegiance(Myself,EVILCUTOFF)
-	See([GOODCUTOFF])
+	See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
 		Continue()
 END
 
 IF
-	OR(3)
+	OR(4)
 	  Global("RR#Active","LOCALS",0)
-	  StateCheck(Myself,STATE_REALLY_DEAD)
-	  StateCheck(Myself,STATE_DISABLED)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
 THEN
 	RESPONSE #100
 		NoAction()
@@ -60,6 +87,28 @@ IF
 THEN
 	RESPONSE #100
 		NoAction()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+                SetGlobal("RR#Ethereal","LOCALS",0) // reset Etherealness variable
+                SetGlobal("RR#DGaze","LOCALS",0) // reset Death Gaze variable
+                SetGlobal("RR#DNBGT","LOCALS",0) // reset Nabassu Gating variable
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+                Rest()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+		Continue()
 END
 
 IF
@@ -236,6 +285,7 @@ IF
 	Global("RR#Paralyze","LOCALS",0)
 	See([PC])
 	Range(LastSeenBy(Myself),10)
+        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a paralysis aura
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Paralyze","LOCALS",1)
@@ -324,6 +374,14 @@ THEN
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+  False()
+  Global("flPlaceholder4Gating","LOCALS",0)
+THEN
+  RESPONSE #100
+    Continue()
 END
 
 IF
@@ -472,6 +530,7 @@ IF
 	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
 	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -491,6 +550,7 @@ IF
 	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
 	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -503,6 +563,27 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]))
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+		SetInterrupt(TRUE)
+END
+
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
 	See([GOODCUTOFF.0.0.CLERIC_ALL])
 	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
@@ -511,6 +592,7 @@ IF
 	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
         !SpellCast(LastSeenBy(Myself),WIZARD_VOCALIZE)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -530,6 +612,27 @@ IF
 	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
 	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(ThirdNearest([GOODCUTOFF.0.0.CLERIC_ALL]))
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -549,6 +652,47 @@ IF
 	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
 	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(SecondNearest([GOODCUTOFF.0.0.DRUID_ALL]))
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(ThirdNearest([GOODCUTOFF.0.0.DRUID_ALL]))
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -568,6 +712,47 @@ IF
 	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
 	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(SecondNearest([GOODCUTOFF.0.0.BARD_ALL]))
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(ThirdNearest([GOODCUTOFF.0.0.BARD_ALL]))
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        !Range([EVILCUTOFF.0.DEMONIC.MAGE_ALL.0.0.MASK_CHAOTIC],15) // don't use Silence if (gated) Cambions are nearby
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -849,6 +1034,24 @@ THEN
 END
 
 IF
+	HitBy([GOODCUTOFF],0)
+	!CheckStatGT(LastHitter(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+        !StateCheck(LastHitter(Myself),STATE_PANIC)
+        CheckStatLT(LastHitter(Myself),100,RESISTSLASHING)
+	!StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(LastHitter(Myself),1,STONESKINS)
+	OR(3)
+	  InWeaponRange(LastHitter(Myself))
+	  Range(LastHitter(Myself),4)
+	  RandomNum(3,1)
+	See(LastHitter(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
 	!CheckStatGT(SixthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
 	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
@@ -915,14 +1118,65 @@ THEN
 END
 
 IF
-	HitBy([GOODCUTOFF],0)
-	!CheckStatGT(LastHitter(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-        !StateCheck(LastHitter(Myself),STATE_PANIC)
-        CheckStatLT(LastHitter(Myself),100,RESISTSLASHING)
-	!StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
-        CheckStatLT(LastHitter(Myself),1,STONESKINS)
-	RandomNum(3,1)
-	See(LastHitter(Myself))
+	!CheckStatGT(Player6,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTSLASHING)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTSLASHING)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTSLASHING)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTSLASHING)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTSLASHING)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTSLASHING)
+	See(Player1)
 	False()
 THEN
 	RESPONSE #100
@@ -947,6 +1201,14 @@ THEN
 END
 
 IF
+  False()
+  Global("Placeholder24Gating","LOCALS",0)
+THEN
+  RESPONSE #100
+    Continue()
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!Range(LastSeenBy(Myself),6)
         InMyArea(LastSeenBy(Myself))
@@ -967,14 +1229,24 @@ IF
         !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
 	!CheckStatGT(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
         CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
-        ActionListEmpty()
 THEN
 	RESPONSE #100
 		AttackOneRound(LastSeenBy(Myself))
 END
 
 IF
-	ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+	OR(2)
+	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_CHAOTIC]) // Quasits
+	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // Tanar'ri fiends
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Move","LOCALS",6)
+		MoveToObject(LastHelp(Myself))
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS")
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()

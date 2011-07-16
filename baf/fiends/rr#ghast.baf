@@ -154,6 +154,33 @@ THEN
 END
 
 IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTPIERCING)
+	Range(LastAttackerOf(Myself),8)
+	RandomNum(3,1)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	!CheckStatGT(LastAttackerOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+        !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTPIERCING)
+	Range(LastAttackerOf(Myself),4)
+	See(LastAttackerOf(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
 	!CheckStatGT(SixthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
 	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTPIERCING)
@@ -220,6 +247,72 @@ THEN
 END
 
 IF
+	!CheckStatGT(Player6,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTPIERCING)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTPIERCING)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTPIERCING)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTPIERCING)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTPIERCING)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTPIERCING)
+	See(Player1)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
         !HasItem("RR#DNABA",LastSeenBy(Myself)) // Nabassu melee attack
 	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
         !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
@@ -231,7 +324,6 @@ THEN
 END
 
 IF
-	ActionListEmpty()
 	Allegiance(Myself,EVILCUTOFF)
 	Exists([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC])
 	!Range([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],10)
@@ -245,21 +337,19 @@ THEN
 END
 
 IF
-	ActionListEmpty()
 	Allegiance(Myself,GOODCUTOFF)
 	Exists([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC])
 	!Range([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],10)
         HasItem("RR#DNABA",[GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // Nabassu melee attack
 	InMyArea([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC])
 	InActiveArea(Myself)
-	!See([EVILCUTOFF])
+	!Range([EVILCUTOFF],15)
 THEN
 	RESPONSE #100
 		Formation([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],[-4.-4])
 END
 
 IF
-	ActionListEmpty()
 	!Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],10)
 THEN
 	RESPONSE #100

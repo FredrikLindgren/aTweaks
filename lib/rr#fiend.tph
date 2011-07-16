@@ -334,7 +334,7 @@ COPY_EXISTING ~SPIN558.SPL~  ~override~                                         
    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
     FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
-     WRITE_BYTE  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "-5" // save bonus: -5
+     WRITE_LONG  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "-5" // save bonus: -5
     END
   END
 LAUNCH_PATCH_FUNCTION ~RR#AGLEF~                                                   // Start FUNCTION call (my custom "Add Global Effect" function)
@@ -345,6 +345,8 @@ INT_VAR                                                                         
   "rr#prob1" = "100"                                                               // probability1: 100%
  END                                                                               // end FUNCTION call
 PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                                 // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
+
+COPY ~atweaks/spl/rr#wsh37.spl~ ~override~                                         // Wish: Improved Haste on all party members
 
 COPY_EXISTING ~SPWISH38.SPL~  ~override/RR#WSH38.SPL~                              // Wish: Breach on all enemies in the area
   READ_LONG  0x64 "abil_off"
@@ -378,7 +380,7 @@ WRITE_SHORT 0x22 "13"                                                           
    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
     FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
-     WRITE_BYTE  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "0" // save bonus: 0
+     WRITE_LONG  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) 0  // save bonus: 0
     END
   END
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
@@ -410,7 +412,7 @@ COPY_EXISTING ~SPWI205.SPL~  ~override/RR#DMFEA.SPL~                            
    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
     FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
-     WRITE_BYTE  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "0" // save bonus: 0
+     WRITE_LONG  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "0" // save bonus: 0
     END
   END
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
@@ -428,7 +430,7 @@ COPY_EXISTING ~SPWI104.SPL~  ~override/RR#DCHRM.SPL~                            
       PATCH_IF ("%RR#DURATION%" > 20) BEGIN
         WRITE_LONG  ("%fx_off%" + 0x0e + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "120" // duration: 120 (Glabrezu charisma bonus)
       END
-     WRITE_BYTE  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "0" // save bonus: 0 (Glabrezu charisma bonus)
+     WRITE_LONG  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "0" // save bonus: 0 (Glabrezu charisma bonus)
     END
   END
 
@@ -558,22 +560,16 @@ COPY ~aTweaks/ITM/RR#DGLAB.ITM~ ~override~                                      
 
 COPY ~aTweaks/ITM/RR#DMARI.ITM~ ~override~                                         // Marilith melee attack
 
-COPY ~aTweaks/ITM/RR#DBALR.ITM~ ~override~                                         // Balor melee attack
-LPF DELETE_ITEM_EFFECT INT_VAR opcode_to_delete = "-1" END
-target = 2
-timing = 1
-probability1 = 5
-type = 1
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 139 target parameter1 = 64285 timing probability1 END //string: vorpal hit
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 141 target parameter2 = 39 timing probability1 END //visual: hit, finger of death
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 13 target parameter2 = BIT3 timing probability1 END //Kill target, chunky-style
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 146 target parameter2 = 1 timing probability1 = 56 probability2 = 6 savingtrow = BIT1 STR_VAR resource = rr#dbflw END //flaming whip, save vs breath
+COPY ~atweaks/itm/rr#dbalr.itm~ ~override~                                         // Balor Vorpal Sword (right hand)
+COPY ~atweaks/itm/rr#dbal2.itm~ ~override~                                         // Balor Flaming Whip (left hand)
+
 
 COPY ~aTweaks/ITM/RR#DIMP.ITM~  ~override~                                         // Imp melee attack
 COPY ~aTweaks/ITM/RR#DFCAT.ITM~ ~override~                                         // Fell Cat melee attack
 COPY ~aTweaks/ITM/RR#DABIS.ITM~ ~override~                                         // Abishai melee attack
 COPY ~aTweaks/ITM/RR#DBFND.ITM~ ~override~                                         // Bone Fiend melee attack
 COPY ~aTweaks/ITM/RR#DCORN.ITM~ ~override~                                         // Cornugon melee attack
+COPY ~atweaks/itm/rr#dmaur.itm~ ~override~                                         // Maurezhi melee attack
 
 COPY ~aTweaks/ITM/RR#DGELU.ITM~ ~override~                                         // Gelugon melee attack
 LPF DELETE_ITEM_EFFECT INT_VAR opcode_to_delete = "-1" END
@@ -600,25 +596,12 @@ LPF ADD_ITEM_EFFECT INT_VAR type opcode = 174 target timing = 4 duration probabi
 
 COPY ~aTweaks/ITM/RR#DPITF.ITM~ ~override~                                         // Pit Fiend melee attack
 COPY_EXISTING ~DEMSUC01.ITM~  ~override~                                           // Succubus melee attack
-LAUNCH_PATCH_FUNCTION ~DELETE_ITEM_EFFECT~                                         // add new equipping effect
+LAUNCH_PATCH_FUNCTION ~DELETE_ITEM_EFFECT~                                         // delete effect
 INT_VAR                                                                            // initialize variables
 "opcode_to_delete" = "-1"                                                          // effect: -1 (all effects)
 END
 BUT_ONLY_IF_IT_CHANGES
 
-COPY_EXISTING ~MAUREZHI.ITM~  ~override~                                           // Maurezhi melee attack
-READ_LONG 0x64 abil_off
-READ_SHORT 0x68 abil_num
-READ_LONG 0x6a fx_off
-WRITE_LONG 0x60 "2"                                                                // enchantment level: 2
-  FOR (i = 0; i < "%abil_num%"; i += 1) BEGIN                                      // parse each ability
-  READ_BYTE (%abil_off% + %i% * 0x38) abil_type                                    // read ability type
-    PATCH_IF (%abil_type% = 1) BEGIN                                               // only patch the melee ability header
-      WRITE_SHORT ("%abil_off%" + 0x14) "0"                                        // THAC0 bonus
-      WRITE_SHORT ("%abil_off%" + 0x1a) "4"                                        // damage bonus
-    END
-  END
-BUT_ONLY_IF_IT_CHANGES
 
 COPY_EXISTING ~RINGDEMN.ITM~  ~override~                                           // Fiend immunity ring
 LAUNCH_PATCH_FUNCTION ~DELETE_ITEM_EQEFFECT~                                       // remove equipping effect

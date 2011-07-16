@@ -43,3 +43,15 @@ THEN
                 ActionOverride(LastSummonerOf(Myself),ReallyForceSpell(Myself,WIZARD_METEOR_SWARM))
 		SetInterrupt(TRUE)
 END
+
+IF
+        Global("RR#Wish","GLOBAL",4) // Wish: Improved Haste on all party members
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#Wish","GLOBAL",0) // Wish: None
+		DisplayStringHead(LastSummonerOf(Myself),@698) // I wish for me and my allies to become faster!
+                DisplayStringHead(Myself,@693) // Done.
+                ActionOverride(LastSummonerOf(Myself),ReallyForceSpellRES("RR#WSH37",Myself))
+		SetInterrupt(TRUE)
+END

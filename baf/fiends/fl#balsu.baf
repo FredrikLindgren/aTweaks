@@ -1,12 +1,3 @@
-
-IF
-  HasItem("dw#sumfi",Myself)
-THEN
-  RESPONSE #100
-    DestroyItem("dw#sumfi")
-    Continue()
-END
-
 IF
 	Die()
         Global("RR#DBFLE","LOCALS",0) // A Balor explodes if slain in the Abyss
@@ -25,6 +16,24 @@ THEN
 	RESPONSE #100
                 SetGlobal("RR#DBFLE","LOCALS",1)
                 ReallyForceSpellDeadRES("RR#DBFLE",Myself) // Death Throes
+END
+
+
+IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
+END
+
+IF
+	OR(2)
+	  StateCheck(Myself,STATE_REALLY_DEAD)
+	  StateCheck(Myself,STATE_DISABLED)
+THEN
+	RESPONSE #100
+		NoAction()
 END
 
 IF
@@ -1066,6 +1075,22 @@ THEN
 END
 
 IF
+	HitBy([GOODCUTOFF],0)
+	!CheckStatGT(LastHitter(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+        !StateCheck(LastHitter(Myself),STATE_PANIC)
+        CheckStatLT(LastHitter(Myself),100,RESISTSLASHING)
+	OR(3)
+	  InWeaponRange(LastHitter(Myself))
+	  Range(LastHitter(Myself),4)
+	  RandomNum(3,1)
+	See(LastHitter(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
 	!CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
 	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
@@ -1132,12 +1157,65 @@ THEN
 END
 
 IF
-	HitBy([GOODCUTOFF],0)
-	!CheckStatGT(LastHitter(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-        !StateCheck(LastHitter(Myself),STATE_PANIC)
-        CheckStatLT(LastHitter(Myself),100,RESISTSLASHING)
-	RandomNum(3,1)
-	See(LastHitter(Myself))
+	!CheckStatGT(Player6,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTSLASHING)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTSLASHING)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTSLASHING)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTSLASHING)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTSLASHING)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTSLASHING)
+	See(Player1)
 	False()
 THEN
 	RESPONSE #100
@@ -1173,14 +1251,13 @@ IF
 	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
 	!CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
         CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
-        ActionListEmpty()
 THEN
 	RESPONSE #100
 		AttackReevaluate(LastSeenBy(Myself),15)
 END
 
 IF
-	ActionListEmpty()
+	True()
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()

@@ -1,12 +1,3 @@
-
-IF
-  HasItem("dw#sumfi",Myself)
-THEN
-  RESPONSE #100
-    DestroyItem("dw#sumfi")
-    Continue()
-END
-
 IF
 	Die()
         Global("RR#DGaze","LOCALS",1)
@@ -22,7 +13,23 @@ THEN
 END
 
 IF
-	Global("RR#Active","LOCALS",1)
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
+END
+
+IF
+	OR(2)
+	  StateCheck(Myself,STATE_REALLY_DEAD)
+	  StateCheck(Myself,STATE_DISABLED)
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
 	!InActiveArea(Myself)
 	!See([GOODCUTOFF])
 THEN
@@ -204,6 +211,7 @@ IF
 	Global("RR#Paralyze","LOCALS",0)
 	See([PC])
 	Range(LastSeenBy(Myself),10)
+        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a paralysis aura
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Paralyze","LOCALS",1)
@@ -702,6 +710,24 @@ THEN
 END
 
 IF
+	HitBy([GOODCUTOFF],0)
+	!CheckStatGT(LastHitter(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+        !StateCheck(LastHitter(Myself),STATE_PANIC)
+        CheckStatLT(LastHitter(Myself),100,RESISTSLASHING)
+	!StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(LastHitter(Myself),1,STONESKINS)
+	OR(3)
+	  InWeaponRange(LastHitter(Myself))
+	  Range(LastHitter(Myself),4)
+	  RandomNum(3,1)
+	See(LastHitter(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
 	!CheckStatGT(SixthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
 	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
@@ -768,14 +794,65 @@ THEN
 END
 
 IF
-	HitBy([GOODCUTOFF],0)
-	!CheckStatGT(LastHitter(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-        !StateCheck(LastHitter(Myself),STATE_PANIC)
-        CheckStatLT(LastHitter(Myself),100,RESISTSLASHING)
-	!StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
-        CheckStatLT(LastHitter(Myself),1,STONESKINS)
-	RandomNum(3,1)
-	See(LastHitter(Myself))
+	!CheckStatGT(Player6,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTSLASHING)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTSLASHING)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTSLASHING)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTSLASHING)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTSLASHING)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTSLASHING)
+	See(Player1)
 	False()
 THEN
 	RESPONSE #100
@@ -820,14 +897,13 @@ IF
         !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
 	!CheckStatGT(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
         CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
-        ActionListEmpty()
 THEN
 	RESPONSE #100
 		AttackOneRound(LastSeenBy(Myself))
 END
 
 IF
-	ActionListEmpty()
+	True()
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()

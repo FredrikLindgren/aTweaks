@@ -1,20 +1,17 @@
 IF
   Global("flNoGating","LOCALS",0)
-  OR(2)
+  Global("RR#FNOGT","GLOBAL",0) // fiendish gating is allowed (console toggle)
     !GlobalTimerNotExpired("flGatingTimer","LOCALS")
-    G("flGatingTrue",1)
   !GlobalTimerNotExpired("RR#Cast","LOCALS")
-  OR(2)
-    HPPercentLT(Myself,50)
-    G("flGatingTrue",1)
+  OR(3)
+    HPPercentLT(Myself,51)
+    RandomNum(3,1)
+    !Range([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],15) // no Tanar'ri fiends nearby
   InActiveArea(Myself)
-  RandomNum(2,1)
 THEN
   RESPONSE #100
-    SetInterrupt(FALSE)
-    DisplayStringHead(Myself,10000758) //Attempts to open a gate to the Abyss
-    Wait(5)
-    ReallyForceSpellRES("fl#gtbal",Myself)
+    SetGlobalTimer("RR#Cast","LOCALS",6)
     SetGlobalTimer("flGatingTimer","LOCALS",300)
-    SetInterrupt(TRUE)
+    DisplayStringHead(Myself,10000758) //Attempts to open a gate to the Abyss
+    ForceSpellRES("fl#gtbal",Myself)
 END

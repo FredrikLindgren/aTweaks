@@ -1264,19 +1264,16 @@ COPY_EXISTING ~AR0601.ARE~ ~override~                                           
   REPLACE_TEXTUALLY CASE_INSENSITIVE "MEPFIR01" "MEPSMO01"                         // replace Fire Mephits with Smoke Mephits (note: name lengths must be the same)
   READ_LONG  0x54 "actor_off"
   READ_SHORT 0x58 "actor_num"
-  SET "mepmis" = 0
   WHILE ("%actor_num%" > 0) BEGIN
     SET "actor_num" = ("%actor_num%" - 1)
+    READ_SHORT ("%actor_off%" + 0x20 + ("%actor_num%" * 0x110)) "x_coord"
+    READ_SHORT ("%actor_off%" + 0x22 + ("%actor_num%" * 0x110)) "y_coord"
     READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
-    PATCH_IF ("%cre_file%" STRING_EQUAL_CASE "MEPMIS01") BEGIN
-      PATCH_IF ("%mepmis%" = 0) BEGIN
-        SET "mepmis" = 1
-      END ELSE BEGIN
+    PATCH_IF (("%cre_file%" STRING_EQUAL_CASE "MEPMIS01") AND ("%x_coord%" = 1455)) BEGIN
         WRITE_ASCII ("%actor_off%" +        ("%actor_num%" * 0x110)) ~Steam Mephit~ #32
         WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~MEPSTE01~ #8
       END
     END
-  END
 BUT_ONLY_IF_IT_CHANGES
 
 
@@ -1345,3 +1342,14 @@ COPY_EXISTING ~MEPHSP01.BCS~ ~override~                                         
   REPLACE_TEXTUALLY EXACT_MATCH ~See([PC])~ ~!StateCheck(Myself,STATE_REALLY_DEAD) See([PC])~
  COMPILE_BAF_TO_BCS
  BUT_ONLY_IF_IT_CHANGES 
+
+
+// New load screen hints
+
+COPY_EXISTING ~LOADHINT.2DA~ ~override~                                            // Load screen hints (SoA)
+               ~LOADH25.2DA~ ~override~                                            // Load screen hints (ToB)
+COUNT_2DA_ROWS 2 rows
+INSERT_2DA_ROW rows 2 ~%rows%          RR#9003~
+SET rows = rows + 1
+REPLACE ~RR#9003~ @9003                                                            // Mephit gating tip
+BUT_ONLY_IF_IT_CHANGES

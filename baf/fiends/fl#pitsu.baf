@@ -8,6 +8,15 @@ THEN
 END
 
 IF
+	OR(2)
+	  StateCheck(Myself,STATE_REALLY_DEAD)
+	  StateCheck(Myself,STATE_DISABLED)
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
 	!InActiveArea(Myself)
 	!See([GOODCUTOFF])
 THEN
@@ -171,6 +180,7 @@ IF
         !GlobalTimerNotExpired("RR#PFear","LOCALS")
 	See(NearestEnemyOf(Myself))
 	Range(LastSeenBy(Myself),10)
+        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a fear aura
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#PFear","LOCALS",18)
@@ -204,6 +214,40 @@ THEN
 		SetInterrupt(FALSE)
                 SetGlobal("RR#PFWish","LOCALS",1)
                 SetGlobal("RR#Wish","GLOBAL",2) // Wish: Breach on all enemies in the area
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WISH",Myself) // Wish
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        Global("RR#PFWish","LOCALS",0)
+	CheckStat(Myself,0,IMPROVEDHASTE)
+	Range([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],12)
+	Range(SecondNearest([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]),12)
+	Range(ThirdNearest([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]),12) // ideal case, three Baatezu allies are nearby
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#PFWish","LOCALS",1)
+                SetGlobal("RR#Wish","GLOBAL",4) // Wish: Improved Haste on self and nearby allies
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WISH",Myself) // Wish
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        Global("RR#PFWish","LOCALS",0)
+	CheckStat(Myself,0,IMPROVEDHASTE)
+	Range([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],12)
+	Range(SecondNearest([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]),12) // still good, two Baatezu allies are nearby
+	RandomNum(3,1)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#PFWish","LOCALS",1)
+                SetGlobal("RR#Wish","GLOBAL",4) // Wish: Improved Haste on self and nearby allies
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#WISH",Myself) // Wish
 		SetInterrupt(TRUE)
@@ -863,6 +907,24 @@ THEN
 END
 
 IF
+	HitBy([GOODCUTOFF],0)
+	!CheckStatGT(LastHitter(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+        !StateCheck(LastHitter(Myself),STATE_PANIC)
+        CheckStatLT(LastHitter(Myself),100,RESISTSLASHING)
+	!StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(LastHitter(Myself),1,STONESKINS)
+	OR(3)
+	  InWeaponRange(LastHitter(Myself))
+	  Range(LastHitter(Myself),4)
+	  RandomNum(3,1)
+	See(LastHitter(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
 	!CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
 	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
@@ -929,14 +991,65 @@ THEN
 END
 
 IF
-	HitBy([GOODCUTOFF],0)
-	!CheckStatGT(LastHitter(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-        !StateCheck(LastHitter(Myself),STATE_PANIC)
-        CheckStatLT(LastHitter(Myself),100,RESISTSLASHING)
-	!StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
-        CheckStatLT(LastHitter(Myself),1,STONESKINS)
-	RandomNum(3,1)
-	See(LastHitter(Myself))
+	!CheckStatGT(Player6,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTSLASHING)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTSLASHING)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTSLASHING)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTSLASHING)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTSLASHING)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTSLASHING)
+	See(Player1)
 	False()
 THEN
 	RESPONSE #100

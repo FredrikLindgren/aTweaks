@@ -297,6 +297,7 @@ IF
         !GlobalTimerNotExpired("RR#PFear","LOCALS")
 	See(NearestEnemyOf(Myself))
 	Range(LastSeenBy(Myself),10)
+        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a fear aura
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#PFear","LOCALS",18)
@@ -428,6 +429,78 @@ THEN
 		SetInterrupt(FALSE)
                 SetGlobal("RR#PFWish","LOCALS",1)
                 SetGlobal("RR#Wish","GLOBAL",2) // Wish: Breach on all enemies in the area
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WISH",Myself) // Wish
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        Allegiance(Myself,EVILCUTOFF)
+        Global("RR#PFWish","LOCALS",0)
+	CheckStat(Myself,0,IMPROVEDHASTE)
+	Range([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],12)
+	Range(SecondNearest([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]),12)
+	Range(ThirdNearest([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]),12) // ideal case, three Baatezu allies are nearby
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#PFWish","LOCALS",1)
+                SetGlobal("RR#Wish","GLOBAL",4) // Wish: Improved Haste on self and nearby allies
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WISH",Myself) // Wish
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        Allegiance(Myself,EVILCUTOFF)
+        Global("RR#PFWish","LOCALS",0)
+	CheckStat(Myself,0,IMPROVEDHASTE)
+	Range([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],12)
+	Range(SecondNearest([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]),12) // still good, two Baatezu allies are nearby
+	RandomNum(3,1)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#PFWish","LOCALS",1)
+                SetGlobal("RR#Wish","GLOBAL",4) // Wish: Improved Haste on self and nearby allies
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WISH",Myself) // Wish
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        Allegiance(Myself,GOODCUTOFF)
+        Global("RR#PFWish","LOCALS",0)
+	CheckStat(Myself,0,IMPROVEDHASTE)
+	Range([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],12)
+	Range(SecondNearest([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]),12)
+	Range(ThirdNearest([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]),12) // ideal case, three Baatezu allies are nearby
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#PFWish","LOCALS",1)
+                SetGlobal("RR#Wish","GLOBAL",4) // Wish: Improved Haste on self and nearby allies
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WISH",Myself) // Wish
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        Allegiance(Myself,GOODCUTOFF)
+        Global("RR#PFWish","LOCALS",0)
+	CheckStat(Myself,0,IMPROVEDHASTE)
+	Range([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],12)
+	Range(SecondNearest([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]),12) // still good, two Baatezu allies are nearby
+	RandomNum(3,1)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+                SetGlobal("RR#PFWish","LOCALS",1)
+                SetGlobal("RR#Wish","GLOBAL",4) // Wish: Improved Haste on self and nearby allies
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#WISH",Myself) // Wish
 		SetInterrupt(TRUE)
@@ -757,7 +830,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Allegiance(Myself,GOODCUTOFF)
-	!See([EVILCUTOFF])
+	!Range([EVILCUTOFF],15)
 	Detect([EVILCUTOFF])
         !StateCheck(LastSeenBy(Myself),STATE_NONDETECTION)
         !CheckStat(LastSeenBy(Myself),3,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Divination
@@ -1545,6 +1618,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
         CheckStatLT(LastSeenBy(Myself),100,RESISTFIRE)
 	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1594,10 +1668,9 @@ IF
 	!HasItemEquiped("LICH",LastSeenBy(Myself)) // Lich innate Protection from Evil
 	!CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
         CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
-        ActionListEmpty()
 THEN
 	RESPONSE #100
-		AttackOneRound(LastSeenBy(Myself))
+		AttackReevaluate(LastSeenBy(Myself),15)
 END
 
 IF
@@ -1610,7 +1683,7 @@ THEN
 END
 
 IF
-	ActionListEmpty()
+	True()
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()

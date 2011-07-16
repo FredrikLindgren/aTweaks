@@ -205,6 +205,7 @@ IF
         !GlobalTimerNotExpired("RR#PFear","LOCALS")
 	See(NearestEnemyOf(Myself))
 	Range(LastSeenBy(Myself),10)
+        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a fear aura
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#PFear","LOCALS",18)
@@ -1168,7 +1169,6 @@ IF
 	!HasItemEquiped("LICH",LastSeenBy(Myself)) // Lich innate Protection from Evil
 	!CheckStatGT(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
         CheckStatLT(LastSeenBy(Myself),100,RESISTPIERCING)
-        ActionListEmpty()
 THEN
 	RESPONSE #100
 		AttackReevaluate(LastSeenBy(Myself),15)
@@ -1184,7 +1184,7 @@ THEN
 END
 
 IF
-	ActionListEmpty()
+	True()
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()

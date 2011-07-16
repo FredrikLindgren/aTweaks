@@ -8,42 +8,59 @@ THEN
 END
 
 IF
+  Global("flNoGating","LOCALS",0)
   OR(2)
     Exists(LastSummonerOf(Myself))
     Name("RR#HSGEL",Myself)
-  Global("flNoGating","LOCALS",0)
 THEN
   RESPONSE #100
     SetGlobal("flNoGating","LOCALS",1)
 END
 
 IF
+  HasItem("MAGE01",Myself) // invisibility item which prevents the party from targeting not-yet-gated fiends
+THEN
+  RESPONSE #100
+    DestroyItem("MAGE01")
+    Continue()
+END
+
+IF
 	Global("RR#Active","LOCALS",0)
-	OR(2)
+	OR(5)
 	  AttackedBy([ANYONE],DEFAULT)
 	  TookDamage()
+	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_LAWFUL]) // Imps
+	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]) // Baatezu fiends
+          Name("RR#HSGEL",Myself) // indicates gated fiend
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
 		Enemy()
+		Help()
 		Continue()
 END
 
 IF
 	Global("RR#Active","LOCALS",0)
         Allegiance(Myself,EVILCUTOFF)
-	See([GOODCUTOFF])
+	See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
 		Continue()
 END
 
 IF
-	OR(3)
+	OR(4)
 	  Global("RR#Active","LOCALS",0)
-	  StateCheck(Myself,STATE_REALLY_DEAD)
-	  StateCheck(Myself,STATE_DISABLED)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
 THEN
 	RESPONSE #100
 		NoAction()
@@ -59,6 +76,25 @@ THEN
 END
 
 IF
+	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+                Rest()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+  RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+    Continue()
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	OR(2)
           AreaCheck("AR3004") // Dead Magic zone
@@ -66,14 +102,6 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",600) // no spellcasting in Dead Magic zones
-END
-
-IF
-  False()
-  Global("flPlaceholder4Gating","LOCALS",0)
-THEN
-  RESPONSE #100
-    Continue()
 END
 
 IF
@@ -144,6 +172,14 @@ THEN
 	RESPONSE #100
                 SetGlobal("RR#Bhave","LOCALS",0) // Teleport + melee
 		SetGlobalTimer("RR#Tactic","LOCALS",12)
+END
+
+IF
+  False()
+  Global("flPlaceholder4Gating","LOCALS",0)
+THEN
+  RESPONSE #100
+    Continue()
 END
 
 IF
@@ -707,6 +743,24 @@ THEN
 END
 
 IF
+	HitBy([GOODCUTOFF],0)
+	!CheckStatGT(LastHitter(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+        !StateCheck(LastHitter(Myself),STATE_PANIC)
+        CheckStatLT(LastHitter(Myself),100,RESISTPIERCING)
+	!StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
+        CheckStatLT(LastHitter(Myself),1,STONESKINS)
+	OR(3)
+	  InWeaponRange(LastHitter(Myself))
+	  Range(LastHitter(Myself),4)
+	  RandomNum(3,1)
+	See(LastHitter(Myself))
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
 	!CheckStatGT(SixthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
 	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTPIERCING)
@@ -773,14 +827,65 @@ THEN
 END
 
 IF
-	HitBy([GOODCUTOFF],0)
-	!CheckStatGT(LastHitter(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
-        !StateCheck(LastHitter(Myself),STATE_PANIC)
-        CheckStatLT(LastHitter(Myself),100,RESISTPIERCING)
-	!StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
-        CheckStatLT(LastHitter(Myself),1,STONESKINS)
-	RandomNum(3,1)
-	See(LastHitter(Myself))
+	!CheckStatGT(Player6,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(Player6,STATE_IMMOBILE)
+        CheckStatLT(Player6,100,RESISTPIERCING)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player5,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(Player5,STATE_IMMOBILE)
+        CheckStatLT(Player5,100,RESISTPIERCING)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player4,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(Player4,STATE_IMMOBILE)
+        CheckStatLT(Player4,100,RESISTPIERCING)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player3,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(Player3,STATE_IMMOBILE)
+        CheckStatLT(Player3,100,RESISTPIERCING)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player2,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(Player2,STATE_IMMOBILE)
+        CheckStatLT(Player2,100,RESISTPIERCING)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!CheckStatGT(Player1,2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	StateCheck(Player1,STATE_IMMOBILE)
+        CheckStatLT(Player1,100,RESISTPIERCING)
+	See(Player1)
 	False()
 THEN
 	RESPONSE #100
@@ -822,8 +927,17 @@ THEN
 END
 
 IF
+  False()
+  Global("Placeholder24Gating","LOCALS",0)
+THEN
+  RESPONSE #100
+    Continue()
+END
+
+IF
         !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
 	CheckStatGT([EVILCUTOFF],50,RESISTCOLD) // avoid friendly fire, if possible
 	CheckStatGT(SecondNearest([EVILCUTOFF]),50,RESISTCOLD)
 	CheckStatGT(ThirdNearest([EVILCUTOFF]),50,RESISTCOLD)
@@ -862,14 +976,24 @@ IF
 	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
 	!CheckStatGT(LastSeenBy(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
         CheckStatLT(LastSeenBy(Myself),100,RESISTPIERCING)
-        ActionListEmpty()
 THEN
 	RESPONSE #100
 		AttackReevaluate(LastSeenBy(Myself),15)
 END
 
 IF
-	ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+	OR(2)
+	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_LAWFUL]) // Imps
+	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]) // Baatezu fiends
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Move","LOCALS",6)
+		MoveToObject(LastHelp(Myself))
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS")
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()

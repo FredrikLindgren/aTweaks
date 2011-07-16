@@ -1,27 +1,21 @@
 IF
   Global("flNoGating","LOCALS",0)
-  OR(2)
+  Global("RR#FNOGT","GLOBAL",0) // fiendish gating is allowed (console toggle)
     !GlobalTimerNotExpired("flGatingTimer","LOCALS")
-    G("flGatingTrue",1)
   !GlobalTimerNotExpired("RR#Cast","LOCALS")
   OR(2)
-    HPPercentLT(Myself,50)
-    G("flGatingTrue",1)
+    HPPercentLT(Myself,51)
+    RandomNum(4,1)
   InActiveArea(Myself)
-  RandomNum(2,1)
 THEN
   RESPONSE #30
-    SetInterrupt(FALSE)
-    DisplayStringHead(Myself,10000759) //Attempts to open a gate to Baator
-    Wait(5)
-    ReallyForceSpellRES("fl#gtgel",Myself)
+    SetGlobalTimer("RR#Cast","LOCALS",6)
     SetGlobalTimer("flGatingTimer","LOCALS",7200)
-    SetInterrupt(TRUE)
+    DisplayStringHead(Myself,10000759) //Attempts to open a gate to Baator
+    ForceSpellRES("fl#gtgel",Myself)
   RESPONSE #70
-    SetInterrupt(FALSE)
-    DisplayStringHead(Myself,10000759) //Attempts to open a gate to Baator
-    Wait(5)
-    DisplayStringHead(Myself,10000760) //The attempt fails
+    SetGlobalTimer("RR#Cast","LOCALS",6)
     SetGlobalTimer("flGatingTimer","LOCALS",7200)
-    SetInterrupt(TRUE)
+    DisplayStringHead(Myself,10000791) // fails to open a gate to Baator
+    SpellNoDec(Myself,DO_NOTHING)
 END
