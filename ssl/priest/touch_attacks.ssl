@@ -1,0 +1,48 @@
+IF TRIGGER
+  TargetBlock(PCsInOrderShort)
+  TriggerBlock(Disabled|Enemy|SINec|MR50|SpellTurning|MagicDamage50)
+  !CheckStat(scstarget,4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+  Range(scstarget,5)
+  HPPercentGT(scstarget,50)
+  !HasItem("harm",Myself)
+  !HasItem("slaylive",Myself)
+  !HasItem("critical",Myself)
+  !HasItem("serious",Myself)
+THEN DO
+    Combine()
+    Action(SpellMyself,CLERIC_HARM)
+    SetGlobalTimer("flTouchAttack","LOCAL",12)
+END
+
+IF TRIGGER
+  TargetBlock(PCsInOrderShort)
+  TriggerBlock(Disabled|Enemy|SINec|Slayable|MR75|SpellTurning)
+  !CheckStat(scstarget,4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+  Range(scstarget,5)
+  HPPercentGT(scstarget,50)
+  !HasItem("clck26",scstarget)
+  !HasItem("harm",Myself)
+  !HasItem("slaylive",Myself)
+  !HasItem("critical",Myself)
+  !HasItem("serious",Myself)
+THEN DO
+    Combine()
+    Action(SpellMyself,CLERIC_SLAY_LIVING)
+    SetGlobalTimer("flTouchAttack","LOCALS",18)
+END
+
+IF TRIGGER
+  TargetBlock(PCsInOrderShort)
+  TriggerBlock(Disabled|Enemy|SINec|MR75|SpellTurning|MagicDamage50)
+  Range(scstarget,5)
+  !CheckStat(scstarget,4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+  !HasItem("harm",Myself)
+  !HasItem("slaylive",Myself)
+  !HasItem("critical",Myself)
+  !HasItem("serious",Myself)
+THEN DO
+    Combine()
+    Action(SpellMyself,CLERIC_CAUSE_SERIOUS_WOUNDS|100|50)
+    SetGlobalTimer("flTouchAttack","LOCALS",12)
+END
+

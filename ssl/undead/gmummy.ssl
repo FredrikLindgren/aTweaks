@@ -11,7 +11,7 @@ THEN
     Continue()
 END
 
-//E.g. if some stupid undead hasn't realised it's now working for the forces of evil (borrowed from SCSII)
+//If some stupid undead hasn't realised it's now working for the forces of evil (borrowed from SCSII)
 IF
   AttackedBy([ENEMY.UNDEAD],DEFAULT)
   Allegiance(LastAttackerOf(Myself),ENEMY)
@@ -33,53 +33,28 @@ THEN
     NoAction()
 END
 
-//Time to turn any undead, but don't do it too often
+//Turn undead, at most every 3 rounds
 VARIABLE(TurnUndead=True&TurnLevel=17)
 INCLUDE FILE(general/turn.ssl)
 
-//Summons
-IF TRIGGER
-  Target(LastSeenBy(Myself))
-  TriggerBlock(Enemy|CanCastPriest)
-  !See([ENEMY.UNDEAD.0.0.SUMMONED])
-  !See([ENEMY.UNDEAD.0.0.20])
-THEN DO
-  Action(SpellMyself,CLERIC_ANIMATE_DEAD|200|50)
-END
 
-
-
-
-
-IF TRIGGER
-  TargetBlock(PCsPreferringStrong)
-  TriggerBlock(Enemy|Disabled|SIEnc|CanCastPriest|MR50|MinorGlobe|Hold)
-THEN DO
-  Action(Spell,CLERIC_HOLD_PERSON|100|25)
-END
-
-//Symbol, Death
-IF TRIGGER
-  TargetBlock(PCsPreferringWeak)
-  TriggerBlock(Enemy|Disabled|SICon|CanCastPriest|MR50|Slayable)
-THEN DO
-  Action(Spell,1719|100|100)
-END
-
-
-
-
-
-IF TRIGGER
-  Target(LastSeenBy(Myself))
-  TriggerBlock(Enemy|CanCastPriest)
-THEN DO
-  Action(SpellMyself,CLERIC_AERIAL_SERVANT|100|25)
-END
-
-
-
-
-
-
+INCLUDE FILE (priest/use_touch_attacks.ssl)
+INCLUDE FILE (priest/symbol.ssl)
+INCLUDE FILE (priest/summons.ssl)
+INCLUDE FILE (priest/dispel.ssl)
+INCLUDE FILE (priest/protevil.ssl)
+INCLUDE FILE (priest/hold.ssl)
+INCLUDE FILE (priest/group_buffs.ssl)
+INCLUDE FILE (priest/domination.ssl)
+INCLUDE FILE (priest/protlightning.ssl)
+INCLUDE FILE (priest/personal_buffs.ssl)
+INCLUDE FILE (priest/armor_of_faith.ssl)
+INCLUDE FILE (priest/touch_attacks.ssl)
+INCLUDE FILE (priest/true_seeing.ssl)
+INCLUDE FILE (priest/bolt_of_glory.ssl)
+INCLUDE FILE (priest/doom.ssl)
+INCLUDE FILE (priest/greater_command.ssl)
+INCLUDE FILE (priest/blight.ssl)
+INCLUDE FILE (priest/poison.ssl)
+INCLUDE FILE (priest/protmagic.ssl)
 

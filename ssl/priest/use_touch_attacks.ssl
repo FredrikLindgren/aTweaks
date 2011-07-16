@@ -1,0 +1,23 @@
+IF TRIGGER
+  TargetBlock(PCsInOrderShort)
+  TriggerBlock(Disabled|Enemy|SINec|MR50|SpellTurning|MagicDamage50)
+  !CheckStat(scstarget,4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+  !GlobalTimerNotExpired("flTouchAttack","LOCALS")
+  OR(3)
+    HasItem("harm",Myself)
+    HasItem("critical",Myself)
+    HasItem("serious",Myself)
+THEN DO
+    Action(ClericAttack)
+END
+
+IF TRIGGER
+  TargetBlock(PCsInOrderShort)
+  TriggerBlock(Disabled|Enemy|SINec|Slayable|MR75|SpellTurning)
+  !CheckStat(scstarget,4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+  !HasItem("clck26",scstarget)
+  !GlobalTimerNotExpired("flTouchAttack","LOCALS")
+  HasItem("slaylive",Myself)
+THEN DO
+    Action(ClericAttack)
+END
