@@ -204,6 +204,7 @@ IF
         !GlobalTimerNotExpired("RR#PFear","LOCALS")
 	See(NearestEnemyOf(Myself))
 	Range(LastSeenBy(Myself),10)
+        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a fear aura
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#PFear","LOCALS",18)
@@ -993,6 +994,7 @@ END
 IF
         !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
         !Range(LastSeenBy(Myself),6)
         !Race(LastSeenBy(Myself),LICH)
         !Race(LastSeenBy(Myself),RAKSHASA)
@@ -1033,14 +1035,13 @@ IF
 	!HasItemEquiped("LICH",LastSeenBy(Myself)) // Lich innate Protection from Evil
 	!CheckStatGT(LastSeenBy(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
         CheckStatLT(LastSeenBy(Myself),100,RESISTPIERCING)
-        ActionListEmpty()
 THEN
 	RESPONSE #100
 		AttackReevaluate(LastSeenBy(Myself),15)
 END
 
 IF
-	ActionListEmpty()
+	True()
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()

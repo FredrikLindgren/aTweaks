@@ -1,0 +1,19 @@
+IF
+        Global("flNoGating","LOCALS",0)
+        Global("RR#FNOGT","GLOBAL",0) // fiendish gating is allowed (console toggle)
+        Global("RR#ETHPL","LOCALS",0) //Only Gate if we are not ethereal
+        GlobalLT("RR#DNBGT","LOCALS",3) // can gate 3x per day
+        !GlobalTimerNotExpired("RR#Cast","LOCALS") // always open gates if there's nothing better to do
+        InActiveArea(Myself)
+THEN
+	RESPONSE #45
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#DNBGT","LOCALS",1)
+                DisplayStringHead(Myself,10000758) //Attempts to open a gate to the Abyss
+		ForceSpellRES("fl#gtnab",Myself) // Gate (Nabassu version)
+	RESPONSE #55
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                IncrementGlobal("RR#DNBGT","LOCALS",1)
+                DisplayStringHead(Myself,10000790) // fails to open a gate to the Abyss
+		SpellNoDec(Myself,DO_NOTHING)
+END

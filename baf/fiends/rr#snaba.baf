@@ -391,6 +391,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),GOLEM)
 	Range(LastSeenBy(Myself),10)
+        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a paralysis aura
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Paralyze","LOCALS",1)
@@ -733,6 +734,25 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(ThirdNearest([0.0.0.MAGE_ALL]))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
 	See([0.0.0.CLERIC_ALL])
         !Race(LastSeenBy(Myself),LICH)
         !Race(LastSeenBy(Myself),RAKSHASA)
@@ -771,6 +791,25 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(ThirdNearest([0.0.0.CLERIC_ALL]))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
 	See([0.0.0.DRUID_ALL])
         !Race(LastSeenBy(Myself),LICH)
         !Race(LastSeenBy(Myself),RAKSHASA)
@@ -790,7 +829,83 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(SecondNearest([0.0.0.DRUID_ALL]))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(ThirdNearest([0.0.0.DRUID_ALL]))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
 	See([0.0.0.BARD_ALL])
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(SecondNearest([0.0.0.BARD_ALL]))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
+	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("AMUL21",LastSeenBy(Myself)) // Amulet of Power
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Silence","LOCALS",18)
+                ForceSpellRES("RR#PR211",LastSeenBy(Myself)) // Silence 15' Radius
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Silence","LOCALS")
+	See(ThirdNearest([0.0.0.BARD_ALL]))
         !Race(LastSeenBy(Myself),LICH)
         !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_SILENCED)
@@ -1289,14 +1404,13 @@ IF
 	!HasItemEquiped("LICH",LastSeenBy(Myself)) // Lich innate Protection from Evil
 	!CheckStatGT(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
         CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
-        ActionListEmpty()
 THEN
 	RESPONSE #100
 		AttackOneRound(LastSeenBy(Myself))
 END
 
 IF
-	ActionListEmpty()
+	True()
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()

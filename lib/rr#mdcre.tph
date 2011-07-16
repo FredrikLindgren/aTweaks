@@ -42,6 +42,7 @@ INT_VAR                                                                         
 "newrace"  = "999"                                                                 // new race
 "newclass" = "999"                                                                 // new class
 "newgendr" = "999"                                                                 // new gender
+"newsex"   = "99"                                                                  // new sex
 "newalign" = "99"                                                                  // new alignment
 "newhide"  = "999"                                                                 // new Hide in Shadows value
 "newmsil"  = "999"                                                                 // new Move Silently value
@@ -87,6 +88,7 @@ READ_BYTE  0x63   oldrm                                                         
 READ_BYTE  0x234 "oldlvl1"
 READ_BYTE  0x235  oldlvl2
 READ_BYTE  0x236  oldlvl3                                                          // level (first class)
+READ_BYTE  0x237 "oldsex"                                                          // Sex
 READ_BYTE  0x238 "oldstr"                                                          // Strength
 READ_BYTE  0x239 "oldstrx"                                                         // Exceptional Strength
 READ_BYTE  0x23a "oldint"                                                          // Inteligence
@@ -238,6 +240,9 @@ PATCH_IF (("%oldhide%" < "%newhide%") AND ("newhide" != "999")) OR (("%enforce%"
 END
 PATCH_IF (("%oldmsil%" < "%newmsil%") AND ("newmsil" != "999")) OR (("%enforce%" = "1") AND ("%newmsil%" != "999")) BEGIN
   WRITE_BYTE 0x68 "%newhide%"                                                     // set new Hide in Shadows value
+END
+PATCH_IF (("%oldsex%" != "%newsex%") AND ("%newsex%" != "99")) OR (("%enforce%" = "1") AND ("%newsex%" != "99")) BEGIN
+  WRITE_BYTE 0x237 "%newsex%"                                                      // set new Sex value
 END
 
 

@@ -238,6 +238,32 @@ BEGIN                                                                           
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+// Replace one generic Tanar'ri with a Nabassu inside the Planar Sphere
+
+COPY_EXISTING ~AR0414.ARE~ ~override~                                              // Planar Sphere, Abyssal Plane
+  READ_LONG  0x54 "actor_off"
+  READ_SHORT 0x58 "actor_num"
+  WHILE ("%actor_num%" > 0) BEGIN
+    SET "actor_num" = ("%actor_num%" - 1)
+    READ_SHORT ("%actor_off%" + 0x20 + ("%actor_num%" * 0x110)) "x_coord"
+    READ_SHORT ("%actor_off%" + 0x22 + ("%actor_num%" * 0x110)) "y_coord"
+    READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
+    PATCH_IF (("%cre_file%" STRING_EQUAL_CASE "ABYDEM01") AND ("%x_coord%" = 2155)) BEGIN
+      WRITE_ASCII ("%actor_off%" +        ("%actor_num%" * 0x110)) ~Nabassu~ #32
+      WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~OBSDEM05~ #8
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Special case, the restored Planar Sphere Nabassu needs a heart and an allegiance change
+
+COPY_EXISTING ~obsdem05.cre~ ~override~                                            // Restored Planar Sphere Nabassu
+  ADD_CRE_ITEM "MISC6M" #0 #0 #0 none inv1                                         // Demon Heart
+  WRITE_BYTE  0x270 "255"                                                          // set initial allegiance to ENEMY
+BUT_ONLY_IF_IT_CHANGES
+
+
 // Nabassu
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
@@ -245,15 +271,13 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~DEMNAB02~                                                           // Nabassu
 //            ~ENDDEM04~                                                           // Nabassu (unused?)
 //            ~ENDDEM05~                                                           // Nabassu (unused?)
-              ~OBSDEM01~                                                           // Lea'liyl (named Nabassu within the Planar Sphere)
-              ~OBSDEM05~                                                           // Nabassu (cutscene only?)
+              ~OBSDEM05~                                                           // Nabassu
 //             ~PPNAB01~                                                           // Nabassu (cutscene only?)
 //             ~PPNAB02~                                                           // Nabassu (cutscene only?)
 //             ~PPNAB03~                                                           // Nabassu
                ~PMASTER~                                                           // Master of Thralls (named Nabassu within the Planar Prison)
                ~RUMAR02~                                                           // Nabassu
                 ~UDNABA~                                                           // Nabassu
-              ~ABYDEM01~                                                           // Tanar'ri (Nabassu within the Planar Sphere)
               ~TANARI01~                                                           // Tanar'ri (Nabassu within the Planar Sphere)
                  ~TANAR~                                                           // Aec'Letec (BGT)
                 ~_TANAR~                                                           // Aec'Letec (Tutu)
@@ -270,6 +294,7 @@ END                                                                             
 // Glabrezu
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~ABYDEM01~                                                           // Tanar'ri (Planar Sphere, becomes a Glabrezu through aTweaks)
               ~DEMGLA01~                                                           // Glabrezu
                ~DEMGLAB~                                                           // Glabrezu
               ~DEMGLAB2~                                                           // Glabrezu
@@ -316,6 +341,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~ICMARILI~                                                           // Marilith (no animation)
               ~MELSUM05~                                                           // Marilith
               ~GORWOM03~                                                           // Y'tossi (Watcher's Keep final seal Huntress' party)
+              ~OBSDEM01~                                                           // Lea'liyl (named Marilith within the Planar Sphere)
 BEGIN                                                                              // execute the following
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
     COPY_EXISTING ~%file%.cre~ ~override~
@@ -470,12 +496,51 @@ ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.spl AND !FiendsOriginal BEGIN //FiendsOri
 END 
 
 
-// New dialogue
+// New dialogues
 
 ACTION_IF FILE_EXISTS_IN_GAME ~x#amelia.dlg~ BEGIN                                        // if the file exists
   COMPILE ~atweaks/dlg/x#amelia.d~                                                        // Make Amelia change into a Sirine instead of a Fire Elemental (BG1 NPCs)
 END                                                                                       // ends ACTION_IF FILE_EXIS
 
+COMPILE ~atweaks/dlg/obsdem05.d~                                                          // revised Planar Sphere Nabassu dialogue (adds mephit/quasit spawning)
+
+// Revised Planar Sphere Tanar'ri dialogue (removes mephit/quasit spawning)
+COPY_EXISTING abydem01.dlg override 
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("imp01",[1217.1897],2)~ ~~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("imp01",[1030.2269],9)~ ~~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("imp01",[932.1837],0)~ ~~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("impqua01",[780.1918],15)~ ~~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("impqua01",[1289.2230],7)~ ~~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("mepfir01",[1179.2257],7)~ ~~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("mepfir01",[1345.2081],4)~ ~~
+  END
+BUT_ONLY
+
+// Make the Planar Sphere demons' dialogue files pause the game
+
+COPY_EXISTING ~ABYDEM01.DLG~ ~override~
+              ~OBSDEM01.DLG~ ~override~
+              ~OBSDEM05.DLG~ ~override~
+  WRITE_LONG 0x30 0
+BUT_ONLY_IF_IT_CHANGES
+
+// Special case, inlined script change for the new Nabassu in the Planar Sphere quest
+
+<<<<<<<<atweaks/inlined/obsdem05.baf
+IF
+	Global("RR#Intd","LOCALS",0)
+	NumTimesTalkedTo(0)
+        See([PC])
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Intd","LOCALS",1)
+		FaceObject([PC])
+		StartDialogueNoSet([PC])
+END
+>>>>>>>>
+
+COMPILE ~atweaks/inlined/obsdem05.baf~
 
 
 // New AI Scripts
@@ -530,12 +595,12 @@ DECOMPILE_BCS_TO_BAF
 COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
 
-//Planar Sphere Nabassu shouldn't summon Imps
-COPY_EXISTING abydem01.dlg override 
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~"imp01"~ ~"impqua01"~
-  END
-BUT_ONLY
+COPY_EXISTING ~OBSDEM01.BCS~ ~override~                                            // restore Lea'liyl's original dialogue
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~Detect([PC])~ ~NumTimesTalkedTo(0) Detect([PC])~
+  REPLACE_TEXTUALLY EXACT_MATCH ~SetGlobal("summon","LOCALS",1)~ ~SetGlobal("summon","LOCALS",1) FaceObject([PC]) StartDialogueNoSet([PC])~
+COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
 
 //Fix minhp items so the wearer can't be killed by the Nabassu's Death Gaze
 COPY_EXISTING ABAZRING.ITM override
@@ -832,6 +897,25 @@ COPY_EXISTING ~MAGE20B.BCS~ ~override~                                          
 DECOMPILE_BCS_TO_BAF                                                               // note: this is basically a bugfix, as ApplySpell() casts the spell at 1st level even if the caster's level is higher than that
   REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~ ~ReallyForceSpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~
 COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
+
+
+// New load screen hints
+
+COPY_EXISTING ~LOADHINT.2DA~ ~override~                                            // Load screen hints (SoA)
+               ~LOADH25.2DA~ ~override~                                            // Load screen hints (ToB)
+COUNT_2DA_ROWS 2 rows
+INSERT_2DA_ROW rows 2 ~%rows%          RR#9000~
+SET rows = rows + 1
+INSERT_2DA_ROW rows 2 ~%rows%          RR#9001~
+SET rows = rows + 1
+INSERT_2DA_ROW rows 2 ~%rows%          RR#9002~
+SET rows = rows + 1
+INSERT_2DA_ROW rows 2 ~%rows%          RR#9004~
+REPLACE ~RR#9000~ @9000                                                            // Etheralness tip
+REPLACE ~RR#9001~ @9001                                                            // Death Gaze tip
+REPLACE ~RR#9002~ @9002                                                            // Fiend gating tip
+REPLACE ~RR#9004~ @9004                                                            // Extraplanar healing immunity tip
 BUT_ONLY_IF_IT_CHANGES
 
 

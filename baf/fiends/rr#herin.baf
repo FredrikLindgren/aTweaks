@@ -8,32 +8,49 @@ THEN
 END
 
 IF
+  HasItem("MAGE01",Myself) // invisibility item which prevents the party from targeting not-yet-gated fiends
+THEN
+  RESPONSE #100
+    DestroyItem("MAGE01")
+    Continue()
+END
+
+IF
 	Global("RR#Active","LOCALS",0)
-	OR(2)
+	OR(5)
 	  AttackedBy([ANYONE],DEFAULT)
 	  TookDamage()
+	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_LAWFUL]) // Imps
+	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]) // Baatezu fiends
+          Name("RR#HSERI",Myself) // indicates gated fiend
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
 		Enemy()
+		Help()
 		Continue()
 END
 
 IF
 	Global("RR#Active","LOCALS",0)
         Allegiance(Myself,EVILCUTOFF)
-	See([GOODCUTOFF])
+	See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
 		Continue()
 END
 
 IF
-	OR(3)
+	OR(4)
 	  Global("RR#Active","LOCALS",0)
-	  StateCheck(Myself,STATE_REALLY_DEAD)
-	  StateCheck(Myself,STATE_DISABLED)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
 THEN
 	RESPONSE #100
 		NoAction()
@@ -46,6 +63,25 @@ IF
 THEN
 	RESPONSE #100
 		NoAction()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+                Rest()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+		Continue()
 END
 
 IF
@@ -81,7 +117,6 @@ IF
 	StateCheck(Myself,STATE_INVISIBLE)
         !Global("RR#AStyle","LOCALS",2) // Out of Ammo
 	Range([GOODCUTOFF],4)
-	ActionListEmpty()
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()
@@ -537,20 +572,6 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#WI203",Myself) // Detect Invisibility
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-        Allegiance(Myself,GOODCUTOFF)
-	!See([EVILCUTOFF])
-	Detect([EVILCUTOFF])
-        !StateCheck(LastSeenBy(Myself),STATE_NONDETECTION)
-        !CheckStat(LastSeenBy(Myself),3,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Divination
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		FaceObject(LastSeenBy(Myself))
-		ForceSpellRES("RR#WI203",Myself) // Detect Invisibility
 END
 
 IF
@@ -1642,7 +1663,7 @@ THEN
 END
 
 IF
-	!HasItemEquiped("shld24",Nearest([GOODCUTOFF])) // Reflection Shield +1
+	!HasItemEquiped("shld24",[GOODCUTOFF]) // Reflection Shield +1
 	!CheckStat([GOODCUTOFF],1,CLERIC_PHYSICAL_MIRROR)
 	!CheckStatGT([GOODCUTOFF],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
 	CheckStatGT([GOODCUTOFF],-5,ACMISSILEMOD)
@@ -1650,6 +1671,84 @@ IF
 	StateCheck([GOODCUTOFF],STATE_IMMOBILE)
 	CheckStatLT([GOODCUTOFF],100,RESISTMISSILE)
 	See([GOODCUTOFF])
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!HasItemEquiped("shld24",Player6) // Reflection Shield +1
+	!CheckStat(Player6,1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStatGT(Player6,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player6,STATE_IMMOBILE)
+	CheckStatLT(Player6,100,RESISTMISSILE)
+	See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!HasItemEquiped("shld24",Player5) // Reflection Shield +1
+	!CheckStat(Player5,1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStatGT(Player5,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player5,STATE_IMMOBILE)
+	CheckStatLT(Player5,100,RESISTMISSILE)
+	See(Player5)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!HasItemEquiped("shld24",Player4) // Reflection Shield +1
+	!CheckStat(Player4,1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStatGT(Player4,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player4,STATE_IMMOBILE)
+	CheckStatLT(Player4,100,RESISTMISSILE)
+	See(Player4)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!HasItemEquiped("shld24",Player3) // Reflection Shield +1
+	!CheckStat(Player3,1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStatGT(Player3,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player3,STATE_IMMOBILE)
+	CheckStatLT(Player3,100,RESISTMISSILE)
+	See(Player3)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!HasItemEquiped("shld24",Player2) // Reflection Shield +1
+	!CheckStat(Player2,1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStatGT(Player2,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player2,STATE_IMMOBILE)
+	CheckStatLT(Player2,100,RESISTMISSILE)
+	See(Player2)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!HasItemEquiped("shld24",Player1) // Reflection Shield +1
+	!CheckStat(Player1,1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStatGT(Player1,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+	StateCheck(Player1,STATE_IMMOBILE)
+	CheckStatLT(Player1,100,RESISTMISSILE)
+	See(Player1)
 	False()
 THEN
 	RESPONSE #100
@@ -1818,15 +1917,24 @@ IF
 	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
 	!CheckStatGT(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
         CheckStatLT(LastSeenBy(Myself),100,RESISTMISSILE)
-        ActionListEmpty()
 THEN
 	RESPONSE #100
 		AttackReevaluate(LastSeenBy(Myself),15)
 END
 
 IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+	OR(2)
+	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_LAWFUL]) // Imps
+	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]) // Baatezu fiends
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Move","LOCALS",6)
+		MoveToObject(LastHelp(Myself))
+END
 
-        ActionListEmpty()
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS")
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()

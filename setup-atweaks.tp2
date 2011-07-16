@@ -1,5 +1,5 @@
 /*************************************************************************
- *               aVENGER's Tweak Pack (aTweaks) version 3.61
+ *               aVENGER's Tweak Pack (aTweaks) version 3.62
  *                            -=by aVENGER=-
  *                http://www.spellholdstudios.net/ie/atweaks
  *************************************************************************/
@@ -8,11 +8,12 @@
 
 BACKUP ~atweaks/backup~
 AUTHOR "Wisp, shsforums.net"                                                       // Author and e-mail address
-VERSION ~v3.61~                                                                    // Mod version
+VERSION ~v3.62~                                                                    // Mod version
 ALWAYS                                                                             // Always do this block
   INCLUDE ~aTweaks/LIB/RR#AGLEF.TPH~                                               // Include my custom "Add Global Effect" function
   INCLUDE ~aTweaks/LIB/RR#SP2IN.TPH~                                               // Include my custom "Spell to Innate" function
   INCLUDE ~aTweaks/LIB/REGEXP.TPH~                                                 // allows regexp to match tabs and newlines (from the G3 BG2 Fixpack)
+  INCLUDE ~aTweaks/lib/tobexfix.tph~                                               // if TobEx is installed, this disables some of its currently buggy options
   INCLUDE "atweaks/lib/rr#mdcre.tph"
   INCLUDE "atweaks/lib/rr#mdcsc.tph"
   INCLUDE "atweaks/lib/lib.tpa"
@@ -1616,6 +1617,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~MELSUM05~                                                           // Marilith (Mellisan summon)
               ~GORWOM03~                                                           // Y'tossi (Watcher's Keep final seal Huntress' party)
               fl#hsmar                                                             //Fiendish Gating 
+              rr#hsmar                                                             //Fiendish Gating 
               d0qpwima                                                             //Quest Pack, Infernal Thievery
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
@@ -1630,6 +1632,22 @@ END                                                                             
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Special case, separate trearment for Lea'liyl
+
+ACTION_IF FILE_EXISTS_IN_GAME ~RR#DMARI.ITM~ BEGIN                                 // check for aTweaks' PnP Fiends component
+COPY_EXISTING ~obsdem01.cre~ ~override~                                            // aTweaks' PnP Fiends component changes Lea'liyl into a Marilith
+PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+PATCH_IF valid BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+// =============================================================================== // the actual work starts from here
+  SAY INITIAL_MEETING @431 SAY BATTLE_CRY1 @431 SAY BATTLE_CRY2 @432 SAY ATTACK1 @433 SAY ATTACK2 @434 SAY ATTACK3 @435 SAY ATTACK4 @436 SAY DAMAGE @437 SAY DYING @438 SAY HURT @439 SAY SELECT_COMMON1 @440 SAY SELECT_COMMON2 @431 SAY SELECT_COMMON3 @432
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file validity check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+
 
 
 
@@ -1713,6 +1731,7 @@ REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                           
 
 
 INCLUDE "atweaks/lib/c510.tpa"
+
 
 /*
 /////////////////////////////////////

@@ -18,54 +18,73 @@ END
 
 IF
   Global("flNoGating","LOCALS",0)
-  OR(4)
+  OR(5)
     Exists(LastSummonerOf(Myself))
     Name("RR#HSSUC",Myself)
     Name("KIRINHALE",Myself)
     Name("x#amelia",Myself) // Amelia from BG1 NPCs' Coran quest
+    CheckStatGT(Myself,0,TRACKING) // indicates gated fiend
 THEN
   RESPONSE #100
     SetGlobal("flNoGating","LOCALS",1)
 END
 
 IF
-	Global("RR#Intdlg","LOCALS",0)
+  HasItem("MAGE01",Myself) // invisibility item which prevents the party from targeting not-yet-gated fiends
+THEN
+  RESPONSE #100
+    DestroyItem("MAGE01")
+    Continue()
+END
+
+IF
+	Global("RR#Intd","LOCALS",0)
         Name("KIRINHALE",Myself) // Kirinhale
 	NumTimesTalkedTo(0)
         See([PC])
 THEN
 	RESPONSE #100
-		SetGlobal("RR#Intdlg","LOCALS",1)
+		SetGlobal("RR#Intd","LOCALS",1)
+		FaceObject([PC])
 		StartDialogueNoSet([PC])
 END
 
 IF
 	Global("RR#Active","LOCALS",0)
-	OR(2)
+	OR(5)
 	  AttackedBy([ANYONE],DEFAULT)
 	  TookDamage()
+	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_CHAOTIC]) // Quasits
+	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // Tanar'ri fiends
+          Name("RR#HSSUC",Myself) // indicates gated fiend
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
 		Enemy()
+		Help()
 		Continue()
 END
 
 IF
 	Global("RR#Active","LOCALS",0)
         Allegiance(Myself,EVILCUTOFF)
-	See([GOODCUTOFF])
+	See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
 THEN
 	RESPONSE #100
 		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
 		Continue()
 END
 
 IF
-	OR(3)
+	OR(4)
 	  Global("RR#Active","LOCALS",0)
-	  StateCheck(Myself,STATE_REALLY_DEAD)
-	  StateCheck(Myself,STATE_DISABLED)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
 THEN
 	RESPONSE #100
 		NoAction()
@@ -81,10 +100,21 @@ THEN
 END
 
 IF
-  False()
-  Global("flPlaceholder4Gating","LOCALS",0)
+	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
 THEN
   RESPONSE #100
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+                Rest()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
     Continue()
 END
 
@@ -319,6 +349,14 @@ IF
 THEN
 	RESPONSE #100
 		NoAction()
+END
+
+IF
+  False()
+  Global("flPlaceholder4Gating","LOCALS",0)
+THEN
+  RESPONSE #100
+    Continue()
 END
 
 IF
@@ -1283,7 +1321,7 @@ THEN
 END
 
 IF
-	ActionListEmpty()
+	True()
         !Range([GOODCUTOFF],30) // no non-charmed party members present
         !Range(LastSeenBy(Myself),2)
 THEN
@@ -1857,7 +1895,6 @@ END
 //END
 
 IF
-        ActionListEmpty()
         Range([GOODCUTOFF],8)
 THEN
 	RESPONSE #100
@@ -1865,7 +1902,6 @@ THEN
 END
 
 IF
-        ActionListEmpty()
 	!Class(LastSeenBy(Myself),MONK)
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
@@ -1897,7 +1933,19 @@ THEN
 END
 
 IF
-        ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+	!StateCheck([EVILCUTOFF.HUMANOID.0.0.0.MALE],STATE_CHARMED)
+	OR(2)
+	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_CHAOTIC]) // Quasits
+	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // Tanar'ri fiends
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Move","LOCALS",6)
+		MoveToObject(LastHelp(Myself))
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS")
 	!StateCheck([EVILCUTOFF.HUMANOID.0.0.0.MALE],STATE_CHARMED)
 THEN
 	RESPONSE #100
