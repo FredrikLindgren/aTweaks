@@ -199,16 +199,11 @@ COMPILE ~aTweaks/BAF/fl#SCRL.BAF~                                               
 
 
 COPY "atweaks/eff/fl#gscrl.eff" override                                           //Give ability eff
-  WRITE_LONG 0x24 9 //timing mode
   WRITE_ASCII 0x30 fl#mscrl
   
 COPY "atweaks/spl/fl#nscrl.spl" override                                           //Protection from fl#gscrl
   LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = "-1" END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 9 STR_VAR resource = fl#gscrl END
-  READ_LONG 0x64 ao
-  FOR (i=0; i<SHORT_AT 0x68; ++i) BEGIN
-    WRITE_SHORT ao + 0x28*i + 0x12 0 //casting time
-  END
      
 COPY "atweaks/eff/fl#sscrl.eff" override                                           //Display string eff
   SAY 0x1c @8270 
@@ -220,10 +215,6 @@ COPY "atweaks/spl/fl#gscrl.spl" override
     END
   END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 timing = 1 STR_VAR resource = fl#nscrl END //Cast spell
-  READ_LONG 0x64 ao
-  FOR (i=0; i<SHORT_AT 0x68; ++i) BEGIN
-    WRITE_SHORT ao + 0x28*i + 0x12 0 //casting time
-  END
 
 OUTER_SPRINT $clabtable(0) clabma01
 OUTER_SET clabcount = 1

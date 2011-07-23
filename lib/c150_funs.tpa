@@ -703,6 +703,9 @@ DEFINE_PATCH_FUNCTION make_cambion BEGIN
     PATCH_IF (%bg1lswrd% < 1) BEGIN                                                    // if the creature has no Large Sword proficiency
       WRITE_BYTE 0x6e 1                                                                // add 1 proficiency point
     END
+    PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~IDEMON01~) BEGIN                       // special case, the trapped Cambion in Irenicus' dungeon
+      ADD_CRE_ITEM ~INVULNER~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~LRING~               // make the Cambion invulnerable while under the protective sphere
+    END
     WRITE_LONG 0x14 6000                                                               // XP when killed
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
@@ -721,12 +724,13 @@ DEFINE_PATCH_FUNCTION make_cambion BEGIN
           "newcr"    = "50"                                                                  // new Resist Cold value
           "newer"    = "100"                                                                 // new Resist Electricity value
           "newlvl1"  = "6"                                                                   // new level (first class)
-          "newstr"   = "19"                                                                  // new Strength value
+          "newstr"   = "18"                                                                  // new Strength value
+          "newstrx"  = "76"                                                                  // new Exceptional Strength value
           "newint"   = "16"                                                                  // new Intelligence value
           "newwis"   = "8"                                                                   // new Wisdom value
           "newdex"   = "16"                                                                  // new Dexterity value
           "newcon"   = "17"                                                                  // new Constitution value
-          "newchr"   = "6"                                                                   // new Charisma value
+          "newchr"   = "18"                                                                  // new Charisma value
           "newmor"   = "14"                                                                  // new morale value
           "newmorb"  = "5"                                                                   // new morale break value
           "newmorr"  = "15"                                                                  // new morale recovery value

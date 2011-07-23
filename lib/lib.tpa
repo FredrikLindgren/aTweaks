@@ -321,6 +321,76 @@ END
       
       
       
+// The Shield spell and amulet should protect from RR/aTweaks' cloned Magic Missile
+DEFINE_ACTION_FUNCTION magic_missile_shield BEGIN
+ACTION_IF !FILE_CONTAINS_EVALUATED (spwi114.spl "RR#WI112") BEGIN
+COPY_EXISTING ~spwi114.spl~ ~override~ // Shield (WIZARD_SHIELD)
+  READ_LONG  0x64 "abil_off" ELSE 0
+  READ_SHORT 0x68 "abil_num" ELSE 0
+  READ_LONG  0x6a "fx_off"   ELSE 0
+  SET "delta" = 0
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN
+    READ_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    SET "abil_fx_idx" = ("%abil_fx_idx%" + "%delta%")
+    WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+     READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
+     READ_ASCII ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "resref"
+     READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "resref"
+      PATCH_IF (("%opcode%" = "206") AND ("%resref%" STRING_EQUAL_CASE ~SPWI112~)) BEGIN           // effect #206: Protection from Spell
+        READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // clone effect
+        SET "index2"= "%abil_fx_num%" // kills loop
+        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30                // new effect
+          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"        // cloned effect
+          WRITE_ASCII           ("%fx_off%" + 0x14 + ("%abil_fx_idx%" * 0x30)) "RR#WI112" #8       // resref (RR/aTweaks cloned Magic Missile)
+        SET "delta" = "%delta%" + 1
+        WRITE_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%" + 1)
+      END
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+COPY_EXISTING ~amul15.itm~   ~override~ // Shield Amulet
+  READ_LONG  0x64 "abil_off" ELSE 0
+  READ_SHORT 0x68 "abil_num" ELSE 0
+  READ_LONG  0x6a "fx_off"   ELSE 0
+  SET "abil_length" = 0x38
+  SET "fx_delta" = 0
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN // start iterating through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + ("%abil_length%" * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + ("%abil_length%" * "%index%")) "abil_fx_idx"
+    SET "abil_fx_idx" = ("%abil_fx_idx%" + "%fx_delta%")
+    WRITE_SHORT ("%abil_off%" + 0x20 + ("%abil_length%" * "%index%")) ("%abil_fx_idx%")
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
+      READ_LONG  ("%fx_off%" + 0x08 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "param2"
+      PATCH_IF (("%opcode%" = "142") AND ("%param2%" = "15")) BEGIN // display shield icon
+        READ_ASCII ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "clone" (48) // clone fx
+        INSERT_BYTES            ("%fx_off%" +        (0x30 * "%abil_fx_idx%")) 0x30           // insert new effect
+          WRITE_EVALUATED_ASCII ("%fx_off%" +        (0x30 * "%abil_fx_idx%")) "%clone%"      // clones effect
+          WRITE_SHORT           ("%fx_off%" +        (0x30 * "%abil_fx_idx%")) "206"          // effect #206: Protection from Spell
+          WRITE_LONG            ("%fx_off%" + 0x04 + (0x30 * "%abil_fx_idx%")) "0"            // param1: 0 (empty strref)
+          WRITE_LONG            ("%fx_off%" + 0x08 + (0x30 * "%abil_fx_idx%")) "0"            // param2: 0
+          WRITE_ASCII           ("%fx_off%" + 0x14 + (0x30 * "%abil_fx_idx%")) ~RR#WI112~ #8  // resref (RR/aTweaks cloned Magic Missile)
+        SET "fx_delta" = "%fx_delta%" + 1
+        SET "abil_fx_num" = "%abil_fx_num%" + 1
+        WRITE_SHORT  ("%abil_off%" + 0x1e + ("%abil_length%" * "%index%")) "%abil_fx_num%"
+        SET "index2" = "%abil_fx_num%" // kills loop
+      END
+    END
+  END
+  BUT_ONLY_IF_IT_CHANGES
+
+ACTION_IF MOD_IS_INSTALLED ITEM_PACK.TP2 2 THEN BEGIN                              // Checks for the Tweaked Items component of Daulmakan's Item Pack
+  COPY_EXISTING ~amul15.itm~   ~override~                                          // Shield Amulet
+    LPF ADD_ITEM_EQEFFECT 
+      INT_VAR opcode = 206 target = 1 timing = 2  
+      STR_VAR resource = RR#WI112
+    END
+END
+END // ends initial ACTION_IF check
+END // ends function definition      
       
       
       
