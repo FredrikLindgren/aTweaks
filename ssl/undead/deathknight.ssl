@@ -112,11 +112,11 @@ IF
 THEN
   RESPONSE #100
     SetGlobalTimer("flFearAura","LOCALS",18)
-    ForceSpellRES("FLDKAURA",Myself)
+    ReallyForceSpellRES("FLDKAURA",Myself)
     Continue()
 END
 
-//E.g. if some stupid undead hasn't realised it's now working for the forces of evil (borrowed from SCSII)
+//If some stupid undead hasn't realised it's now working for the forces of evil (borrowed from SCSII)
 IF
   AttackedBy([ENEMY.UNDEAD],DEFAULT)
   Allegiance(LastAttackerOf(Myself),ENEMY)
@@ -128,8 +128,11 @@ THEN
     Continue()
 END
 
-VARIABLE(ThereAreExtraActions=True&ExtraActions=SetGlobal("flDispel","LOCALS",0) SetGlobal("flSymbol","LOCALS",0) SetGlobal("flPowerWord","LOCALS",0) SetGlobal("flUsedSword","LOCALS",0))
-INCLUDE FILE(include/baseinitial.ssl)
+BEGIN LOOP(ThereAreExtraActions||True)
+BEGIN LOOP(ExtraActions||SetGlobal("flDispel","LOCALS",0) SetGlobal("flSymbol","LOCALS",0) SetGlobal("flPowerWord","LOCALS",0) SetGlobal("flUsedSword","LOCALS",0))
+  INCLUDE FILE(include/baseinitial.ssl)
+END LOOP
+END LOOP
 
 /////////////////////////////////////////////////
 //Detect Invisibility at will
@@ -245,7 +248,7 @@ END
 //20-dice Fireball once per day
 IF TRIGGER
   TargetBlock(PlayersReverse)
-  TriggerBlock(FireRes|MR50|SIEvo|MinorGlobe|Enemy|CanCastMage)
+  TriggerBlock(FireRes50|MR50|SIEvo|MinorGlobe|Enemy|CanCastMage)
   DifficultyGT(EASY) //Only on Core or higher
   CheckStatGT(Myself,49,RESISTMAGIC)
   !HasItem("clck26",scstarget)
@@ -325,7 +328,7 @@ END
 
 IF TRIGGER
   TargetBlock(EnemiesReverseFar)
-  TriggerBlock(MR50|ColdRes|SIEvo|Enemy|CanCastMage)
+  TriggerBlock(MR50|ColdRes50|SIEvo|Enemy|CanCastMage)
   !Range(scstarget,20)
 THEN DO
   Combine()
@@ -334,7 +337,7 @@ END
 
 IF TRIGGER
   TargetBlock(EnemiesReverseClose)
-  TriggerBlock(MR50|ColdRes|SIEvo|Enemy|CanCastMage)
+  TriggerBlock(MR50|ColdRes50|SIEvo|Enemy|CanCastMage)
   CheckStatGT(Myself,49,RESISTMAGIC)
   HPPercentGT(Myself,20)
 THEN DO
@@ -342,7 +345,17 @@ THEN DO
   Action(SpellNoDecRES,"fl#icew"|100|100)
 END
 
-VARIABLE(TurnUndead=True&TurnLevel=6&AttackType=ClericAttack&DamageRes=SlashRes)
-INCLUDE FILE(general/melee_high.ssl)
+//Turn undead and paladins
+BEGIN LOOP(TurnUndead||True)
+BEGIN LOOP(TurnLevel||6)
+  INCLUDE FILE(general/turn.ssl)
+END LOOP
+END LOOP
+  
+BEGIN LOOP(AttackType||ClericAttack)
+BEGIN LOOP(DamageRes||SlashRes)
+  INCLUDE FILE(general/melee_high.ssl)
+END LOOP
+END LOOP
 
 INCLUDE FILE(include/baseend.ssl)

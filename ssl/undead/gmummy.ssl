@@ -6,7 +6,7 @@ IF
   Detect(NearestEnemyOf(Myself))
 THEN
   RESPONSE #100
-    ForceSpellRES("fl#gmumf",Myself)
+    ReallyForceSpellRES("fl#gmumf",Myself)
     SetGlobalTimer("flAura","LOCALS",18)
     Continue()
 END
@@ -34,9 +34,11 @@ THEN
 END
 
 //Turn undead, at most every 3 rounds
-VARIABLE(TurnUndead=True&TurnLevel=17)
-INCLUDE FILE(general/turn.ssl)
-
+BEGIN LOOP(TurnUndead||True)
+BEGIN LOOP(TurnLevel||17)
+  INCLUDE FILE(general/turn.ssl)
+END LOOP
+END LOOP
 
 INCLUDE FILE (priest/use_touch_attacks.ssl)
 INCLUDE FILE (priest/symbol.ssl)
@@ -57,4 +59,15 @@ INCLUDE FILE (priest/greater_command.ssl)
 INCLUDE FILE (priest/blight.ssl)
 INCLUDE FILE (priest/poison.ssl)
 INCLUDE FILE (priest/protmagic.ssl)
+INCLUDE FILE (priest/command.ssl)
 
+//sanctuary - boring for the player
+//silence - can't use without stupidness ensuing
+
+BEGIN LOOP(AttackType||ClericAttack)
+BEGIN LOOP(DamageRes||CrushRes)
+  INCLUDE FILE(general/melee_high.ssl)
+END LOOP
+END LOOP
+
+INCLUDE FILE(include/baseend.ssl)

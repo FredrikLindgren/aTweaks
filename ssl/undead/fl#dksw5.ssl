@@ -14,8 +14,11 @@ THEN
     MoveToObject(LastSummonerOf(Myself))
 END
 
-VARIABLE(DamageRes=SlashRes&AttackType=Attack)
-INCLUDE FILE(general/melee_high.ssl)
+BEGIN LOOP(DamageRes||SlashRes)
+BEGIN LOOP(AttackType||Attack)
+  INCLUDE FILE(general/melee_high.ssl)
+END LOOP
+END LOOP
 
 IF
   See(NearestEnemyOf(Myself))

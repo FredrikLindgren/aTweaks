@@ -1,8 +1,25 @@
 
 INCLUDE FILE(beholder/definitions_beholder.ssl)
 
-VARIABLE(ThereAreExtraActions=True&ExtraActions=SetGlobal("flCone","LOCALS",0) SetGlobal("flBolt","LOCALS",0))
-INCLUDE FILE(include/baseinitial.ssl)
+IF
+  Die()
+THEN
+  RESPONSE #98
+    BEGIN LOOP(loopvar||1;2;3;4;5;6)
+      ReallyForceSpellDeadRES("fl#bhrhl",Playerloopvar)
+    END LOOP
+  RESPONSE #2
+    ReallyForceSpellDeadRES("fl#bhxpl",Myself)
+    BEGIN LOOP(loopvar||1;2;3;4;5;6)
+      ReallyForceSpellDeadRES("fl#bhrhl",Playerloopvar)
+    END LOOP
+END
+
+BEGIN LOOP(ThereAreExtraActions||True)
+BEGIN LOOP(ExtraActions||SetGlobal("flCone","LOCALS",0) SetGlobal("flBolt","LOCALS",0))
+  INCLUDE FILE(include/baseinitial.ssl)
+END LOOP
+END LOOP
 
 //Gauths can apparently use all their eyes all the time
 //1 Cause Serious Wounds
@@ -20,20 +37,6 @@ THEN
   RESPONSE #100
     ReallyForceSpellRES("fl#gauth",Myself)
     SetGlobal("flLightUp","LOCALS",1)
-END
-
-IF
-  Die()
-THEN
-  RESPONSE #98
-    BEGIN LOOP(loopvar||1;2;3;4;5;6)
-      ReallyForceSpellDeadRES("fl#bhrhl",Playerloopvar)
-    END LOOP
-  RESPONSE #2
-    ReallyForceSpellDeadRES("fl#bhxpl",Myself)
-    BEGIN LOOP(loopvar||1;2;3;4;5;6)
-      ReallyForceSpellDeadRES("fl#bhrhl",Playerloopvar)
-    END LOOP
 END
 
 INCLUDE FILE(beholder/gauth_eyes.ssl)
