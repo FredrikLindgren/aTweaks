@@ -289,6 +289,7 @@ SAY NAME1 @687 SAY NAME2 @687
 COPY ~aTweaks/EFF/RR#CNSTR.EFF~ ~override/RR#DENTG.EFF~                            // Rope of Entanglement immunity (for large and incorporeal creatures)
   WRITE_ASCII 0x30 ~RR#DENTG~ #8                                                   // resref: RR#DENTG
 COPY ~aTweaks/SPL/RR#TELWE.SPL~ ~override~                                         // Teleport Without Error
+COPY ~aTweaks/SPL/RR#TELWX.SPL~ ~override~                                         // Teleport Without Error (for teleporting off-screen, also makes the caster invisible for 1 second in order to break spell and attack lock on)
 COPY ~aTweaks/SPL/RR#TELAW.SPL~ ~override~                                         // Teleport Away (Noble Djinn)
 COPY ~aTweaks/SPL/RR#TELAW.SPL~ ~override/RR#PSTHA.SPL~                            // Plane Shift - The Abyss (Glabrezu)
 READ_LONG  0x64 "abil_off"
@@ -527,6 +528,7 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END  
 
 COPY_EXISTING spwi112.spl "override/RR#WI112.spl"                                  //Magic Missile
   LPF RR#SP2IN INT_VAR rr#rinvis = 1 END 
+LAUNCH_ACTION_FUNCTION magic_missile_shield END                                     // Make the Shield spell and amulet protect against the cloned Magic Missile
   
 COPY_EXISTING spwi104.spl "override/RR#WI104.spl"                                  //Charm Person
   LPF RR#SP2IN INT_VAR rr#rinvis = 1 END
