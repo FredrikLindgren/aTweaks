@@ -25,10 +25,10 @@ COPY_EXISTING msectype.2da override
 
 */
 
-DiseaseSecType = fl#Disease
-FearSecType = fl#Fear
+OUTER_SET DiseaseSecType = fl#Disease
+OUTER_SET FearSecType = fl#Fear
   
-ADD_PROJECTILE "atweaks/pro/fl#sight.pro"                                          //INAREANP with twice the radius
+ADD_PROJECTILE "atweaks/pro/fl#sight.pro" //INAREANP with twice the radius
 
 
 //Banshee
@@ -118,11 +118,12 @@ BEGIN
         END
         REPLACE_CRE_ITEM helmnoan #0 #0 #0 none helmet                             //Helmet
         REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring                                //Standard undead immunities
-        LPF ADD_CRE_EFFECT INT_VAR
-                          opcode = 297                                             //Immunity to Turn Undead
-                          target = 1 
-                          timing = 9
-                          paramater2 = 1 END
+        LPF ADD_CRE_EFFECT
+	  INT_VAR
+            opcode = 297 //Immunity to Turn Undead                                            
+            target = 1 
+            timing = 9
+            paramater2 = 1 END
         LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END                   //Invisibility detection by script
         LPF DELETE_CRE_ITEM STR_VAR item_to_delete = "sw2h02\|sw2hdeat\|_?sw2h05" END
         LPF RR#MDCRE
@@ -276,41 +277,33 @@ BEGIN
   END
 END
 
-
 ACTION_IF !BG1 OR BGT BEGIN
-  COPY_EXISTING uddeath.cre  "override/fl#udkn1.cre"
+  COPY_EXISTING uddeath2.cre override
+                deck615.cre  override
+                uddeath.cre  "override/fl#udkn1.cre"
                 uddeath.cre  "override/fl#udkn2.cre"
                 uddeath.cre  "override/fl#udkn3.cre"
                 deathkni.cre "override/fl#wkkn1.cre"
                 deathkni.cre "override/fl#wkkn2.cre"
                 deathkni.cre "override/fl#wkkn3.cre"
-  
-  COPY_EXISTING uddeath.cre  override
-                uddeath2.cre override
-                deathkni.cre override
-                deck615.cre  override
-                fl#udkn1.cre override
-                fl#udkn2.cre override
-                fl#udkn3.cre override
-                fl#wkkn1.cre override
-                fl#wkkn2.cre override
-                fl#wkkn3.cre override
+		uddeath.cre  override
+		deathkni.cre override
     PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
     PATCH_IF valid BEGIN
       r = RANDOM(1 6)
       SPRINT sword $dksw("%r%")
       PATCH_IF r = 1 BEGIN
-        ADD_CRE_ITEM "%sword%" #0 #0 #0 unstealable weapon1 EQUIP
+        REPLACE_CRE_ITEM "%sword%" #0 #0 #0 unstealable weapon1 EQUIP
       END ELSE PATCH_IF r = 2 BEGIN
-        ADD_CRE_ITEM "%sword%" #0 #0 #0 unstealable weapon1 EQUIP TWOHANDED
+        REPLACE_CRE_ITEM "%sword%" #0 #0 #0 unstealable weapon1 EQUIP TWOHANDED
       END ELSE PATCH_IF r = 3 BEGIN
-        ADD_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" weapon1 EQUIP TWOHANDED
+        REPLACE_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" weapon1 EQUIP TWOHANDED
         ADD_CRE_ITEM fl#brsw #0 #0 #0 unstealable inv1
       END ELSE PATCH_IF r = 4 OR r = 6 BEGIN
-        ADD_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" weapon1 EQUIP
+        REPLACE_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" weapon1 EQUIP
         ADD_CRE_ITEM fl#brsw #0 #0 #0 unstealable inv1
       END ELSE BEGIN
-        ADD_CRE_ITEM fl#dksw5 #0 #1 #0 "unstealable&undroppable" weapon1 EQUIP
+        REPLACE_CRE_ITEM fl#dksw5 #0 #1 #0 "unstealable&undroppable" weapon1 EQUIP
         ADD_CRE_ITEM sw2h01 #0 #0 #0 unstealable weapon2 TWOHANDED
         ADD_CRE_ITEM fl#brsw #0 #0 #0 unstealable inv1
       END
@@ -339,14 +332,14 @@ END
 //Ghasts
 
 ACTION_FOR_EACH file IN
-               ghast                                                                //BG1 standard Ghast
-               ghastd                                                               //Durlag's Tower Ghast Trap Ghast
-               _ghast
-               _ghastd
-               ghasts                                                               //Tiax' summoned ghast
-               _ghasts
-               ghast01                                                              //BG2 standard Ghast
-               nevm3                                                                //Nev's undead trap Ghast
+		ghast                                                                //BG1 standard Ghast
+		ghastd                                                               //Durlag's Tower Ghast Trap Ghast
+		_ghast
+		_ghastd
+		ghasts                                                               //Tiax' summoned ghast
+		_ghasts
+		ghast01                                                              //BG2 standard Ghast
+		nevm3                                                                //Nev's undead trap Ghast
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
@@ -571,7 +564,6 @@ BEGIN
 END
 
 COPY "atweaks/itm/fl#glord.itm" override
-  PATCH_PRINT "ADDING EFFECT"
   LPF ADD_ITEM_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 parameter2 = 1 timing = 1 savingthrow = 4 type = 1 STR_VAR resource = fl#glor2 END
 
 COPY "atweaks/spl/fl#base.spl" "override/fl#glor2.spl"
@@ -582,7 +574,7 @@ COPY "atweaks/spl/fl#base.spl" "override/fl#glor2.spl"
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 9 timing = 4 duration = i*300 END
   END
 
-OUTER_SET $AddSecType(fl#glor2.spl) = DiseaseSecType
+OUTER_SET $f_AddSecType(fl#glor2.spl) = DiseaseSecType
 
 COPY "atweaks/eff/fl#glord.eff" override
      
@@ -597,13 +589,13 @@ COPY "atweaks/spl/fl#glord.spl" override
     END
   END
 
-OUTER_SET $AddSecType(fl#glord.spl) = FearSecType
+OUTER_SET $f_AddSecType(fl#glord.spl) = FearSecType
 
 //Mummies
 
 ACTION_FOR_EACH file IN
-               mummy
-               mummy01
+		mummy
+		mummy01
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
@@ -702,8 +694,8 @@ COPY "atweaks/spl/fl#mumfh.spl" override
     END
   END
   
-OUTER_SET $AddSecType(fl#mumfh.spl) = FearSecType
-OUTER_SET $AddSecType(fl#mumfn.spl) = FearSecType
+OUTER_SET $f_AddSecType(fl#mumfh.spl) = FearSecType
+OUTER_SET $f_AddSecType(fl#mumfn.spl) = FearSecType
 
 COPY "atweaks/spl/fl#mum.spl" override
   FOR (i=LONG_AT 0x6a;i<SOURCE_SIZE;i+=0x30) BEGIN
@@ -723,15 +715,15 @@ COPY "atweaks/spl/fl#mum.spl" override
   
 //Spells and items that cure and protect against disease and fear are patched at the end
 
-OUTER_SET $AddSecType(fl#mum.spl) = DiseaseSecType
+OUTER_SET $f_AddSecType(fl#mum.spl) = DiseaseSecType
 
 
 
 // Greater Mummies
 
 ACTION_FOR_EACH file IN
-               mumgre01
-               riftcr03
+		mumgre01
+		riftcr03
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
@@ -851,7 +843,7 @@ COPY "atweaks/spl/fl#mum.spl" "override/fl#gmum.spl"
   END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*300 END
   
-OUTER_SET $AddSecType(fl#gmum.spl) = DiseaseSecType
+OUTER_SET $f_AddSecType(fl#gmum.spl) = DiseaseSecType
 
 //Fear aura
 COPY "atweaks/spl/fl#mumfa.spl" "override/fl#gmumf.spl"
@@ -901,7 +893,7 @@ COPY //"atweaks/spl/fl#mumfh.spl" "override/fl#gmumh.spl"
     WRITE_SHORT ao + 0x28*i + 0x1e ne
   END
 
-OUTER_SET $AddSecType(fl#gmumn.spl) = FearSecType
+OUTER_SET $f_AddSecType(fl#gmumn.spl) = FearSecType
 
 
 
@@ -1016,7 +1008,7 @@ COPY "atweaks/spl/fl#skelw.spl" override
 
 // Scripts
 
-ACTION_IF GAME_IS ~tutu tutu_totsc~ BEGIN
+ACTION_IF BG1 AND !BGT BEGIN
   OUTER_SPRINT DurlagArea fw0516
   OUTER_SPRINT TutuJournal
   "
@@ -1044,7 +1036,7 @@ ACTION_IF GAME_IS ~tutu tutu_totsc~ BEGIN
   OUTER_SPRINT SkeletC _kelet_c
   OUTER_SPRINT killgood _illgood
   OUTER_SPRINT gooddeat _ooddeat
-END ELSE ACTION_IF GAME_IS bgt BEGIN
+END ELSE ACTION_IF BGT BEGIN
   OUTER_SPRINT DurlagArea ard016
   OUTER_SPRINT TutuJournal ""
   OUTER_SPRINT Skelwa bgskelwa
@@ -1069,155 +1061,22 @@ COMPILE ~atweaks/baf/undead/fl#death.baf~
         "atweaks/baf/undead/fl#sklwm.baf"
         "atweaks/baf/undead/fl#sklwr.baf"
         "atweaks/baf/undead/fl#bansh.baf"
+	"atweaks/baf/undead/fl#gmum.baf"
 
 
 
-//Write the queued up values
-ACTION_PHP_EACH AddSecType AS file => SecTypeToAdd BEGIN
+//Write the queued-up values
+ACTION_PHP_EACH f_AddSecType AS file => SecTypeToAdd BEGIN
   COPY_EXISTING "%file%" override
     WRITE_BYTE 0x27 SecTypeToAdd
   BUT_ONLY
 END
 
-//Add the SecTypes to items and spells that should grant immunity or be able to remove them        
-COPY_EXISTING_REGEXP GLOB ~.+\.\(spl\|itm\)$~ override
-  PATCH_IF SOURCE_SIZE > 0x71 BEGIN
-    READ_LONG  0x64 ao
-    READ_SHORT 0x68 na
-    READ_LONG  0x6a eo
-    READ_SHORT 0x6e ei1
-    READ_SHORT 0x70 gne
-    
-    FOR (i=0;i<gne;++i) BEGIN
-      READ_SHORT eo + 0x30*(ei1 + i)       type ELSE 999
-      READ_LONG  eo + 0x30*(ei1 + i) + 0x8 p2   ELSE 999
+OUTER_SET $f_ImmunitySecType(78) = DiseaseSecType
+OUTER_SET $f_ImmunitySecType(24) = FearSecType
 
-      //Fear, on-equip immunity
-      PATCH_IF type = 101 AND p2 = 24 BEGIN
-        PHP_EACH AddSecType AS file => SecTypeToAdd BEGIN
-          PATCH_IF "%SOURCE_EXT%" STRING_EQUAL_CASE itm AND "%file%" STRING_MATCHES_REGEXP ".*\.spl$" = 0 AND SecTypeToAdd = FearSecType BEGIN
-            INNER_PATCH "%file%" BEGIN
-              READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
-            END
-            LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 206 target = 1 timing = 2 STR_VAR resource = EVAL "%spell%" END
-            ++i
-            ++gne
-          END
-        END
-      END
+OUTER_SET $f_RemoveSecType(79) = DiseaseSecType
+OUTER_SET $f_RemoveSecType(161) = FearSecType
 
-      //Disease, on-equip immunity
-      PATCH_IF type = 101 AND p2 = 78 BEGIN
-        PHP_EACH AddSecType AS file => SecTypeToAdd BEGIN
-          PATCH_IF "%SOURCE_EXT%" STRING_EQUAL_CASE itm AND "%file%" STRING_MATCHES_REGEXP ".*\.spl$" = 0 AND SecTypeToAdd = DiseaseSecType BEGIN
-            INNER_PATCH "%file%" BEGIN
-              READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
-            END
-            LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 206 target = 1 timing = 2 STR_VAR resource = EVAL "%spell%" END
-            ++i
-            ++gne
-          END
-        END
-      END
-    END
+LAF integrate_sectypes END
 
-    WRITE_SHORT 0x70 gne
-    ei = ei1 + gne
-    ne = 0
-    al = "%SOURCE_EXT%" STRING_EQUAL_CASE itm ? 0x38 : 0x28
-
-    //Check for effects to remove e.g. fear or disease and effects that grant immunity to e.g. fear or disease
-    FOR (i=0;i<na AND ao + na*al < SOURCE_SIZE;++i) BEGIN
-      ei += ne
-      WRITE_SHORT ao + al*i + 0x20 ei
-      READ_SHORT  ao + al*i + 0x1e ne
-      FOR (j=0;j<ne;++j) BEGIN
-        READ_SHORT eo + 0x30*(ei + j)        type   ELSE 999
-        READ_BYTE  eo + 0x30*(ei + j) + 0x2  target ELSE 0
-        READ_BYTE  eo + 0x30*(ei + j) + 0x3  power  ELSE 0
-        READ_LONG  eo + 0x30*(ei + j) + 0x4  p1     ELSE 999
-        READ_LONG  eo + 0x30*(ei + j) + 0x8  p2     ELSE 999
-        READ_BYTE  eo + 0x30*(ei + j) + 0xc  timing ELSE 0
-        READ_BYTE  eo + 0x30*(ei + j) + 0xd  dr     ELSE 0
-        READ_LONG  eo + 0x30*(ei + j) + 0xe  time   ELSE 0
-
-
-
-        PATCH_IF type = 79 BEGIN //cure disease
-          INSERT_BYTES  eo + 0x30*(ei + j)        0x30
-            WRITE_SHORT eo + 0x30*(ei + j)        221 //remove sec type
-            WRITE_BYTE  eo + 0x30*(ei + j) + 0x2  target
-            WRITE_BYTE  eo + 0x30*(ei + j) + 0x3  power
-            WRITE_LONG  eo + 0x30*(ei + j) + 0x4  9
-            WRITE_LONG  eo + 0x30*(ei + j) + 0x8  DiseaseSecType
-            WRITE_BYTE  eo + 0x30*(ei + j) + 0xc  1
-            WRITE_BYTE  eo + 0x30*(ei + j) + 0x12 100
-          ++ne
-          ++j
-        END
-
-
-
-        PATCH_IF type = 161 BEGIN //remove fear
-          INSERT_BYTES  eo + 0x30*(ei + j)        0x30
-            WRITE_SHORT eo + 0x30*(ei + j)        221 //remove sec type
-            WRITE_BYTE  eo + 0x30*(ei + j) + 0x2  target
-            WRITE_BYTE  eo + 0x30*(ei + j) + 0x3  power
-            WRITE_LONG  eo + 0x30*(ei + j) + 0x4  9
-            WRITE_LONG  eo + 0x30*(ei + j) + 0x8  FearSecType
-            WRITE_BYTE  eo + 0x30*(ei + j) + 0xc  1
-            WRITE_BYTE  eo + 0x30*(ei + j) + 0x12 100
-          ++ne
-          ++j
-        END
-
-
-
-        PATCH_IF type = 101 AND p2 = 78 BEGIN //immunity to disease
-          PHP_EACH AddSecType AS file => SecTypeToAdd BEGIN
-            PATCH_IF "%file%" STRING_MATCHES_REGEXP ".*\.spl$" = 0 AND SecTypeToAdd = DiseaseSecType BEGIN
-              INNER_PATCH "%file%" BEGIN
-                READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
-              END
-              INSERT_BYTES   eo + 0x30*(ei + j)        0x30
-                WRITE_SHORT  eo + 0x30*(ei + j)        206 //protection from spell
-                WRITE_BYTE   eo + 0x30*(ei + j) + 0x2  target
-                WRITE_BYTE   eo + 0x30*(ei + j) + 0x3  power
-                WRITE_BYTE   eo + 0x30*(ei + j) + 0xc  timing
-                WRITE_BYTE   eo + 0x30*(ei + j) + 0xd  dr
-                WRITE_LONG   eo + 0x30*(ei + j) + 0xe  time
-                WRITE_BYTE   eo + 0x30*(ei + j) + 0x12 100
-                WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 "%spell%" #8
-              ++ne
-              ++j
-            END
-          END
-        END
-
-
-
-        PATCH_IF type = 101 AND p2 = 24 BEGIN //immunity to fear
-          PHP_EACH AddSecType AS file => SecTypeToAdd BEGIN
-            PATCH_IF "%file%" STRING_MATCHES_REGEXP ".*\.spl$" AND SecTypeToAdd = FearSecType BEGIN
-              INNER_PATCH "%file%" BEGIN
-                READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
-              END
-              INSERT_BYTES   eo + 0x30*(ei + j)        0x30
-                WRITE_SHORT  eo + 0x30*(ei + j)        206 //protection from spell
-                WRITE_BYTE   eo + 0x30*(ei + j) + 0x2  target
-                WRITE_BYTE   eo + 0x30*(ei + j) + 0x3  power
-                WRITE_BYTE   eo + 0x30*(ei + j) + 0xc  timing
-                WRITE_BYTE   eo + 0x30*(ei + j) + 0xd  dr
-                WRITE_LONG   eo + 0x30*(ei + j) + 0xe  time
-                WRITE_BYTE   eo + 0x30*(ei + j) + 0x12 100
-                WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 "%spell%" #8
-              ++ne
-              ++j
-            END
-          END
-        END
-      END
-      WRITE_SHORT ao + al*i + 0x1e ne
-    END
-  END
-BUT_ONLY

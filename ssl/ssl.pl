@@ -1016,7 +1016,6 @@ foreach (@filelist) {
 
 
 	$inputfile=~s/\\/\//g;
-	print "\n \n Input file is $inputfile \n";
 	read_input();
 
 
