@@ -4,10 +4,10 @@ INCLUDE "atweaks/lib/dsandstuff.tpa"
 
 INCLUDE "atweaks/lib/lib.tpa"
 
-ACTION_IF !FILE_CONTAINS (msectype.2da fl#Disease) BEGIN
+ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
   ADD_SECTYPE fl#Disease @1025
 END
-ACTION_IF !FILE_CONTAINS (msectype.2da fl#Fear) BEGIN
+ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Fear) BEGIN
   ADD_SECTYPE fl#Fear @1027
 END
 
@@ -476,8 +476,8 @@ BEGIN
 END
 
 COPY "atweaks/itm/fl#ghoul.itm" override
-  LPF ADD_ITM_EFFECT INT_VAR type = 1 opcode = 177 target = 2 duration = 1 parameter1 = 2 parameter2 = 4 STR_VAR resource = fl#ghoul END //Protection from fl#ghoul.spl for elves
-  LPF ADD_ITM_EFFECT INT_VAR type = 1 opcode = 146 target = 2 timing = 1 parameter1 = 1 parameter2 = 1 STR_VAR resource = fl#ghoul END //Cast fl#ghoul.spl
+  LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 177 target = 2 duration = 1 parameter1 = 2 parameter2 = 4 STR_VAR resource = fl#ghoul END //Protection from fl#ghoul.spl for elves
+  LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 146 target = 2 timing = 1 parameter1 = 1 parameter2 = 1 STR_VAR resource = fl#ghoul END //Cast fl#ghoul.spl
 
 COPY "atweaks/eff/base.eff" "override/fl#ghoul.eff"
   WRITE_LONG 0x10 206
@@ -566,7 +566,7 @@ END
 COPY "atweaks/itm/fl#glord.itm" override
   LPF ADD_ITEM_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 parameter2 = 1 timing = 1 savingthrow = 4 type = 1 STR_VAR resource = fl#glor2 END
 
-COPY "atweaks/spl/fl#base.spl" "override/fl#glor2.spl"
+COPY "atweaks/spl/base.spl" "override/fl#glor2.spl"
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#glor2 END
   FOR (i=1;i<30;++i) BEGIN
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target = 2 parameter1 = 5 parameter2 = 4194304 timing = 4 duration = i*300 END
@@ -651,8 +651,8 @@ BEGIN
 END
 
 COPY "atweaks/itm/fl#mum.itm" override
-  //LPF ADD_ITM_EFFECT INT_VAR type = 1 opcode = 272 target = 1 timing = 2 parameter1 = 6 parameter2 = 3 STR_VAR resource = fl#mumfa END
-  //LPF ADD_ITM_EFFECT INT_VAR type = 1 opcode = 232 target = 1 timing = 2 parameter1 = 0 parameter2 = 1 STR_VAR resource = fl#mumfa END //cast spell on self every round
+  //LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 272 target = 1 timing = 2 parameter1 = 6 parameter2 = 3 STR_VAR resource = fl#mumfa END
+  //LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 232 target = 1 timing = 2 parameter1 = 0 parameter2 = 1 STR_VAR resource = fl#mumfa END //cast spell on self every round
 
   /*
 COPY "atweaks/eff/base.eff" "override/fl#mumfa.eff"
