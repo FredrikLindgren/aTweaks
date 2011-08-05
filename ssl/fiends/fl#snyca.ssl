@@ -14,14 +14,6 @@
 INCLUDE FILE(fiends/definitions.ssl)
 
 IF
-  HasItem("dw#sumfi",Myself)
-THEN
-  RESPONSE #100
-    DestroyItem("dw#sumfi")
-    Continue()
-END
-
-IF
   Die()
   Global("fl#EACheck","LOCALS",1) // Fiend was summoned by an enemy
   Global("fl#XP","LOCALS",0)
@@ -29,6 +21,14 @@ THEN
   RESPONSE #100
     SetGlobal("fl#XP","LOCALS",1)
     AddexperienceParty(25000) //Nycaloth XP value
+END
+
+IF
+  HasItem("dw#sumfi",Myself)
+THEN
+  RESPONSE #100
+    DestroyItem("dw#sumfi")
+    Continue()
 END
 
 INCLUDE FILE(fiends/include/summoned_check.ssl)
