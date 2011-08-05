@@ -1,5 +1,5 @@
 
-INCLUDE FILE(beholder/definitions_beholder.ssl)
+INCLUDE FILE(beholder/definitions.ssl)
 
 //2-5 eyes are disabled from injuries and undeath
 BEGIN LOOP(loopvar||2;3;4;5)
@@ -389,7 +389,7 @@ INCLUDE FILE(beholder/standard_eyes.ssl)
 //Disrupt enemy spellcasting
 IF TRIGGER
   Global("flDisabled11","LOCALS",0)
-  TargetBlock(PureCasters)
+  TargetBlock(GoodPureCasters)
   TriggerBlock(Enemy|Disabled)
   OR(7) //otherwise it misbehaves when no caster has been seen and starts shooting at anyone
     Class(scstarget,MAGE)
@@ -422,7 +422,7 @@ END
 //Deal with Fighter/Casters
 IF TRIGGER
   Global("flDisabled11","LOCALS",0)
-  TargetBlock(FighterCasters)
+  TargetBlock(GoodFighterCasters)
   TriggerBlock(Enemy|Disabled)
   OR(3)
     Class(scstarget,FIGHTER_MAGE)
@@ -500,7 +500,7 @@ END
 ////////////////////////////////////////
 IF TRIGGER
   Global("flDisabled1","LOCALS",0)
-  TargetBlock(HumanoidsPreferringStrong)
+  TargetBlock(GoodHumanoidsPreferringStrong)
   TriggerBlock(Charm|Disabled|Enemy|MinorGlobe|SIEnc)
 THEN DO
   Combine()
@@ -540,7 +540,7 @@ END
 ////////////////////////////////////////
 IF TRIGGER
   Global("flDisabled10","LOCALS",0)
-  TargetBlock(Summons)
+  TargetBlock(GoodSummons)
   OR(2)
     Gender(scstarget,SUMMONED)
     Gender(scstarget,20)
