@@ -517,40 +517,41 @@ COMPILE "atweaks/baf/beholder/fl#behol.baf"
         "atweaks/baf/beholder/fl#bhdir.baf"
 
 //Beholders should not be healed if an eye-stalk is destroyed by area-effect magic
-ACTION_FOR_EACH file IN spblun29
-                        spcl412b
-                        spcl414b 
-                        spcl910b 
-                        spcl911b 
-                        spcl722 
-                        spdr301 
-                        spdr601 
-                        sppr302 
-                        sppr304 
-                        sppr313 
-                        sppr314 
-                        sppr503 
-                        sppr705 
-                        sppr707 
-                        sppr720
-                        spwi103 
-                        spwi304 
-                        spwi308 
-                        spwi313 
-                        spwi404
-                        spwi502 
-                        spwi503 
-                        spwi523 
-                        spwi614
-                        spwi615 
-                        spwi712 
-                        spwi714 
-                        spwi810
-                        spwi812 
-                        spwi911 
-                        spwish24
-                        spwish32
-                        spwm188
+ACTION_FOR_EACH file IN 
+		spblun29
+                spcl412b
+                spcl414b 
+                spcl910b 
+                spcl911b 
+                spcl722 
+                spdr301 
+                spdr601 
+                sppr302 
+                sppr304 
+                sppr313 
+                sppr314 
+                sppr503 
+                sppr705 
+                sppr707 
+                sppr720
+                spwi103 
+                spwi304 
+                spwi308 
+                spwi313 
+                spwi404
+                spwi502 
+                spwi503 
+                spwi523 
+                spwi614
+                spwi615 
+                spwi712 
+                spwi714 
+                spwi810
+                spwi812 
+                spwi911 
+                spwish24
+                spwish32
+                spwm188
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.spl" BEGIN
     COPY_EXISTING "%file%.spl" override
@@ -563,35 +564,62 @@ BEGIN
   END
 END
 
-OUTER_SET
-
-ACTION_FOR_EACH file IN amul01
-                        arow06
-                        misc3h
-                        potn13
-                        potn26
-                        potn27
-                        ring27 //header 1 and 2
+//This doesn't work right. We almost need per-item code
+/*
+ACTION_FOR_EACH file IN 
+		amul01
+                arow06
+                misc3h
+                potn13
+                potn26
+                potn27
+                ring27 //header 1 and 2
 //Fire Seeds            ring33
-                        staf13 //header 2
-                        wand05 //header 0
-                        wand06
-                        wand07
-                        wand11
-                        wand12
-                        wand13
-                        wand15
+                staf13 //header 2
+                wand05 //header 0
+                wand06
+                wand07
+                wand11
+                wand12
+                wand13
+                wand15
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.itm" BEGIN
     COPY_EXISTING "%file%.itm" override
       PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+	READ_LONG 0x64 ao
+	READ_LONG 0x6a eo
+	done = 0
+	FOR (i = 0; i < SHORT_AT 0x68; ++i) BEGIN
+	  READ_BYTE ao + 0x38*i ab_type
+	  PATCH_IF ab_type = 3 BEGIN
+	    READ_SHORT ao + 0x38*i + 0x20 ei
+	    FOR (j = 0; SHORT_AT ao + 0x38*i + 0x1e; ++j) BEGIN
+	      READ_SHORT eo + 0x30*(ei + j) type
+	      PATCH_IF type = 148 BEGIN
+		done = 1
+		READ_ASCII eo + 0x30*(ei + j) + 0x14 res
+		INNER_ACTION BEGIN
+		  COPY_EXISTING "%res%.spl" override
+		    PATCH_FOR_EACH resource IN fl#h5 fl#h10 fl#h15 fl#h20 fl#h25 fl#h30 BEGIN
+		      LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 duration = 1 STR_VAR resource END
+		    END
+		  BUT_ONLY
+		END
+	      END
+	    END
+	  END
+	END
+	
+	    
         //check if there's cast spell (at point) on the header
         
 
         //else:
         PATCH_FOR_EACH resource IN fl#h5 fl#h10 fl#h15 fl#h20 fl#h25 fl#h30 BEGIN
-          LPF ADD_ITEM_EFFECT INT_VAR
-
+          LPF ADD_ITEM_EFFECT INT_VAR opcode = 206 target = 2 duration = 1 STR_VAR resource END
+	END
+*/
   
   
   
