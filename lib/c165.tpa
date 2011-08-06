@@ -10,7 +10,8 @@ COPY_EXISTING msectype.2da override
 
 //Gauth's Lightning Bolt
 COPY_EXISTING spwi308.spl "override/fl#bhblt.spl"
-  LPF prep_spell END
+  LPF prep_itm_spl END
+  LPF configure_spell_header INT_VAR f_Type = 2 f_Projectile = 40 END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target = 2 timing = 1 power = 3 parameter2 = 262144 resist_dispel = 1 dicenumber = 4 dicesize = 4 END
 
 //Charm Monster
@@ -32,7 +33,8 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhchr.spl"
 
 //Gauth's Cone of Cold
 COPY_EXISTING spwi503.spl "override/fl#bhcne.spl"
-  LPF prep_spell END
+  LPF prep_itm_spl END
+  LPF configure_spell_header INT_VAR f_Target = 4 f_Range = 12 f_Projectile = 250 END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target = 2 timing = 1 power = 5 parameter2 = 131072 resist_dispel = 1 dicenumber = 3 dicesize = 4 END
 
 //Dweomer Drain
@@ -509,12 +511,16 @@ BEGIN
   END
 END
 
-COMPILE "atweaks/baf/beholder/fl#behol.baf"
-        "atweaks/baf/beholder/fl#bhund.baf"
-        "atweaks/baf/beholder/fl#bhhiv.baf"
-        "atweaks/baf/beholder/fl#gauth.baf"
-        "atweaks/baf/beholder/fl#bhspe.baf"
-        "atweaks/baf/beholder/fl#bhdir.baf"
+COPY_EXISTING sword01.cre override
+  READ_BYTE 0x275 SUMMONED
+
+COMPILE "atweaks/baf/beholders/fl#behol.baf"
+        "atweaks/baf/beholders/fl#bhund.baf"
+        "atweaks/baf/beholders/fl#bhhiv.baf"
+        "atweaks/baf/beholders/fl#gauth.baf"
+        "atweaks/baf/beholders/fl#bhspe.baf"
+        "atweaks/baf/beholders/fl#bhdir.baf"
+  EVAL
 
 //Beholders should not be healed if an eye-stalk is destroyed by area-effect magic
 ACTION_FOR_EACH file IN 
