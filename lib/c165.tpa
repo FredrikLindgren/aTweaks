@@ -1,11 +1,7 @@
 
-INCLUDE "atweaks/lib/dsandstuff.tpa"
-
-COPY_EXISTING msectype.2da override
-  COUNT_2DA_ROWS 2 num_row
-  INSERT_2DA_ROW num_row 2 ~GauthParalyze fl#replace~
-  REPLACE "fl#replace" @1025
-  GauthParalyzeSecType = num_row - 1
+INCLUDE "atweaks/lib/tactical_shared.tpa"
+  
+ADD_SECTYPE fl#GauthParalyze @1025
 
 
 //Gauth's Lightning Bolt
@@ -132,21 +128,12 @@ COPY "atweaks/spl/fl#bhbrn.spl" override //Director's Burning Hands
      "atweaks/spl/fl#h10.spl"   override //Heal: 10 HP
      "atweaks/spl/fl#h25.spl"   override //heal: 25 HP
 
-ACTION_IF !FILE_EXISTS_IN_GAME "fl#icew.spl" BEGIN
-  ADD_PROJECTILE ~atweaks/pro/fl#icew.pro~                                          //Single-round Ice Storm (cue imagination stretch)
-  COPY ~atweaks/spl/fl#icew.spl~ override                                           //Death Knight's Wall of Ice (sheet of falling ice)
-    SAY 0x8 @1024
-    FOR(i=0;i<SHORT_AT 0x68;++i) BEGIN
-      WRITE_SHORT LONG_AT 0x64+i*0x28+0x26 fl#icew
-    END
-END
-
 //Spell that removes Gauth paralyzation
 COPY "atweaks/spl/fl#bhrhl.spl" override
   FOR (i=LONG_AT 0x6a;i<SOURCE_SIZE;i+=0x30) BEGIN
     READ_SHORT i type
     PATCH_IF type = 221 BEGIN
-      WRITE_LONG i + 0x8 GauthParalyzeSecType
+      WRITE_LONG i + 0x8 fl#GauthParalyze
     END
   END
 
@@ -512,7 +499,7 @@ BEGIN
 END
 
 COPY_EXISTING sword01.cre override
-  READ_BYTE 0x275 SUMMONED
+  READ_BYTE 0x275 SUMMONED //Used in fl#behol.baf
 
 COMPILE "atweaks/baf/beholders/fl#behol.baf"
         "atweaks/baf/beholders/fl#bhund.baf"

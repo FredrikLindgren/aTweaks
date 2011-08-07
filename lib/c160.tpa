@@ -1,34 +1,10 @@
 
-INCLUDE "atweaks/lib/dsandstuff.tpa"
+INCLUDE "atweaks/lib/tactical_shared.tpa"
 
+LAF ret_from_eval STR_VAR f_Entry = fl#Disease RET DiseaseSecType = f_Value END
+LAF ret_from_eval STR_VAR f_Entry = fl#Fear RET FearSecType = f_Value END
 
-INCLUDE "atweaks/lib/lib.tpa"
-
-ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
-  ADD_SECTYPE fl#Disease @1025
-END
-ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Fear) BEGIN
-  ADD_SECTYPE fl#Fear @1027
-END
-
-/*
-COPY_EXISTING msectype.2da override
-  COUNT_2DA_ROWS 2 num_row
-  INSERT_2DA_ROW num_row 2 ~fl#Disease fl#replace~
-  REPLACE "fl#replace" @1025
-  DiseaseSecType = num_row - 1
-  COUNT_2DA_ROWS 2 num_row
-  INSERT_2DA_ROW num_row 2 ~fl#Fear fl#replace~
-  REPLACE "fl#replace" @1027
-  FearSecType = num_row - 1
-  //PRETTY_PRINT_2DA
-
-*/
-
-OUTER_SET DiseaseSecType = fl#Disease
-OUTER_SET FearSecType = fl#Fear
-  
-ADD_PROJECTILE "atweaks/pro/fl#sight.pro" //INAREANP with twice the radius
+LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Value END
 
 
 //Banshee
@@ -212,26 +188,7 @@ COPY "atweaks/cre/fl#dksw5.cre" override                                        
   SAY 0x8 @1030
   SAY 0xc @1030
   WRITE_ASCII 0x248 fl#dksw5 #8
-
-ACTION_IF !FILE_EXISTS_IN_GAME "rr#spain.spl" BEGIN
-  ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                        // New projectile for Symbol Pain (party friendly)
-  COPY ~aTweaks/SPL/RR#SPAIN.SPL~ ~override~                                       // Pit Fiend Symbol Pain
-    READ_LONG  0x64 ab_off
-    READ_SHORT 0x68 ab_num
-    FOR(i=0; i<ab_num; i+=1) BEGIN
-      WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                  // use new projectile (party friendly)
-    END
-END
-
-ACTION_IF !FILE_EXISTS_IN_GAME "fl#icew.spl" BEGIN
-  ADD_PROJECTILE ~atweaks/pro/fl#icew.pro~                                          //Single-round Ice Storm (cue imagination stretch)
-  COPY ~atweaks/spl/fl#icew.spl~ override                                           //Death Knight's Wall of Ice (sheet of falling ice)
-    SAY 0x8 @1024
-    FOR(i=0;i<SHORT_AT 0x68;++i) BEGIN
-      WRITE_SHORT LONG_AT 0x64+i*0x28+0x26 fl#icew
-    END
-END
-  
+ 
 OUTER_SPRINT $dksw(1) sw1h42
 OUTER_SPRINT $dksw(2) sw2h20
 OUTER_SPRINT $dksw(3) fl#dksw3

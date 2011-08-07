@@ -2,15 +2,7 @@
 // Used for better compatibility with other mods that also modify the Fiends' AI and/or abilities
 
 
-DEFINE_ACTION_MACRO ~RR#FIEND~ BEGIN
-
-
-
-INCLUDE "atweaks/lib/dsandstuff.tpa"
-
-ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#EVAL.2DA~ THEN BEGIN                         // only copy the evaluation file once
-  COPY ~aTweaks/LIB/RR#EVAL.2DA~ ~override~
-END                                                                                // ends ACTION_IF block
+INCLUDE "atweaks/lib/tactical_shared.tpa"
 
 // Add new secondary types
 
@@ -18,28 +10,9 @@ ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da RR#ETHER) BEGIN
   ADD_SECTYPE RR#ETHER @707
   APPEND RR#EVAL.2da "RR#ETHER %RR#ETHER%"
 END
-ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
-  ADD_SECTYPE fl#Disease #2449
-  APPEND RR#EVAL.2da "fl#Disease %fl#Disease%"
-END
 
 LAF ret_from_eval STR_VAR f_Entry = RR#ETHER RET RR#ETHER = f_Value END            //Retrieve stored values from RR#EVAL.2da
 LAF ret_from_eval STR_VAR f_Entry = fl#Disease RET fl#Disease = f_Value END
-
-//Add new projectiles
-
-ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.pro BEGIN
-  ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                        // New projectile for Symbol Pain (party friendly)
-  APPEND RR#EVAL.2da "RR#SPAIN %RR#SPAIN%"
-END
-ACTION_IF !FILE_EXISTS_IN_GAME fl#cnenp.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/fl#cnenp.pro~                                        //Invisible, cone-shaped projectile, party-friendly
-  APPEND RR#EVAL.2da "fl#cnenp %fl#cnenp%"
-END
-ACTION_IF !FILE_EXISTS_IN_GAME fl#sight.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/fl#sight.pro~                                        //Like INAREANP, but extends roughly as far as you can see 
-  APPEND RR#EVAL.2da "fl#sight %fl#sight%"
-END
 
 LAF ret_from_eval STR_VAR f_Entry = RR#SPAIN RET RR#SPAIN = f_Value END
 LAF ret_from_eval STR_VAR f_Entry = fl#cnenp RET fl#cnenp = f_Value END
@@ -316,13 +289,6 @@ ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DDOOR.BAM~ THEN BEGIN                     
   COPY    ~aTweaks/VVC/RR#DDOOR.VVC~   ~override~                                  // Custom Dimension Door VVC
 END                                                                                // ends ACTION_IF block
 
-COPY ~aTweaks/SPL/RR#SPAIN.SPL~ ~override~                                         // Pit Fiend Symbol Pain
-  READ_LONG  0x64 ab_off
-  READ_SHORT 0x68 ab_num
-  FOR(i=0; i<ab_num; i+=1) BEGIN
-    WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                    // use new projectile (party friendly)
-  END 
-
 COPY_EXISTING ~SPIN558.SPL~  ~override~                                            // Erinyes Charm
   WRITE_ASCII 0x10 "CAS_M05" #8                                                    // casting sound: CAS_M05.WAV
   WRITE_SHORT 0x25 "4"                                                             // spell school: 4 (Enchantment)
@@ -490,8 +456,8 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END  
 COPY_EXISTING ~SPWI401.SPL~  ~override/RR#WI401.SPL~                               // Clone Confusion into an innate ability (used by Glabrezu)
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
-COPY_EXISTING ~SPWI404.SPL~  ~override/RR#WI404.SPL~                               // Clone Ice Storm into an innate ability (used by Gelugon)
-LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+//COPY_EXISTING ~SPWI404.SPL~  ~override/RR#WI404.SPL~                               // Clone Ice Storm into an innate ability (used by Gelugon)
+//LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
 COPY_EXISTING ~SPWI405.SPL~  ~override/RR#WI405.SPL~                               // Clone Improved Invisibility into an innate ability (used by Pit Fiend)
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
@@ -1074,8 +1040,3 @@ OUTER_SET $f_ImmunitySecType(78) = fl#Disease
 OUTER_SET $f_RemoveSecType(79) = fl#Disease
 
 LAF integrate_sectypes END
-
-
-  
-
-END  // ends macro

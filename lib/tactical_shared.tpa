@@ -1,0 +1,71 @@
+//Shared resources for Fiends, Undead, Beholders, Mephits, etc
+
+//Detectable Spells
+INCLUDE "atweaks/lib/ds.tpa"
+
+// STATE.IDS additions (mirrors G3 BG2 Fixpack, SCSII and IESDP code)
+APPEND ~STATE.IDS~ ~0x80101FEF CD_STATE_NOTVALID~ UNLESS ~CD_STATE_NOTVALID~ // CamDawg's custom IsValidForPartyDialogue() state
+APPEND ~STATE.IDS~ ~0x00000FC0 STATE_REALLY_DEAD~ UNLESS ~0x00000FC0 STATE_REALLY_DEAD~ // includes all possible death states (normal, frozen...)
+APPEND ~STATE.IDS~ ~0x00102029 STATE_HARMLESS~ UNLESS ~0x00102029 STATE_HARMLESS~ // includes Feeblemind, Charmed, Helpless, Stunned, Sleeping
+APPEND ~STATE.IDS~ ~0x60400010 STATE_ILLUSIONS~ UNLESS ~0x60400010 STATE_ILLUSIONS~ // includes Invisible, Imp. Invisibility, Mirror Image, Blur
+APPEND ~STATE.IDS~ ~0x80040004 STATE_RANGED_TARGET~ UNLESS ~0x80040004 STATE_RANGED_TARGET~ // includes Blind, Confused, Panic
+APPEND ~STATE.IDS~ ~0x00000029 STATE_IMMOBILE~ UNLESS ~0x00000029 STATE_IMMOBILE~ // includes Helpless, Stunned, Sleeping
+APPEND ~STATE.IDS~ ~0x00400010 STATE_NOT_TARGETABLE~ UNLESS ~0x00400010 STATE_NOT_TARGETABLE~ // includes Improved Invisibility and plain Invisibility
+APPEND ~STATE.IDS~ ~0x8010202D STATE_DISABLED~ UNLESS ~0x8010202D STATE_DISABLED~ // includes Helpless, Stunned, Panic, Sleeping, Charmed, Feebleminded, Confused 
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#EVAL.2DA~ THEN BEGIN
+  COPY ~aTweaks/LIB/RR#EVAL.2DA~ ~override~
+END
+
+
+//Add new secondary types
+
+ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
+  ADD_SECTYPE fl#Disease #2449
+  APPEND RR#EVAL.2da "fl#Disease %fl#Disease%"
+END
+ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Fear) BEGIN
+  ADD_SECTYPE fl#Fear @1027
+  APPEND rr#eval.2da "fl#Fear %fl#Fear%"
+END
+
+
+//Add new projectiles
+
+ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.pro BEGIN
+  ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                        // New projectile for Symbol Pain (party friendly)
+  APPEND RR#EVAL.2da "RR#SPAIN %RR#SPAIN%"
+END
+ACTION_IF !FILE_EXISTS_IN_GAME fl#cnenp.pro BEGIN
+  ADD_PROJECTILE ~atweaks/pro/fl#cnenp.pro~                                        //Invisible, cone-shaped projectile, party-friendly
+  APPEND RR#EVAL.2da "fl#cnenp %fl#cnenp%"
+END
+ACTION_IF !FILE_EXISTS_IN_GAME fl#sight.pro BEGIN
+  ADD_PROJECTILE ~atweaks/pro/fl#sight.pro~                                        //Like INAREANP, but extends roughly as far as you can see 
+  APPEND RR#EVAL.2da "fl#sight %fl#sight%"
+END
+ACTION_IF !FILE_EXISTS_IN_GAME fl#icew.pro BEGIN
+  ADD_PROJECTILE ~atweaks/pro/fl#icew.pro~                                          //Single-round Ice Storm (cue imagination stretch)
+  APPEND rr#eval.2da "fl#icew %fl#icew%"
+END
+
+
+//Add new spells
+
+ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.spl BEGIN
+  COPY ~aTweaks/SPL/RR#SPAIN.SPL~ ~override~                                         // Symbol Pain
+    READ_LONG  0x64 ab_off
+    READ_SHORT 0x68 ab_num
+    FOR(i=0; i<ab_num; i+=1) BEGIN
+      WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                    // use new projectile (party friendly)
+    END
+END
+
+ACTION_IF !FILE_EXISTS_IN_GAME fl#icew.spl BEGIN
+  COPY ~atweaks/spl/fl#icew.spl~ override                                           //Wall of Ice (sheet of falling ice)
+    SAY 0x8 @1024
+    FOR(i=0;i<SHORT_AT 0x68;++i) BEGIN
+      WRITE_SHORT LONG_AT 0x64+i*0x28+0x26 fl#icew
+    END
+END
+
