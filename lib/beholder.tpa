@@ -1,0 +1,728 @@
+ADD_SECTYPE fl#GauthParalyse @1025
+
+
+//Burning Hands
+COPY_EXISTING spwi103.spl "override/fl#bhbrn.spl"
+  LPF prep_itm_spl END
+  LPF configure_spell_header
+    INT_VAR
+      f_Range = 5
+      f_Projectile = 22
+  END
+  PATCH_FOR_EACH savingthrow IN 0 1 BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode = 12 //Damage
+	target = 2
+	power = 1
+	parameter1 = 8
+	parameter2 = 0x80000
+	timing = 1
+	dispel_resist = 1
+	dicenumber = 1
+	dicesize = 2
+	savingthrow
+    END
+  END
+
+//Charm Monster
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhchm.spl"
+  SAY 0x8 @1403
+  WRITE_SHORT 0x25 4 //Enchantment
+  WRITE_BYTE 0x27 11 //disabling
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 5 //Charm
+      target = 2
+      power = 4
+      parameter2 = 1
+      resist_dispel = 1
+      duration = 100
+      savingthrow = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 50 //Colour, glow RGB 
+      target = 2
+      power = 4
+      parameter1 = 0x9390ff
+      parameter2 = 0x1e0000
+      resist_dispel = 1
+      duration = 1
+      savingthrow = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 141 //Lighting Effect
+      target = 2
+      power = 4
+      parameter2 = 8
+      timing = 1
+      resist_dispel = 1
+      savingthrow = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 142 //Display Icon
+      target = 2
+      power = 4
+      resist_dispel = 1
+      duration = 100
+      savingthrow = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 174 //Play Sound
+      target = 2
+      power = 4
+      timing = 3
+      resist_dispel = 1
+      duration = 100
+      savingthrow = 1
+    STR_VAR
+      resource = eff_e07
+  END
+  PATCH_FOR_EACH race IN 2 3 BEGIN
+    PATCH_FOR_EACH eff IN cdelfcm0 cdelfcm1 cdelfcm2 cdelfcm3 cdelfcm4 cdelfcm5 cdelfcm6 BEGIN
+      LPF ADD_SPELL_EFFECT
+	INT_VAR
+	  opcode = 177 //Use EFF File
+	  target = 2
+	  parameter1 = race
+	  parameter2 = 4
+	  probability1 = race = 2 ? 90 : 30
+	STR_VAR resource = EVAL "%eff%"
+      END
+    END
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 215 //Play 3D Effect
+      target = 2
+      power = 4
+      parameter2 = 1
+      resist_dispel = 1
+      duration = 3
+      savingthrow = 1
+    STR_VAR
+      resource = spnwchrm
+  END
+
+//Cone of Cold
+COPY_EXISTING spwi503.spl "override/fl#bhcne.spl"
+  LPF prep_itm_spl END
+  LPF configure_spell_header
+    INT_VAR
+      f_Target = 4
+      f_Range = 12
+      f_Projectile = 250
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 12 //Damage
+      target = 2
+      timing = 1
+      power = 5
+      parameter2 = 0x20000
+      resist_dispel = 1
+      dicenumber = 3
+      dicesize = 4
+  END
+
+//Enervation
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhenr.spl"
+  SAY 0x8 @1405
+  WRITE_SHORT 0x25 7 //Necromancy
+  WRITE_BYTE 0x27 11 //disabling
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 50 //Colour, glow RGB
+      target = 2
+      power = 4
+      parameter1 = 0x206700
+      parameter2 = 0x18f830
+      resist_dispel = 1
+      duration = 1
+      savingthrow = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 141 //Lighting Effect
+      target = 2
+      power = 4
+      parameter2 = 2
+      timing = 1
+      resist_dispel = 1
+      savingthrow = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 174 //Play Sound
+      target = 2
+      power = 4
+      timing = 1
+      resist_dispel = 1
+      savingthrow = 1
+    STR_VAR
+      resource = eff_m07
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 216 //Level Drain
+      target = 2
+      power = 4
+      parameter1 = 3
+      timing = 1
+      resist_dispel = 1
+      savingthrow = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 233 //Modify Proficiency
+      target = 2
+      power = 4
+      parameter1 = 1
+      parameter2 = 134
+      timing = 1
+      resist_dispel = 1
+      savingthrow = 1
+  END
+
+//Hold Monster
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhhlm.spl"
+  SAY 0x8 #22616
+  WRITE_SHORT 0x25 4 //Enchantment
+  WRITE_BYTE 0x27 11 //disabling
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 141 //Lighting Effect
+      target = 2
+      power = 5
+      parameter2 = 9
+      timing = 1
+      resist_dispel = 1
+      savingthrow = 1
+      savingbonus = "-3"
+  END
+  PATCH_FOR_EACH timing in 0 4 BEGIN
+    PATCH_MATCH timing
+      WITH
+      0 BEGIN SPRINT resource eff_m15 END
+      4 BEGIN SPRINT resource eff_e08 END
+      DEFAULT
+    END
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode = 174 //Play Sound
+	target = 2
+	power = 5
+	timing
+	resist_dispel = 1
+	duration = timing = 4 ? 24 : 0
+	savingthrow = 1
+	savingbonus = "-3"
+      STR_VAR
+	resource
+    END
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 175 //Hold
+      target = 2
+      power = 5
+      parameter2 = 2
+      resist_dispel = 1
+      duration = 24
+      savingthrow = 1
+      savingbonus = "-3"
+  END
+
+//Lightning Bolt
+COPY_EXISTING spwi308.spl "override/fl#bhblt.spl"
+  LPF prep_itm_spl END
+  LPF configure_spell_header
+    INT_VAR
+      f_Type = 2
+      f_Projectile = 40
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 12 //Damage
+      target = 2
+      timing = 1
+      power = 3
+      parameter2 = 0x40000
+      resist_dispel = 1
+      dicenumber = 4
+      dicesize = 4
+  END
+  
+//Magic Missile
+COPY_EXISTING spwi112.spl "override/fl#bhmmi.spl"
+  LPF prep_itm_spl END
+  LPF configure_spell_header
+    INT_VAR
+      f_Type = 2
+      f_Range = 30
+      f_Level = 9
+      f_Projectile = 72
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 12 //Damage
+      target = 2
+      power = 1
+      parameter1 = 1
+      paremeter2 = 0x400000
+      timing = 1
+      resist_dispel = 1
+      dicenumber = 1
+      dicesize = 4
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 141 //Lighting Effect
+      target = 2
+      power = 1
+      paremeter2 = 24
+      timing = 1
+      resist_dispel = 1
+  END
+
+//Paralysis
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhpar.spl"
+  SAY 0x8 #10856
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 174 //Play Sound
+      target = 2
+      power = 7
+      resist_dispel = 1
+      savingthrow = 1
+    STR_VAR
+      resource = eff_m26
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 175 //Hold
+      target = 2
+      power = 7
+      parameter1 = 0
+      parameter2 = 2
+      resist_dispel = 1
+      duration = 96
+      savingthrow = 1
+  END
+
+//Sleep
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhslp.spl"
+  SAY 0x8 #12047
+  WRITE_SHORT 0x25 4 //Enchantment
+  WRITE_BYTE 0x27 11 //disabling
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 39 //Unconciousness
+      target = 2
+      power = 1
+      resist_dispel = 1
+      duration = 300
+      dicenumber = 4
+      savingthrow = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 139 //Display String
+      target = 2
+      power = 1
+      parameter1 = 14001
+      timing = 1
+      resist_dispel = 1
+      dicenumber = 4
+      savingthrow = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 142 //Display Icon
+      target = 2
+      power = 1
+      parameter2 = 14
+      resist_dispel = 1
+      duration = 300
+      dicenumber = 4
+      savingthrow = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 174 //Play Sound
+      target = 2
+      power = 1
+      timing = 4
+      resist_dispel = 1
+      duration = 300
+      dicenumber = 4
+      savingthrow = 1
+    STR_VAR
+      resource = eff_m05
+  END
+  PATCH_FOR_EACH race IN 2 3 BEGIN
+    PATCH_FOR_EACH eff IN cdelfsl0 cdelfsl1 cdelfsl2 cdelfsl3 cdelfsl4 BEGIN
+      LPF ADD_SPELL_EFFECT
+	INT_VAR
+	  opcode = 177 //Use EFF File
+	  target = 2
+	  parameter1 = race
+	  parameter2 = 4
+	  probability1 = race = 2 ? 90 : 30
+	STR_VAR
+	  resource = EVAL "%eff%"
+      END
+    END
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 215 //Play 3D Effect
+      target = 2
+      power = 1
+      parameter2 = 1
+      resist_dispel = 1
+      duration = 1
+      dicenumber = 4
+      savingthrow = 1
+    STR_VAR
+      resource = spnwchrm
+  END
+
+//Telekinesis and Repulsion
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhtlk.spl"
+     "atweaks/spl/fl#bhray.spl" "override/fl#bhrep.spl"
+  PATCH_IF "%DEST_RES%" STRING_EQUAL_CASE "fl#bhtlk" BEGIN
+    SAY 0x8 @1402
+  END ELSE BEGIN
+    SAY 0x8 @1404
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 12 //Damage
+      target = 2
+      power = 5
+      parameter1 = 12
+      timing = 1
+      resist_dispel = 1
+      dicenumber = 1
+      dicesize = 8
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 235 //Wing Buffet
+      target = 2
+      power = 5
+      parameter1 = 30
+      parameter2 = 2
+      resist_dispel = 1
+      duration = 2
+  END
+
+
+//Director stuff
+
+//Spell to remove Director's central-eye bonus
+COPY "atweaks/spl/base.spl" "override/fl#bhdir.spl"
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 0 //AC
+      target = 2
+      parameter1 = 2
+      timing = 1
+  END
+  PATCH_FOR_EACH opcode IN 33 34 35 36 37 BEGIN //Saving throws
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode
+	target = 2
+	parameter1 = 2
+	timing = 1
+    END
+  END
+  PATCH_FOR_EACH opcode IN 86 87 88 89 BEGIN //Physical damage resistance
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode
+	target = 2
+	parameter2 = 1
+	timing = 1
+    END
+  END
+
+
+//Gauth stuff  
+
+//Gauth's Dweomer Drain
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhdrn.spl"
+  SAY 0x8 @1400
+  c = 0
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 139 //Display String
+      target = 2
+      timing = 1
+      power = 4
+      probability1 = c * 3 + 2
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 141 //Lighting Effect
+      target = 2
+      timing = 1
+      power = 4
+      parameter2 = 14
+      probability1 = c * 3 + 2
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 174 //Play Sound
+      target = 2
+      timing = 1
+      power = 4
+      probability1 = c * 3 + 2
+    STR_VAR
+      resource = eff_m02
+  END
+  PATCH_FOR_EACH school IN 1 2 3 4 5 6 7 8 BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode = 220 //Remove School
+	target = 2
+	timing = 1
+	power = 4
+	parameter1 = 9
+	parameter2 = school
+	probability1 = c * 3 + 2
+	probability2 = c * 3
+    END
+    ++c
+  END
+  FOR (i=LONG_AT 0x6a;i<SOURCE_SIZE;i+=0x30) BEGIN
+    READ_SHORT i type
+    PATCH_IF type = 139 BEGIN
+      SAY i + 0x4 @1401
+    END
+  END
+
+//Spell that cures Gauth paralysation
+COPY "atweaks/spl/base.spl" "override/fl#bhgcp.spl"
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 221
+      target = 2
+      parameter1 = 9
+      oarameter2 = fl#GauthParalyse
+      timing = 1
+  END
+
+//Gauth kaplooie spell
+COPY "atweaks/spl/base.spl" "override/fl#bhxpl.spl"
+  LPF configure_spell_header
+    INT_VAR
+      f_Type = 1
+      f_Target = 5
+      f_Projectile = 94
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 12
+      target = 1
+      parameter2 = 0x400000
+      timing = 1
+      dispel_resist = 1
+      dicenumber = 4
+      dicesize = 4
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 215
+      target = 2
+      timing = 1
+      dispel_resist = 1
+    STR_VAR
+      resource = spboltgl
+  END
+
+//Gauth glow spell
+COPY "atweaks/spl/base.spl" "override/fl#bhgau.spl"
+  PATCH_FOR_EACH parameter2 IN 1 2 BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode = 8 //Colour, solid glow
+	target = 1
+	parameter1 = 0x7f007f
+	parameter2
+	timing = 1
+	duration = 7200
+    END
+  END
+
+
+//Spectator stuff
+
+//Spectator's CSW (extra spicy)
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhwnd.spl"
+  SAY 0x8 #2624
+  WRITE_SHORT 0x25 7 //Necromancy
+  WRITE_BYTE 0x27 10 //offensive damage
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 12 //Damage
+      target = 2
+      power = 4
+      parameter1 = 19
+      parameter2 = 0x400000
+      timing = 1
+      resist_dispel = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 50 //Colour, glow RGB
+      target = 2
+      power = 4
+      parameter1 = 0xf3933c
+      parameter2 = 0x1e0000
+      resist_dispel = 1
+      duration = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 141 //Lighting Effect
+      target = 2
+      power = 4
+      parameter2 = 2
+      timing = 1
+      resist_dispel = 1
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 174 //Play Sound
+      target = 2
+      power = 4
+      timing = 1
+    STR_VAR
+      resource = eff_p06
+  END
+
+
+
+//Spells for healing the beholder when an eye is destroyed
+ACTION_FOR_EACH p1 IN 1 6 10 25 BEGIN
+  COPY "atweaks/spl/base.spl" "override/fl#bhh%p1%.spl"
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode = 17
+	target = 2
+	parameter1 = p1
+	timing = 1
+    END
+END
+
+//Beholders should not be healed if an eye-stalk is destroyed by area-effect magic
+ACTION_FOR_EACH file IN 
+		spblun29
+                spcl412b
+                spcl414b 
+                spcl910b 
+                spcl911b 
+                spcl722 
+                spdr301 
+                spdr601 
+                sppr302 
+                sppr304 
+                sppr313 
+                sppr314 
+                sppr503 
+                sppr705 
+                sppr707 
+                sppr720
+                spwi103 
+                spwi304 
+                spwi308 
+                spwi313 
+                spwi404
+                spwi502 
+                spwi503 
+                spwi523 
+                spwi614
+                spwi615 
+                spwi712 
+                spwi714 
+                spwi810
+                spwi812 
+                spwi911 
+                spwish24
+                spwish32
+                spwm188
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.spl" BEGIN
+    COPY_EXISTING "%file%.spl" override
+      PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+        PATCH_FOR_EACH resource IN fl#h5 fl#h10 fl#h15 fl#h20 fl#h25 fl#h30 BEGIN
+          LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 duration = 1 STR_VAR resource END
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+//This doesn't work right. We almost need per-item code
+/*
+ACTION_FOR_EACH file IN 
+		amul01
+                arow06
+                misc3h
+                potn13
+                potn26
+                potn27
+                ring27 //header 1 and 2
+//Fire Seeds            ring33
+                staf13 //header 2
+                wand05 //header 0
+                wand06
+                wand07
+                wand11
+                wand12
+                wand13
+                wand15
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.itm" BEGIN
+    COPY_EXISTING "%file%.itm" override
+      PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+	READ_LONG 0x64 ao
+	READ_LONG 0x6a eo
+	done = 0
+	FOR (i = 0; i < SHORT_AT 0x68; ++i) BEGIN
+	  READ_BYTE ao + 0x38*i ab_type
+	  PATCH_IF ab_type = 3 BEGIN
+	    READ_SHORT ao + 0x38*i + 0x20 ei
+	    FOR (j = 0; SHORT_AT ao + 0x38*i + 0x1e; ++j) BEGIN
+	      READ_SHORT eo + 0x30*(ei + j) type
+	      PATCH_IF type = 148 BEGIN
+		done = 1
+		READ_ASCII eo + 0x30*(ei + j) + 0x14 res
+		INNER_ACTION BEGIN
+		  COPY_EXISTING "%res%.spl" override
+		    PATCH_FOR_EACH resource IN fl#h5 fl#h10 fl#h15 fl#h20 fl#h25 fl#h30 BEGIN
+		      LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 duration = 1 STR_VAR resource END
+		    END
+		  BUT_ONLY
+		END
+	      END
+	    END
+	  END
+	END
+	
+	    
+        //check if there's cast spell (at point) on the header
+        
+
+        //else:
+        PATCH_FOR_EACH resource IN fl#h5 fl#h10 fl#h15 fl#h20 fl#h25 fl#h30 BEGIN
+          LPF ADD_ITEM_EFFECT INT_VAR opcode = 206 target = 2 duration = 1 STR_VAR resource END
+	END
+*/
