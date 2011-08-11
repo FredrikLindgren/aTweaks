@@ -1,8 +1,39 @@
 ADD_SECTYPE fl#GauthParalyse @1025
 
 
+//Blindness
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhbln.spl"
+  SAY 0x8 #12015
+  WRITE_LONG 0x18 BIT10
+  WRITE_SHORT 0x25 5 //Illusion
+  WRITE_BYTE 0x27 11 //disabling
+  DEFINE_ARRAY opcode BEGIN 50 74 139 142 174 206 206 206 206 215 215 END
+  DEFINE_ARRAY p1 BEGIN 0x7f7f7f00 0 0 8 0 0 0 0 0 0 0 END
+  DEFINE_ARRAY p2 BEGIN 0x140000 0 14674 0 0 0 0 0 0 1 1 END
+  DEFINE_ARRAY duration BEGIN 1 600 0 600 600 600 600 600 600 3 3 END
+  DEFINE_ARRAY resref BEGIN "" "" "" "" eff_e07 spwi105 spin937 rr#mracs fl#clrsp sph1hi01 sphlhi02 END
+  PHP_EACH opcode AS idx => opcode BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode
+	target = 2
+	power = 1
+	parameter1 = $p1("%idx%")
+	parameter2 = $p2("%idx%")
+	timing = opcode = 139 ? 1 : opcode = 174 ? 4 : 0
+	duration = $duration("%idx%")
+	savingthrow = 1
+      STR_VAR
+	resource = EVAL $resref("%idx%")
+    END
+  END
+  PATCH_FOR_EACH array IN opcode p1 p2 duration resref BEGIN
+    CLEAR_ARRAY "%array%"
+  END
+
 //Burning Hands
 COPY_EXISTING spwi103.spl "override/fl#bhbrn.spl"
+  WRITE_LONG 0x18 BIT10
   LPF prep_itm_spl END
   LPF configure_spell_header
     INT_VAR
@@ -25,91 +56,80 @@ COPY_EXISTING spwi103.spl "override/fl#bhbrn.spl"
     END
   END
 
+//Chain Lightning
+COPY_EXISTING spwi615.spl "override/fl#bhchl.spl"
+  SAY 0x8 25939
+  WRITE_LONG 0x18 BIT10
+  LPF prep_itm_spl END
+  LPF configure_spell_header
+    INT_VAR
+      f_Type = 2
+      f_Projectile = 213
+  END
+  PATCH_FOR_EACH savingthrow IN 0 1 BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode = 12
+	target = 2
+	power = 6
+	parameter1 = 0x40000
+	timing = 1
+	resist_dispel = 1
+	dicenumber = 3
+	dicesize = 6
+	savingthrow
+    END
+  END
+
 //Charm Monster
 COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhchm.spl"
   SAY 0x8 @1403
+  WRITE_LONG 0x18 BIT10
   WRITE_SHORT 0x25 4 //Enchantment
   WRITE_BYTE 0x27 11 //disabling
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 5 //Charm
-      target = 2
-      power = 4
-      parameter2 = 1
-      resist_dispel = 1
-      duration = 100
-      savingthrow = 1
-  END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 50 //Colour, glow RGB 
-      target = 2
-      power = 4
-      parameter1 = 0x9390ff
-      parameter2 = 0x1e0000
-      resist_dispel = 1
-      duration = 1
-      savingthrow = 1
-  END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 141 //Lighting Effect
-      target = 2
-      power = 4
-      parameter2 = 8
-      timing = 1
-      resist_dispel = 1
-      savingthrow = 1
-  END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 142 //Display Icon
-      target = 2
-      power = 4
-      resist_dispel = 1
-      duration = 100
-      savingthrow = 1
-  END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 174 //Play Sound
-      target = 2
-      power = 4
-      timing = 3
-      resist_dispel = 1
-      duration = 100
-      savingthrow = 1
-    STR_VAR
-      resource = eff_e07
-  END
-  PATCH_FOR_EACH race IN 2 3 BEGIN
-    PATCH_FOR_EACH eff IN cdelfcm0 cdelfcm1 cdelfcm2 cdelfcm3 cdelfcm4 cdelfcm5 cdelfcm6 BEGIN
+  PATCH_FOR_EACH race IN 2 3 BEGIN //These have to go at the very start
+    PATCH_FOR_EACH resource IN cdelfcm0 cdelfcm1 cdelfcm2 cdelfcm3 cdelfcm4 cdelfcm5 cdelfcm6 BEGIN
       LPF ADD_SPELL_EFFECT
 	INT_VAR
 	  opcode = 177 //Use EFF File
 	  target = 2
+	  power = 5
 	  parameter1 = race
 	  parameter2 = 4
 	  probability1 = race = 2 ? 90 : 30
-	STR_VAR resource = EVAL "%eff%"
+	STR_VAR
+	  resource
       END
     END
   END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 215 //Play 3D Effect
-      target = 2
-      power = 4
-      parameter2 = 1
-      resist_dispel = 1
-      duration = 3
-      savingthrow = 1
-    STR_VAR
-      resource = spnwchrm
+  DEFINE_ARRAY opcode BEGIN 5 50 141 142 174 215 END
+  DEFINE_ARRAY p1 BEGIN 1 0x9390ff 0 0 0 0 END
+  DEFINE_ARRAY p2 BEGIN 1 0x1e0000 8 0 0 1 END
+  DEFINE_ARRAY duration BEGIN 100 1 0 100 100 3 END
+  DEFINE_ARRAY resref BEGIN "" "" "" "" eff_e07 spnwchrm END
+  PHP_EACH opcode AS idx => opcode BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode
+	target = 2
+	power = 4
+	parameter1 = $p1("%idx%")
+	parameter2 = $p2("%idx%")
+	resist_dispel = 1
+	timing = opcode = 141 ? 1 : opcode = 174 ? 3 : 0
+	duration = $duration("%idx%")
+	savingthrow = 1
+      STR_VAR
+	resource = EVAL $resref("%idx%")
+    END
+  END
+  PATCH_FOR_EACH array IN opcode p1 p2 duration resref BEGIN
+    CLEAR_ARRAY "%array%"
   END
 
 //Cone of Cold
 COPY_EXISTING spwi503.spl "override/fl#bhcne.spl"
+  WRITE_LONG 0x18 BIT10
   LPF prep_itm_spl END
   LPF configure_spell_header
     INT_VAR
@@ -121,76 +141,152 @@ COPY_EXISTING spwi503.spl "override/fl#bhcne.spl"
     INT_VAR
       opcode = 12 //Damage
       target = 2
-      timing = 1
       power = 5
       parameter2 = 0x20000
+      timing = 1
       resist_dispel = 1
       dicenumber = 3
       dicesize = 4
   END
 
+//Emotion
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhemo.spl"
+  SAY 0x8 #22173
+  WRITE_LONG 0x18 BIT10
+  WRITE_SHORT 0x25 4 //Enchantment
+  WRITE_BYTE 0x27 11 //disabling
+  PATCH_FOR_EACH race IN 2 3 BEGIN //These have to go at the start
+    PATCH_FOR_EACH resource IN cdelfsl4 cdelfsl3 cdelfsl2 cdelfsl1 cdelfsl0 BEGIN
+      LPF ADD_SPELL_EFFECT
+	INT_VAR
+	  opcode = 177 //Use EFF File
+	  target = 2
+	  power = 4
+	  parameter1 = race
+	  parameter2 = 4
+	  probability1 = race = 2 ? 90 : 30
+	STR_VAR
+	  resource
+      END
+    END
+  END
+  DEFINE_ARRAY opcode BEGIN 39 50 142 174 215 END
+  DEFINE_ARRAY p1 BEGIN 0 0x9f9f00 0 0 0 END
+  DEFINE_ARRAY p2 BEGIN 0 0x1e0000 44 0 1 END
+  DEFINE_ARRAY duration BEGIN 132 1 132 132 2 END
+  DEFINE_ARRAY resref BEGIN "" "" "" eff_e05 magres END
+  PHP_EACH opcode AS idx => opcode BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode
+	target = 2
+	power = 4
+	parameter1 = $p1("%idx%")
+	parameter2 = $p2("%idx%")
+	dispel_resist = 1
+	timing = opcode = 174 ? 4 : 0
+	duration = $duration("%idx%")
+	savingthrow = 1
+      STR_VAR
+	resource = EVAL $resref("%idx%")
+    END
+  END
+  PATCH_FOR_EACH array IN opcode p1 p2 duration resref BEGIN
+    CLEAR_ARRAY "%array%"
+  END
+      
 //Enervation
 COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhenr.spl"
   SAY 0x8 @1405
+  WRITE_LONG 0x18 BIT10
   WRITE_SHORT 0x25 7 //Necromancy
   WRITE_BYTE 0x27 11 //disabling
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 50 //Colour, glow RGB
-      target = 2
-      power = 4
-      parameter1 = 0x206700
-      parameter2 = 0x18f830
-      resist_dispel = 1
-      duration = 1
-      savingthrow = 1
+  DEFINE_ARRAY opcode BEGIN 50 141 174 216 233 END
+  DEFINE_ARRAY p1 BEGIN 0x206700 0 0 3 1 END
+  DEFINE_ARRAY p2 BEGIN 0x18f830 2 0 0 134 END
+  DEFINE_ARRAY resref BEGIN "" "" eff_m07 "" "" END
+  PHP_EACH opcode AS idx => opcode BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode
+	target = 2
+	power = 4
+	parameter1 = $p1("%idx%")
+	parameter2 = $p2("%idx%")
+	timing = opcode = 50 ? 0 : 1
+	resist_dispel = 1
+	duration opcode = 50 ? 1 : 0
+	savingthrow = 1
+      STR_VAR
+	resource = EVAL $resref("%idx%")
+    END
   END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 141 //Lighting Effect
-      target = 2
-      power = 4
-      parameter2 = 2
-      timing = 1
-      resist_dispel = 1
-      savingthrow = 1
+  PATCH_FOR_EACH array IN opcode p1 p2 resref BEGIN
+    CLEAR_ARRAY "%array%"
   END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 174 //Play Sound
-      target = 2
-      power = 4
-      timing = 1
-      resist_dispel = 1
-      savingthrow = 1
-    STR_VAR
-      resource = eff_m07
+  
+//Enfeeblement
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhenf.spl"
+  SAY 0x8 @1406
+  WRITE_LONG 0x18 BIT10
+  WRITE_SHORT 0x25 4 //Enchantment
+  WRITE_BYTE 0x27 11 //disabling
+  DEFINE_ARRAY opcode BEGIN 44 50 139 141 142 174 174 END
+  DEFINE_ARRAY p1 BEGIN 5 0x606000 7924 0 0 0 0 END
+  DEFINE_ARRAY p2 BEGIN 1 0x140000 0 9 113 0 0 END
+  DEFINE_ARRAY timing BEGIN 0 0 1 1 0 0 4 END
+  DEFINE_ARRAY duration BEGIN 120 1 0 0 120 0 120 END
+  DEFINE_ARRAY resref BEGIN "" "" "" "" "" eff_m05 eff_e05 END
+  PHP_EACH opcode AS idx => opcode BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode
+	target = 2
+	power = 2
+	parameter1 = $p1("%idx%")
+	parameter2 = $p2("%idx%")
+	timing = $timing("%idx%")
+	resist_dispel = 1
+	duration = $duration("%idx%")
+	savingthrow = 1
+      STR_VAR
+	resource = EVAL $resref("%idx%")
+    END
   END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 216 //Level Drain
-      target = 2
-      power = 4
-      parameter1 = 3
-      timing = 1
-      resist_dispel = 1
-      savingthrow = 1
+  PATCH_FOR_EACH array IN opcode p1 p2 timing duration resref BEGIN
+    CLEAR_ARRAY "%array%"
   END
-  LPF ADD_SPELL_EFFECT
+
+//Freeze Ray
+COPY "atweaks/spl/base.spl" "override/fl#bhfrz.spl"
+  SAY 0x8 @1408
+  WRITE_LONG 0x18 BIT10
+  WRITE_SHORT 0x25 6 //Evocation
+  WRITE_BYTE 0x27 10 //offensive damage
+  LPF configure_spell_effect
     INT_VAR
-      opcode = 233 //Modify Proficiency
-      target = 2
-      power = 4
-      parameter1 = 1
-      parameter2 = 134
-      timing = 1
-      resist_dispel = 1
-      savingthrow = 1
+      f_Type = 2
+      f_Projectile = 105
+  END
+  PATCH_FOR_EACH savingthrow IN 0 1 BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode = 12
+	target = 2
+	power = 3
+	parameter2 = 0x20000
+	timing = 1
+	resist_dispel = 1
+	dicenumber = 2
+	dicesize = 6
+	savingthrow
+    END
   END
 
 //Hold Monster
 COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhhlm.spl"
   SAY 0x8 #22616
+  WRITE_LONG 0x18 BIT10
   WRITE_SHORT 0x25 4 //Enchantment
   WRITE_BYTE 0x27 11 //disabling
   LPF ADD_SPELL_EFFECT
@@ -239,6 +335,7 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhhlm.spl"
 
 //Lightning Bolt
 COPY_EXISTING spwi308.spl "override/fl#bhblt.spl"
+  WRITE_LONG 0x18 BIT10
   LPF prep_itm_spl END
   LPF configure_spell_header
     INT_VAR
@@ -249,9 +346,9 @@ COPY_EXISTING spwi308.spl "override/fl#bhblt.spl"
     INT_VAR
       opcode = 12 //Damage
       target = 2
-      timing = 1
       power = 3
       parameter2 = 0x40000
+      timing = 1
       resist_dispel = 1
       dicenumber = 4
       dicesize = 4
@@ -259,6 +356,7 @@ COPY_EXISTING spwi308.spl "override/fl#bhblt.spl"
   
 //Magic Missile
 COPY_EXISTING spwi112.spl "override/fl#bhmmi.spl"
+  WRITE_LONG 0x18 BIT10
   LPF prep_itm_spl END
   LPF configure_spell_header
     INT_VAR
@@ -292,6 +390,9 @@ COPY_EXISTING spwi112.spl "override/fl#bhmmi.spl"
 //Paralysis
 COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhpar.spl"
   SAY 0x8 #10856
+  WRITE_LONG 0x18 BIT10
+  WRITE_SHORT 0x25 4 //Enchantment
+  WRITE_BYTE 0x27 11 //disabling
   LPF ADD_SPELL_EFFECT
     INT_VAR
       opcode = 174 //Play Sound
@@ -314,82 +415,83 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhpar.spl"
       savingthrow = 1
   END
 
+//Scorch
+COPY_EXISTING spwi217.spl "override/fl#bhscr.spl"
+  SAY 0x8 @1407
+  WRITE_LONG 0x18 BIT10
+  WRITE_SHORT 0x25 6 //Evocation
+  WRITE_BYTE 0x27 10 //offensive damage
+  LPF prep_itm_spl END
+  LPF configure_spell_header
+    INT_VAR
+      f_Range = 15
+      f_Projectile = 109
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 12 //Damage
+      target = 2
+      power = 2
+      parameter2 = 0x80000
+      timing = 1
+      resist_dispel = 1
+      dicenumber = 3
+      dicesize = 6
+  END
+  //LPF ADD_SPELL_EFFECT
+  //  INT_VAR
+  //    opcode = 174 //Play Sound
+  //    target = 1
+  //    resist_dispel = 2
+  //  STR_VAR
+  //    resource = tra_17
+  //END
+  
 //Sleep
 COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhslp.spl"
   SAY 0x8 #12047
+  WRITE_LONG 0x18 BIT10
   WRITE_SHORT 0x25 4 //Enchantment
   WRITE_BYTE 0x27 11 //disabling
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 39 //Unconciousness
-      target = 2
-      power = 1
-      resist_dispel = 1
-      duration = 300
-      dicenumber = 4
-      savingthrow = 1
-  END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 139 //Display String
-      target = 2
-      power = 1
-      parameter1 = 14001
-      timing = 1
-      resist_dispel = 1
-      dicenumber = 4
-      savingthrow = 1
-  END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 142 //Display Icon
-      target = 2
-      power = 1
-      parameter2 = 14
-      resist_dispel = 1
-      duration = 300
-      dicenumber = 4
-      savingthrow = 1
-  END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 174 //Play Sound
-      target = 2
-      power = 1
-      timing = 4
-      resist_dispel = 1
-      duration = 300
-      dicenumber = 4
-      savingthrow = 1
-    STR_VAR
-      resource = eff_m05
-  END
-  PATCH_FOR_EACH race IN 2 3 BEGIN
-    PATCH_FOR_EACH eff IN cdelfsl0 cdelfsl1 cdelfsl2 cdelfsl3 cdelfsl4 BEGIN
+  PATCH_FOR_EACH race IN 2 3 BEGIN //These have to go at the very start or they don't do their job
+    PATCH_FOR_EACH resource IN cdelfsl0 cdelfsl1 cdelfsl2 cdelfsl3 cdelfsl4 BEGIN
       LPF ADD_SPELL_EFFECT
 	INT_VAR
 	  opcode = 177 //Use EFF File
 	  target = 2
+	  power = 1
 	  parameter1 = race
 	  parameter2 = 4
 	  probability1 = race = 2 ? 90 : 30
 	STR_VAR
-	  resource = EVAL "%eff%"
+	  resource
       END
     END
   END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 215 //Play 3D Effect
-      target = 2
-      power = 1
-      parameter2 = 1
-      resist_dispel = 1
-      duration = 1
-      dicenumber = 4
-      savingthrow = 1
-    STR_VAR
-      resource = spnwchrm
+  DEFINE_ARRAY opcode BEGIN 39 139 142 174 215 END
+  DEFINE_ARRAY p1 BEGIN 0 14001 0 0 0 END
+  DEFINE_ARRAY p2 BEGIN 0 0 14 0 1 END
+  DEFINE_ARRAY duration BEGIN 300 0 300 300 1 END
+  DEFINE_ARRAY resref BEGIN "" "" "" eff_m05 spnwchrm END
+  PHP_EACH opcode AS idx => opcode BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+	opcode
+	target = 2
+	power = 1
+	parameter1 = $p1("%idx%")
+	parameter2 = $p2("%idx%")
+	timing = opcode = 141 ? 1 : opcode = 174 ? 4 : 0
+	resist_dispel = 1
+	duration = $duration("%idx%")
+	dicenumber = 4
+	savingthrow = 1
+      STR_VAR
+	resource = EVAL $resref("%idx%")
+    END
+  END
+  PATCH_FOR_EACH array IN opcode p1 p2 duration resref BEGIN
+    CLEAR_ARRAY "%array%"
   END
 
 //Telekinesis and Repulsion
@@ -400,6 +502,9 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhtlk.spl"
   END ELSE BEGIN
     SAY 0x8 @1404
   END
+  WRITE_LONG 0x18 BIT10
+  WRITE_SHORT 0x25 8 //Alteration
+  WRITE_BYTE 0x27 11 //disabling
   LPF ADD_SPELL_EFFECT
     INT_VAR
       opcode = 12 //Damage
@@ -464,25 +569,25 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhdrn.spl"
     INT_VAR
       opcode = 139 //Display String
       target = 2
+      power = 9
       timing = 1
-      power = 4
       probability1 = c * 3 + 2
   END
   LPF ADD_SPELL_EFFECT
     INT_VAR
       opcode = 141 //Lighting Effect
       target = 2
-      timing = 1
-      power = 4
+      power = 9
       parameter2 = 14
+      timing = 1
       probability1 = c * 3 + 2
   END
   LPF ADD_SPELL_EFFECT
     INT_VAR
       opcode = 174 //Play Sound
       target = 2
+      power = 9
       timing = 1
-      power = 4
       probability1 = c * 3 + 2
     STR_VAR
       resource = eff_m02
@@ -492,10 +597,10 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhdrn.spl"
       INT_VAR
 	opcode = 220 //Remove School
 	target = 2
-	timing = 1
 	power = 4
 	parameter1 = 9
 	parameter2 = school
+	timing = 1
 	probability1 = c * 3 + 2
 	probability2 = c * 3
     END
@@ -567,6 +672,7 @@ COPY "atweaks/spl/base.spl" "override/fl#bhgau.spl"
 //Spectator's CSW (extra spicy)
 COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhwnd.spl"
   SAY 0x8 #2624
+  WRITE_LONG 0x18 BIT10
   WRITE_SHORT 0x25 7 //Necromancy
   WRITE_BYTE 0x27 10 //offensive damage
   LPF ADD_SPELL_EFFECT
@@ -581,7 +687,7 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhwnd.spl"
   END
   LPF ADD_SPELL_EFFECT
     INT_VAR
-      opcode = 50 //Colour, glow RGB
+      opcode = 50 //Colour, pulse
       target = 2
       power = 4
       parameter1 = 0xf3933c
@@ -611,7 +717,7 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhwnd.spl"
 
 
 //Spells for healing the beholder when an eye is destroyed
-ACTION_FOR_EACH p1 IN 1 6 10 25 BEGIN
+ACTION_FOR_EACH p1 IN 1 5 10 15 20 25 30 BEGIN
   COPY "atweaks/spl/base.spl" "override/fl#bhh%p1%.spl"
     LPF ADD_SPELL_EFFECT
       INT_VAR
@@ -662,7 +768,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.spl" BEGIN
     COPY_EXISTING "%file%.spl" override
       PATCH_IF SOURCE_SIZE > 0x71 BEGIN
-        PATCH_FOR_EACH resource IN fl#h5 fl#h10 fl#h15 fl#h20 fl#h25 fl#h30 BEGIN
+        PATCH_FOR_EACH resource IN fl#bhh1 fl#bhh5 fl#bhh10 fl#bhh15 fl#bhh20 fl#bhh25 fl#bhh30 BEGIN
           LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 duration = 1 STR_VAR resource END
         END
       END
@@ -707,7 +813,7 @@ BEGIN
 		READ_ASCII eo + 0x30*(ei + j) + 0x14 res
 		INNER_ACTION BEGIN
 		  COPY_EXISTING "%res%.spl" override
-		    PATCH_FOR_EACH resource IN fl#h5 fl#h10 fl#h15 fl#h20 fl#h25 fl#h30 BEGIN
+		    PATCH_FOR_EACH resource IN fl#bhh1 fl#bhh5 fl#bhh10 fl#bhh15 fl#bhh20 fl#bhh25 fl#bhh30 BEGIN
 		      LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 duration = 1 STR_VAR resource END
 		    END
 		  BUT_ONLY

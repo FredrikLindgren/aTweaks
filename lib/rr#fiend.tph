@@ -913,29 +913,8 @@ COPY "atweaks/spl/base.spl" "override/fl#clrsp.spl"
   LPF RR#SP2IN INT_VAR rr#rinvs = 1 END //General "make innate" treatment (overrides the casting time specified above)
 
 //Patch immunity to fl#clrsp into spells, items that cause blindness
-COPY_EXISTING spdr101.spl  override
-              spin595.spl  override
-              spin878.spl  override
-              spin893.spl  override
-              spin929.spl  override
-              spin931.spl  override
-              sppr704.spl  override
-              sppr707.spl  override
-              spwi106.spl  override
-              spwi118.spl  override
-              spwi224.spl  override
-              spwi714.spl  override
-              spwi815.spl  override
-              spwi958.spl  override
-              spwm178.spl  override
-              chalcy2.itm  override
-              gorwom4.itm  override
-              halb06.itm   override
-              sorb.itm     override
-              sw1h51.itm   override
-              wand19.itm   override
-  LPF add_conditional_immunity INT_VAR f_Condition = 74 STR_VAR f_Spell = fl#clrsp END
-BUT_ONLY
+ACTION_DEFINE_ARRAY array_as_argument BEGIN fl#clrsp END  
+LAF add_immunity_blindness END
   
 //Shout
 COPY "atweaks/spl/base.spl" "override/fl#shout.spl"

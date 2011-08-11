@@ -3,6 +3,39 @@ ACTION_IF FILE_EXISTS ~atweaks/lib/temp.tpa~ BEGIN //stuff that's pending inclus
   INCLUDE ~atweaks/lib/temp.tpa~
 END
 
+//Adds immunity to the provided spell to blindness-causing spells and items
+DEFINE_ACTION_FUNCTION add_blindness_immunity BEGIN
+  COPY_EXISTING spdr101.spl  override
+		spin595.spl  override
+		spin878.spl  override
+		spin893.spl  override
+		spin929.spl  override
+		spin931.spl  override
+		sppr704.spl  override
+		sppr707.spl  override
+		spwi106.spl  override
+		spwi118.spl  override
+		spwi224.spl  override
+		spwi714.spl  override
+		spwi815.spl  override
+		spwi958.spl  override
+		spwm178.spl  override
+		chalcy2.itm  override
+		gorwom4.itm  override
+		halb06.itm   override
+		sorb.itm     override
+		sw1h51.itm   override
+		wand19.itm   override
+    PHP_EACH array_as_argument AS idx => f_Spell BEGIN
+      LPF add_conditional_immunity
+	INT_VAR f_Condition = 74
+	STR_VAR f_Spell
+      END
+    END
+    CLEAR_ARRAY array_as_argument
+  BUT_ONLY
+END
+
 //Deletes all extended effects from the source spell and sets casting time for all extended headers to f_CastingTime
 DEFINE_PATCH_FUNCTION prep_for_gate INT_VAR f_CastingTime = 1 BEGIN
   READ_LONG  0x64 ao
