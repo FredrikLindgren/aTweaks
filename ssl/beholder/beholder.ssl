@@ -11,7 +11,6 @@ IF
 THEN
   RESPONSE #100
     SetGlobal("flNumDisabled","LOCALS",loopvar)
-    //SetGlobal("flDamagedEyes","LOCALS",loopvar)
     SetGlobal("flDoOnce","LOCALS",1)
 END
 END LOOP
@@ -381,287 +380,116 @@ INCLUDE FILE(beholder/standard_eyes.ssl)
 //11 Central eye (Anti-magic ray) 2
 
 
+VARIABLE(HasCharmPerson=True)
+VARIABLE(HasCharmMonster=True)
+VARIABLE(HasSleep=True)
+VARIABLE(HasTelekinesis=True)
+VARIABLE(HasPetrify=True)
+VARIABLE(HasDisintegrate=True)
+VARIABLE(HasFear=True)
+VARIABLE(HasSlow=True)
+VARIABLE(HasCauseWoundsNormal=True)
+VARIABLE(HasDeath=True)
+VARIABLE(HasAntimagic=True)
+
+
 //Start shootin'
 
 ////////////////////////////////////////
 //Anti-magic
 ////////////////////////////////////////
-//Disrupt enemy spellcasting
-IF TRIGGER
-  Global("flDisabled11","LOCALS",0)
-  TargetBlock(GoodPureCasters)
-  TriggerBlock(Enemy|Disabled)
-  OR(7) //otherwise it misbehaves when no caster has been seen and starts shooting at anyone
-    Class(scstarget,MAGE)
-    Class(scstarget,CLERIC_MAGE)
-    Class(scstarget,MAGE_THIEF)
-    Class(scstarget,CLERIC)
-    Class(scstarget,CLERIC_THIEF)
-    Class(scstarget,DRUID)
-    Class(scstarget,BARD)
-THEN DO
-  Combine()
-  Action(BHCentralEye,BEHOLDER_ANTIMAGIC_RAY,flUseEye11|200|100)
-END
-
-//Help fellow beholders
-IF TRIGGER
-  Global("flDisabled11","LOCALS",0)
-  TargetBlock(Beholders)
-  !Range(scstarget,2)
-  OR(5)
-    StateCheck(scstarget,STATE_BLIND)
-    StateCheck(scstarget,STATE_CONFUSED)
-    StateCheck(scstarget,STATE_PANIC)
-    StateCheck(scstarget,STATE_CHARMED)
-    CheckStatGT(scstarget,0,CLERIC_INSECT_PLAGUE)
-THEN DO
-  Action(BHCentralEye,BEHOLDER_ANTIMAGIC_RAY,flUseEye11|100|100)
-END
-
-//Deal with Fighter/Casters
-IF TRIGGER
-  Global("flDisabled11","LOCALS",0)
-  TargetBlock(GoodFighterCasters)
-  TriggerBlock(Enemy|Disabled)
-  OR(3)
-    Class(scstarget,FIGHTER_MAGE)
-    Class(scstarget,FIGHTER_DRUID)
-    Class(scstarget,FIGHTER_CLERIC)
-  OR(3)
-    //CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
-    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_PETRIFICATION)
-    CheckStatGT(scstarget,0,SCRIPTINGSTATE2)
-    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_MAGIC_ENERGY)
-THEN DO
-  Combine()
-  Action(BHCentralEye,BEHOLDER_ANTIMAGIC_RAY,flUseEye11|100|100)
-END
-
-//Remove select protections
-IF TRIGGER
-  Global("flDisabled11","LOCALS",0)
-  TargetBlock(EnemiesReverse)
-  TriggerBlock(Enemy|Disabled)
-  //CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
-  CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_PETRIFICATION)
-  CheckStatGT(scstarget,0,SCRIPTINGSTATE2)
-  CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_MAGIC_ENERGY)
-THEN DO
-  Combine()
-  Action(BHCentralEye,BEHOLDER_ANTIMAGIC_RAY,flUseEye11|100|100)
-END
-
-IF TRIGGER
-  Global("flDisabled11","LOCALS",0)
-  TargetBlock(EnemiesReverse)
-  TriggerBlock(Enemy|Disabled)
-  OR(3)
-    //CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
-    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_PETRIFICATION)
-    CheckStatGT(scstarget,0,SCRIPTINGSTATE2)
-    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_MAGIC_ENERGY)
-THEN DO
-  Combine()
-  Action(BHCentralEye,BEHOLDER_ANTIMAGIC_RAY,flUseEye11|25|100)
-END
-
-////debuff
-//IF TRIGGER
-//  Global("flDisabled11","LOCALS",0)
-//  TargetBlock(PlayersReverse)
-//  TargetBlock(EnemiesInOrder)
-//  TriggerBlock(Enemy|Disabled)
-//  OR(11)
-//    StateCheck(scstarget,STATE_HASTED)
-//    StateCheck(scstarget,STATE_BLESS)
-//    StateCheck(scstarget,STATE_CHANT)
-//    StateCheck(scstarget,STATE_MIRRORIMAGE)
-//    CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
-//    CheckStatGT(scstarget,0,CLERIC_ARMOR_OF_FAITH)
-//    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_THE_ELEMENTS)
-//    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_MAGIC_ENERGY)
-//    CheckStatGT(scstarget,0,CLERIC_REGENERATION)
-//    CheckStatGT(scstarget,0,CLERIC_BLADE_BARRIER)
-//    CheckStatGT(scstarget,0,SCRIPTINGSTATE6) //Various Strength spells
-//  !StateCheck(scstarget,STATE_SLOWED)
-//  !StateCheck(scstarget,STATE_SLEEPING)
-//  !StateCheck(scstarget,STATE_PANIC)
-//  !CheckStatGT(scstarget,0,WIZARD_GREATER_MALISON)
-//  !CheckStatGT(scstarget,0,CLERIC_INSECT_PLAGUE)
-//THEN DO
-//  Combine()
-//  Action(BHCentralEye,BEHOLDER_ANTIMAGIC_RAY,flUseEye11|50|100)
-//END
+BEGIN LOOP(EyeNumber||11)
+  INCLUDE FILE(beholder/rays/antimagic.ssl)
+END LOOP
 
 
 ////////////////////////////////////////
 //Charm person
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled1","LOCALS",0)
-  TargetBlock(GoodHumanoidsPreferringStrong)
-  TriggerBlock(Charm|Disabled|Enemy|MinorGlobe|SIEnc)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_CHARM_PERSON,flUseEye1)
-END
+BEGIN LOOP(EyeNumber||1)
+  INCLUDE FILE(beholder/rays/charm_person.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Charm monster
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled2","LOCALS",0)
-  TargetBlock(GoodPreferringStrong)
-  TriggerBlock(Charm|Disabled|Enemy|SIEnc)
-  !General(scstarget,UNDEAD)
-THEN DO
-  Combine()
-  Action(BeholderRayRES,"fl#bhchm",flUseEye2)
-END
+BEGIN LOOP(EyeNumber||2)
+  INCLUDE FILE(beholder/rays/charm_monster.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Disintegrate
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled6","LOCALS",0)
-  Global("fl#bhDisintegration","GLOBAL",0)
-  TargetBlock(PCsPreferringStrong)
-  TriggerBlock(Slayable|Disabled|Enemy)
-  Range(scstarget,20)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_DISINTEGRATE,flUseEye6)
-  SetGlobalTimer("flNotMove","LOCALS",10)
-END
+BEGIN LOOP(EyeNumber||6)
+  INCLUDE FILE(beholder/rays/disintegrate.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Death Ray
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled10","LOCALS",0)
-  TargetBlock(GoodSummons)
-  OR(2)
-    Gender(scstarget,SUMMONED)
-    Gender(scstarget,20)
-  TriggerBlock(Disabled|Enemy)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_DEATH_RAY,flUseEye10|100|100)
-END
+BEGIN LOOP(EyeNumber||10)
+  INCLUDE FILE(beholder/rays/death.ssl)
+END LOOP
 
-IF TRIGGER
-  Global("flDisabled10","LOCALS",0)
-  TargetBlock(PCsPreferringStrong)
-  TriggerBlock(Slayable|Disabled|Enemy)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_DEATH_RAY,flUseEye10)
-  SetGlobalTimer("flNotMove","LOCALS",10)
-END
 
 ////////////////////////////////////////
 //Flesh to Stone
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled5","LOCALS",0)
-  TargetBlock(PCsPreferringStrong)
-  TriggerBlock(Disabled|Enemy|Petrify)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_FLESH_TO_STONE,flUseEye5)
-  SetGlobalTimer("flNotMove","LOCALS",10)
-END
+BEGIN LOOP(EyeNumber||5)
+  INCLUDE FILE(beholder/rays/petrify.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Hold monster (Death Tyrant)
 ////////////////////////////////////////
-IF TRIGGER
-  RequireBlock(DeathTyrant)
-  Global("flDisable1","LOCALS",0)
-  Global("flHold1","LOCALS",1)
-  TargetBlock(PCsPreferringStrong)
-  TriggerBlock(Disabled|Enemy|Hold)
-THEN DO
-  Combine()
-  Action(BeholderRayRES,"fl#bhhlm",flUseEye1)
-END
+BEGIN LOOP(EyeNumber||1;2)
+  INCLUDE FILE(beholder/rays/hold_monster.ssl)
+END LOOP
 
-IF TRIGGER
-  RequireBlock(DeathTyrant)
-  Global("flDisable2","LOCALS",0)
-  Global("flHold2","LOCALS",1)
-  TargetBlock(PCsPreferringStrong)
-  TriggerBlock(Disabled|Enemy|Hold)
-THEN DO
-  Combine()
-  Action(BeholderRayRES,"fl#bhhlm",flUseEye2)
-END
 
 ////////////////////////////////////////
 //Fear
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled7","LOCALS",0)
-  TargetBlock(PCsPreferringStrong)
-  TriggerBlock(Disabled|Enemy|Fear)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_FEAR,flUseEye7)
-END
+BEGIN LOOP(EyeNumber||7)
+  INCLUDE FILE(beholder/rays/fear.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Slow
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled8","LOCALS",0)
-  TargetBlock(PCsPreferringStrong)
-  TriggerBlock(Disabled|Enemy|SIAlt|Slow)
-  !StateCheck(scstarget,STATE_SLOWED)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_SLOW,flUseEye8)
-END
+BEGIN LOOP(EyeNumber||8)
+  INCLUDE FILE(beholder/rays/slow.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Sleep
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled3","LOCALS",0)
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|Enemy|SIEnc|Sleep)
-  LevelLT(scstarget,5)
-THEN DO
-  Combine()
-  Action(BeholderRayRES,"fl#bhslp",flUseEye3)
-END
+BEGIN LOOP(EyeNumber||3)
+  INCLUDE FILE(beholder/rays/sleep.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Cause Serious Wounds
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled9","LOCALS",0)
-  TargetBlock(PCsPreferringWeak)
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|Enemy)
-  !HasItemEquiped("clck26",scstarget)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_CAUSE_SERIOUS_WOUNDS,flUseEye9)
-  SetGlobalTimer("flNotMove","LOCALS",10)
-END
+BEGIN LOOP(EyeNumber||9)
+  INCLUDE FILE(beholder/rays/cause_wounds_normal.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Telekinesis
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled4","LOCALS",0)
-  TargetBlock(GoodPreferringStrong)
-  TriggerBlock(Disabled|Enemy)
-THEN DO
-  Combine()
-  Action(BeholderRayRES,"fl#bhtlk",flUseEye4)
-END
+BEGIN LOOP(EyeNumber||4)
+  INCLUDE FILE(beholder/rays/telekinesis.ssl)
+END LOOP
+
 
 
 //If we still have something useful, go for the disabled etc
@@ -669,84 +497,36 @@ END
 ////////////////////////////////////////
 //Cause Serious Wounds
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled9","LOCALS",0)
-  TargetBlock(PCsPreferringWeak)
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Enemy)
-  !HasItemEquiped("clck26",scstarget)
-  !StateCheck(scstarget,STATE_STONE_DEATH)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_CAUSE_SERIOUS_WOUNDS,flUseEye9)
-  SetGlobalTimer("flNotMove","LOCALS",10)
-END
+BEGIN LOOP(EyeNumber||9)
+  INCLUDE FILE(beholder/rays/wipeout/cause_wounds_normal.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Flesh to Stone
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled5","LOCALS",0)
-  TargetBlock(PCsPreferringStrong)
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Enemy|Petrify)
-  !StateCheck(scstarget,STATE_STONE_DEATH)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_FLESH_TO_STONE,flUseEye5)
-  SetGlobalTimer("flNotMove","LOCALS",10)
-END
+BEGIN LOOP(EyeNumber||5)
+  INCLUDE FILE(beholder/rays/wipeout/petrify.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Disintegrate
 ////////////////////////////////////////
-IF TRIGGER
-  Global("flDisabled6","LOCALS",0)
-  Global("fl#bhDisintegration","GLOBAL",0)
-  TargetBlock(PCsPreferringStrong)
-  TriggerBlock(Slayable|Enemy)
-  Range(scstarget,20)
-  !StateCheck(scstarget,STATE_STONE_DEATH)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_DISINTEGRATE,flUseEye6)
-  SetGlobalTimer("flNotMove","LOCALS",10)
-END
+BEGIN LOOP(EyeNumber||6)
+  INCLUDE FILE(beholder/rays/wipeout/disintegrate.ssl)
+END LOOP
+
 
 ////////////////////////////////////////
 //Death Ray
 ////////////////////////////////////////
+BEGIN LOOP(EyeNumber||10)
+  INCLUDE FILE(beholder/rays/wipeout/death.ssl)
+END LOOP
 
-IF TRIGGER
-  Global("flDisabled10","LOCALS",0)
-  TargetBlock(PCsPreferringStrong)
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Slayable|Enemy)
-  !StateCheck(scstarget,STATE_STONE_DEATH)
-THEN DO
-  Combine()
-  Action(BeholderRay,BEHOLDER_DEATH_RAY,flUseEye10)
-  SetGlobalTimer("flNotMove","LOCALS",10)
-END
 
 
 INCLUDE FILE(beholder/attack.ssl)
 
-//Pursue
-BEGIN LOOP(loopvar||1;2;3;4;5;6)
-IF
-  !See([GOODCUTOFF])
-  Allegiance(Myself,EVILCUTOFF)
-  GlobalTimerNotExpired("flChasePlayerloopvar","LOCALS")
-THEN
-  RESPONSE #100
-    MoveToObject(Playerloopvar)
-END
-END LOOP
-
-//INCLUDE FILE(include/baseend.ssl)
-
-
-
-
-
+INCLUDE FILE(include/pursue.ssl)

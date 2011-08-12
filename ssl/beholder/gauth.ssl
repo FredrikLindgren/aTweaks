@@ -6,12 +6,12 @@ IF
 THEN
   RESPONSE #98
     BEGIN LOOP(loopvar||1;2;3;4;5;6)
-      ReallyForceSpellDeadRES("fl#bhrhl",Playerloopvar)
+      ReallyForceSpellDeadRES("fl#bhgcp",Playerloopvar)
     END LOOP
   RESPONSE #2
     ReallyForceSpellDeadRES("fl#bhxpl",Myself)
     BEGIN LOOP(loopvar||1;2;3;4;5;6)
-      ReallyForceSpellDeadRES("fl#bhrhl",Playerloopvar)
+      ReallyForceSpellDeadRES("fl#bhgcp",Playerloopvar)
     END LOOP
 END
 
@@ -35,7 +35,7 @@ IF
   Global("flActive","LOCALS",1)
 THEN
   RESPONSE #100
-    ReallyForceSpellRES("fl#gauth",Myself)
+    ReallyForceSpellRES("fl#bhgau",Myself)
     SetGlobal("flLightUp","LOCALS",1)
 END
 
@@ -68,25 +68,27 @@ IF TRIGGER
   Global("flDisabled6","LOCALS",0)
   TargetBlock(PCsPreferringStrong)
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|Enemy)
+  TriggerBlock(Disabled|Enemy|MRFull|SIEnc|BHShield)
   !CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
 THEN DO
   Combine()
-  Action(BHCentralEye,WIZARD_FEEBLEMIND,flUseEye6|100|50)
+  Action(BHCentralEyeRES,"fl#bhfbl",flUseEye6|100|50)
 END
 
+
 ///////////////////////////////
-//Paralyzation
+//Paralyzation (à la Gauth)
 ///////////////////////////////
 IF TRIGGER
   Global("flDisabled5","LOCALS",0)
   TargetBlock(PCsPreferringStrong)
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|Enemy|Hold)
+  TriggerBlock(Disabled|Enemy|Hold|MRFull|SIEnc|BHShield)
 THEN DO
   Combine()
-  Action(BeholderRay,BEHOLDER_PARALYZATION,flUseEye5|100|50)
+  Action(BeholderRayRES,"fl#bhgpa",flUseEye5|100|50)
 END
+
 
 ///////////////////////////////
 //Repulsion
@@ -94,7 +96,7 @@ END
 IF TRIGGER
   Global("flDisabled2","LOCALS",0)
   TargetBlock(PCsPreferringStrong)
-  TriggerBlock(Disabled|Enemy)
+  TriggerBlock(Disabled|Enemy|MRFull|SIAlt|BHShield)
 THEN DO
   Combine()
   Action(BeholderRayRES,"fl#bhrep",flUseEye2|100|100)
@@ -106,7 +108,7 @@ END
 IF TRIGGER
   Global("flDisabled3","LOCALS",0)
   TargetBlock(EnemiesReverse)
-  TriggerBlock(Disabled|Enemy|ColdRes75|SIEvo)
+  TriggerBlock(Disabled|Enemy|ColdRes75|SIEvo|MR50)
   Range(scstarget,15)
   !HasItemEquiped("clck26",scstarget)
 THEN DO
@@ -120,7 +122,7 @@ IF TRIGGER
   Global("flDisabled4","LOCALS",0)
   TargetBlock(PCsPreferringStrong)
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|Enemy|ElecRes75|SIEvo)
+  TriggerBlock(Disabled|Enemy|ElecRes75|SIEvo|MR50|MinorGlobe)
   !HasItemEquiped("clck26",scstarget)
 THEN DO
   Combine()
@@ -134,7 +136,7 @@ IF TRIGGER
   Global("flDisabled1","LOCALS",0)
   TargetBlock(PCsPreferringStrong)
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(Disabled|Enemy)
+  TriggerBlock(Disabled|Enemy|MRFull|MagicDamageFull|SINec|BHShield)
   !HasItemEquiped("clck26",scstarget)
 THEN DO
   Combine()
@@ -164,7 +166,7 @@ END
 IF TRIGGER
   Global("flDisabled3","LOCALS",0)
   TargetBlock(EnemiesReverse)
-  TriggerBlock(Enemy|ColdRes75)
+  TriggerBlock(Enemy|ColdRes75|MR50|SIEvo)
   !StateCheck(scstarget,STATE_STONE_DEATH) //but the petrified dude next to him is toast, sorry dude
   Range(scstarget,15)
   !HasItemEquiped("clck26",scstarget)
@@ -179,7 +181,7 @@ IF TRIGGER
   Global("flDisabled4","LOCALS",0)
   TargetBlock(PCsPreferringStrong)
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(Enemy|ElecRes75)
+  TriggerBlock(Enemy|ElecRes75|MR50|SIEvo|MinorGlobe)
   !StateCheck(scstarget,STATE_STONE_DEATH)
   !HasItemEquiped("clck26",scstarget)
 THEN DO
@@ -194,7 +196,7 @@ IF TRIGGER
   Global("flDisabled1","LOCALS",0)
   TargetBlock(PCsPreferringStrong)
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(Enemy)
+  TriggerBlock(Enemy|MagicDamageFull|MRFull|SINec|BHShield)
   !StateCheck(scstarget,STATE_STONE_DEATH)
   !HasItemEquiped("clck26",scstarget)
 THEN DO
@@ -204,11 +206,4 @@ END
 
 INCLUDE FILE(beholder/attack.ssl)
 
-INCLUDE FILE(include/baseend.ssl)
-
-
-
-
-
-
-
+INCLUDE FILE(include/pursue.ssl)

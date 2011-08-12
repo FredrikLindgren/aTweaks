@@ -229,7 +229,7 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhenr.spl"
 COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhenf.spl"
   SAY 0x8 @1406
   WRITE_LONG 0x18 BIT10
-  WRITE_SHORT 0x25 4 //Enchantment
+  //WRITE_SHORT 0x25 4 //Enchantment
   WRITE_BYTE 0x27 11 //disabling
   DEFINE_ARRAY opcode BEGIN 44 50 139 141 142 174 174 END
   DEFINE_ARRAY p1 BEGIN 5 0x606000 7924 0 0 0 0 END
@@ -257,11 +257,14 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhenf.spl"
     CLEAR_ARRAY "%array%"
   END
 
+//Feeblemind
+COPY_EXISTING spwi509.spl "override/fl#bhfbl.spl"
+  
 //Freeze Ray
 COPY "atweaks/spl/base.spl" "override/fl#bhfrz.spl"
   SAY 0x8 @1408
   WRITE_LONG 0x18 BIT10
-  WRITE_SHORT 0x25 6 //Evocation
+  //WRITE_SHORT 0x25 6 //Evocation
   WRITE_BYTE 0x27 10 //offensive damage
   LPF configure_spell_effect
     INT_VAR
@@ -355,14 +358,14 @@ COPY_EXISTING spwi308.spl "override/fl#bhblt.spl"
   END
   
 //Magic Missile
-COPY_EXISTING spwi112.spl "override/fl#bhmmi.spl"
+COPY_EXISTING spwi112.spl "override/fl#bhmm2.spl"
   WRITE_LONG 0x18 BIT10
   LPF prep_itm_spl END
   LPF configure_spell_header
     INT_VAR
       f_Type = 2
       f_Range = 30
-      f_Level = 9
+      f_Level = 3
       f_Projectile = 72
   END
   LPF ADD_SPELL_EFFECT
@@ -387,39 +390,11 @@ COPY_EXISTING spwi112.spl "override/fl#bhmmi.spl"
       resist_dispel = 1
   END
 
-//Paralysis
-COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhpar.spl"
-  SAY 0x8 #10856
-  WRITE_LONG 0x18 BIT10
-  WRITE_SHORT 0x25 4 //Enchantment
-  WRITE_BYTE 0x27 11 //disabling
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 174 //Play Sound
-      target = 2
-      power = 7
-      resist_dispel = 1
-      savingthrow = 1
-    STR_VAR
-      resource = eff_m26
-  END
-  LPF ADD_SPELL_EFFECT
-    INT_VAR
-      opcode = 175 //Hold
-      target = 2
-      power = 7
-      parameter1 = 0
-      parameter2 = 2
-      resist_dispel = 1
-      duration = 96
-      savingthrow = 1
-  END
-
 //Scorch
 COPY_EXISTING spwi217.spl "override/fl#bhscr.spl"
   SAY 0x8 @1407
   WRITE_LONG 0x18 BIT10
-  WRITE_SHORT 0x25 6 //Evocation
+  //WRITE_SHORT 0x25 6 //Evocation
   WRITE_BYTE 0x27 10 //offensive damage
   LPF prep_itm_spl END
   LPF configure_spell_header
@@ -613,6 +588,34 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhdrn.spl"
     END
   END
 
+//Gauth's Paralysis
+COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhgpa.spl"
+  SAY 0x8 #10856
+  WRITE_LONG 0x18 BIT10
+  WRITE_SHORT 0x25 fl#GauthParalyse
+  WRITE_BYTE 0x27 11 //disabling
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 174 //Play Sound
+      target = 2
+      power = 7
+      resist_dispel = 1
+      savingthrow = 1
+    STR_VAR
+      resource = eff_m26
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 175 //Hold
+      target = 2
+      power = 7
+      parameter1 = 0
+      parameter2 = 2
+      timing = 1
+      resist_dispel = 1
+      savingthrow = 1
+  END
+
 //Spell that cures Gauth paralysation
 COPY "atweaks/spl/base.spl" "override/fl#bhgcp.spl"
   LPF ADD_SPELL_EFFECT
@@ -717,7 +720,7 @@ COPY "atweaks/spl/fl#bhray.spl" "override/fl#bhwnd.spl"
 
 
 //Spells for healing the beholder when an eye is destroyed
-ACTION_FOR_EACH p1 IN 1 5 10 15 20 25 30 BEGIN
+ACTION_FOR_EACH p1 IN 1 5 10 15 20 25 30 35 40 BEGIN
   COPY "atweaks/spl/base.spl" "override/fl#bhh%p1%.spl"
     LPF ADD_SPELL_EFFECT
       INT_VAR

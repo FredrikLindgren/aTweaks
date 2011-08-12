@@ -1,10 +1,8 @@
 BEGIN_ACTION_DEFINITION
   Name(BeholderRay)
   TRIGGER
-    False()
     //!GlobalTimerNotExpired("scsargument2","LOCALS")
     Global("scsargument2","LOCALS",1)
-    !HasItemEquiped("wa2shiel",scstarget) //of balduran
     !CheckStatGT(scstarget,99,SPELLFAILUREMAGE) //probably means we've zapped them with an anti-magic ray
     !CheckStatGT(scstarget,99,SPELLFAILUREPRIEST)
     !StateCheck(Myself,STATE_BLIND)
@@ -14,16 +12,13 @@ BEGIN_ACTION_DEFINITION
       //SetGlobalTimer("scsargument2","LOCALS",6)
       SetGlobal("scsargument2","LOCALS",0)
       ReallyForceSpell(scstarget,scsargument1)
-      //Wait(1)
 END
 
 BEGIN_ACTION_DEFINITION
   Name(BeholderRayRES)
   TRIGGER
-    False()
     //!GlobalTimerNotExpired("scsargument2","LOCALS")
     Global("scsargument2","LOCALS",1)
-    !HasItemEquiped("wa2shiel",scstarget) //of balduran
     !CheckStatGT(scstarget,99,SPELLFAILUREMAGE) //probably means we've zapped them with an anti-magic ray
     !CheckStatGT(scstarget,99,SPELLFAILUREPRIEST)
     !StateCheck(Myself,STATE_BLIND)
@@ -33,17 +28,14 @@ BEGIN_ACTION_DEFINITION
       //SetGlobalTimer("scsargument2","LOCALS",6)
       SetGlobal("scsargument2","LOCALS",0)
       ReallyForceSpellRES(scsargument1,scstarget)
-      //Wait(1)
 END
 
 BEGIN_ACTION_DEFINITION
   Name(BHRayRESLimited)
   TRIGGER
-    False()
     //!GlobalTimerNotExpired("scsargument2","LOCALS")
     Global("scsargument2","LOCALS",1)
     GlobalLT("scsargument3","LOCALS",scsargument4)
-    !HasItemEquiped("wa2shiel",scstarget) //of balduran
     !CheckStatGT(scstarget,99,SPELLFAILUREMAGE) //probably means we've zapped them with an anti-magic ray
     !CheckStatGT(scstarget,99,SPELLFAILUREPRIEST)
     !StateCheck(Myself,STATE_BLIND)
@@ -54,16 +46,13 @@ BEGIN_ACTION_DEFINITION
       SetGlobal("scsargument2","LOCALS",0)
       IncrementGlobal("scsargument3","LOCALS",1)
       ReallyForceSpellRES(scsargument1,scstarget)
-      //Wait(1)
 END
 
 BEGIN_ACTION_DEFINITION
   Name(BHCentralEye)
   TRIGGER
-    False()
     //!GlobalTimerNotExpired("scsargument2","LOCALS")
     Global("scsargument2","LOCALS",1)
-    !HasItemEquiped("wa2shiel",scstarget) //of balduran
     !CheckStatGT(scstarget,99,SPELLFAILUREMAGE) //probably means we've zapped them with an anti-magic ray
     !CheckStatGT(scstarget,99,SPELLFAILUREPRIEST)
     !StateCheck(Myself,STATE_BLIND)
@@ -74,7 +63,21 @@ BEGIN_ACTION_DEFINITION
       SetGlobal("scsargument2","LOCALS",0)
       FaceObject(scstarget)
       ReallyForceSpell(scstarget,scsargument1)
-      //Wait(1)
+END
+
+BEGIN_ACTION_DEFINITION
+  Name(BHCentralEyeRES)
+  TRIGGER
+    Global("scsargument2","LOCALS",1)
+    !CheckStatGT(scstarget,99,SPELLFAILUREMAGE) //probably means we've zapped them with an anti-magic ray
+    !CheckStatGT(scstarget,99,SPELLFAILUREPRIEST)
+    !StateCheck(Myself,STATE_BLIND)
+    !CheckStatGT(scstarget,0,SANCTUARY)
+  ACTION
+    RESPONSE #scsprob1
+      SetGlobal("scsargument2","LOCALS",0)
+      FaceObject(scstarget)
+      ReallyForceSpellRES(scsargument1,scstarget)
 END
 
 BEGIN_ACTION_DEFINITION
