@@ -325,7 +325,7 @@ ACTION_IF FiendsOriginal = 0 BEGIN
   ACTION_FOR_EACH file IN
                   dw#drxg1                                                         //SCSII Glabrezu by Underdark exit
                   dw#drxg2                                                         //SCSII Glabrezu by Underdark exit
-                  dw#sengl                                                         //SCSII Glabrexu at Sendai's
+                  dw#sengl                                                         //SCSII Glabrezu at Sendai's
   BEGIN
     ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
       COPY_EXISTING "%file%.cre" override
@@ -403,6 +403,8 @@ END
    
 
 COPY ~atweaks/cre/RR#SGELU.CRE~ ~override/RR#HGEL.CRE~                             // Gelugon (hostile)
+LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                    // grant immunities to cold-based area effect spells
+LAUNCH_PATCH_FUNCTION poison_spell_immunities END                                  // grant immunities to poison-based area effect spells
   PATCH_IF FiendsScripts BEGIN                                                       //If we are using existing values for stats, copy HP from Glabrezus
     INNER_ACTION BEGIN
       COPY_EXISTING demglasu.cre override
@@ -454,12 +456,12 @@ COMPILE ~atweaks/baf/fiends/fl#nabsu.baf~
         ~atweaks/baf/fiends/fl#balsu.baf~
         ~atweaks/baf/fiends/fl#pitsu.baf~
         
-COPY_EXISTING ~demnabsu.cre~ ~override/fl#nabsu.cre~
+COPY_EXISTING ~demnab01.cre~ ~override/fl#nabsu.cre~
               ~telcor1.cre~  ~override/fl#corsu.cre~
-              ~demglasu.cre~ ~override/fl#glasu.cre~
+             ~demgla01.cre~  ~override/fl#glasu.cre~
               ~rr#hgel.cre~  ~override/fl#gelsu.cre~
-              ~telbal1.cre~  ~override/fl#balsu.cre~
-              ~dempitsu.cre~ ~override/fl#pitsu.cre~
+             ~dembal01.cre~  ~override/fl#balsu.cre~
+             ~dempit01.cre~  ~override/fl#pitsu.cre~
   WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
   WRITE_ASCIIE 0x248 "%DEST_RES%" #8                                               // summoned script
   WRITE_ASCII  0x250 ~~ #8                                                         // disable class AI script
@@ -732,7 +734,7 @@ SAY NAME1 #17320 SAY NAME2 #17320  SAY DESC @751 SAY UNIDENTIFIED_DESC @751     
       PATCH_IF (("%opcode%" = "177") AND ("%resref%" STRING_EQUAL_CASE ~SPCACO~)) BEGIN  // effect #177: Use EFF File
         WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "48"               // param1: 48 (MASK_CHAOTIC)
         WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"                // param2: 8 (ALIGN.IDS)
-        WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "90"               // duration: 90 (15 rounds)
+        WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "120"              // duration: 120 (20 rounds)
         READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // clone effect
         SET "index2"= "%abil_fx_num%" // kills loop
         INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
@@ -777,7 +779,7 @@ SAY NAME1 #17360 SAY NAME2 #17360  SAY DESC @752 SAY UNIDENTIFIED_DESC @752     
       PATCH_IF (("%opcode%" = "177") AND ("%resref%" STRING_EQUAL_CASE ~SPFIEND~)) BEGIN  // effect #177: Use EFF File
         WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "48"               // param1: 48 (MASK_CHAOTIC)
         WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"                // param2: 8 (ALIGN.IDS)
-        WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "120"              // duration: 120 (20 rounds)
+        WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "198"              // duration: 198 (33 rounds)
         READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // clone effect
         SET "index2"= "%abil_fx_num%" // kills loop
         INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
@@ -832,7 +834,7 @@ COPY_EXISTING ~SPWI905.SPL~  ~override~                                         
       PATCH_IF (("%opcode%" = "177") AND ("%resref%" STRING_EQUAL_CASE ~SPGATE~)) BEGIN  // effect #177: Use EFF File
         WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "16"               // param1: 16 (MASK_LAWFUL)
         WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"                // param2: 8 (ALIGN.IDS)
-        WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "198"              // duration: 198 (33 rounds)
+        WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "396"              // duration: 396 (66 rounds)
         READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // clone effect
         SET "index2"= "%abil_fx_num%" // kills loop
         INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
@@ -927,6 +929,15 @@ BUT_ONLY_IF_IT_CHANGES
 // ================================================
 
 ACTION_IF MOD_IS_INSTALLED SPELL_REV.TP2 0 THEN BEGIN                              // Checks for the main component of Spell Revisions
+
+COPY_EXISTING ~scrl8i.itm~ ~override~                                              // Restore default Summon Cacofiend scroll usability flags
+  PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
+    READ_BYTE  0x2d "use"
+    WRITE_BYTE 0x2d ("%use%" BAND 0b11111011)                                      // removes illusionist flag
+    READ_BYTE  0x2d "use"
+    WRITE_BYTE 0x2d ("%use%" BOR  0b00000001)                                      // adds diviner flag
+  END
+BUT_ONLY_IF_IT_CHANGES
 
 COPY_EXISTING ~SPCACO.EFF~ ~override~                                              // Summon Cacofiend effect file
   WRITE_ASCII 0x30 ~DEMNABSU~ #8                                                   // resref: SPCACO (Nabassu) i.e. revert from Death Knight

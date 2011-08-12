@@ -32,10 +32,10 @@ THEN
 END
 
 IF
-  HasItem("MAGE01",Myself) // invisibility item which prevents the party from targeting not-yet-gated fiends
+  HasItem("RR#DINV",Myself) // invisibility item which prevents the party from targeting not-yet-gated fiends
 THEN
   RESPONSE #100
-    DestroyItem("MAGE01")
+    DestroyItem("RR#DINV")
     Continue()
 END
 
@@ -216,6 +216,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // but they should not disrupt the Blood War
 	!CheckStatGT(ThirdNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
@@ -233,6 +234,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // but they should not disrupt the Blood War
 	!CheckStatGT(FourthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
@@ -250,6 +253,9 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // but they should not disrupt the Blood War
 	!CheckStatGT(FifthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
@@ -267,6 +273,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // but they should not disrupt the Blood War
 	!CheckStatGT(SixthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
@@ -782,7 +792,7 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI314",LastSeenBy(Myself)) // Vampiric Touch
+		ForceSpellRES("RR#DVTC1",LastSeenBy(Myself)) // Vampiric Touch
 		SetInterrupt(TRUE)
 END
 
@@ -806,7 +816,7 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI314",LastSeenBy(Myself)) // Vampiric Touch
+		ForceSpellRES("RR#DVTC1",LastSeenBy(Myself)) // Vampiric Touch
 		SetInterrupt(TRUE)
 END
 
@@ -830,7 +840,7 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI314",LastSeenBy(Myself)) // Vampiric Touch
+		ForceSpellRES("RR#DVTC1",LastSeenBy(Myself)) // Vampiric Touch
 		SetInterrupt(TRUE)
 END
 
@@ -854,7 +864,7 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI314",LastSeenBy(Myself)) // Vampiric Touch
+		ForceSpellRES("RR#DVTC1",LastSeenBy(Myself)) // Vampiric Touch
 		SetInterrupt(TRUE)
 END
 
@@ -878,7 +888,7 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI314",LastSeenBy(Myself)) // Vampiric Touch
+		ForceSpellRES("RR#DVTC1",LastSeenBy(Myself)) // Vampiric Touch
 		SetInterrupt(TRUE)
 END
 
@@ -902,7 +912,7 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI314",LastSeenBy(Myself)) // Vampiric Touch
+		ForceSpellRES("RR#DVTC1",LastSeenBy(Myself)) // Vampiric Touch
 		SetInterrupt(TRUE)
 END
 

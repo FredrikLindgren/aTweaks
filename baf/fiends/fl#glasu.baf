@@ -8,9 +8,10 @@ THEN
 END
 
 IF
-	OR(2)
-	  StateCheck(Myself,STATE_REALLY_DEAD)
-	  StateCheck(Myself,STATE_DISABLED)
+	OR(3)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
 THEN
 	RESPONSE #100
 		NoAction()
@@ -206,6 +207,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // but they should not disrupt the Blood War
 	!CheckStatGT(ThirdNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
@@ -223,6 +225,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // but they should not disrupt the Blood War
 	!CheckStatGT(FourthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
@@ -240,6 +244,9 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // but they should not disrupt the Blood War
 	!CheckStatGT(FifthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
@@ -257,6 +264,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // but they should not disrupt the Blood War
 	!CheckStatGT(SixthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
@@ -412,6 +423,313 @@ THEN
 		AttackOneRound(LastSeenBy(Myself))
 		SetInterrupt(TRUE)
 END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See([GOODCUTOFF.0.MIST.0.0.SUMMONED])
+	OR(2)
+	  HasItem("NISHRUU",LastSeenBy(Myself)) // Nishruu or Hakeashar (unmodded game)
+	  HasItem("HAKSU",LastSeenBy(Myself)) // Spell Revisions' Hakeashar
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                FaceObject(LastSeenBy(Myself))
+                ReallyForceSpellRES("SPWI302",LastSeenBy(Myself)) // using the wizard version of Remove Magic here to accont for the unmodded Nishruu/Hakeashar script
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+	See(NearestEnemyOf(Myself))
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(4)                                           // note: no level check is needed for dispelling magical weapons
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+	See(SecondNearestEnemyOf(Myself))
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(4)                                           // note: no level check is needed for dispelling magical weapons
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+	See(ThirdNearestEnemyOf(Myself))
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(4)                                           // note: no level check is needed for dispelling magical weapons
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+	See(FourthNearestEnemyOf(Myself))
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(4)                                           // note: no level check is needed for dispelling magical weapons
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+	See(FifthNearestEnemyOf(Myself))
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(4)                                           // note: no level check is needed for dispelling magical weapons
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+	See(SixthNearestEnemyOf(Myself))
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(4)                                           // note: no level check is needed for dispelling magical weapons
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+	See(SeventhNearestEnemyOf(Myself))
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(4)                                           // note: no level check is needed for dispelling magical weapons
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+	See(EighthNearestEnemyOf(Myself))
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(4)                                           // note: no level check is needed for dispelling magical weapons
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+	See(NinthNearestEnemyOf(Myself))
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(4)                                           // note: no level check is needed for dispelling magical weapons
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+	See(TenthNearestEnemyOf(Myself))
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(4)                                           // note: no level check is needed for dispelling magical weapons
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+
 
 IF
         Global("RR#Bhave","LOCALS",1)
@@ -947,6 +1265,425 @@ THEN
                 IncrementGlobal("RR#PWStun","LOCALS",1)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
+	See(NearestEnemyOf(Myself))
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(16)
+          CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+	  CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+          CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
+	See(SecondNearestEnemyOf(Myself))
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(16)
+          CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+	  CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+          CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
+	See(ThirdNearestEnemyOf(Myself))
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(16)
+          CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+	  CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+          CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
+	See(FourthNearestEnemyOf(Myself))
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(16)
+          CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+	  CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+          CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
+	See(FifthNearestEnemyOf(Myself))
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(16)
+          CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+	  CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+          CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
+	See(SixthNearestEnemyOf(Myself))
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(16)
+          CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+	  CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+          CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
+	See(SeventhNearestEnemyOf(Myself))
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(16)
+          CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+	  CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+          CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
+	See(EighthNearestEnemyOf(Myself))
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(16)
+          CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+	  CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+          CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
+	See(NinthNearestEnemyOf(Myself))
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(16)
+          CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+	  CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+          CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
+	See(TenthNearestEnemyOf(Myself))
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
+	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
+	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+	OR(16)
+          CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+	  CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+          CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+	  HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+	  HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+	  HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+	  HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+        !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI302",LastSeenBy(Myself)) // Remove Magic
+		SetInterrupt(TRUE)
 END
 
 IF
