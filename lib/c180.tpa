@@ -10,7 +10,6 @@ INCLUDE "atweaks/lib/dsandstuff.tpa"                                            
 // New spells
 //////////////
 
-
 COPY ~atweaks/spl/mephits/rr#maigt.spl~ ~override~                                 // Gate (Air Mephit)
 COPY ~atweaks/eff/mephits/rr#maigt.eff~ ~override~                                 // Gate EFF (Air Mephit)
 COPY ~atweaks/spl/mephits/rr#maibg.spl~ ~override~                                 // Breathe Grit (Air Mephit)
@@ -163,20 +162,8 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END  
 
 COPY ~atweaks/itm/mephits/rr#mrg1t.itm~ ~override~                                 // Mephit regeneration (1hp/turn)
 COPY ~atweaks/itm/mephits/rr#mimun.itm~ ~override~                                 // Mephit immunities amulet (shared by all mephits)
+LAUNCH_PATCH_FUNCTION ~cure_spell_immunities~ END                                  // add immunity to cure/cause wound spells
 PATCH_FOR_EACH ~spell~ IN                                                          // for each of the following spells
-            ~SPPR103~                                                              // Cure Light Wounds
-            ~SPPR215~                                                              // Cure Medium Wounds
-            ~SPPR315~                                                              // Cure Medium Wounds
-            ~SPPR401~                                                              // Cure Serious Wounds
-            ~SPPR404~                                                              // Neutralize Poison
-            ~SPPR502~                                                              // Cure Critical Wounds
-            ~SPPR514~                                                              // Mass Cure
-            ~SPPR514~                                                              // Mass Cure
-            ~SPPR607~                                                              // Heal
-            ~SPIN101~                                                              // Cure Light Wounds (Bhaalpower)
-            ~SPIN551~                                                              // Cause Serious Wounds (Hive Mother)
-            ~SPIN986~                                                              // Cause Serious Wounds (Beholder)
-            ~SPCL211~                                                              // Paladin Lay On Hands
            ~RR#MOZSC~                                                              // Stinking Cloud (aTweaks' Ooze Mephit)
            ~RR#MDUGD~                                                              // Glass Dust (aTweaks' Dust Mephit)
 BEGIN                                                                              // execute the following
@@ -196,36 +183,13 @@ BUT_ONLY_IF_IT_CHANGES
 
 
 COPY ~atweaks/itm/mephits/rr#mgasi.itm~ ~override~                                 // gas imunity ring (shared by several mephits)
-PATCH_FOR_EACH ~spell~ IN                                                          // for each of the following spells
-            ~SPWI004~                                                              // Stinking Cloud (trap)
-            ~SPWI016~                                                              // Cloudkill (trap)
-            ~SPWI213~                                                              // Stinking Cloud
-            ~SPWI502~                                                              // Cloudkill
-            ~SPWI614~                                                              // Death Fog
-            ~SPWI810~                                                              // Incendiary Cloud
-            ~SPIN940~                                                              // Stinking Cloud (mephit)
-            ~SPIN979~                                                              // Golem Gas Cloud
-            ~SPIN642~                                                              // Poisonous Cloud
-           ~RR#WI502~                                                              // aTweaks' Cloudkill (used by Marilith)
-           ~RR#MMSWF~                                                              // Wall of Fog (aTweaks' Mist Mephit)
-BEGIN                                                                              // execute the following
-LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                          // add new equipping effect
-INT_VAR                                                                            // initialize variables
-"opcode" = "206"                                                                   // effect: #206 (Protection from Spell)
-"target" = "1"                                                                     // target: 1 (self)
-"timing" = "2"                                                                     // timing mode: 2 (while equipped)
-"duration" = "0"                                                                   // duration: 0
-"parameter1" = "4742"                                                              // param1: string (Spell Ineffective)
-"probability1" = "100"                                                             // probability1: 100%
-STR_VAR                                                                            // initialize strings
-"resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-END                                                                                // ends FUNCTION
-END                                                                                // ends PATCH_FOR_EACH block
-BUT_ONLY_IF_IT_CHANGES                                                   
+LAUNCH_PATCH_FUNCTION cloud_spell_immunities END                                   // grant immunities to gas-based area effect spells
+
 
 
 COPY ~atweaks/itm/mephits/rr#maiw1.itm~ ~override~                                 // Air Mephit melee attack and special traits
 COPY ~atweaks/itm/mephits/rr#mduw1.itm~ ~override~                                 // Dust Mephit melee attack and special traits
+LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
 COPY ~atweaks/itm/mephits/rr#meaw1.itm~ ~override~                                 // Earth Mephit melee attack and special traits
 COPY ~atweaks/itm/mephits/rr#meaw1.itm~ ~override/rr#meaw2.itm~                    // spawn Earth Mephit's second melee attack (Grow ability result)
 READ_LONG 0x64 abil_off
@@ -248,6 +212,7 @@ COPY ~atweaks/itm/mephits/rr#mraw1.itm~ ~override~                              
 COPY ~atweaks/itm/mephits/rr#msaw1.itm~ ~override~                                 // Salt Mephit melee attack and special traits
 COPY ~atweaks/itm/mephits/rr#msmw1.itm~ ~override~                                 // Smoke Mephit melee attack and special traits
 COPY ~atweaks/itm/mephits/rr#mstw1.itm~ ~override~                                 // Steam Mephit melee attack and special traits
+
 
 
 
@@ -1353,4 +1318,36 @@ COUNT_2DA_ROWS 2 rows
 INSERT_2DA_ROW rows 2 ~%rows%          RR#9003~
 SET rows = rows + 1
 REPLACE ~RR#9003~ @9003                                                            // Mephit gating tip
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Make Wand of Cloudkill cast the proper Cloudkill spell instead of mimicking its effects 
+// Note: this is needed in order to grant proper immunity to gas-based spells to certain mephits
+
+COPY_EXISTING ~spwi502.spl~  ~override/rr#wi502.spl~                                          // Clone Cloudkill into an innate ability (used by the Cloudkill wand)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END                // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~wand13.itm~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN                                                    // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                                            // Nythrun's SPL/ITM re-indexer macro
+ READ_LONG  0x64 "abil_off" ELSE 0
+ READ_SHORT 0x68 "abil_num" ELSE 0
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN
+    READ_BYTE  ("%abil_off%" +        ("%index%" * 0x38)) "type"
+    PATCH_IF ("%type%" = 3) BEGIN
+        WRITE_SHORT ("%abil_off%" + 0x2a + ("%index%" * 0x38)) 1                              // projectile: none
+    END
+  END
+  LAUNCH_PATCH_FUNCTION ~DELETE_ITEM_EFFECT~ INT_VAR opcode_to_delete = "-1" header = 1 END   // delete all opcodes in the item's extended header
+  LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EFFECT~
+  INT_VAR 
+    opcode = 148                                                                              // effect: #148 (Cast spell at point)
+    target = 1                                                                                // target: self (note: odd setting, but apparently needed)
+    timing = 1                                                                                // timing: permanent
+    parameter1 = 1                                                                            // param1: casting level
+    parameter2 = 1                                                                            // param2: cast instantly
+    probability1 = 100                                                                        // probability1: 100
+  STR_VAR resource = ~RR#WI502~                                                               // resref: RR/aTweaks innate Cloudkill
+  END                                                                                         
+END                                                                                           // ends file size check
 BUT_ONLY_IF_IT_CHANGES

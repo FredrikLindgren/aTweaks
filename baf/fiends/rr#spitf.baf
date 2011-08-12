@@ -171,6 +171,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],6) // but they should not disrupt the Blood War
 	!CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
@@ -189,6 +190,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],6) // but they should not disrupt the Blood War
 	!CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
@@ -207,6 +210,9 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],6) // but they should not disrupt the Blood War
 	!CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
@@ -225,6 +231,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],6) // but they should not disrupt the Blood War
 	!CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
@@ -406,15 +416,35 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#PFWish","LOCALS",0)
-        HPPercentLT(Myself,60)
+        OR(3)
+          HPPercentLT(Myself,61)
+          CheckStatGT(Myself,0,LEVELDRAIN)
+          StateCheck(Myself,STATE_BLIND)
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
                 SetGlobal("RR#PFWish","LOCALS",1)
-                SetGlobal("RR#Wish","GLOBAL",1) // Wish: Heal self
+                SetGlobal("RR#Wish","GLOBAL",1) // Wish: Restore Full Health (self only)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#WISH",Myself) // Wish
 		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!StateCheck(Myself,STATE_IMPROVEDINVISIBILITY)
+	!Global("dvgldust","LOCALS",1)
+	!CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
+	!CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
+	!CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
+	!CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+	!CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+	!CheckStatGT(NearestENemyOfType([0.0.PLANATAR]),0,TRUE_SIGHT)
+	!CheckStatGT(NearestENemyOfType([0.0.DARKPLANATAR]),0,TRUE_SIGHT)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
 END
 
 IF
@@ -543,6 +573,11 @@ IF
         See(NearestEnemyOf(Myself))
         !StateCheck(LastSeenBy(Myself),STATE_PANIC)
         Range(LastSeenBy(Myself),10)
+        HPGT(LastSeenBy(Myself),19)
+	OR(3)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL2)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL3)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
 	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
@@ -711,28 +746,10 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Tactic","LOCALS")
-	RandomNum(2,1)
 THEN
 	RESPONSE #100
                 SetGlobal("RR#Bhave","LOCALS",3) // Fireball
 		SetGlobalTimer("RR#Tactic","LOCALS",12)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!StateCheck(Myself,STATE_IMPROVEDINVISIBILITY)
-	!Global("dvgldust","LOCALS",1)
-	!CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
-	!CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
-	!CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
-	!CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-	!CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-	!CheckStatGT(NearestENemyOfType([0.0.PLANATAR]),0,TRUE_SIGHT)
-	!CheckStatGT(NearestENemyOfType([0.0.DARKPLANATAR]),0,TRUE_SIGHT)
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
 END
 
 IF
@@ -830,7 +847,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Allegiance(Myself,GOODCUTOFF)
-	!Range([EVILCUTOFF],15)
+	!See([EVILCUTOFF])
 	Detect([EVILCUTOFF])
         !StateCheck(LastSeenBy(Myself),STATE_NONDETECTION)
         !CheckStat(LastSeenBy(Myself),3,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Divination
@@ -1670,13 +1687,14 @@ IF
         CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
 THEN
 	RESPONSE #100
-		AttackReevaluate(LastSeenBy(Myself),15)
+		AttackOneRound(LastSeenBy(Myself))
 END
 
 IF
         See([0.0.TROLL])
 	!Range(LastSeenBy(Myself),6)
         CheckStatLT(LastSeenBy(Myself),100,RESISTFIRE)
+	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		MoveToObjectNoInterrupt(LastSeenBy(Myself))

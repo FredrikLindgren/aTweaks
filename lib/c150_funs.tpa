@@ -12,10 +12,12 @@ DEFINE_PATCH_FUNCTION make_imp BEGIN
     REPLACE_CRE_ITEM ~RR#DIMP~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                  // replace default weapon with a more PnP accurate weapon
     REMOVE_CRE_ITEM ~RINGDEMN~                                                         // removes RINGDEMN.ITM (Imps are not actual Fiends in 2E)
     REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (regeneration now handled via equipped weapon)
-    WRITE_LONG 0x14 1400                                                               //XP
-    PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting                                                   //Only do this if we're not just adding aTweaks scripting
+    newxpv = 1400
+    LPM update_fiend_xp
+    PATCH_IF FiendsScripts = 0 BEGIN                                                   // Only do this if we're not just adding aTweaks scripting                                                   
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "18"                                                                  // new hit point value
           "newac"    = "2"                                                                   // new Armor Class value
           "newth"    = "19"                                                                  // new THAC0 value
@@ -60,6 +62,10 @@ DEFINE_PATCH_FUNCTION make_imp BEGIN
         "script06"   = "DW#MELEE"                                                          // SCSII melee script
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                    // grant immunities to cold-based area effect spells
+    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
+    LAUNCH_PATCH_FUNCTION cure_spell_immunities END                                    // grant immunities to cure/cause wound spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -83,10 +89,12 @@ DEFINE_PATCH_FUNCTION make_hellcat BEGIN
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
     REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
     REPLACE_CRE_ITEM ~RR#DFCAT~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-    WRITE_LONG 0x14 3000
+    newxpv = 3000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "51"                                                                  // new hit point value
           "newac"    = "6"                                                                   // new Armor Class value
           "newth"    = "13"                                                                  // new THAC0 value
@@ -131,6 +139,7 @@ DEFINE_PATCH_FUNCTION make_hellcat BEGIN
         "skipfile02" = "GORCAMB7"                                                          // skip script patching for a designated file
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -153,10 +162,12 @@ DEFINE_PATCH_FUNCTION make_erinyes BEGIN
     REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
-    WRITE_LONG 0x14 7000                                                               //XP
+    newxpv = 7000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "48"                                                                  // new hit point value
           "newac"    = "2"                                                                   // new Armor Class value
           "newth"    = "13"                                                                  // new THAC0 value
@@ -198,6 +209,7 @@ DEFINE_PATCH_FUNCTION make_erinyes BEGIN
         "script05"   = "BPDEMON"                                                           // Big Picture Demon AI
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -222,10 +234,12 @@ DEFINE_PATCH_FUNCTION make_bone_fiend BEGIN
     REPLACE_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNDROPPABLE~ ~RRING~                         // replace undead immunities with fiend immunities 
     REMOVE_CRE_ITEM ~IMMUNE2~                                                          // removes IMMUNE2.ITM (no immunity to +1 weapons in PnP)
     REMOVE_CRE_ITEM ~REGHP2R~                                                          // removes REGHP2R.ITM (no regeneration in PnP)
-    WRITE_LONG 0x14 7000                                                               //XP
+    newxpv = 7000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "40"                                                                  // new hit point value
           "newac"    = "3"                                                                   // new Armor Class value
           "newth"    = "15"                                                                  // new THAC0 value
@@ -270,6 +284,7 @@ DEFINE_PATCH_FUNCTION make_bone_fiend BEGIN
         "script07"   = "DW#BONEF"                                                          // SCSII Bone Fiend script
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -304,10 +319,12 @@ DEFINE_PATCH_FUNCTION make_abishai BEGIN
     REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
     REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
     REPLACE_CRE_ITEM ~RR#DABIS~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-    WRITE_LONG 0x14 9000                                                               //XP
+    newxpv = 9000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "51"                                                                  // new hit point value
           "newac"    = "1"                                                                   // new Armor Class value
           "newth"    = "13"                                                                  // new THAC0 value
@@ -349,6 +366,7 @@ DEFINE_PATCH_FUNCTION make_abishai BEGIN
         "script05"   = "DW#MELEE"                                                          // SCSII melee script
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
@@ -364,35 +382,6 @@ DEFINE_PATCH_FUNCTION make_abishai BEGIN
           "effsource" = ""                                                                   // effsource: none
       END
     END
-    PATCH_FOR_EACH ~spell~ IN                                                          // grant immunity to each of the following spells (prevents AI quirks)
-                ~SPIN561~                                                              // Fire Giant Lava Pit (FIRE_GIANT_LAVA)
-                ~SPIN819~                                                              // Lava Burst (LAVA_BURST)
-                ~SPWI022~                                                              // Lava Pit (TRAP_MUCK)
-                ~SPWI103~                                                              // Burning Hands
-                ~SPWI217~                                                              // Agannazar's Scorcher
-                ~SPWI304~                                                              // Fireball
-                ~RR#WI304~                                                             // Pit Fiend Fireball
-                ~SPWI502~                                                              // Cloudkill
-               ~RR#WI502~                                                              // aTweaks' Marilith Cloudkill
-                ~SPWI523~                                                              // Sunfire
-                ~SPWI712~                                                              // Delayed Blast Fireball
-                ~SPWI810~                                                              // Incendiary Cloud
-                ~SPWI911~                                                              // Meteor Swarm
-                ~SPPR705~                                                              // Fire Storm
-    BEGIN                                                                              // execute the following
-      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-      INT_VAR                                                                            // initialize variables
-        "opcode" = "206"                                                                   // effect: #101 (Protection from Opcode)
-        "target" = "1"                                                                     // target: 1 (self)
-        "timing" = "9"                                                                     // timing mode: 9 (permanent after death)
-        "duration" = "0"                                                                   // duration: 0
-        "sectype" = "0"                                                                    // secondary type: none
-        "probability1" = "100"                                                             // probability1: 100%
-      STR_VAR                                                                            // initialize strings
-        "resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-        "effsource" = ""                                                                   // effsource: none
-      END                                                                                // ends FUNCTION
-    END
     // =============================================================================== // the actual work ends here
   END                                                                                // ends file validity check
 END
@@ -407,10 +396,12 @@ DEFINE_PATCH_FUNCTION make_cornugon BEGIN
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
     REPLACE_CRE_ITEM ~RR#DCORN~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-    WRITE_LONG 0x14 10000
+    newxpv = 10000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "80"                                                                  // new hit point value
           "newac"    = "-2"                                                                  // new Armor Class value
           "newth"    = "11"                                                                  // new THAC0 value
@@ -456,6 +447,7 @@ DEFINE_PATCH_FUNCTION make_cornugon BEGIN
         "script06"   = "DW#MELEE"                                                          // SCSII melee script
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -482,7 +474,7 @@ DEFINE_PATCH_FUNCTION make_cornugon BEGIN
         "sectype" = "0"                                                                    // secondary type: none
         probability1 = "100"                                                               // probability1: 100%
       STR_VAR
-        "resource"  = "RR#WI308"                                                           // resref: RR#WI308.SPL (Cornugon's own Lightning Bolt)
+        "resource"  = "RR#WI308"                                                       // resref: RR#WI308.SPL (note: special case - Cornugon's own Lightning Bolt)
         "effsource" = ""                                                                   // effsource: none
     END
     WRITE_BYTE  0x2E "49"                                                              // major color (brown)
@@ -500,10 +492,12 @@ DEFINE_PATCH_FUNCTION make_pit_fiend INT_VAR enforce = 0 BEGIN
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
     REPLACE_CRE_ITEM ~RR#DPITF~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace generic attack with a Pit Fiend specific attack
-    WRITE_LONG 0x14 21000
+    newxpv = 21000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "104"                                                                 // new hit point value
           "newac"    = "-5"                                                                  // new Armor Class value
           "newth"    = "7"                                                                   // new THAC0 value
@@ -559,6 +553,7 @@ DEFINE_PATCH_FUNCTION make_pit_fiend INT_VAR enforce = 0 BEGIN
       END                                                                                // ends FUNCTION call
     END
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -580,38 +575,10 @@ DEFINE_PATCH_FUNCTION make_pit_fiend INT_VAR enforce = 0 BEGIN
       END                                                                                // ends FUNCTION
     END
     WRITE_SHORT 0x28 "4352"                                                            // special case, Pit Fiends should use the TANARRI (winged demon) avatar
-    PATCH_FOR_EACH ~spell~ IN                                                          // grant immunity to each of the following spells (prevents AI quirks)
-                ~SPIN561~                                                              // Fire Giant Lava Pit (FIRE_GIANT_LAVA)
-                ~SPIN819~                                                              // Lava Burst (LAVA_BURST)
-                ~SPWI022~                                                              // Lava Pit (TRAP_MUCK)
-                ~SPWI103~                                                              // Burning Hands
-                ~SPWI217~                                                              // Agannazar's Scorcher
-                ~SPWI304~                                                              // Fireball
-                ~RR#WI304~                                                              // Pit Fiend's own Fireball
-                ~SPWI502~                                                              // Cloudkill
-               ~RR#WI502~                                                              // aTweaks' Marilith Cloudkill
-                ~SPWI523~                                                              // Sunfire
-                ~SPWI712~                                                              // Delayed Blast Fireball
-                ~SPWI810~                                                              // Incendiary Cloud
-                ~SPWI911~                                                              // Meteor Swarm
-                ~SPPR705~                                                              // Fire Storm
-    BEGIN                                                                              // execute the following
-      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-      INT_VAR                                                                            // initialize variables
-        "opcode" = "206"                                                                   // effect: #101 (Protection from Opcode)
-        "target" = "1"                                                                     // target: 1 (self)
-        "timing" = "9"                                                                     // timing mode: 9 (permanent after death)
-        "duration" = "0"                                                                   // duration: 0
-        "sectype" = "0"                                                                    // secondary type: none
-        "probability1" = "100"                                                             // probability1: 100%
-      STR_VAR                                                                            // initialize strings
-        "resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-        "effsource" = ""                                                                   // effsource: none
-      END                                                                                // ends FUNCTION
     END
     // =============================================================================== // the actual work ends here
   END                                                                                // ends file validity check
-END
+
 
 
 DEFINE_PATCH_FUNCTION make_quasit BEGIN
@@ -625,10 +592,12 @@ DEFINE_PATCH_FUNCTION make_quasit BEGIN
     REPLACE_CRE_ITEM ~RR#DQUAS~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
     REMOVE_CRE_ITEM ~RINGDEMN~                                                         // removes RINGDEMN.ITM (Imps are not actual Fiends in 2E)
     REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (regeneration now handled via equipped weapon)
-    WRITE_LONG 0x14 1400
+    newxpv = 1400
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "24"                                                                  // new hit point value
           "newac"    = "2"                                                                   // new Armor Class value
           "newth"    = "17"                                                                  // new THAC0 value
@@ -678,6 +647,10 @@ DEFINE_PATCH_FUNCTION make_quasit BEGIN
         "skipfile02" = "TELQUA2"                                                           // skip script patching for a designated file
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                    // grant immunities to cold-based area effect spells
+    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
+    LAUNCH_PATCH_FUNCTION cure_spell_immunities END                                    // grant immunities to cure/cause wound spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -699,6 +672,9 @@ DEFINE_PATCH_FUNCTION make_cambion BEGIN
     REMOVE_CRE_ITEM ~SEEINVIS~                                                         // removes SEEINVIS.ITM (no detect invisibility in PnP)
     REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
     ADD_CRE_ITEM ~DWDUST~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~ARMOR~                   // unequipp armor in order to enable arcane spellcasting
+    PATCH_IF !FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~RINGDEMN~) BEGIN               // if the creature doesn't possess Fiend immunities
+      ADD_CRE_ITEM ~RR#DCAM2~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~RRING~               // add Cambion immunities (as all fiends except not immune to normal weapons)
+    END
     READ_BYTE 0x6e bg1lswrd                                                            // BG1 Proficiency slot (Large Sword)
     PATCH_IF (%bg1lswrd% < 1) BEGIN                                                    // if the creature has no Large Sword proficiency
       WRITE_BYTE 0x6e 1                                                                // add 1 proficiency point
@@ -706,10 +682,12 @@ DEFINE_PATCH_FUNCTION make_cambion BEGIN
     PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~IDEMON01~) BEGIN                       // special case, the trapped Cambion in Irenicus' dungeon
       ADD_CRE_ITEM ~INVULNER~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~LRING~               // make the Cambion invulnerable while under the protective sphere
     END
-    WRITE_LONG 0x14 6000                                                               // XP when killed
+    newxpv = 6000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "48"                                                                  // new hit point value
           "newac"    = "2"                                                                   // new Armor Class value
           "newth"    = "15"                                                                  // new THAC0 value
@@ -768,6 +746,8 @@ DEFINE_PATCH_FUNCTION make_cambion BEGIN
         "skipfile05" = "ILLCAMB2"                                                          // skip script patching for a designated file
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -785,6 +765,7 @@ DEFINE_PATCH_FUNCTION make_cambion BEGIN
           "effsource" = ""                                                                   // effsource: none
       END
     END
+    PATCH_IF NOT ("%SOURCE_RES%" STRING_EQUAL_CASE ~GORCAMB~) BEGIN                    // special case, don't alter Aesgareth's spell selection
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
     ADD_MEMORIZED_SPELL ~SPWI106~ #0 ~wizard~                                          // adds 1x Blindness
@@ -795,6 +776,7 @@ DEFINE_PATCH_FUNCTION make_cambion BEGIN
     ADD_MEMORIZED_SPELL ~SPWI212~ #1 ~wizard~                                          // adds 1x Mirror Image
     ADD_MEMORIZED_SPELL ~SPWI305~ #2 ~wizard~                                          // adds 1x Haste
     ADD_MEMORIZED_SPELL ~SPWI312~ #2 ~wizard~                                          // adds 1x Slow
+    END
     // =============================================================================== // the actual work ends here
   END                                                                                // ends file validity check
 END
@@ -809,10 +791,12 @@ DEFINE_PATCH_FUNCTION make_alu-fiend BEGIN
     REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
     REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
     ADD_CRE_ITEM ~CLCK14~ #0 #0 #0 ~UNSTEALABLE~ ~ARMOR~                               // replace armor with a robe to enable arcane spellcasting
-    WRITE_LONG 0x14 6000
+    newxpv = 6000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "48"                                                                  // new hit point value
           "newac"    = "2"                                                                   // new Armor Class value
           "newth"    = "17"                                                                  // new THAC0 value
@@ -863,6 +847,8 @@ DEFINE_PATCH_FUNCTION make_alu-fiend BEGIN
         "script08"   = "BPDEMON"                                                           // Big Picture demon script
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -925,10 +911,12 @@ DEFINE_PATCH_FUNCTION make_maurezhi BEGIN
     REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
     REPLACE_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace undead immunities with fiend immunities 
     REPLACE_CRE_ITEM ~RR#DMAUR~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-    WRITE_LONG 0x14 6000                                                               //XP
+    newxpv = 6000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "45"                                                                  // new hit point value
           "newac"    = "0"                                                                   // new Armor Class value
           "newth"    = "15"                                                                  // new THAC0 value
@@ -973,6 +961,8 @@ DEFINE_PATCH_FUNCTION make_maurezhi BEGIN
         "script07"   = "BPDEMON"                                                           // Big Picture demon script
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -992,10 +982,12 @@ DEFINE_PATCH_FUNCTION make_succubus BEGIN
     REMOVE_CRE_ITEM ~DW#SUMFI~                                                         // removes DW#SUMFI.ITM (SCSII's fiend immunities, prevents conflict)
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
-    WRITE_LONG 0x14 11000                                                              //XP
+    newxpv = 11000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "48"                                                                  // new hit point value
           "newac"    = "0"                                                                   // new Armor Class value
           "newth"    = "15"                                                                  // new THAC0 value
@@ -1048,6 +1040,8 @@ DEFINE_PATCH_FUNCTION make_succubus BEGIN
         "script11"   = "_INITDLG"                                                          // dialogue initialization script (Tutu Kirinhale)
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
     END
@@ -1072,10 +1066,12 @@ DEFINE_PATCH_FUNCTION make_nabassu BEGIN
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
     REPLACE_CRE_ITEM ~RR#DNABA~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-    WRITE_LONG 0x14 16000                                                              //XP
+    newxpv = 16000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "76"                                                                  // new hit point value
           "newac"    = "-5"                                                                  // new Armor Class value
           "newth"    = "13"                                                                  // new THAC0 value
@@ -1132,6 +1128,8 @@ DEFINE_PATCH_FUNCTION make_nabassu BEGIN
       END                                                                                // ends FUNCTION call
     END
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                               // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
@@ -1148,20 +1146,6 @@ DEFINE_PATCH_FUNCTION make_nabassu BEGIN
       END
     END
     PATCH_FOR_EACH ~spell~ IN                                                          // grant immunity to each of the following spells (prevents AI quirks)
-                ~SPIN561~                                                              // Fire Giant Lava Pit (FIRE_GIANT_LAVA)
-                ~SPIN819~                                                              // Lava Burst (LAVA_BURST)
-                ~SPWI022~                                                              // Lava Pit (TRAP_MUCK)
-                ~SPWI103~                                                              // Burning Hands
-                ~SPWI217~                                                              // Agannazar's Scorcher
-                ~SPWI304~                                                              // Fireball
-                ~SPWI308~                                                              // Lightning Bolt (Tanar'ri only)
-                ~SPWI502~                                                              // Cloudkill
-               ~RR#WI502~                                                              // aTweaks' Marilith Cloudkill
-                ~SPWI523~                                                              // Sunfire
-                ~SPWI712~                                                              // Delayed Blast Fireball
-                ~SPWI810~                                                              // Incendiary Cloud
-                ~SPWI911~                                                              // Meteor Swarm
-                ~SPPR705~                                                              // Fire Storm
                 ~RR#PR211~                                                             // Nabassu's own Silence 15' Radius
     BEGIN                                                                              // execute the following
       LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
@@ -1198,14 +1182,16 @@ DEFINE_PATCH_FUNCTION make_glabrezu INT_VAR enforce = 0 BEGIN
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
     REPLACE_CRE_ITEM ~RR#DGLAB~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
-    WRITE_LONG 0x14 12000                                                              //XP
     PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~ABYDEM01~) BEGIN                       //  special case for the replaced Planar Sphere Tanar'ri
      SAY NAME1 #38955 SAY NAME2 #38955                                                 // change name to Glabrezu (was Tanar'ri)
       ADD_CRE_ITEM ~IMMUNE2~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~RRING~                // add immunity to +1 weapons and below
     END
+    newxpv = 12000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "80"                                                                  // new hit point value
           "newac"    = "-7"                                                                  // new Armor Class value
           "newth"    = "11"                                                                  // new THAC0 value
@@ -1270,6 +1256,9 @@ DEFINE_PATCH_FUNCTION make_glabrezu INT_VAR enforce = 0 BEGIN
       END                                                                                // ends FUNCTION call
     END
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
+    LAUNCH_PATCH_FUNCTION acid_spell_immunities END                                    // grant immunities to acid-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "16" END                                                // mark opcode #16 (Haste) for deletion
       LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
@@ -1286,39 +1275,10 @@ DEFINE_PATCH_FUNCTION make_glabrezu INT_VAR enforce = 0 BEGIN
       END
     END
     WRITE_SHORT 0x28 "57585"                                                           // special case, Glabrezu should use the IC_GLAB avatar
-    PATCH_FOR_EACH ~spell~ IN                                                          // grant immunity to each of the following spells (prevents AI quirks)
-                ~SPIN561~                                                              // Fire Giant Lava Pit (FIRE_GIANT_LAVA)
-                ~SPIN819~                                                              // Lava Burst (LAVA_BURST)
-                ~SPWI022~                                                              // Lava Pit (TRAP_MUCK)
-                ~SPWI103~                                                              // Burning Hands
-                ~SPWI217~                                                              // Agannazar's Scorcher
-                ~SPWI304~                                                              // Fireball
-                ~SPWI308~                                                              // Lightning Bolt (Tanar'ri only)
-                ~SPWI502~                                                              // Cloudkill
-               ~RR#WI502~                                                              // aTweaks' Marilith Cloudkill
-                ~SPWI523~                                                              // Sunfire
-                ~SPWI614~                                                              // Death Fog (Glabrezu only)
-                ~SPWI712~                                                              // Delayed Blast Fireball
-                ~SPWI810~                                                              // Incendiary Cloud
-                ~SPWI911~                                                              // Meteor Swarm
-                ~SPPR705~                                                              // Fire Storm
-    BEGIN                                                                              // execute the following
-      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-        INT_VAR                                                                            // initialize variables
-          "opcode" = "206"                                                                   // effect: #101 (Protection from Opcode)
-          "target" = "1"                                                                     // target: 1 (self)
-          "timing" = "9"                                                                     // timing mode: 9 (permanent after death)
-          "duration" = "0"                                                                   // duration: 0
-          "sectype" = "0"                                                                    // secondary type: none
-          "probability1" = "100"                                                             // probability1: 100%
-        STR_VAR                                                                            // initialize strings
-          "resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-          "effsource" = ""                                                                   // effsource: none
-      END                                                                                // ends FUNCTION
     END
     // =============================================================================== // the actual work ends here
   END                                                                                // ends file validity check
-END
+
 
 
 DEFINE_PATCH_FUNCTION make_marilith BEGIN
@@ -1331,13 +1291,15 @@ DEFINE_PATCH_FUNCTION make_marilith BEGIN
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
     REPLACE_CRE_ITEM ~RR#DMARI~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a less powerful weapon (closer to PnP damage output)
     ADD_CRE_ITEM ~IPSION~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                              // add protection from all mind-affecting spells
-    WRITE_LONG 0x14 23000                                                              //XP
     PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~OBSDEM01~) BEGIN                       //  special case for Lea'liyl (named Marilith within the Planar Sphere)
       ADD_CRE_ITEM ~IMMUNE2~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~RRING~                // add immunity to +1 weapons and below
     END
+    newxpv = 23000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "96"                                                                  // new hit point value
           "newac"    = "-9"                                                                  // new Armor Class value
           "newapr"   = "1"                                                                   // new number of attacks per round
@@ -1385,6 +1347,8 @@ DEFINE_PATCH_FUNCTION make_marilith BEGIN
         "script09"   = "TANARI"                                                            // generic Tanar'ri script
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "1" END                                                 // mark opcode #1 (Attacks Per Round Modifier) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                          // delete the EFF with the designated opcode
@@ -1403,18 +1367,6 @@ DEFINE_PATCH_FUNCTION make_marilith BEGIN
         STR_VAR
           "effsource" = ""                                                                   // effsource: none
       END
-    END
-    LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-      INT_VAR
-        opcode = "206"                                                                     // effect: #206 (Protection from Spell)
-        target = "1"                                                                       // target: 1 (self)
-        timing = "9"                                                                       // timing mode: 9 (permanent after death)
-        "duration" = "0"                                                                   // duration: 0
-        "sectype" = "0"                                                                    // secondary type: none
-        probability1 = "100"                                                               // probability1: 100%
-      STR_VAR
-        "resource"  = "RR#WI502"                                                           // resref: RR#WI302.SPL (Marilith's own Cloudkill)
-        "effsource" = ""                                                                   // effsource: none
     END
     WRITE_BYTE  0x2E "26"                                                              // major color (wood)
     WRITE_SHORT 0x28 "57488"                                                               // special case, all Mariliths should use the proper avatar
@@ -1436,10 +1388,12 @@ DEFINE_PATCH_FUNCTION make_balor BEGIN
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
     WRITE_BYTE 0x72 0                                                                  // BG1 Proficiency slot (blunt)
-    WRITE_LONG 0x14 26000                                                              //XP
+    newxpv = 26000
+    LPM update_fiend_xp
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                            // Initialize variables
+           newxpv
           "newhp"    = "104"                                                                 // new hit point value
           "newac"    = "-8"                                                                  // new Armor Class value
           "newapr"   = "1"                                                                   // new number of attacks per round
@@ -1507,6 +1461,8 @@ DEFINE_PATCH_FUNCTION make_balor BEGIN
         "skipfile03" = "GORDEMC1"                                                          // skip script patching for a designated file
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   //Only do this if we're not just adding aTweaks scripting
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
       LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
         INT_VAR
           opcode = "300"                                                                     // effect: #300 (NPC Bump)
@@ -1536,6 +1492,8 @@ DEFINE_PATCH_FUNCTION make_ultroloth BEGIN
   PATCH_IF valid BEGIN
     // =============================================================================== // the actual work starts from here
     SAY NAME1 @733 SAY NAME2 @733                                                    //Ultroloth
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION acid_spell_immunities END                                    // grant immunities to acid-based area effect spells
     WRITE_LONG 0x14 26000
     WRITE_LONG 0x28 25088                                                            //MAGE_MALE_HUMAN
     WRITE_BYTE 0x2c 30                                                               //Metal color, standard
@@ -1585,6 +1543,8 @@ DEFINE_PATCH_FUNCTION make_nycaloth BEGIN
   PATCH_IF valid BEGIN
     // =============================================================================== // the actual work starts from here
     SAY NAME1 @734 SAY NAME2 @734                                                    //Nycaloth   
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION acid_spell_immunities END                                    // grant immunities to acid-based area effect spells
     WRITE_LONG 0x14 25000
     REPLACE_CRE_ITEM fl#nyca #0 #0 #0 none weapon1 EQUIP
     REPLACE_TEXTUALLY CASE_INSENSITIVE immune3 immune2
@@ -1627,6 +1587,8 @@ DEFINE_PATCH_FUNCTION make_arcanaloth BEGIN
   PATCH_IF valid BEGIN
     // =============================================================================== // the actual work starts from here
     SAY NAME1 @735 SAY NAME2 @735                                                    //Arcanaloth 
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+    LAUNCH_PATCH_FUNCTION acid_spell_immunities END                                    // grant immunities to acid-based area effect spells
     WRITE_LONG 0x14 20000
     WRITE_LONG 0x28 25088                                                            //MAGE_MALE_HUMAN
     WRITE_BYTE 0x2c 30                                                               //Metal color, standard

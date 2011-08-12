@@ -323,6 +323,9 @@ COPY ~aTweaks/SPL/RR#SPAIN.SPL~ ~override~                                      
     WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                    // use new projectile (party friendly)
   END 
 
+COPY ~atweaks/spl/rr#dvtc1.spl~ ~override~                                          // Nabassu Vampiric Touch, part 1 - damage (note: deals 3d6 points of magical damage)
+COPY ~atweaks/spl/rr#dvtc2.spl~ ~override~                                          // Nabassu Vampiric Touch, part 2 - healing (note: grants 10 temporary hit points and also heals the caster; the hit point amount must be a fixed value otherwise it behaves buggy)
+
 COPY_EXISTING ~SPIN558.SPL~  ~override~                                            // Erinyes Charm
   WRITE_ASCII 0x10 "CAS_M05" #8                                                    // casting sound: CAS_M05.WAV
   WRITE_SHORT 0x25 "4"                                                             // spell school: 4 (Enchantment)
@@ -347,6 +350,7 @@ INT_VAR                                                                         
  END                                                                               // end FUNCTION call
 PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                                 // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
 
+COPY ~atweaks/spl/rr#wsh01.spl~ ~override~                                         // Wish: Restore Full Health (self only)
 COPY ~atweaks/spl/rr#wsh37.spl~ ~override~                                         // Wish: Improved Haste on all party members
 
 COPY_EXISTING ~SPWISH38.SPL~  ~override/RR#WSH38.SPL~                              // Wish: Breach on all enemies in the area
@@ -472,6 +476,9 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                   
 COPY_EXISTING ~SPWI212.SPL~  ~override/RR#WI212.SPL~                               // Clone Mirror Image into an innate ability (used by Glabrezu)
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
 
+COPY_EXISTING ~SPWI302.SPL~  ~override/RR#WI302.SPL~                               // Clone Remove Magic into an innate ability (used by Glabrezu and Balor in SCSII)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
 COPY_EXISTING ~SPWI304.SPL~  ~override/RR#WI304.SPL~                               // Clone Fireball into an innate ability (used by Pit Fiend)
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
@@ -479,9 +486,6 @@ COPY_EXISTING ~SPWI306.SPL~  ~override/RR#WI306.SPL~                            
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
 COPY_EXISTING ~SPWI308.SPL~  ~override/RR#WI308.SPL~                               // Clone Lightning Bolt into an innate ability (used by Cornugon)
-LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
-
-COPY_EXISTING ~SPWI314.SPL~  ~override/RR#WI314.SPL~                               // Clone Vampiric Touch into an innate ability (used by Nabassu)
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
 COPY_EXISTING ~SPWI326.SPL~  ~override/RR#WI326.SPL~                               // Clone Dispel Magic into an innate ability (used by Glabrezu and Balor)
@@ -544,6 +548,7 @@ COPY_EXISTING sppr705.spl "override/RR#PR705.spl"                               
 
 // New items
 
+COPY ~atweaks/itm/rr#dinv.itm~  ~override~                                         // item which makes fiends untargetable until the gating animation finishes
 COPY ~aTweaks/ITM/RR#GHAST.ITM~ ~override~                                         // spawned Ghast melee attack
 COPY ~aTweaks/ITM/RR#DQUAS.ITM~ ~override~                                         // Quasit melee attack
 COPY ~aTweaks/ITM/RR#DNABA.ITM~ ~override~                                         // Nabassu melee attack
@@ -645,7 +650,13 @@ INT_VAR                                                                         
 END                                                                                // ends FUNCTION
 END                                                                                // ends PATCH_FOR_EACH block
 PATCH_FOR_EACH ~icon~ IN                                                           // for each of the following icons
+                  ~0~                                                              // Charm
+                  ~1~                                                              // Dire Charm
+                  ~2~                                                              // Rigid Thinking
+                  ~3~                                                              // Confusion
                  ~14~                                                              // Sleep
+                 ~43~                                                              // Domination
+                 ~47~                                                              // Chaos
                  ~55~                                                              // Stun
                 ~130~                                                              // Unconscious
 BEGIN
@@ -659,35 +670,16 @@ INT_VAR                                                                         
 "probability1" = "100"                                                             // probability1: 100%
 END                                                                                // ends FUNCTION
 END                                                                                // ends PATCH_FOR_EACH block
-PATCH_FOR_EACH ~spell~ IN                                                          // for each of the following spells
-            ~SPPR103~                                                              // Cure Light Wounds
-            ~SPPR215~                                                              // Cure Medium Wounds
-            ~SPPR315~                                                              // Cure Medium Wounds
-            ~SPPR401~                                                              // Cure Serious Wounds
-            ~SPPR404~                                                              // Neutralize Poison
-            ~SPPR502~                                                              // Cure Critical Wounds
-            ~SPPR514~                                                              // Mass Cure
-            ~SPPR514~                                                              // Mass Cure
-            ~SPPR607~                                                              // Heal
-            ~SPIN101~                                                              // Cure Light Wounds (Bhaalpower)
-            ~SPIN551~                                                              // Cause Serious Wounds (Hive Mother)
-            ~SPIN986~                                                              // Cause Serious Wounds (Beholder)
-            ~SPCL211~                                                              // Paladin Lay On Hands
-BEGIN                                                                              // execute the following
-LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                          // add new equipping effect
-INT_VAR                                                                            // initialize variables
-"opcode" = "206"                                                                   // effect: #206 (Protection from Spell)
-"target" = "1"                                                                     // target: 1 (self)
-"timing" = "2"                                                                     // timing mode: 2 (while equipped)
-"duration" = "0"                                                                   // duration: 0
-"parameter1" = "4742"                                                              // param1: string (Spell Ineffective)
-"probability1" = "100"                                                             // probability1: 100%
-STR_VAR                                                                            // initialize strings
-"resource"  = EVALUATE_BUFFER "%spell%"                                            // resref: the current spell
-END                                                                                // ends FUNCTION
-END                                                                                // ends PATCH_FOR_EACH block
+LAUNCH_PATCH_FUNCTION cure_spell_immunities END                                    // grant immunities to cure/cause wound spells
+LAUNCH_PATCH_FUNCTION poison_spell_immunities END                                  // grant immunities to poison-based area effect spells
 BUT_ONLY_IF_IT_CHANGES                                                   
 
+
+COPY_EXISTING ~RINGDEMN.ITM~  ~override/rr#dcam2.itm~                              // Cambion immunities
+LAUNCH_PATCH_FUNCTION ~DELETE_ITEM_EQEFFECT~                                       // remove equipping effect
+INT_VAR                                                                            // initialize variables
+"opcode_to_delete" = "120"                                                         // effect: #120 (Protection from Melee Weapons)
+END                                                                                // ends FUNCTION
 
 
 // New Creatures

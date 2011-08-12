@@ -88,6 +88,7 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],6) // but they should not disrupt the Blood War
 	!CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
@@ -105,6 +106,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],6) // but they should not disrupt the Blood War
 	!CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
@@ -122,6 +125,9 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],6) // but they should not disrupt the Blood War
 	!CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
@@ -139,6 +145,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
+	!StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
+	!StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if nearby enemies are not already immobile
 	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],6) // but they should not disrupt the Blood War
 	!CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
@@ -191,7 +201,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#PFWish","LOCALS",0)
-        HPPercentLT(Myself,40)
+        OR(3)
+          HPPercentLT(Myself,61)
+          CheckStatGT(Myself,0,LEVELDRAIN)
+          StateCheck(Myself,STATE_BLIND)
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -200,6 +213,24 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#WISH",Myself) // Wish
 		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!StateCheck(Myself,STATE_IMPROVEDINVISIBILITY)
+	!Global("dvgldust","LOCALS",1)
+	!CheckStatGT(Player1,0,TRUE_SIGHT)
+	!CheckStatGT(Player2,0,TRUE_SIGHT)
+	!CheckStatGT(Player3,0,TRUE_SIGHT)
+	!CheckStatGT(Player4,0,TRUE_SIGHT)
+	!CheckStatGT(Player5,0,TRUE_SIGHT)
+	!CheckStatGT(Player6,0,TRUE_SIGHT)
+	!CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+	!CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
 END
 
 IF
@@ -402,24 +433,6 @@ THEN
 	RESPONSE #100
                 SetGlobal("RR#Bhave","LOCALS",0) // Teleport + melee
 		SetGlobalTimer("RR#Tactic","LOCALS",12)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!StateCheck(Myself,STATE_IMPROVEDINVISIBILITY)
-	!Global("dvgldust","LOCALS",1)
-	!CheckStatGT(Player1,0,TRUE_SIGHT)
-	!CheckStatGT(Player2,0,TRUE_SIGHT)
-	!CheckStatGT(Player3,0,TRUE_SIGHT)
-	!CheckStatGT(Player4,0,TRUE_SIGHT)
-	!CheckStatGT(Player5,0,TRUE_SIGHT)
-	!CheckStatGT(Player6,0,TRUE_SIGHT)
-	!CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
-	!CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
 END
 
 IF
