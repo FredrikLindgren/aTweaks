@@ -436,15 +436,15 @@ BUT_ONLY_IF_IT_CHANGES
 //////////
 
 //Ultroloth
-COPY_EXISTING telbal1.cre "override/fl#sultr.cre"
+COPY "atweaks/cre/fiendbase.cre" "override/fl#sultr.cre"
   LPF make_ultroloth END
     
 //Nycaloth
-COPY_EXISTING telbal1.cre "override/fl#snyca.cre"
+COPY "atweaks/cre/fiendbase.cre" "override/fl#snyca.cre"
   LPF make_nycaloth END
 
 //Arcanaloth
-COPY_EXISTING telbal1.cre "override/fl#sarca.cre"
+COPY "atweaks/cre/fiendbase.cre" "override/fl#sarca.cre"
   LPF make_arcanaloth END
 
 
@@ -498,6 +498,13 @@ ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.spl AND !FiendsOriginal BEGIN //FiendsOri
     WRITE_ASCIIE 0x30 $crefile("%SOURCE_RES%") #8
   BUT_ONLY
 END 
+
+//SCSII colours these dudes green, but we turn them into glabrezus and mariliths
+ACTION_IF FILE_EXISTS_IN_GAME dw#fiends_notinnate.mrk OR FILE_EXISTS_IN_GAME dw#fiends_innate.mrk BEGIN
+  COPY_EXISTING abydem01.cre override
+		obsdem01.cre override
+    LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 51 END
+END
 
 
 // New dialogues
