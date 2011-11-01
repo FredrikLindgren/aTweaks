@@ -1,0 +1,22 @@
+//Toss fiends at significant threats
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TargetBlock(GoodCelestial)
+  TargetBlock(GoodFiend)
+  //Account for ProEvil?
+  Allegiance(Myself,ENEMY)
+  !See([ENEMY.0.DEMONIC.0.0.0.LAWFUL_EVIL])
+  !See([ENEMY.0.0.TANARI.0.0.LAWFUL_EVIL])
+  !See([ENEMY.0.0.0.0.SUMMONED_DEMON.LAWFUL_EVIL])
+THEN DO
+    Action(Spell,WIZARD_GATE|200|50)
+END
+
+//Whip up a guardian fiend if we've been incapacitated
+IF TRIGGER
+  StateCheck(Myself,STATE_BLIND)
+  Allegiance(Myself,ENEMY)
+  TriggerBlock(PlayersInRange)
+THEN DO
+    Action(SpellMyself,WIZARD_GATE)
+END

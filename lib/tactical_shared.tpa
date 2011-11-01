@@ -84,3 +84,20 @@ ACTION_IF !FILE_EXISTS_IN_GAME fl#icew.spl BEGIN
     END
 END
 
+//Tag celestials, for detectability (mirrors code in SCSII)
+ACTION_FOR_EACH celestial IN 
+		devagood
+		devaevil
+		plangood
+		planevil
+		ca#dastr
+		ca#dmond
+		ca#dmova
+		ca#plan
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%celestial%.cre" BEGIN
+    COPY_EXISTING "%celestial%.cre" override
+      WRITE_BYTE 0x274 182
+    BUT_ONLY
+  END 
+END
