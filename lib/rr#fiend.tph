@@ -8,64 +8,6 @@ DEFINE_ACTION_MACRO ~RR#FIEND~ BEGIN
 
 INCLUDE "atweaks/lib/dsandstuff.tpa"
 
-ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#EVAL.2DA~ THEN BEGIN                         // only copy the evaluation file once
-  COPY ~aTweaks/LIB/RR#EVAL.2DA~ ~override~
-END                                                                                // ends ACTION_IF block
-
-// Add new secondary types
-
-ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da RR#ETHER) BEGIN
-  ADD_SECTYPE RR#ETHER @707
-  APPEND RR#EVAL.2da "RR#ETHER %RR#ETHER%"
-END
-ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
-  ADD_SECTYPE fl#Disease #2449
-  APPEND RR#EVAL.2da "fl#Disease %fl#Disease%"
-END
-
-LAF ret_from_eval STR_VAR f_Entry = RR#ETHER RET RR#ETHER = f_Value END            //Retrieve stored values from RR#EVAL.2da
-LAF ret_from_eval STR_VAR f_Entry = fl#Disease RET fl#Disease = f_Value END
-
-//Add new projectiles
-
-ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.pro BEGIN
-  ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                        // New projectile for Symbol Pain (party friendly)
-  APPEND RR#EVAL.2da "RR#SPAIN %RR#SPAIN%"
-END
-ACTION_IF !FILE_EXISTS_IN_GAME fl#cnenp.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/fl#cnenp.pro~                                        //Invisible, cone-shaped projectile, party-friendly
-  APPEND RR#EVAL.2da "fl#cnenp %fl#cnenp%"
-END
-ACTION_IF !FILE_EXISTS_IN_GAME fl#sight.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/fl#sight.pro~                                        //Like INAREANP, but extends roughly as far as you can see 
-  APPEND RR#EVAL.2da "fl#sight %fl#sight%"
-END
-
-LAF ret_from_eval STR_VAR f_Entry = RR#SPAIN RET RR#SPAIN = f_Value END
-LAF ret_from_eval STR_VAR f_Entry = fl#cnenp RET fl#cnenp = f_Value END
-LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Value END
-
-
-// Assign the Enchantment school to enchantment based spell-like abilities and make them turn the caster visible
-
-COPY_EXISTING ~SPWI929.SPL~                ~override~                              // Succubus Charm Female
-              ~SPWI930.SPL~                ~override~                              // Succubus Charm Male
-WRITE_ASCII 0x10 "CAS_M05" #8                                                      // casting sound: CAS_M05.WAV
-WRITE_SHORT 0x25 "4"                                                               // spell school: 4 (Enchantment)
-WRITE_SHORT 0x22 "11"                                                              // casting graphics: 11 (Enchantment)
-WRITE_LONG  0x34 "1"                                                               // spell level: 1
-LAUNCH_PATCH_FUNCTION ~RR#AGLEF~                                                   // Start FUNCTION call (my custom "Add Global Effect" function)
-INT_VAR                                                                            // initialize variables
-  "rr#opcode" = "136"                                                              // effect: #136 (force visible)
-  "rr#target" = "1"                                                                // target: 1 (self)
-  "rr#timing" = "1"                                                                // timing mode: 1 (permanent)
-  "rr#prob1" = "100"                                                               // probability1: 100%
- END                                                                               // end FUNCTION call
-PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                                 // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
-BUT_ONLY_IF_IT_CHANGES
-
-
-
 // New spells
 
 COPY ~aTweaks/SPL/RR#DLDRN.SPL~ ~override~                                         // Drain Life (Alu-Fiend)
@@ -82,6 +24,7 @@ COPY ~aTweaks/BAM/RR#SKISS.BAM~ ~override~                                      
 COPY ~aTweaks/VVC/RR#PSHFT.VVC~ ~override~                                         // Plane Shift/Etherealness VVC animation
 COPY ~aTweaks/BAM/RR#PSHFT.BAM~ ~override~                                         // Plane Shift/Etherealness BAM graphics
 COPY ~aTweaks/WAV/RR#PSHFT.WAV~ ~override~                                         // Plane Shift/Etherealness sound
+
 
 COPY ~aTweaks/SPL/RR#ETHER.SPL~ ~override~                                         // Etherealness (Succubus)
   SAY NAME1 @671 SAY NAME2 @671
@@ -168,9 +111,9 @@ COPY ~aTweaks/EFF/RR#DGZ01.EFF~ ~override~                                      
 COPY ~aTweaks/EFF/RR#DGZ02.EFF~ ~override~                                         // Death Gaze display Cursed Icon
 COPY ~aTweaks/EFF/RR#DGZ03.EFF~ ~override~                                         // Death Gaze transform into Ghast
 COPY ~aTweaks/SPL/RR#DGZRM.SPL~ ~override~                                         // Death Gaze removal (curse is lifted after the creature dies)
-COPY ~aTweaks/SPL/RR#DFA1.SPL~ ~override~                                          // Fear Aura (Cornugon and Gelugon)
+COPY ~aTweaks/SPL/RR#DFA1.SPL~  ~override~                                         // Fear Aura (Cornugon, Gelugon and Bone Fiend)
   SAY NAME1 @672 SAY NAME2 @672
-COPY ~aTweaks/SPL/RR#DFA2.SPL~ ~override~                                          // Fear Aura (Pit Fiend)
+COPY ~aTweaks/SPL/RR#DFA2.SPL~  ~override~                                         // Fear Aura (Pit Fiend)
   SAY NAME1 @672 SAY NAME2 @672
 COPY ~aTweaks/EFF/RR#DFA1.EFF~ ~override~                                          // Cornugon/Gelugon Fear Aura immunity effect (for Constructs, Undead, Trolls... etc.)
 COPY ~aTweaks/EFF/RR#DFA2.EFF~ ~override~                                          // Pit Fiend Fear Aura immunity effect (for Constructs, Undead, Trolls... etc.)
@@ -197,11 +140,22 @@ COPY ~aTweaks/EFF/RR#DPDIS.EFF~ ~override~                                      
   SAY 0x1C @676                                                                    // Unaffected by Disease
 COPY ~aTweaks/SPL/RR#DBFLW.SPL~ ~override~                                         // Flaming Whip (Balor)
   SAY NAME1 @679 SAY NAME2 @679
+COPY ~aTweaks/EFF/RR#DBFLW.EFF~ ~override~                                         // Flaming Whip ability immunity (for large and incorporeal creatures)
 COPY ~aTweaks/SPL/RR#DBFLA.SPL~ ~override~                                         // Body Flames (Balor)
   SAY NAME1 @682 SAY NAME2 @682
 COPY ~aTweaks/SPL/RR#DBFLE.SPL~ ~override~                                         // Death Throes (Balor)
   SAY NAME1 @683 SAY NAME2 @683
-COPY ~aTweaks/EFF/RR#DBFLW.EFF~ ~override~                                         // Flaming Whip ability immunity (for large and incorporeal creatures)
+COPY ~aTweaks/SPL/RR#VORPL.SPL~ ~override~                                         // Vorpal Hit (Balor)
+COPY ~aTweaks/EFF/RR#VORPL.EFF~ ~override~                                         // Vorpal Hit immunity (for slimes, constructs, incorporeal creatures...)
+
+
+
+// Make Death Ward protect against the Balors' Vorpal Hits
+
+COPY_EXISTING ~SPPR409.SPL~ ~override~ // Death Ward
+LPF add_conditional_immunity INT_VAR f_Condition = 101 STR_VAR f_Spell = RR#VORPL END
+BUT_ONLY_IF_IT_CHANGES
+
 
 COPY ~aTweaks/SPL/RR#CNSTR.SPL~ ~override/RR#DGRAB.SPL~                            // Grab ability (Glabrezu)
 SAY NAME1 @684 SAY NAME2 @684                                                    
@@ -371,7 +325,7 @@ COPY_EXISTING ~SPWI104.SPL~  ~override/RR#DSUGG.SPL~                            
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 BUT_ONLY_IF_IT_CHANGES
 
-COPY_EXISTING ~SPWI205.SPL~  ~override/RR#DCFEA.SPL~                               // Change Spook into Cause Fear (used by Cambion)
+COPY_EXISTING ~SPWI125.SPL~  ~override/RR#DCFEA.SPL~                               // Change Spook into Cause Fear (used by Cambion)
   SAY NAME1 @710 SAY NAME2 @710                                                    // Cause Fear
 WRITE_ASCII 0x10 "CAS_M01" #8                                                      // casting sound: CAS_M01.WAV
 WRITE_SHORT 0x25 "5"                                                               // spell school: 5 (Illusion)
@@ -407,9 +361,11 @@ WRITE_SHORT 0x22 "11"                                                           
   END
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
-/* //This spell has been replaced by fl#cnefr
-COPY_EXISTING ~SPWI205.SPL~  ~override/RR#DMFEA.SPL~                               // Change Horror into Fear (used by Maurezhi)
-  SAY NAME1 #2619 SAY NAME2 #2619                                                  // Fear
+COPY_EXISTING ~SPWI205.SPL~  ~override/rr#dmfea.spl~                               // Change Horror into Blast of Fear (used by Quasits)
+  SAY NAME1 @748 SAY NAME2 @748                                                    // Blast of Fear
+WRITE_ASCII 0x10 "CAS_M01" #8                                                      // casting sound: CAS_M01.WAV
+WRITE_SHORT 0x25 "5"                                                               // spell school: 5 (Illusion)
+WRITE_SHORT 0x22 "13"                                                              // casting graphics: 13 (Illusion)
   READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
   READ_LONG  0x6a "fx_off"
@@ -420,8 +376,11 @@ COPY_EXISTING ~SPWI205.SPL~  ~override/RR#DMFEA.SPL~                            
      WRITE_LONG  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "0" // save bonus: 0
     END
   END
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %rr#fcsng%                                    // use new projectile
+  END 
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
-*/
+
 
 COPY_EXISTING ~SPWI104.SPL~  ~override/RR#DCHRM.SPL~                               // Change Charm Person into a Glabrezu specific ability (used only on neutral bystanders)
   READ_LONG  0x64 "abil_off"
@@ -433,9 +392,9 @@ COPY_EXISTING ~SPWI104.SPL~  ~override/RR#DCHRM.SPL~                            
     FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
       READ_LONG  ("%fx_off%" + 0x0e + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "RR#DURATION"
       PATCH_IF ("%RR#DURATION%" > 20) BEGIN
-        WRITE_LONG  ("%fx_off%" + 0x0e + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "120" // duration: 120 (Glabrezu charisma bonus)
+        WRITE_LONG  ("%fx_off%" + 0x0e + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "120" // duration: 120 (Glabrezu charisma bonus vs. commoners)
       END
-     WRITE_LONG  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "0" // save bonus: 0 (Glabrezu charisma bonus)
+     WRITE_LONG  ("%fx_off%" + 0x28 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "-5" // save bonus: -5 (Glabrezu charisma bonus vs. commoners)
     END
   END
 
@@ -457,6 +416,17 @@ COPY_EXISTING ~spwi203.spl~ ~override~ // Detect Invisibility
     END
   END
 BUT_ONLY_IF_IT_CHANGES
+
+
+// Pyrotechnics (for Balors, Mariliths, Abishai, Cornugons and Pit Fiends)
+
+COPY ~atweaks/spl/rr#pyrot.spl~ ~override~                                         // Pyrotechnics
+  SAY NAME1 @747 SAY NAME2 @747
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %rr#pyrot%                                    // use new projectile (party friendly)
+  END 
 
 
 // Clone spells into innate abilities
@@ -568,6 +538,8 @@ COPY ~aTweaks/ITM/RR#DGLAB.ITM~ ~override~                                      
 COPY ~aTweaks/ITM/RR#DMARI.ITM~ ~override~                                         // Marilith melee attack
 
 COPY ~atweaks/itm/rr#dbalr.itm~ ~override~                                         // Balor Vorpal Sword (right hand)
+LAUNCH_PATCH_FUNCTION ~entangle_immunities~ END                                    // add immunity to Entangle spells and abilities
+
 COPY ~atweaks/itm/rr#dbal2.itm~ ~override~                                         // Balor Flaming Whip (left hand)
 
 

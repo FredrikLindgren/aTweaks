@@ -1,5 +1,5 @@
 /*************************************************************************
- *               aVENGER's Tweak Pack (aTweaks) version 3.67
+ *               aVENGER's Tweak Pack (aTweaks) version 3.70
  *                            -=by aVENGER=-
  *                http://www.spellholdstudios.net/ie/atweaks
  *************************************************************************/
@@ -8,12 +8,12 @@
 
 BACKUP ~atweaks/backup~
 AUTHOR "Wisp, shsforums.net"                                                       // Author and e-mail address
-VERSION ~v3.67~                                                                    // Mod version
+VERSION ~v3.70~                                                                    // Mod version
 ALWAYS                                                                             // Always do this block
   INCLUDE ~aTweaks/LIB/RR#AGLEF.TPH~                                               // Include my custom "Add Global Effect" function
   INCLUDE ~aTweaks/LIB/RR#SP2IN.TPH~                                               // Include my custom "Spell to Innate" function
   INCLUDE ~aTweaks/LIB/REGEXP.TPH~                                                 // allows regexp to match tabs and newlines (from the G3 BG2 Fixpack)
-//  INCLUDE ~aTweaks/lib/tobexfix.tph~                                               // if TobEx is installed, this disables some of its currently buggy options
+  INCLUDE ~aTweaks/lib/tobexfix.tph~                                               // if TobEx is installed, this disables some of its currently buggy options
   INCLUDE "atweaks/lib/rr#mdcre.tph"
   INCLUDE "atweaks/lib/rr#mdcsc.tph"
   INCLUDE "atweaks/lib/lib.tpa"
@@ -235,6 +235,82 @@ COPY_EXISTING spdr101.spl  override
   LPF add_conditional_immunity INT_VAR f_Condition = 74 STR_VAR f_Spell = spwi105 END
   LPF add_conditional_immunity INT_VAR f_Condition = 74 STR_VAR f_Spell = spin937 END
 BUT_ONLY
+
+
+//////////////////////
+// PnP Dimension Door
+//////////////////////
+
+BEGIN @105 DESIGNATED 105 // PnP Dimension Door
+GROUP @1   // PnP tweaks
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DDOOR.BAM~ THEN BEGIN                        // Checks for the Icewind Dale's Dimension Door animation component
+  COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override/RR#DDOOR.BAM~                     // IWD1's Dimension Door animation (custom file name)
+  COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override/RR#DDOOR.WAV~                     // IWD1's Dimension Door sound effect (custom file name)
+  COPY    ~aTweaks/VVC/RR#DDOOR.VVC~   ~override~                                  // Custom Dimension Door VVC
+END                                                                                // ends ACTION_IF block
+
+COPY ~atweaks/spl/spwi402.spl~ ~override~                                          // Dimension Door
+  SAY UNIDENTIFIED_DESC @1891 SAY DESC @1891
+
+COPY ~atweaks/itm/rr#scr1v.itm~ ~override~                                         // Dimension Door scroll
+  SAY DESC @1891
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~BGSCRL1V~                                                           // Dimension Door scroll (BGT)
+              ~D0SCRLDD~                                                           // Dimension Door scroll (D0 Tweaks)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN                                   // if the designated file with a SPL extension exists
+COPY_EXISTING ~%file%.itm~ ~override~
+  PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
+// =============================================================================== // the actual work starts from here
+  SAY DESC @1891
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+ACTION_IF MOD_IS_INSTALLED SPELL_REV.TP2 0 THEN BEGIN                              // Checks for the main component of Spell Revisions
+COPY_EXISTING ~scrl1v.itm~ ~override~                                              // Dimension Door scroll (SR)
+  PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
+    SAY DESC @1891
+  END
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends SR check
+
+ACTION_IF FILE_EXISTS_IN_GAME ~d0scrldd.itm~ BEGIN                                 // Check for D0Tweaks' Dimension Door component
+COPY ~atweaks/spl/spwi402.spl~ ~override/spwi450.spl~                              // Dimension Door
+    SAY DESC @1891
+END                                                                                // ends D0Tweaks' check
+
+COPY_EXISTING_REGEXP GLOB ~^.+\.sto$~ ~override~                                   // parses through all stores in the game (even those added by mods)
+PATCH_IF (%SOURCE_SIZE% > 0x9b) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+  READ_LONG 0x08 "itemtype" ELSE 0                                                 // check store type
+  PATCH_IF ("%itemtype%" != 5) BEGIN                                               // if the store isn't a container
+// =============================================================================== // the actual work starts from here
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~d0scrldd~) AND NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~BGSCRL1V~) AND FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL1U~) BEGIN
+  ADD_STORE_ITEM ~rr#scr1v~ AFTER ~SCRL1U~ #1 #0 #0 ~IDENTIFIED~ #2                // Add 2x Dimension Door scroll
+END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends store type check
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+
+
+// If TobEx is present restore Dimension Door to the mage/sorcerer spell selection screen
+
+ACTION_IF FILE_EXISTS_IN_GAME ~tobex_ini/tobexcore.ini~ BEGIN                      // if TobEx is installed
+  COPY ~tobex_ini/tobexcore.ini~ ~tobex_ini~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~Externalise Mage Spell Hiding=0~ ~Externalise Mage Spell Hiding=1~
+  BUT_ONLY_IF_IT_CHANGES
+END
+
+ACTION_IF FILE_EXISTS_IN_GAME ~hidespl.2da~ BEGIN                                  // if TobEx or Tob Hacks are installed
+COPY_EXISTING ~hidespl.2da~ ~override~                                             // Swashbuckler's kit ability table
+  REPLACE_TEXTUALLY ~SPWI402~ ~RR#BLNK~                                            // Remove Dimension Door from the hidden spells list
+BUT_ONLY_IF_IT_CHANGES
+END
 
 
 
@@ -549,12 +625,117 @@ INCLUDE "atweaks/lib/c160.tpa"
 
 
 BEGIN @180 DESIGNATED 180 // PnP Mephits
-GROUP @1
+GROUP @1 // PnP Tweaks
 REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
 
 INCLUDE "atweaks/lib/c180.tpa"
 
 
+
+/////////////////////
+// PnP Fey creatures
+/////////////////////
+
+
+BEGIN @185 DESIGNATED 185 // PnP Fey creatures
+GROUP @1 // PnP Tweaks
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+
+INCLUDE "atweaks/lib/c185.tpa"
+
+
+
+
+//////////////////////////////////////
+// Revised Call Woodland Beings spell
+//////////////////////////////////////
+
+BEGIN @186 DESIGNATED 186 // Revised Call Woodland Beings spell
+GROUP @1 // PnP Tweaks
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~rr#fdrya.bcs~ @1908                         // PnP Fey creatures required
+
+COPY    ~atweaks/spl/fey/sppr410.spl~   ~override~                                 // Call Woodland Beings spell
+SAY DESC @1895 SAY UNIDENTIFIED_DESC @1895
+
+COPY   ~atweaks/eff/fey/rr#sdrya.eff~   ~override~                                 // Summon Dryad EFF
+COPY   ~atweaks/eff/fey/rr#shama.eff~   ~override~                                 // Summon Hamadryad EFF
+COPY   ~atweaks/eff/fey/rr#snymp.eff~   ~override~                                 // Summon Nymph EFF
+
+COPY_EXISTING ~dry01.cre~    ~override/rr#sdrya.cre~                               // Summoned Dryad
+              ~hamasu.cre~   ~override/rr#shama.cre~                               // Summoned Hamadryad
+             ~nymphsu.cre~   ~override/rr#snymp.cre~                               // Summoned Nymph
+  WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
+  WRITE_ASCIIE 0x248 "%DEST_RES%" #8                                               // Override script
+  WRITE_ASCII  0x250 ~~ #8                                                         // disable class AI script
+  WRITE_ASCII  0x258 ~~ #8                                                         // disable race AI script
+  WRITE_ASCII  0x260 ~~ #8                                                         // disable general AI script
+  WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
+  WRITE_BYTE   0x270 128                                                           // set intial allegiance to Neutral
+  WRITE_BYTE   0x275 2                                                             // set gender to Female (treated as gated creatures)
+  WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32                                              // death variable
+  WRITE_ASCII  0x2cc ~~ #8                                                         // dialogue file
+  READ_LONG 0x2bc io
+  FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN                                              // Make all items unstealable&undroppable
+    WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
+  END
+
+COMPILE ~atweaks/baf/fey/rr#sdrya.baf~                                             // Summoned Dryad AI script
+COMPILE ~atweaks/baf/fey/rr#shama.baf~                                             // Summoned Hamadryad AI script
+COMPILE ~atweaks/baf/fey/rr#snymp.baf~                                             // Summoned Nymph AI script
+
+
+
+/*
+
+/////////////////////////////
+// PnP Spiders and Ettercaps
+/////////////////////////////
+
+
+BEGIN @187 DESIGNATED 187 // PnP Spiders and Ettercaps
+GROUP @1 // PnP Tweaks
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+
+INCLUDE "atweaks/lib/c187.tpa"
+
+
+//////////////////////
+// PnP Ooze creatures
+//////////////////////
+
+
+BEGIN @188 DESIGNATED 188 // PnP Ooze creatures
+GROUP @1 // PnP Tweaks
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+
+INCLUDE "atweaks/lib/c188.tpa"
+
+
+///////////////////////
+// PnP Plant creatures
+///////////////////////
+
+
+BEGIN @189 DESIGNATED 189 // PnP Ooze creatures
+GROUP @1 // PnP Tweaks
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+
+INCLUDE "atweaks/lib/c189.tpa"
+
+
+//////////////////
+// PnP Elementals
+//////////////////
+
+
+BEGIN @190 DESIGNATED 190 // PnP Elementals
+GROUP @1 // PnP Tweaks
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+
+INCLUDE "atweaks/lib/c190.tpa"
+
+*/
 
 
 // ******************************************************* Gameplay tweaks ********************************************************************************
@@ -1043,6 +1224,41 @@ BUT_ONLY_IF_IT_CHANGES
 
 
 
+///////////////////////////////////////////////
+// Make Death Ward protect against Vorpal Hits
+///////////////////////////////////////////////
+
+BEGIN @211 DESIGNATED 211 // Make Death Ward protect against Vorpal Hits
+GROUP @2 // Gameplay tweaks
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE !MOD_IS_INSTALLED spell_rev.tp2 0 @98                            // Spell Revisions already does this
+
+
+COPY_EXISTING ~sppr409.spl~ ~override~                                             // Death Ward
+  READ_LONG  0x64 "abil_off" ELSE 0
+  READ_SHORT 0x68 "abil_num" ELSE 0
+  READ_LONG  0x6a "fx_off"   ELSE 0
+  SET "delta" = 0
+  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN
+    READ_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    SET "abil_fx_idx" = ("%abil_fx_idx%" + "%delta%")
+    WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+     READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
+      PATCH_IF ("%opcode%" = 101) BEGIN // clone Protection: from Opcode effect
+        READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30)
+        SET "index2"= "%abil_fx_num%" // kills loop
+        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
+          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
+          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "13"             // param2: 13 (Instant Death opcode)
+        SET "delta" = "%delta%" + 1
+        WRITE_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%" + 1)
+      END
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
 
 
 ////////////////////////////////////////////////////////////////////
@@ -1300,6 +1516,7 @@ COPY_EXISTING xpbonus.2da override
 BUT_ONLY
 
 
+
 ///////////////////////
 // Simple Thief script
 ///////////////////////
@@ -1553,102 +1770,25 @@ BUT_ONLY_IF_IT_CHANGES
 
 
 
-///////////////////////////////////////////////
-// Give Shambling Mounds their proper soundset
-///////////////////////////////////////////////
-
-// This tweak restores the proper soundset to Shambling Mounds. The files already existed, but were unused in the unmodded game (SHAMB01-SHAMB07.WAV)
+////////////////////////////////////////////////////////////
+// Give Shambling Mounds their proper soundset (DEPRECATED)
+////////////////////////////////////////////////////////////
 
 BEGIN @303 DESIGNATED 303 // Give Shambling Mounds their proper soundset
 GROUP @3 // Cosmetic tweaks
 REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
-
-
-ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-              ~hgmound~                                                            // Shambling mound
-               ~hgmnd2~                                                            // Shambling mound
-             ~smound01~                                                            // Shambling mound
-             ~smoundsu~                                                            // Shambling mound
-             ~globsham~                                                            // Shambling mound (Watcher's Keep globe)
-             ~ca#shm01~                                                            // Lesser Shambler from Caedwyr's Geomantic Sorcerer mod
-             ~ca#shm02~                                                            // Shambling Mound from Caedwyr's Geomantic Sorcerer mod
-             ~ca#shm03~                                                            // Greater Shambler from Caedwyr's Geomantic Sorcerer mod
-BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-  SAY INITIAL_MEETING @421 SAY BATTLE_CRY1 @421 SAY BATTLE_CRY2 @422 SAY ATTACK1 @423 SAY ATTACK2 @424 SAY ATTACK3 @425 SAY DAMAGE @426 SAY DYING @427 SAY SELECT_COMMON1 @421 SAY SELECT_COMMON2 @422  
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
-END                                                                                // ends ACTION_FOR_EACH block
+DEPRECATED @93 // Note: now a part of Distinctive creature soundsets
 
 
 
-//////////////////////////////////////////////
-// Give Mariliths their Icewind Dale soundset
-//////////////////////////////////////////////
-
-// This gives Mariliths the Yxunomei soundset from Icewind Dale 
+//////////////////////////////////////////////////////////
+// Give Mariliths their Icewind Dale soundset (DEPRECATED)
+//////////////////////////////////////////////////////////
 
 BEGIN @304 DESIGNATED 304 // Give Mariliths their Icewind Dale soundset
 GROUP @3 // Cosmetic tweaks
 REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
-
-COPY    ~aTweaks/WAV/RR#MAR01.WAV~ ~override~                                      // IWD Marilith Initial Meeting and Battle Cry 1
-COPY    ~aTweaks/WAV/RR#MAR02.WAV~ ~override~                                      // IWD Marilith Battle Cry 2
-COPY    ~aTweaks/WAV/RR#MAR03.WAV~ ~override~                                      // IWD Marilith Attack 1
-COPY    ~aTweaks/WAV/RR#MAR04.WAV~ ~override~                                      // IWD Marilith Attack 2
-COPY    ~aTweaks/WAV/RR#MAR05.WAV~ ~override~                                      // IWD Marilith Attack 3
-COPY    ~aTweaks/WAV/RR#MAR06.WAV~ ~override~                                      // IWD Marilith Attack 4
-COPY    ~aTweaks/WAV/RR#MAR07.WAV~ ~override~                                      // IWD Marilith Damage
-COPY    ~aTweaks/WAV/RR#MAR08.WAV~ ~override~                                      // IWD Marilith Dying
-COPY    ~aTweaks/WAV/RR#MAR09.WAV~ ~override~                                      // IWD Marilith Hurt
-COPY    ~aTweaks/WAV/RR#MAR10.WAV~ ~override~                                      // IWD Marilith Select Common 1
-
-
-ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-              ~DEMOSUM1~                                                           // Marilith (Demogorgon summon)
-              ~ICMARILI~                                                           // Marilith (unused?)
-              ~MELSUM05~                                                           // Marilith (Mellisan summon)
-              ~GORWOM03~                                                           // Y'tossi (Watcher's Keep final seal Huntress' party)
-              fl#hsmar                                                             //Fiendish Gating 
-              rr#hsmar                                                             //Fiendish Gating 
-              d0qpwima                                                             //Quest Pack, Infernal Thievery
-BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-  SAY INITIAL_MEETING @431 SAY BATTLE_CRY1 @431 SAY BATTLE_CRY2 @432 SAY ATTACK1 @433 SAY ATTACK2 @434 SAY ATTACK3 @435 SAY ATTACK4 @436 SAY DAMAGE @437 SAY DYING @438 SAY HURT @439 SAY SELECT_COMMON1 @440 SAY SELECT_COMMON2 @431 SAY SELECT_COMMON3 @432
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
-END                                                                                // ends ACTION_FOR_EACH block
-
-
-// Special case, separate trearment for Lea'liyl
-
-ACTION_IF FILE_EXISTS_IN_GAME ~RR#DMARI.ITM~ BEGIN                                 // check for aTweaks' PnP Fiends component
-COPY_EXISTING ~obsdem01.cre~ ~override~                                            // aTweaks' PnP Fiends component changes Lea'liyl into a Marilith
-PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-PATCH_IF valid BEGIN
-  PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                                   // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
-// =============================================================================== // the actual work starts from here
-  SAY INITIAL_MEETING @431 SAY BATTLE_CRY1 @431 SAY BATTLE_CRY2 @432 SAY ATTACK1 @433 SAY ATTACK2 @434 SAY ATTACK3 @435 SAY ATTACK4 @436 SAY DAMAGE @437 SAY DYING @438 SAY HURT @439 SAY SELECT_COMMON1 @440 SAY SELECT_COMMON2 @431 SAY SELECT_COMMON3 @432
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file validity check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
-
-
+DEPRECATED @93 // Note: now a part of Distinctive creature soundsets
 
 
 
@@ -1662,6 +1802,19 @@ REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                           
 
 
 INCLUDE "atweaks/lib/c310.tpa"
+
+
+
+//////////////////////////////////
+// Distinctive creature soundsets
+//////////////////////////////////
+
+BEGIN @315 DESIGNATED 315 // Distinctive creature soundsets
+GROUP @3 // Cosmetic tweaks
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+
+INCLUDE "atweaks/lib/c315.tpa"
+
 
 
 // ******************************************************* Miscellaneous tweaks ****************************************************************************

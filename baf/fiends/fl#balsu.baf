@@ -74,6 +74,30 @@ THEN
 END
 
 IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+                GlobalShout(5827) // aTweaks global shout
+		Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Allegiance(Myself,EVILCUTOFF)
+	!Range(NearestEnemyOf(Myself),20)
+	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5827) // Tanar'ri fiends global shout
+        InMyArea(LastHeardBy(Myself))
+	!Range(LastHeardBy(Myself),12)
+	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: only teleport to other targets if the nearest enemy is not already immobile
 	StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
@@ -256,7 +280,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -266,6 +290,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -299,7 +324,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -309,6 +334,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -343,7 +369,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -353,6 +379,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -387,7 +414,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -397,6 +424,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -431,7 +459,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -441,6 +469,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -475,7 +504,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -485,6 +514,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -519,7 +549,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -529,6 +559,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -563,7 +594,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -573,6 +604,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -607,7 +639,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -617,6 +649,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -651,7 +684,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),20,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -661,6 +694,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1429,13 +1463,193 @@ THEN
 END
 
 IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(NearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(ThirdNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FourthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FifthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SixthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SeventhNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(EighthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(NinthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(TenthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
 	See(NearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL) // higher level check tolerance
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1445,6 +1659,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1476,7 +1691,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1486,6 +1701,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1518,7 +1734,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1528,6 +1744,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1560,7 +1777,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1570,6 +1787,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1602,7 +1820,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1612,6 +1830,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1644,7 +1863,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1654,6 +1873,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1686,7 +1906,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1696,6 +1916,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1728,7 +1949,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1738,6 +1959,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1770,7 +1992,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1780,6 +2002,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1812,7 +2035,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),21,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1822,6 +2045,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW

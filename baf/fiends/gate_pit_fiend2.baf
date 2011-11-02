@@ -3,7 +3,9 @@ IF
   Global("RR#FNOGT","GLOBAL",0) // fiendish gating is allowed (console toggle)
   !GlobalTimerNotExpired("RR#Cast","LOCALS") // always open gates if there is nothing better to do
   InActiveArea(Myself)
-  NumCreatureLT([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // sanity check, otherwise you end up with a practically unlimited number of fiends!
+  OR(2)
+    NumCreatureLT([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // sanity check, otherwise you end up with a practically unlimited number of fiends!
+    Name("GorBat1",Myself) // Ka'rashur should open gates regardles of the number of Baatezu that are currently present
 OR(2)
   See([GOODCUTOFF]) // another safeguard, don't open gates while off-screen from the party
   See([0.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // or a Tanar'ri is nearby

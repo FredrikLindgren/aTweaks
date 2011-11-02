@@ -95,16 +95,6 @@ THEN
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
-	See([GOODCUTOFF])
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Help","LOCALS",12)
-		Help()
-		Continue()
-END
-
-IF
         Name("GorWom03",Myself) // Y'tossi
 	Global("invite","LOCALS",0)
 	See([GOODCUTOFF])
@@ -153,6 +143,30 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
 		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+                GlobalShout(5828) // aTweaks hostile global shout
+		Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!Range(NearestEnemyOf(Myself),20)
+	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5828) // Hostile Tanar'ri fiends global shout
+        InMyArea(LastHeardBy(Myself))
+	!Range(LastHeardBy(Myself),12)
+	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
 END
 
 IF
@@ -268,19 +282,6 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Tactic","LOCALS")
-        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
-	OR(2)
-          !Range([EVILCUTOFF],15)
-          CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
-	RandomNum(3,1)
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Tactic","LOCALS",6) // special case, shorter timers for continual damage spells
-                SetGlobal("RR#Bhave","LOCALS",2) // Cloudkill
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Tactic","LOCALS")
 	OR(2)
 	  RandomNum(4,1)
           !Range(NearestEnemyOf(Myself),6)
@@ -288,6 +289,17 @@ THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Tactic","LOCALS",12)
                 SetGlobal("RR#Bhave","LOCALS",1) // Curse
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Tactic","LOCALS")
+	OR(2)
+	  RandomNum(3,1)
+          !Range(NearestEnemyOf(Myself),6)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Tactic","LOCALS",12)
+                SetGlobal("RR#Bhave","LOCALS",2) // Pyrotechnics
 END
 
 IF
@@ -304,7 +316,7 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Tactic","LOCALS",12)
-                SetGlobal("RR#Bhave","LOCALS",0) // Cause Serious Wounds
+                SetGlobal("RR#Bhave","LOCALS",0) // Cloudkill and/or Cause Serious Wounds
 END
 
 IF
@@ -404,6 +416,7 @@ IF
         CheckStatLT(WorstAC([PC]),1,STONESKINS)
 	!CheckStatGT(WorstAC([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
         CheckStatLT(WorstAC([PC]),100,RESISTSLASHING)
+        !StateCheck(WorstAC([PC]),STATE_CHARMED)
 	!Range(WorstAC([PC]),6)
 	See(WorstAC([PC]))
 THEN
@@ -436,8 +449,8 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",2)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	OR(2)
           !Range([EVILCUTOFF],15)
           CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
@@ -463,8 +476,8 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",2)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	OR(2)
           !Range([EVILCUTOFF],15)
           CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
@@ -490,8 +503,8 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",2)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	OR(2)
           !Range([EVILCUTOFF],15)
           CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
@@ -517,8 +530,8 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",2)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	OR(2)
           !Range([EVILCUTOFF],15)
           CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
@@ -544,8 +557,8 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",2)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	OR(2)
           !Range([EVILCUTOFF],15)
           CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
@@ -571,8 +584,8 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",2)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	OR(2)
           !Range([EVILCUTOFF],15)
           CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
@@ -598,8 +611,8 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",2)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	OR(2)
           !Range([EVILCUTOFF],15)
           CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
@@ -625,8 +638,8 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",2)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	OR(2)
           !Range([EVILCUTOFF],15)
           CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
@@ -652,8 +665,8 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",2)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	OR(2)
           !Range([EVILCUTOFF],15)
           CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
@@ -679,8 +692,8 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",2)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	OR(2)
           !Range([EVILCUTOFF],15)
           CheckStatGT([EVILCUTOFF],90,RESISTPOISON)
@@ -856,6 +869,196 @@ THEN
 END
 
 IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(NearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(ThirdNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FourthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FifthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SixthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SeventhNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(EighthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(NinthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(TenthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(NearestEnemyOf(Myself))
 	Range(LastSeenBy(Myself),4)
@@ -863,6 +1066,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+	!Race(LastSeenBy(Myself),MEPHIT)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
 	!HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
 	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
@@ -887,6 +1091,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+	!Race(LastSeenBy(Myself),MEPHIT)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
 	!HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
 	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
@@ -911,6 +1116,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+	!Race(LastSeenBy(Myself),MEPHIT)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
 	!HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
 	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
@@ -935,6 +1141,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+	!Race(LastSeenBy(Myself),MEPHIT)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
 	!HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
 	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
@@ -959,6 +1166,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+	!Race(LastSeenBy(Myself),MEPHIT)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
 	!HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
 	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
@@ -983,6 +1191,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+	!Race(LastSeenBy(Myself),MEPHIT)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
 	!HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
 	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
@@ -1007,6 +1216,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+	!Race(LastSeenBy(Myself),MEPHIT)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
 	!HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
 	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
@@ -1031,6 +1241,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+	!Race(LastSeenBy(Myself),MEPHIT)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
 	!HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
 	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
@@ -1055,6 +1266,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+	!Race(LastSeenBy(Myself),MEPHIT)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
 	!HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
 	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
@@ -1079,6 +1291,7 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+	!Race(LastSeenBy(Myself),MEPHIT)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
 	!HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
 	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
@@ -1093,6 +1306,20 @@ THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		ForceSpellRES("RR#DCSW",LastSeenBy(Myself)) // Cause Serious Wounds
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // note: last resort measure, in case the target is immune to poison and/or curative spells
+	See(NearestEnemyOf(Myself))
+        !StateCheck(LastSeenBy(Myself),STATE_CHANTBAD)
+        !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#CURSE",LastSeenBy(Myself)) // Curse
 END
 
 IF
