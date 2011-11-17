@@ -1,10 +1,21 @@
 IF
-	!AreaType(FOREST) // Dryads' Dimension Door can only be used in Forests
+	Global("rr#trees","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains trees, 2 - check done) 
+	HaveSpellRES("rr#ddoor") // Dimension Door
+	AreaType(OUTDOOR)
+	!AreaType(CITY)
+	!AreaType(DUNGEON)
+THEN
+	RESPONSE #100
+		SetGlobal("rr#trees","LOCALS",1)
+END
+
+IF
+	Global("rr#trees","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains trees, 2 - check done) 
 	HaveSpellRES("rr#ddoor") // Dimension Door
 THEN
 	RESPONSE #100
+		SetGlobal("rr#trees","LOCALS",2)
 		RemoveSpellRES("rr#ddoor") // remove the spell from memory
-		Continue()
 END
 
 IF
@@ -261,6 +272,7 @@ IF
 	See(NearestEnemyOfType([0.HUMANOID.0.FIGHTER_ALL]))
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -300,6 +312,7 @@ IF
 	See(SecondNearestEnemyOfType([0.HUMANOID.0.FIGHTER_ALL]))
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -339,6 +352,7 @@ IF
 	See(ThirdNearestEnemyOfType([0.HUMANOID.0.FIGHTER_ALL]))
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -377,6 +391,7 @@ IF
 	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
 	See(NearestEnemyOfType([0.HUMANOID.0.RANGER_ALL]))
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -415,6 +430,7 @@ IF
 	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
 	See(SecondNearestEnemyOfType([0.HUMANOID.0.RANGER_ALL]))
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -453,6 +469,7 @@ IF
 	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
 	See(ThirdNearestEnemyOfType([0.HUMANOID.0.RANGER_ALL]))
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -494,6 +511,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -535,6 +553,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -576,6 +595,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -617,6 +637,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -658,6 +679,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -699,6 +721,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -740,6 +763,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -781,6 +805,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -822,6 +847,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -863,6 +889,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)

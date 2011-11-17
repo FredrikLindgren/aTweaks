@@ -1,11 +1,21 @@
 IF
-	!AreaType(FOREST) // Dryads' Dimension Door can only be used in Forests
+	Global("rr#trees","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains trees, 2 - check done) 
 	HaveSpellRES("rr#ddoor") // Dimension Door
-        !Name("CDryad",Myself) // Dryad of the Cloudpeaks should have Dimension Door as her Oak is nearby
+	AreaType(OUTDOOR)
+	!AreaType(CITY)
+	!AreaType(DUNGEON)
 THEN
 	RESPONSE #100
+		SetGlobal("rr#trees","LOCALS",1)
+END
+
+IF
+	Global("rr#trees","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains trees, 2 - check done) 
+	HaveSpellRES("rr#ddoor") // Dimension Door
+THEN
+	RESPONSE #100
+		SetGlobal("rr#trees","LOCALS",2)
 		RemoveSpellRES("rr#ddoor") // remove the spell from memory
-		Continue()
 END
 
 IF
@@ -1212,6 +1222,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
 	Help([EVILCUTOFF.0.FAIRY]) // other fey creatures
+        InMyArea(LastHelp(Myself))
+	!StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Move","LOCALS",6)

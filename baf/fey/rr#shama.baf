@@ -1,19 +1,21 @@
 IF
-	!AreaType(FOREST) // Dryads' Dimension Door can only be used in Forests
+	Global("rr#trees","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains trees, 2 - check done) 
 	HaveSpellRES("rr#ddoor") // Dimension Door
+	AreaType(OUTDOOR)
+	!AreaType(CITY)
+	!AreaType(DUNGEON)
 THEN
 	RESPONSE #100
-		RemoveSpellRES("rr#ddoor") // remove the spell from memory
-		Continue()
+		SetGlobal("rr#trees","LOCALS",1)
 END
 
 IF
-	!AreaType(FOREST) // Hamadryads' Detect Pits and Snares can only be used in Forests
-	HaveSpellRES("rr#fdsnr") // Detect Pits and Snares
+	Global("rr#trees","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains trees, 2 - check done) 
 THEN
 	RESPONSE #100
+		SetGlobal("rr#trees","LOCALS",2)
+		RemoveSpellRES("rr#ddoor") // remove the spell from memory
 		RemoveSpellRES("rr#fdsnr") // remove the spell from memory
-		Continue()
 END
 
 IF
@@ -263,6 +265,8 @@ IF
 	!Race(LastSeenBy(Myself),DRAGON)
 	!Class(LastSeenBy(Myself),GIANT)
 	!Class(LastSeenBy(Myself),GOLEM_IRON)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -275,7 +279,8 @@ IF
 	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
 	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -300,6 +305,8 @@ IF
 	!Race(LastSeenBy(Myself),DRAGON)
 	!Class(LastSeenBy(Myself),GIANT)
 	!Class(LastSeenBy(Myself),GOLEM_IRON)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -313,6 +320,8 @@ IF
 	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -337,6 +346,8 @@ IF
 	!Race(LastSeenBy(Myself),DRAGON)
 	!Class(LastSeenBy(Myself),GIANT)
 	!Class(LastSeenBy(Myself),GOLEM_IRON)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -350,6 +361,8 @@ IF
 	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -374,6 +387,8 @@ IF
 	!Race(LastSeenBy(Myself),DRAGON)
 	!Class(LastSeenBy(Myself),GIANT)
 	!Class(LastSeenBy(Myself),GOLEM_IRON)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -387,6 +402,8 @@ IF
 	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -411,6 +428,8 @@ IF
 	!Race(LastSeenBy(Myself),DRAGON)
 	!Class(LastSeenBy(Myself),GIANT)
 	!Class(LastSeenBy(Myself),GOLEM_IRON)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -424,6 +443,8 @@ IF
 	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -448,6 +469,8 @@ IF
 	!Race(LastSeenBy(Myself),DRAGON)
 	!Class(LastSeenBy(Myself),GIANT)
 	!Class(LastSeenBy(Myself),GOLEM_IRON)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -461,6 +484,8 @@ IF
 	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -485,6 +510,8 @@ IF
 	!Race(LastSeenBy(Myself),DRAGON)
 	!Class(LastSeenBy(Myself),GIANT)
 	!Class(LastSeenBy(Myself),GOLEM_IRON)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -498,6 +525,8 @@ IF
 	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -522,6 +551,8 @@ IF
 	!Race(LastSeenBy(Myself),DRAGON)
 	!Class(LastSeenBy(Myself),GIANT)
 	!Class(LastSeenBy(Myself),GOLEM_IRON)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -535,6 +566,8 @@ IF
 	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -559,6 +592,8 @@ IF
 	!Race(LastSeenBy(Myself),DRAGON)
 	!Class(LastSeenBy(Myself),GIANT)
 	!Class(LastSeenBy(Myself),GOLEM_IRON)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -572,6 +607,8 @@ IF
 	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -596,6 +633,8 @@ IF
 	!Race(LastSeenBy(Myself),DRAGON)
 	!Class(LastSeenBy(Myself),GIANT)
 	!Class(LastSeenBy(Myself),GOLEM_IRON)
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -609,6 +648,8 @@ IF
 	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
@@ -626,6 +667,7 @@ IF
 	See(NearestEnemyOfType([0.HUMANOID.0.FIGHTER_ALL]))
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -665,6 +707,7 @@ IF
 	See(SecondNearestEnemyOfType([0.HUMANOID.0.FIGHTER_ALL]))
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -704,6 +747,7 @@ IF
 	See(ThirdNearestEnemyOfType([0.HUMANOID.0.FIGHTER_ALL]))
 	!Class(LastSeenBy(Myself),MONK)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -742,6 +786,7 @@ IF
 	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
 	See(NearestEnemyOfType([0.HUMANOID.0.RANGER_ALL]))
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -780,6 +825,7 @@ IF
 	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
 	See(SecondNearestEnemyOfType([0.HUMANOID.0.RANGER_ALL]))
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -818,6 +864,7 @@ IF
 	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
 	See(ThirdNearestEnemyOfType([0.HUMANOID.0.RANGER_ALL]))
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -859,6 +906,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -900,6 +948,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -941,6 +990,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -982,6 +1032,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1023,6 +1074,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1064,6 +1116,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1105,6 +1158,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1146,6 +1200,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1187,6 +1242,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1228,6 +1284,7 @@ IF
         !Kit(LastSeenBy(Myself),INQUISITOR)
         !Kit(LastSeenBy(Myself),CAVALIER)
 	!Race(LastSeenBy(Myself),ELF)
+        !Race(LastSeenBy(Myself),RAKSHASA)
         !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1400,7 +1457,9 @@ IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("rr#sdet","LOCALS")
 	HaveSpellRES("rr#fdsnr") // Detect Pits and Snares
-	AreaType(FOREST) // Hamadryads' Detect Pits and Snares can only be used in Forests
+	AreaType(OUTDOOR)
+	!AreaType(CITY)
+	!AreaType(DUNGEON)
 	!Range(NearestEnemyOf(Myself),20)
 THEN
 	RESPONSE #100

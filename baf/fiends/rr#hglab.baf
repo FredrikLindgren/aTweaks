@@ -124,11 +124,9 @@ IF
 	  RandomNum(5,1)
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
                 SetGlobal("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		ForceSpellRES("RR#PSHFT",Myself) // Plane Shift - Ethereal Plane
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -141,12 +139,10 @@ IF
 	  RandomNum(4,1)
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
                 SetGlobal("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		SetGlobalTimer("RR#Ethsc","LOCALS",12)
 		ForceSpellRES("RR#PSHFT",Myself) // Plane Shift - Ethereal Plane
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -174,11 +170,9 @@ IF
 	  See([0.0.DEMONIC.0.0.0.MASK_LAWFUL])
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
                 SetGlobal("RR#ETHPL","LOCALS",0) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Ethsc","LOCALS",4)
 		ApplySpellRES("RR#UNETH",Myself) // Leaving the Ethereal Plane
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -244,10 +238,10 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!Range(NearestEnemyOf(Myself),20)
+	!Range(NearestEnemyOf(Myself),30)
 	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5828) // Hostile Tanar'ri fiends global shout
         InMyArea(LastHeardBy(Myself))
-	!Range(LastHeardBy(Myself),12)
+	!Range(LastHeardBy(Myself),30)
 	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
@@ -382,16 +376,6 @@ IF
 THEN
 	RESPONSE #100
                 SetGlobal("RR#Bhave","LOCALS",2) // Charm Person
-		SetGlobalTimer("RR#Tactic","LOCALS",12)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Tactic","LOCALS")
-	RandomNum(3,1)
-	See([GOODCUTOFF])
-THEN
-	RESPONSE #100
-                SetGlobal("RR#Bhave","LOCALS",1) // Confusion
 		SetGlobalTimer("RR#Tactic","LOCALS",12)
 END
 
@@ -822,9 +806,42 @@ THEN
 END
 
 IF
-        Global("RR#Bhave","LOCALS",1)
+	!GlobalTimerNotExpired("rr#conf","LOCALS") // special Confusion block, triggers regardless of tactic if at least three enemies are susceptible
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(NearestEnemyOf(Myself))
+        NumCreatureGT([GOODCUTOFF],2)
+	See([GOODCUTOFF])
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	See(SecondNearest([GOODCUTOFF]))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	See(ThirdNearest([GOODCUTOFF]))
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
@@ -843,132 +860,202 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Cast","LOCALS",12) // special Confusion timer
 		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
 END
 
 IF
-        Global("RR#Bhave","LOCALS",1)
+        GlobalLT("RR#PWStun","LOCALS",7)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(SecondNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD)
-        !Race(LastSeenBy(Myself),SLIME)
-	!Race(LastSeenBy(Myself),DEMONIC)
-        !Race(LastSeenBy(Myself),TROLL)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	See(Player1)
+	HPLT(LastSeenBy(Myself),90)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 THEN
 	RESPONSE #100
+                IncrementGlobal("RR#PWStun","LOCALS",1)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
 END
 
 IF
-        Global("RR#Bhave","LOCALS",1)
+        GlobalLT("RR#PWStun","LOCALS",7)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(ThirdNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD)
-        !Race(LastSeenBy(Myself),SLIME)
-	!Race(LastSeenBy(Myself),DEMONIC)
-        !Race(LastSeenBy(Myself),TROLL)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	See(Player2)
+	HPLT(LastSeenBy(Myself),90)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 THEN
 	RESPONSE #100
+                IncrementGlobal("RR#PWStun","LOCALS",1)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
 END
 
 IF
-        Global("RR#Bhave","LOCALS",1)
+        GlobalLT("RR#PWStun","LOCALS",7)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(FourthNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD)
-        !Race(LastSeenBy(Myself),SLIME)
-	!Race(LastSeenBy(Myself),DEMONIC)
-        !Race(LastSeenBy(Myself),TROLL)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	See(Player3)
+	HPLT(LastSeenBy(Myself),90)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 THEN
 	RESPONSE #100
+                IncrementGlobal("RR#PWStun","LOCALS",1)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
 END
 
 IF
-        Global("RR#Bhave","LOCALS",1)
+        GlobalLT("RR#PWStun","LOCALS",7)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(FifthNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD)
-        !Race(LastSeenBy(Myself),SLIME)
-	!Race(LastSeenBy(Myself),DEMONIC)
-        !Race(LastSeenBy(Myself),TROLL)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	See(Player4)
+	HPLT(LastSeenBy(Myself),90)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 THEN
 	RESPONSE #100
+                IncrementGlobal("RR#PWStun","LOCALS",1)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
 END
 
 IF
-        Global("RR#Bhave","LOCALS",1)
+        GlobalLT("RR#PWStun","LOCALS",7)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(SixthNearestEnemyOf(Myself))
+	See(Player5)
+	HPLT(LastSeenBy(Myself),90)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+THEN
+	RESPONSE #100
+                IncrementGlobal("RR#PWStun","LOCALS",1)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
+END
+
+IF
+        GlobalLT("RR#PWStun","LOCALS",7)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player6)
+	HPLT(LastSeenBy(Myself),90)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+THEN
+	RESPONSE #100
+                IncrementGlobal("RR#PWStun","LOCALS",1)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
+END
+
+IF
+        GlobalLT("RR#PWStun","LOCALS",7)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See([GOODCUTOFF])
+	HPLT(LastSeenBy(Myself),90)
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
         !Race(LastSeenBy(Myself),TROLL)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
+	OR(3)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL2)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL3)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 THEN
 	RESPONSE #100
+                IncrementGlobal("RR#PWStun","LOCALS",1)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
 END
 
 IF
@@ -1164,197 +1251,147 @@ THEN
 END
 
 IF
-        GlobalLT("RR#PWStun","LOCALS",7)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(Player1)
-	HPLT(LastSeenBy(Myself),90)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-THEN
-	RESPONSE #100
-                IncrementGlobal("RR#PWStun","LOCALS",1)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
-END
-
-IF
-        GlobalLT("RR#PWStun","LOCALS",7)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(Player2)
-	HPLT(LastSeenBy(Myself),90)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-THEN
-	RESPONSE #100
-                IncrementGlobal("RR#PWStun","LOCALS",1)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
-END
-
-IF
-        GlobalLT("RR#PWStun","LOCALS",7)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(Player3)
-	HPLT(LastSeenBy(Myself),90)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-THEN
-	RESPONSE #100
-                IncrementGlobal("RR#PWStun","LOCALS",1)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
-END
-
-IF
-        GlobalLT("RR#PWStun","LOCALS",7)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(Player4)
-	HPLT(LastSeenBy(Myself),90)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-THEN
-	RESPONSE #100
-                IncrementGlobal("RR#PWStun","LOCALS",1)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
-END
-
-IF
-        GlobalLT("RR#PWStun","LOCALS",7)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(Player5)
-	HPLT(LastSeenBy(Myself),90)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-THEN
-	RESPONSE #100
-                IncrementGlobal("RR#PWStun","LOCALS",1)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
-END
-
-IF
-        GlobalLT("RR#PWStun","LOCALS",7)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(Player6)
-	HPLT(LastSeenBy(Myself),90)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-THEN
-	RESPONSE #100
-                IncrementGlobal("RR#PWStun","LOCALS",1)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
-END
-
-IF
-        GlobalLT("RR#PWStun","LOCALS",7)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See([GOODCUTOFF])
-	HPLT(LastSeenBy(Myself),90)
+	See(NearestEnemyOf(Myself))
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
         !Race(LastSeenBy(Myself),TROLL)
-	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
-	OR(3)
-	  CheckStatGT(LastSeenBy(Myself),5,LEVEL)
-	  CheckStatGT(LastSeenBy(Myself),5,LEVEL2)
-	  CheckStatGT(LastSeenBy(Myself),5,LEVEL3)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
 THEN
 	RESPONSE #100
-                IncrementGlobal("RR#PWStun","LOCALS",1)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_POWER_WORD_STUN)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(ThirdNearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FourthNearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FifthNearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SixthNearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
 END
 
 IF
@@ -2122,11 +2159,9 @@ IF
 	!See([0.0.DEMONIC.0.0.0.MASK_LAWFUL])
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
                 SetGlobal("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		ForceSpellRES("RR#PSHFT",Myself) // Plane Shift - Ethereal Plane
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -2134,6 +2169,8 @@ IF
 	OR(2)
 	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_CHAOTIC]) // Quasits
 	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // Tanar'ri fiends
+        InMyArea(LastHelp(Myself))
+	!StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Move","LOCALS",6)

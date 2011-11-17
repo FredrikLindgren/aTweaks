@@ -120,6 +120,24 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!StateCheck(Myself,STATE_IMPROVEDINVISIBILITY)
+	!Global("dvgldust","LOCALS",1)
+	!CheckStatGT(Player1,0,TRUE_SIGHT)
+	!CheckStatGT(Player2,0,TRUE_SIGHT)
+	!CheckStatGT(Player3,0,TRUE_SIGHT)
+	!CheckStatGT(Player4,0,TRUE_SIGHT)
+	!CheckStatGT(Player5,0,TRUE_SIGHT)
+	!CheckStatGT(Player6,0,TRUE_SIGHT)
+	!CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+	!CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	Exists(LastAttackerOf(Myself))
 	!Range(LastAttackerOf(Myself),6)
         InMyArea(LastAttackerOf(Myself))
@@ -134,30 +152,6 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
 		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
-	See([GOODCUTOFF])
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Help","LOCALS",12)
-		Help()
-                GlobalShout(5828) // aTweaks hostile global shout
-		Continue()
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!Range(NearestEnemyOf(Myself),20)
-	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],5828) // Hostile Baatezu fiends global shout
-        InMyArea(LastHeardBy(Myself))
-	!Range(LastHeardBy(Myself),12)
-	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
 END
 
 IF
@@ -329,21 +323,27 @@ THEN
 END
 
 IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+                GlobalShout(5828) // aTweaks hostile global shout
+		Continue()
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!StateCheck(Myself,STATE_IMPROVEDINVISIBILITY)
-	!Global("dvgldust","LOCALS",1)
-	!CheckStatGT(Player1,0,TRUE_SIGHT)
-	!CheckStatGT(Player2,0,TRUE_SIGHT)
-	!CheckStatGT(Player3,0,TRUE_SIGHT)
-	!CheckStatGT(Player4,0,TRUE_SIGHT)
-	!CheckStatGT(Player5,0,TRUE_SIGHT)
-	!CheckStatGT(Player6,0,TRUE_SIGHT)
-	!CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
-	!CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
+	!Range(NearestEnemyOf(Myself),30)
+	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],5828) // Hostile Baatezu fiends global shout
+        InMyArea(LastHeardBy(Myself))
+	!Range(LastHeardBy(Myself),30)
+	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
+                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
 END
 
 IF
@@ -647,6 +647,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -675,6 +677,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -703,6 +707,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -731,6 +737,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -759,6 +767,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -787,6 +797,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1541,6 +1553,24 @@ THEN
 END
 
 IF
+	StateCheck(Myself,STATE_INVISIBLE) // if invisible
+        Global("RR#PFWish","LOCALS",0) // and Wish is available
+        HPPercentLT(Myself,61) // and wounded
+THEN
+	RESPONSE #100
+		NoAction() // don't break invisibility by attacking in melee
+END
+
+IF
+	StateCheck(Myself,STATE_INVISIBLE) // if invisible
+        Global("flNoGating","LOCALS",0) // local gating is allowed
+        Global("RR#FNOGT","GLOBAL",0) // global gating is allowed
+THEN
+	RESPONSE #100
+		NoAction() // don't break invisibility by attacking in melee
+END
+
+IF
 	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
         !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
 	!CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
@@ -1555,6 +1585,8 @@ IF
 	OR(2)
 	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_LAWFUL]) // Imps
 	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]) // Baatezu fiends
+        InMyArea(LastHelp(Myself))
+	!StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Move","LOCALS",6)

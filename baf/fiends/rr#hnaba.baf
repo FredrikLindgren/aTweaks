@@ -94,7 +94,7 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
-                SetGlobal("RR#Ethereal","LOCALS",0) // reset Etherealness variable
+                SetGlobal("RR#DNETH","LOCALS",0) // reset Etherealness variable
                 SetGlobal("RR#DGaze","LOCALS",0) // reset Death Gaze variable
                 SetGlobal("RR#DNBGT","LOCALS",0) // reset Nabassu Gating variable
                 ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
@@ -106,10 +106,8 @@ IF
         HPPercent(Myself,100)
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
                 SetGlobal("RR#ETHPL","LOCALS",0) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		ApplySpellRES("RR#UNETH",Myself) // Leaving the Ethereal Plane
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -121,17 +119,15 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	GlobalLT("RR#Ethereal","LOCALS",2)
+	GlobalLT("RR#DNETH","LOCALS",2)
         Global("RR#ETHPL","LOCALS",0) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
         HPPercentLT(Myself,71)
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
-		IncrementGlobal("RR#Ethereal","LOCALS",1)
+		IncrementGlobal("RR#DNETH","LOCALS",1)
                 SetGlobal("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		ForceSpellRES("RR#DNETH",Myself) // Etherealness + increased regeneration rate
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -168,30 +164,6 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
 		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
-	See([GOODCUTOFF])
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Help","LOCALS",12)
-		Help()
-                GlobalShout(5828) // aTweaks hostile global shout
-		Continue()
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!Range(NearestEnemyOf(Myself),20)
-	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5828) // Hostile Tanar'ri fiends global shout
-        InMyArea(LastHeardBy(Myself))
-	!Range(LastHeardBy(Myself),12)
-	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
 END
 
 IF
@@ -317,84 +289,144 @@ THEN
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        Global("RR#DGaze","LOCALS",0)
+	See([PC.HUMANOID])
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+        Global("RR#DGaze","LOCALS",0)
+	See(SecondNearest([PC.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+        Global("RR#DGaze","LOCALS",0)
+	See(ThirdNearest([PC.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+        Global("RR#DGaze","LOCALS",0)
+	See(FourthNearest([PC.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+        Global("RR#DGaze","LOCALS",0)
+	See(FifthNearest([PC.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+        Global("RR#DGaze","LOCALS",0)
+	See(SixthNearest([PC.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
         Global("RR#DGaze","LOCALS",0)
 	See([PC.HUMANOID])
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#DGaze","LOCALS",0)
 	See(SecondNearest([PC.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#DGaze","LOCALS",0)
 	See(ThirdNearest([PC.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#DGaze","LOCALS",0)
 	See(FourthNearest([PC.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#DGaze","LOCALS",0)
 	See(FifthNearest([PC.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#DGaze","LOCALS",0)
 	See(SixthNearest([PC.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
@@ -406,6 +438,30 @@ IF
 THEN
   RESPONSE #100
     Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+                GlobalShout(5828) // aTweaks hostile global shout
+		Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!Range(NearestEnemyOf(Myself),30)
+	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5828) // Hostile Tanar'ri fiends global shout
+        InMyArea(LastHeardBy(Myself))
+	!Range(LastHeardBy(Myself),30)
+	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
 END
 
 IF
@@ -1360,6 +1416,8 @@ IF
 	OR(2)
 	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_CHAOTIC]) // Quasits
 	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // Tanar'ri fiends
+        InMyArea(LastHelp(Myself))
+	!StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Move","LOCALS",6)

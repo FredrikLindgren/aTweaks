@@ -103,6 +103,18 @@ THEN
 END
 
 IF
+        !GlobalTimerNotExpired("RR#PFear","LOCALS")
+	See(NearestEnemyOf(Myself))
+	Range(LastSeenBy(Myself),12)
+        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a fear aura
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#PFear","LOCALS",18)
+                ForceSpellRES("RR#DFA2",Myself) // Pit Fiend Aura of Fear
+                Continue()
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	OR(2)
           AreaCheck("AR3004") // Dead Magic zone
@@ -110,6 +122,30 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",600) // no spellcasting in Dead Magic zones
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        AttackedBy([GOODCUTOFF],DEFAULT)
+        !Allegiance(Myself,GOODCUTOFF)
+	CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
+        !See(NearestEnemyOf(Myself))
+	!StateCheck(Myself,STATE_INVISIBLE)
+	!Global("dvgldust","LOCALS",1)
+	!CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
+	!CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
+	!CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
+	!CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+	!CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+        !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
+        !CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+        !CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+        !CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		DisplayStringHead(Myself,@664) // Bah, the magic of mortals is so predictable.
+                ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
 END
 
 IF
@@ -147,10 +183,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	Allegiance(Myself,GOODCUTOFF)
-	!Range(NearestEnemyOf(Myself),20)
+	!Range(NearestEnemyOf(Myself),30)
 	Heard([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],5827) // Baatezu fiends global shout
         InMyArea(LastHeardBy(Myself))
-	!Range(LastHeardBy(Myself),12)
+	!Range(LastHeardBy(Myself),16)
 	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
@@ -161,10 +197,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	Allegiance(Myself,EVILCUTOFF)
-	!Range(NearestEnemyOf(Myself),20)
+	!Range(NearestEnemyOf(Myself),30)
 	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],5827) // Baatezu fiends global shout
         InMyArea(LastHeardBy(Myself))
-	!Range(LastHeardBy(Myself),12)
+	!Range(LastHeardBy(Myself),16)
 	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
@@ -342,18 +378,6 @@ THEN
 END
 
 IF
-        !GlobalTimerNotExpired("RR#PFear","LOCALS")
-	See(NearestEnemyOf(Myself))
-	Range(LastSeenBy(Myself),12)
-        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a fear aura
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#PFear","LOCALS",18)
-                ForceSpellRES("RR#DFA2",Myself) // Pit Fiend Aura of Fear
-                Continue()
-END
-
-IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#PFWish","LOCALS",0)
         AttackedBy([GOODCUTOFF],0)
@@ -425,30 +449,6 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		DisplayStringHead(Myself,@663) // Foolish mortal, your petty trickery cannot deceive me.
                 ForceSpellRES("RR#WI304",Myself) // Fireball
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-        AttackedBy([GOODCUTOFF],DEFAULT)
-        !Allegiance(Myself,GOODCUTOFF)
-	CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
-        !See(NearestEnemyOf(Myself))
-	!StateCheck(Myself,STATE_INVISIBLE)
-	!Global("dvgldust","LOCALS",1)
-	!CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
-	!CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
-	!CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
-	!CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-	!CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-        !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
-        !CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-        !CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-        !CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		DisplayStringHead(Myself,@664) // Bah, the magic of mortals is so predictable.
-                ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
 END
 
 IF
@@ -618,7 +618,6 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),5,LEVEL3)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
 	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
 THEN
 	RESPONSE #100
@@ -961,6 +960,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -990,6 +991,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1019,6 +1022,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1048,6 +1053,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1077,6 +1084,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1106,6 +1115,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1269,6 +1280,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(NearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1287,6 +1300,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SecondNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1305,6 +1320,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(ThirdNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1323,6 +1340,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(FourthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1341,6 +1360,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(FifthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1359,6 +1380,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SixthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1377,6 +1400,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SeventhNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1395,6 +1420,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(EighthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1413,6 +1440,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(NinthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1431,6 +1460,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(TenthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1897,6 +1928,15 @@ THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
+END
+
+IF
+	StateCheck(Myself,STATE_INVISIBLE) // if invisible
+        Global("RR#PFWish","LOCALS",0) // and Wish is available
+        HPPercentLT(Myself,61) // and wounded
+THEN
+	RESPONSE #100
+		NoAction() // don't break invisibility by attacking in melee
 END
 
 IF

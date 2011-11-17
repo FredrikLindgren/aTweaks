@@ -112,30 +112,6 @@ THEN
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
-	See([GOODCUTOFF])
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Help","LOCALS",12)
-		Help()
-                GlobalShout(5828) // aTweaks hostile global shout
-		Continue()
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!Range(NearestEnemyOf(Myself),20)
-	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],5828) // Hostile Baatezu fiends global shout
-        InMyArea(LastHeardBy(Myself))
-	!Range(LastHeardBy(Myself),12)
-	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
-END
-
-IF
         !GlobalTimerNotExpired("RR#Taunt","LOCALS")
 	See([0.0.DEMONIC.0.0.0.MASK_CHAOTIC])
         CheckStatGT(LastSeenBy(Myself),3,LEVEL) // exclude Quasits
@@ -195,6 +171,30 @@ IF
 THEN
   RESPONSE #100
     Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+                GlobalShout(5828) // aTweaks hostile global shout
+		Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!Range(NearestEnemyOf(Myself),30)
+	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],5828) // Hostile Baatezu fiends global shout
+        InMyArea(LastHeardBy(Myself))
+	!Range(LastHeardBy(Myself),30)
+	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
 END
 
 IF
@@ -1001,6 +1001,8 @@ IF
 	OR(2)
 	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_LAWFUL]) // Imps
 	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]) // Baatezu fiends
+        InMyArea(LastHelp(Myself))
+	!StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Move","LOCALS",6)

@@ -201,10 +201,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	Allegiance(Myself,GOODCUTOFF)
-	!Range(NearestEnemyOf(Myself),20)
+	!Range(NearestEnemyOf(Myself),30)
 	Heard([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5827) // Tanar'ri fiends global shout
         InMyArea(LastHeardBy(Myself))
-	!Range(LastHeardBy(Myself),12)
+	!Range(LastHeardBy(Myself),16)
 	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
@@ -215,10 +215,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	Allegiance(Myself,EVILCUTOFF)
-	!Range(NearestEnemyOf(Myself),20)
+	!Range(NearestEnemyOf(Myself),30)
 	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5827) // Tanar'ri fiends global shout
         InMyArea(LastHeardBy(Myself))
-	!Range(LastHeardBy(Myself),12)
+	!Range(LastHeardBy(Myself),16)
 	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
@@ -1251,6 +1251,7 @@ IF
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
 	!HasItemEquiped("CLCK30",LastSeenBy(Myself)) // Cloak of Bravery
 	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
@@ -1274,6 +1275,7 @@ IF
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
 	!HasItemEquiped("CLCK30",LastSeenBy(Myself)) // Cloak of Bravery
 	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
@@ -1297,6 +1299,7 @@ IF
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
 	!HasItemEquiped("CLCK30",LastSeenBy(Myself)) // Cloak of Bravery
 	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
@@ -1320,6 +1323,7 @@ IF
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
 	!HasItemEquiped("CLCK30",LastSeenBy(Myself)) // Cloak of Bravery
 	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
@@ -1343,6 +1347,7 @@ IF
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
 	!HasItemEquiped("CLCK30",LastSeenBy(Myself)) // Cloak of Bravery
 	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
@@ -1366,6 +1371,7 @@ IF
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Conjuration
 	!HasItemEquiped("CLCK30",LastSeenBy(Myself)) // Cloak of Bravery
 	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
@@ -1662,6 +1668,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(NearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1680,6 +1688,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SecondNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1698,6 +1708,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(ThirdNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1716,6 +1728,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(FourthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1734,6 +1748,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(FifthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1752,6 +1768,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SixthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1770,6 +1788,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SeventhNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1788,6 +1808,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(EighthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1806,6 +1828,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(NinthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
@@ -1824,6 +1848,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(TenthNearestEnemyOf(Myself))
+        !Race(LastSeenBy(Myself),LICH)
+        !Race(LastSeenBy(Myself),RAKSHASA)
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
 	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)

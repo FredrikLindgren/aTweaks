@@ -149,10 +149,8 @@ IF
         HPPercent(Myself,100)
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
                 SetGlobal("RR#ETHPL","LOCALS",0) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		ApplySpellRES("RR#UNETH",Myself) // Leaving the Ethereal Plane
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -164,17 +162,15 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	GlobalLT("RR#Ethereal","LOCALS",2)
+	GlobalLT("RR#DNETH","LOCALS",2)
         Global("RR#ETHPL","LOCALS",0) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
         HPPercentLT(Myself,71)
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
-		IncrementGlobal("RR#Ethereal","LOCALS",1)
+		IncrementGlobal("RR#DNETH","LOCALS",1)
                 SetGlobal("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		ForceSpellRES("RR#DNETH",Myself) // Etherealness + increased regeneration rate
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -184,16 +180,14 @@ IF
 	CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
         !See(NearestEnemyOf(Myself))
         Global("RR#ETHPL","LOCALS",0) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
-	GlobalLT("RR#Ethereal","LOCALS",2)
+	GlobalLT("RR#DNETH","LOCALS",2)
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
-		IncrementGlobal("RR#Ethereal","LOCALS",1)
+		IncrementGlobal("RR#DNETH","LOCALS",1)
                 SetGlobal("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		DisplayStringHead(Myself,@664) // Bah, the magic of mortals is so predictable.
 		ForceSpellRES("RR#DNETH",Myself) // Etherealness + increased regeneration rate
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -243,10 +237,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	Allegiance(Myself,GOODCUTOFF)
-	!Range(NearestEnemyOf(Myself),20)
+	!Range(NearestEnemyOf(Myself),30)
 	Heard([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5827) // Tanar'ri fiends global shout
         InMyArea(LastHeardBy(Myself))
-	!Range(LastHeardBy(Myself),12)
+	!Range(LastHeardBy(Myself),16)
 	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
@@ -257,10 +251,10 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	Allegiance(Myself,EVILCUTOFF)
-	!Range(NearestEnemyOf(Myself),20)
+	!Range(NearestEnemyOf(Myself),30)
 	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5827) // Tanar'ri fiends global shout
         InMyArea(LastHeardBy(Myself))
-	!Range(LastHeardBy(Myself),12)
+	!Range(LastHeardBy(Myself),16)
 	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
@@ -523,7 +517,102 @@ THEN
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        Global("RR#DGaze","LOCALS",0)
+	See(NearestEnemyOfType([0.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	OR(3)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL2)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL3)
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+        Global("RR#DGaze","LOCALS",0)
+	See(SecondNearestEnemyOfType([0.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	OR(3)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL2)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL3)
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+        Global("RR#DGaze","LOCALS",0)
+	See(ThirdNearestEnemyOfType([0.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	OR(3)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL2)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL3)
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+        Global("RR#DGaze","LOCALS",0)
+	See(FourthNearestEnemyOfType([0.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	OR(3)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL2)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL3)
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+        Global("RR#DGaze","LOCALS",0)
+	See(FifthNearestEnemyOfType([0.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	OR(3)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL2)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL3)
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
+        Global("RR#DGaze","LOCALS",0)
+	See(SixthNearestEnemyOfType([0.HUMANOID]))
+        CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // high priority targets with poor saves vs. spells
+	OR(3)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL2)
+	  CheckStatGT(LastSeenBy(Myself),5,LEVEL3)
+	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
+THEN
+	RESPONSE #100
+                SetGlobal("RR#DGaze","LOCALS",1)
+		FaceObject(LastSeenBy(Myself))
+                ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
+END
+
+IF
         Global("RR#DGaze","LOCALS",0)
 	See(NearestEnemyOfType([0.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -534,14 +623,12 @@ IF
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#DGaze","LOCALS",0)
 	See(SecondNearestEnemyOfType([0.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -552,14 +639,12 @@ IF
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#DGaze","LOCALS",0)
 	See(ThirdNearestEnemyOfType([0.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -570,14 +655,12 @@ IF
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#DGaze","LOCALS",0)
 	See(FourthNearestEnemyOfType([0.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -588,14 +671,12 @@ IF
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#DGaze","LOCALS",0)
 	See(FifthNearestEnemyOfType([0.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -606,14 +687,12 @@ IF
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#DGaze","LOCALS",0)
 	See(SixthNearestEnemyOfType([0.HUMANOID]))
         CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
@@ -624,7 +703,6 @@ IF
 	!HasItemEquiped("RR#HEL03",LastSeenBy(Myself)) // Darkveil (RR)
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
                 SetGlobal("RR#DGaze","LOCALS",1)
 		FaceObject(LastSeenBy(Myself))
                 ForceSpellRES("RR#DGAZE",LastSeenBy(Myself)) // Death Gaze
