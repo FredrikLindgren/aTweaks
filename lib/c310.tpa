@@ -1558,7 +1558,6 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~caddem5~
               ~demnabr1~ 
               ~demnabr2~
-              ~dw#nabsu~ 
               ~enddem04~ 
               ~enddem05~ 
               ~esp04~ 
@@ -1602,6 +1601,41 @@ END                                                                             
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
+
+
+//  Special case for the SR/SCS Death Knight. We don't want to make him look like a Nabassu.
+
+ACTION_IF FILE_EXISTS_IN_GAME ~dw#nabsu.cre~ BEGIN                                 // if the file exists
+COPY_EXISTING ~dw#nabsu.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
+ INT_VAR do_message = 1
+END
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~DVDEATHK~) BEGIN            // don't alter avatar or coloring if this is SR's Death Knight
+// =============================================================================== // the actual work starts from here
+  WRITE_SHORT 0x28 "4352"                                                          // Sets avatar to TANARRI (winged demon)
+  WRITE_BYTE  0x2E "34"                                                            // major color (Light Green/Dark Blue)
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "-168490496"                                                      // param1: (color designation)
+  "parameter2" = "2"                                                               // param2: 2 (location - major color)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+  END                                                                              // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+END                                                                                // ends PATCH_IF block
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+
 
 
 

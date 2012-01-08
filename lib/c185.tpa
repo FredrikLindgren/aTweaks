@@ -667,11 +667,15 @@ BUT_ONLY_IF_IT_CHANGES
 
 // The Spellhold Asylum door should be unlocked and opened once (note: remove this fix once it's included in the BG2 Fixpack)
 
+
+
 COPY_EXISTING ~ar1500.bcs~ ~override~
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~RR#Door1501~) BEGIN         // prevent duplication in case the Fixpack version is installed
 DECOMPILE_BCS_TO_BAF
   REPLACE_TEXTUALLY EXACT_MATCH ~GlobalGT("AsylumPlot","GLOBAL",55)~ ~GlobalGT("AsylumPlot","GLOBAL",55) Global("RR#Door1501","AR1500",0)~
   REPLACE_TEXTUALLY EXACT_MATCH ~Unlock("Door1501")~ ~SetGlobal("RR#Door1501","AR1500",1) Unlock("Door1501")~
 COMPILE_BAF_TO_BCS
+END
 BUT_ONLY_IF_IT_CHANGES
 
 
