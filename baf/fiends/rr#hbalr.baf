@@ -116,24 +116,6 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	Exists(LastAttackerOf(Myself))
-	!Range(LastAttackerOf(Myself),6)
-        InMyArea(LastAttackerOf(Myself))
-        Allegiance(LastAttackerOf(Myself),GOODCUTOFF)
-	!StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
-	!CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
-	!See(NearestEnemyOf(Myself))
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
 	!CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
         CheckStatLT(NearestEnemyOf(Myself),100,RESISTSLASHING)
@@ -801,6 +783,24 @@ THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Exists(LastAttackerOf(Myself))
+	!Range(LastAttackerOf(Myself),6)
+        InMyArea(LastAttackerOf(Myself))
+        Allegiance(LastAttackerOf(Myself),GOODCUTOFF)
+	!StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
+	!CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
+	!See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
+		SetInterrupt(TRUE)
 END
 
 IF

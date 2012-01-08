@@ -138,24 +138,6 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	Exists(LastAttackerOf(Myself))
-	!Range(LastAttackerOf(Myself),6)
-        InMyArea(LastAttackerOf(Myself))
-	!StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
-        !StateCheck(LastAttackerOf(Myself),STATE_INVISIBLE)
-	!CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
-	!See(NearestEnemyOf(Myself))
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE) // Note: these blocks are for high priority teleporting to immobile targets
         !Range([0.0.DEMONIC.0.0.0.MASK_CHAOTIC],6) // but they should not disrupt the Blood War
 	!CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
@@ -385,6 +367,24 @@ THEN
                 SetGlobal("RR#Wish","GLOBAL",4) // Wish: Improved Haste on self and nearby allies
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#WISH",Myself) // Wish
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Exists(LastAttackerOf(Myself))
+	!Range(LastAttackerOf(Myself),6)
+        InMyArea(LastAttackerOf(Myself))
+	!StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
+        !StateCheck(LastAttackerOf(Myself),STATE_INVISIBLE)
+	!CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
+	!See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
 		SetInterrupt(TRUE)
 END
 
