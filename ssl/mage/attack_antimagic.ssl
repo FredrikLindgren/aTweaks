@@ -1,0 +1,42 @@
+IF TRIGGER //We probably want to emulate SCSII and have some higher-priority dealing with Spell Trap and SI
+  TargetBlock(PCsInOrder)
+  TriggerBlock(Disabled|Enemy)
+  OR(5)
+    CheckStatGT(scstarget,0,WIZARD_SPELL_TURNING)
+    CheckStatGT(scstarget,0,WIZARD_SPELL_DEFLECTION)
+    CheckStat(scstarget,1,WIZARD_SPELL_TRAP)
+    CheckStatGT(scstarget,0,WIZARD_SPELL_IMMUNITY)
+    CheckStatGT(scstarget,0,MINORGLOBE)
+  //antimagic timer
+THEN DO
+    Combine()
+    Action(Spell,WIZARD_SPELL_STRIKE|100|100)
+    Action(Spell,WIZARD_RUBY_RAY_OF_REVERSAL|100|100)
+    Action(Spell,WIZARD_WARDING_WHIP|100|100)
+    Action(Spell,WIZARD_SECRET_WORD|100|100)
+    Action(Spell,WIZARD_SPELL_THRUST|100|100)
+END
+
+
+IF TRIGGER
+  TargetBlock(PCsInOrder)
+  TargetBlock(Celestials) //Fiends too, maybe
+  TriggerBlock(Disabled|Enemy|SpellTurning|SIAbj)
+  CheckStatGT(scstarget,89,RESISTMAGIC)
+  //antimagic timer
+THEN DO
+    Combine()
+    Action(Spell,WIZARD_LOWER_RESISTANCE|100|100)
+END
+
+
+IF TRIGGER
+  TargetBlock(PCsInOrder)
+  TargetBlock(Celestials) //Fiends too, maybe
+  TriggerBlock(Disabled|Enemy|SpellTurning|SIAbj)
+  CheckStatGT(scstarget,49,RESISTMAGIC)
+  //antimagic timer
+THEN DO
+    Combine()
+    Action(Spell,WIZARD_LOWER_RESISTANCE|100|100)
+END

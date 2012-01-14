@@ -1,0 +1,70 @@
+IF TRIGGER //We should probably favour Breach over anti-magic ray
+  TargetBlock(PCsInOrder)
+  TriggerBlock(Disabled|Enemy|SpellTurning|SIAbj)
+  OR(5)
+    !CheckStatGT(scstarget,-10,SAVEVSSPELL) //Potion of Magic Shielding, probably
+    CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+    CheckStatGT(scstarget,99,MAGICDAMAGERESISTANCE)
+    CheckStatGT(scstarget,0,CLERIC_FREE_ACTION)
+    CheckStatGT(scstarget,0,SCRIPTINGSTATE2) //Death Ward
+  //Breach timer
+THEN DO
+    Action(Spell,WIZARD_BREACH|200|100)
+END
+
+
+IF TRIGGER
+  TargetBlock(PCsInOrder)
+  TriggerBlock(Disabled|Enemy|SIAbj)
+  OR(7)
+    CheckStatGT(scstarget,99,MAGICDAMAGERESISTANCE)
+    !CheckStatGT(scstarget,-10,SAVEVSSPELL) //Potion of Magic Shielding, probably
+    CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_PETRIFICATION)
+    CheckStatGT(scstarget,0,CLERIC_FREE_ACTION)
+    CheckStatGT(scstarget,0,SCRIPTINGSTATE2)
+    CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
+  BEGIN LOOP(loopvar||1;2;3;4;5;6)
+    !StateCheck(Playerloopvar,STATE_DISABLED)
+    !CheckStatGT(Playerloopvar,0,CLERIC_INSECT_PLAGUE)
+    !CheckStatGT(Playerloopvar,0,WIZARD_GREATER_MALISON)
+    !Allegiance(Playerloopvar,ENEMY)
+  END LOOP
+  //RM timer
+THEN DO
+    Combine()
+    Action(Spell,WIZARD_DISPEL_MAGIC|200|100)
+END
+
+
+IF TRIGGER
+  TargetBlock(PCsInOrder)
+  TriggerBlock(Disabled|Enemy|SIAbj)
+  OR(16)
+    !CheckStatGT(scstarget,-10,SAVEVSSPELL) //Potion of Magic Shielding, probably
+    CheckStatGT(scstarget,0,STONESKINS)
+    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+    StateCheck(scstarget,STATE_IMPROVEDINVISIBILITY)
+    StateCheck(scstarget,STATE_BLESS)
+    StateCheck(scstarget,STATE_CHANT)
+    StateCheck(scstarget,STATE_HASTED)
+    StateCheck(scstarget,STATE_MIRRORIMAGE)
+    CheckStatGT(scstarget,0,CLERIC_DEFENSIVE_HARMONY)
+    CheckStatGT(scstarget,0,PROTECTION_FROM_EVIL)
+    CheckStatGT(scstarget,0,CLERIC_PHYSICAL_MIRROR)
+    CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
+    CheckStatGT(scstarget,0,WIZARD_PROTECTION_FROM_PETRIFICATION)
+    CheckStatGT(scstarget,0,CLERIC_FREE_ACTION)
+    CheckStatGT(scstarget,0,SCRIPTINGSTATE2)
+    CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
+  BEGIN LOOP(loopvar||1;2;3;4;5;6)
+    !StateCheck(Playerloopvar,STATE_DISABLED)
+    !CheckStatGT(Playerloopvar,0,CLERIC_INSECT_PLAGUE)
+    !CheckStatGT(Playerloopvar,0,WIZARD_GREATER_MALISON)
+    !Allegiance(Playerloopvar,ENEMY)
+  END LOOP
+  //RM timer
+THEN DO
+    Combine()
+    Action(Spell,WIZARD_DISPEL_MAGIC|200|100)
+END

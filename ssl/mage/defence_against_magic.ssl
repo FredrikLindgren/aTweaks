@@ -1,0 +1,27 @@
+IF TRIGGER
+  See(NearestEnemyOf(Myself)) //Maybe check for casters instead
+  CheckStat(Myself,0,WIZARD_SPELL_TRAP)
+  CheckStat(Myself,0,WIZARD_SPELL_TURNING)
+  CheckStat(Myself,0,WIZARD_SPELL_DEFLECTION)
+  OR(2)
+    !Range(NearestEnemyOf(Myself),5)
+    CheckStatGT(Myself,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+  OR(2)
+    !Range(NearestEnemyOf(Myself),5)
+    CheckStatGT(Myself,0,STONESKINS)
+THEN DO
+    Action(SpellMyself,WIZARD_SPELL_TURNING|100|100)
+END
+
+IF TRIGGER
+  See(NearestEnemyOf(Myself))
+  CheckStat(Myself,0,MINORGLOBE)
+  OR(2)
+    !Range(NearestEnemyOf(Myself),5)
+    CheckStatGT(Myself,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+  OR(2)
+    !Range(NearestEnemyOf(Myself),5)
+    CheckStatGT(Myself,0,STONESKINS)
+THEN DO
+    Action(SpellMyself,WIZARD_GLOBE_OF_INVULNERABILITY|100|100)
+END

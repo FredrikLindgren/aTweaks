@@ -1,0 +1,39 @@
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Enemy|SIDiv|NoTrueSeeing)
+  OR(3)
+    StateCheck(scstarget,STATE_IMPROVEDINVISIBILITY)
+    StateCheck(scstarget,STATE_MIRRORIMAGE)
+    Gender(scstarget,ILLUSIONARY)
+THEN DO
+  Action(SpellMyself,WIZARD_TRUE_SIGHT)
+END
+
+//If a player tries to go invisible within sight
+BEGIN LOOP(loopvar||1;2;3;4;5;6)
+//If we have other PCs present, 50:50
+IF TRIGGER
+  Target(Playerloopvar)
+  TriggerBlock(Enemy|SIDiv|NoTrueSeeing)
+  !See(scstarget)
+  See([PC])
+  Detect(scstarget)
+  GlobalTimerNotExpired("flChasePlayerloopvar","LOCALS")
+  StateCheck(scstarget,STATE_INVISIBLE)
+THEN DO
+  Action(SpellMyself,WIZARD_TRUE_SIGHT|100|100)
+END
+
+//If there's no other PC present, always cast
+IF TRIGGER
+  Target(Playerloopvar)
+  TriggerBlock(Enemy|SIDiv|NoTrueSeeing)
+  !See(scstarget)
+  !See([PC])
+  Detect(scstarget)
+  GlobalTimerNotExpired("flChasePlayerloopvar","LOCALS")
+  StateCheck(scstarget,STATE_INVISIBLE)
+THEN DO
+  Action(SpellMyself,WIZARD_TRUE_SIGHT)
+END  
+END LOOP
