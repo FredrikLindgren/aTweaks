@@ -295,6 +295,18 @@ BEGIN                                                                           
   END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
+ACTION_IF FiendsOriginal = 0 BEGIN
+  ACTION_FOR_EACH file IN
+                ~dw#nabsu~                                                         // SCSII Nabassu
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+      COPY_EXISTING "%file%.cre" override
+        LPF make_nabassu INT_VAR enforce = 1 END
+      BUT_ONLY
+    END
+  END
+END
+
 
 // Glabrezu
 
