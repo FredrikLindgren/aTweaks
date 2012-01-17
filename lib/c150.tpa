@@ -20,6 +20,17 @@ BEGIN                                                                           
     BUT_ONLY_IF_IT_CHANGES
   END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
+ACTION_IF FiendsOriginal = 0 BEGIN
+  ACTION_FOR_EACH file IN
+               ~TCIMP01~                                                           // Imp (Classic Adventures)
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+      COPY_EXISTING "%file%.cre" override
+        LPF make_imp INT_VAR enforce = 1 END
+      BUT_ONLY
+    END
+  END
+END
 
 
 // Hellcat
@@ -190,6 +201,18 @@ BEGIN                                                                           
     BUT_ONLY_IF_IT_CHANGES
   END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
+ACTION_IF FiendsOriginal = 0 BEGIN
+  ACTION_FOR_EACH file IN
+               ~TCCAMBI1~                                                          // Cambion (Classic Adventures)
+               ~TCCAMBI2~                                                          // Cambion (Classic Adventures)
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+      COPY_EXISTING "%file%.cre" override
+        LPF make_cambion INT_VAR enforce = 1 END
+      BUT_ONLY
+    END
+  END
+END
 
 
 // Alu-Fiend

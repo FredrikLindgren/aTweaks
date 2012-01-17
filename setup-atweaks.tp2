@@ -73,6 +73,7 @@ EXTEND_BOTTOM ~dplayer2.bcs~  ~aTweaks/BAF/DPLAYER.BAF~                         
 BEGIN @101 DESIGNATED 101 // Prevent skeletal undead from being affected by Illithids' Devour Brain attack
 GROUP @1   // PnP tweaks 
 REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 
 
 INCLUDE "atweaks/lib/c101.tpa"
@@ -339,7 +340,7 @@ END
 BEGIN @110 DESIGNATED 110 // Magical arrows and bolts deal bonus damage equal to their enchantment level
 GROUP @1   // PnP tweaks
 REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
-REQUIRE_PREDICATE !FILE_EXISTS_IN_GAME ~_sw1h01.itm~ @91                           // Forbid installation on Tutu
+REQUIRE_PREDICATE !GAME_IS ~tutu tutu_totsc~ @91                                   // Forbid installation on Tutu
 REQUIRE_PREDICATE !MOD_IS_INSTALLED item_rev.tp2 0 
               AND !MOD_IS_INSTALLED bgttweak.tp2 2204
               AND !GAME_IS ca                         @98                          //Avoid content duplication
@@ -659,6 +660,7 @@ INCLUDE "atweaks/lib/c160.tpa"
 BEGIN @180 DESIGNATED 180 // PnP Mephits
 GROUP @1 // PnP Tweaks
 REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 
 INCLUDE "atweaks/lib/c180.tpa"
 
@@ -916,6 +918,8 @@ BEGIN @240 DESIGNATED 202 // Enhance the Bhaalpowers and standardize their casti
 SUBCOMPONENT @202  // Revised Bhaalpowers
 GROUP @2 // Gameplay tweaks
 REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~ca~ @92                                                // Do not install this component on Classic Adventures
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 
 COPY    ~aTweaks/BAM/RR#BP1E.BAM~   ~override~                                     // Drain Life icon
 COPY    ~aTweaks/BAM/RR#BP1G.BAM~   ~override~                                     // Healing Touch icon
@@ -1033,7 +1037,7 @@ END // ends BGT check
 
 // Ensure that the "Gained Special Ability X" strings are correctly displaying on Tutu
 
-ACTION_IF FILE_EXISTS_IN_GAME ~fw0100.are~ THEN BEGIN                             // Tutu check
+ACTION_IF GAME_IS ~tutu tutu_totsc~ THEN BEGIN                                    // Tutu check
 COPY_EXISTING ~BALDUR.BCS~  ~override~                                            // Main game script
   DECOMPILE_BCS_TO_BAF
 REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride(Player1,ApplySpellRES("jpglvl1",Myself))~ ~ActionOverride(Player1,AddSpecialAbility("SPIN101"))~
@@ -1078,6 +1082,8 @@ BEGIN @241 DESIGNATED 241 // Only standardize the Bhaalpowers' casting time
 SUBCOMPONENT @202  // Revised Bhaalpowers
 GROUP @2 // Gameplay tweaks
 REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~ca~ @92                                                // Do not install this component on Classic Adventures
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 
 // This tweak reduces the casting time of all SoA Bhaalpowers to 1 in order to match the ToB Bhaalpowers
 
@@ -1104,6 +1110,8 @@ BEGIN @218 DESIGNATED 218 //Regain Bhaalpowers in ToB
 GROUP @2 
 REQUIRE_PREDICATE GAME_IS tob @90
 REQUIRE_PREDICATE !GAME_IS ~tutu tutu_totsc~ @91
+REQUIRE_PREDICATE !GAME_IS ~ca~ @92                                                // Do not install this component on Classic Adventures
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 
 ACTION_IF BGT BEGIN
   OUTER_SPRINT BG2Check ~Global("ENDOFBG1","GLOBAL",2)~
@@ -1832,7 +1840,9 @@ END
 BEGIN @301 DESIGNATED 301 // Change the appearance of Valygar's armor
 GROUP @3 // Cosmetic tweaks
 REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
-FORBID_FILE ~override/_sw1h01.itm~ @91                                             // Forbid installation on Tutu
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
+REQUIRE_PREDICATE !GAME_IS ~ca~ @92                                                // Do not install this component on Classic Adventures
+REQUIRE_PREDICATE !GAME_IS ~tutu tutu_totsc~ @91                                   // Forbid installation on Tutu
 
 
 // This tweak changes the appearance of Valygar's armor to leather (rather than chain) and changes its colorization in order to match its inventory picture
@@ -1870,6 +1880,8 @@ BUT_ONLY_IF_IT_CHANGES
 BEGIN @302 DESIGNATED 302 // Change the appearance of the Robe of Vecna
 GROUP @3 // Cosmetic tweaks
 REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
+REQUIRE_PREDICATE !GAME_IS ~tutu tutu_totsc~ @91                                   // Forbid installation on Tutu
 
 COPY_EXISTING ~wa2robe.itm~ ~override~                                             // Robe of Vecna
   WRITE_ASCII 0x22 ~4W~ #2                                                         // set the paperdoll animation ID to hooded robe (4W)
