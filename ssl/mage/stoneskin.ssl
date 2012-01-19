@@ -1,2 +1,19 @@
 IF TRIGGER
+  !CheckStatGT(Myself,0,STONESKINS)
+  !GlobalTimerNotExpired("flStone","LOCALS")
+  BEGIN LOOP(looptarget||Nearest;SecondNearest;ThirdNearest)
+    BEGIN LOOP(loopcarsomyr||sw2h10;sw2h19)
+      OR(4)
+	CheckStatGT(Myself,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+	!HasItem("loopcarsomyr",looptargetEnemyOf(Myself))
+	StateCheck(looptargetEnemyOf(Myself),STATE_IMMOBILE)
+	!Range(looptargetEnemyOf(Myself),10)
+    END LOOP
+  END LOOP
+THEN DO
+    Action(SpellMyself,WIZARD_STONE_SKIN)
+    SetGlobalTimer("flStone","LOCALS",8)
+END
+
+  
   
