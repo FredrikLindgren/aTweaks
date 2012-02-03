@@ -518,24 +518,40 @@ COPY_EXISTING ~demnab01.cre~ ~override/fl#nabsu.cre~
   END
 
 //Commandeer SCSII's private fiend-summoning spells and have them summon SCSII-aTweaks hybrids
-ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.spl AND !FiendsOriginal BEGIN //FiendsOriginal eq "do not alter mod-added fiends"
-   
-  OUTER_SPRINT $crefile("dw#cacof") "fl#nabsu"
-  OUTER_SPRINT $crefile("dw#sumbf") "fl#corsu"  
-  OUTER_SPRINT $crefile("dw#sumgl") "fl#glasu"
-  OUTER_SPRINT $crefile("dw#sumco") "fl#gelsu"
-  OUTER_SPRINT $crefile("dw#basum") "fl#balsu"
-  OUTER_SPRINT $crefile("dw#pitsu") "fl#pitsu"
+ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND !FiendsOriginal BEGIN //FiendsOriginal eq "do not alter mod-added fiends"
+  
+  ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND FILE_EXISTS_IN_GAME dw#pitsu.eff BEGIN //If SCSII Improved Fiends is installed
+    OUTER_SPRINT $crefile("dw#cacof") "fl#nabsu"
+    OUTER_SPRINT $crefile("dw#sumbf") "fl#corsu"  
+    OUTER_SPRINT $crefile("dw#sumgl") "fl#glasu"
+    OUTER_SPRINT $crefile("dw#sumco") "fl#gelsu"
+    OUTER_SPRINT $crefile("dw#basum") "fl#balsu"
+    OUTER_SPRINT $crefile("dw#pitsu") "fl#pitsu"
     
-  COPY_EXISTING "dw#cacof.eff" override
-                "dw#sumbf.eff" override
-                "dw#sumgl.eff" override
-                "dw#sumco.eff" override
-                "dw#basum.eff" override
-                "dw#pitsu.eff" override
-    WRITE_ASCIIE 0x30 $crefile("%SOURCE_RES%") #8
-  BUT_ONLY
-END 
+    COPY_EXISTING "dw#cacof.eff" override
+                  "dw#sumbf.eff" override
+                  "dw#sumgl.eff" override
+                  "dw#sumco.eff" override
+                  "dw#basum.eff" override
+                  "dw#pitsu.eff" override
+      WRITE_ASCIIE 0x30 $crefile("%SOURCE_RES%") #8
+    BUT_ONLY
+  END /* ELSE BEGIN //Otherwise it is just SCSII Smarter Mages
+    
+    //These are copies of Mordenkainen's Sword; change them to conjure up the appropriate fiend instead
+    COPY_EXISTING dw#sumgl.spl override 
+                  dw#sumco.spl override
+                  dw#cacof.spl override
+                  dw#sumbf.spl override
+      
+      
+    //These are copies of Gate; change the other to conjure up a Balor
+    COPY_EXISTING dw#gatem.spl override
+                  dw#basum.spl override
+      
+      
+  END*/
+END
 
 //SCSII colours these dudes green, but we turn them into glabrezus and mariliths
 ACTION_IF FILE_EXISTS_IN_GAME dw#fiends_notinnate.mrk OR FILE_EXISTS_IN_GAME dw#fiends_innate.mrk BEGIN
