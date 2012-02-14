@@ -97,6 +97,7 @@ IF
     !StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
     CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
     CheckStatLT(SixthNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(SixthNearestEnemyOf(Myself))
     False()
 THEN
@@ -109,6 +110,7 @@ IF
     !StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
     CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCRUSHING)
     CheckStatLT(FifthNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(FifthNearestEnemyOf(Myself))
     False()
 THEN
@@ -121,6 +123,7 @@ IF
     !StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
     CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCRUSHING)
     CheckStatLT(FourthNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(FourthNearestEnemyOf(Myself))
     False()
 THEN
@@ -133,6 +136,7 @@ IF
     !StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
     CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCRUSHING)
     CheckStatLT(ThirdNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(ThirdNearestEnemyOf(Myself))
     False()
 THEN
@@ -145,6 +149,7 @@ IF
     !StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
     CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCRUSHING)
     CheckStatLT(SecondNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(SecondNearestEnemyOf(Myself))
     False()
 THEN
@@ -156,7 +161,102 @@ IF
     !CheckStatGT(NearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
     !StateCheck(NearestEnemyOf(Myself),STATE_PANIC)
     CheckStatLT(NearestEnemyOf(Myself),100,RESISTCRUSHING)
+    !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     CheckStatLT(NearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(NearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+
+
+IF
+    !CheckStatGT(SixthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(SixthNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    CheckStatGT(SixthNearestEnemyOf(Myself),-3,ARMORCLASS) // try to filter out targets with relatively poor AC
+    CheckStatGT(SixthNearestEnemyOf(Myself),-4,ACCRUSHINGMOD) // try to avoid targets with good AC vs. blunt weapons
+    See(SixthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FifthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(FifthNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    CheckStatGT(FifthNearestEnemyOf(Myself),-3,ARMORCLASS) // try to filter out targets with relatively poor AC
+    CheckStatGT(FifthNearestEnemyOf(Myself),-4,ACCRUSHINGMOD) // try to avoid targets with good AC vs. blunt weapons
+    See(FifthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FourthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(FourthNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    CheckStatGT(FourthNearestEnemyOf(Myself),-3,ARMORCLASS) // try to filter out targets with relatively poor AC
+    CheckStatGT(FourthNearestEnemyOf(Myself),-4,ACCRUSHINGMOD) // try to avoid targets with good AC vs. blunt weapons
+    See(FourthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(ThirdNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    CheckStatGT(ThirdNearestEnemyOf(Myself),-3,ARMORCLASS) // try to filter out targets with relatively poor AC
+    CheckStatGT(ThirdNearestEnemyOf(Myself),-4,ACCRUSHINGMOD) // try to avoid targets with good AC vs. blunt weapons
+    See(ThirdNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SecondNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(SecondNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    CheckStatGT(SecondNearestEnemyOf(Myself),-3,ARMORCLASS) // try to filter out targets with relatively poor AC
+    CheckStatGT(SecondNearestEnemyOf(Myself),-4,ACCRUSHINGMOD) // try to avoid targets with good AC vs. blunt weapons
+    See(SecondNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(NearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(NearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCRUSHING)
+    !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    CheckStatLT(NearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    CheckStatGT(NearestEnemyOf(Myself),-3,ARMORCLASS) // try to filter out targets with relatively poor AC
+    CheckStatGT(NearestEnemyOf(Myself),-4,ACCRUSHINGMOD) // try to avoid targets with good AC vs. blunt weapons
     See(NearestEnemyOf(Myself))
     False()
 THEN
@@ -165,12 +265,15 @@ THEN
 END
 
 IF
-    !CheckStatGT(NearestEnemyOfType([0.0.0.BARD_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-    !StateCheck(NearestEnemyOfType([0.0.0.BARD_ALL]),STATE_PANIC)
-    CheckStatLT(NearestEnemyOfType([0.0.0.BARD_ALL]),100,RESISTCRUSHING)
-    !StateCheck(NearestEnemyOfType([0.0.0.BARD_ALL]),STATE_MIRRORIMAGE)
-    CheckStatLT(NearestEnemyOfType([0.0.0.BARD_ALL]),1,STONESKINS)
-    See(NearestEnemyOfType([0.0.0.BARD_ALL])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+    AttackedBy(NearestEnemyOf(Myself),DEFAULT)
+    !CheckStatGT(LastAttackerOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(LastAttackerOf(Myself),1,STONESKINS)
+    !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
+    Range(LastAttackerOf(Myself),8)
+    RandomNum(3,1)
+    See(LastAttackerOf(Myself))
     False()
 THEN
     RESPONSE #100
@@ -178,95 +281,21 @@ THEN
 END
 
 IF
-    !CheckStatGT(SecondNearestEnemyOfType([0.0.0.BARD_ALL]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-    !StateCheck(SecondNearestEnemyOfType([0.0.0.BARD_ALL]),STATE_PANIC)
-    CheckStatLT(SecondNearestEnemyOfType([0.0.0.BARD_ALL]),100,RESISTCRUSHING)
-    !StateCheck(SecondNearestEnemyOfType([0.0.0.BARD_ALL]),STATE_MIRRORIMAGE)
-    CheckStatLT(SecondNearestEnemyOfType([0.0.0.BARD_ALL]),1,STONESKINS)
-    See(SecondNearestEnemyOfType([0.0.0.BARD_ALL])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
+    AttackedBy(NearestEnemyOf(Myself),DEFAULT)
+    !CheckStatGT(LastAttackerOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(LastAttackerOf(Myself),1,STONESKINS)
+    !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
+    Range(LastAttackerOf(Myself),4)
+    See(LastAttackerOf(Myself))
     False()
 THEN
     RESPONSE #100
         NoAction()
 END
 
-IF
-    !CheckStatGT(NearestEnemyOfType([0.0.0.THIEF]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-    !StateCheck(NearestEnemyOfType([0.0.0.THIEF]),STATE_PANIC)
-    CheckStatLT(NearestEnemyOfType([0.0.0.THIEF]),100,RESISTCRUSHING)
-    !StateCheck(NearestEnemyOfType([0.0.0.THIEF]),STATE_MIRRORIMAGE)
-    CheckStatLT(NearestEnemyOfType([0.0.0.THIEF]),1,STONESKINS)
-    See(NearestEnemyOfType([0.0.0.THIEF])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
 
-IF
-    !CheckStatGT(SecondNearestEnemyOfType([0.0.0.THIEF]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-    !StateCheck(SecondNearestEnemyOfType([0.0.0.THIEF]),STATE_PANIC)
-    CheckStatLT(SecondNearestEnemyOfType([0.0.0.THIEF]),100,RESISTCRUSHING)
-    !StateCheck(SecondNearestEnemyOfType([0.0.0.THIEF]),STATE_MIRRORIMAGE)
-    CheckStatLT(SecondNearestEnemyOfType([0.0.0.THIEF]),1,STONESKINS)
-    See(SecondNearestEnemyOfType([0.0.0.THIEF])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
-
-IF
-    !CheckStatGT(SecondNearestEnemyOfType([0.0.0.MAGE_THIEF]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-    !StateCheck(SecondNearestEnemyOfType([0.0.0.MAGE_THIEF]),STATE_PANIC)
-    CheckStatLT(SecondNearestEnemyOfType([0.0.0.MAGE_THIEF]),100,RESISTCRUSHING)
-    !StateCheck(SecondNearestEnemyOfType([0.0.0.MAGE_THIEF]),STATE_MIRRORIMAGE)
-    CheckStatLT(SecondNearestEnemyOfType([0.0.0.MAGE_THIEF]),1,STONESKINS)
-    See(SecondNearestEnemyOfType([0.0.0.MAGE_THIEF])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
-
-IF
-    !CheckStatGT(NearestEnemyOfType([0.0.0.MAGE_THIEF]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-    !StateCheck(NearestEnemyOfType([0.0.0.MAGE_THIEF]),STATE_PANIC)
-    CheckStatLT(NearestEnemyOfType([0.0.0.MAGE_THIEF]),100,RESISTCRUSHING)
-    !StateCheck(NearestEnemyOfType([0.0.0.MAGE_THIEF]),STATE_MIRRORIMAGE)
-    CheckStatLT(NearestEnemyOfType([0.0.0.MAGE_THIEF]),1,STONESKINS)
-    See(NearestEnemyOfType([0.0.0.MAGE_THIEF])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
-
-IF
-    !CheckStatGT(SecondNearestEnemyOfType([0.0.0.MAGE]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-    !StateCheck(SecondNearestEnemyOfType([0.0.0.MAGE]),STATE_PANIC)
-    CheckStatLT(SecondNearestEnemyOfType([0.0.0.MAGE]),100,RESISTCRUSHING)
-    !StateCheck(SecondNearestEnemyOfType([0.0.0.MAGE]),STATE_MIRRORIMAGE)
-    CheckStatLT(SecondNearestEnemyOfType([0.0.0.MAGE]),1,STONESKINS)
-    See(SecondNearestEnemyOfType([0.0.0.MAGE])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
-
-IF
-    !CheckStatGT(NearestEnemyOfType([0.0.0.MAGE]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-    !StateCheck(NearestEnemyOfType([0.0.0.MAGE]),STATE_PANIC)
-    CheckStatLT(NearestEnemyOfType([0.0.0.MAGE]),100,RESISTCRUSHING)
-    !StateCheck(NearestEnemyOfType([0.0.0.MAGE]),STATE_MIRRORIMAGE)
-    CheckStatLT(NearestEnemyOfType([0.0.0.MAGE]),1,STONESKINS)
-    See(NearestEnemyOfType([0.0.0.MAGE])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
 
 IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)

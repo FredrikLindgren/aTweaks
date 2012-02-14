@@ -29,7 +29,26 @@ COPY ~atweaks/spl/elementals/rr#ecems.spl~ ~override~                           
   SAY NAME1 @2101 SAY NAME2 @2101
 
 COPY ~atweaks/spl/elementals/rr#track.spl~ ~override~                              // Tracking
+COPY ~atweaks/spl/elementals/rr#ecfir.spl~ ~override~                              // Conjure Fire Elemental
 
+
+
+COPY ~atweaks/eff/elementals/rr#enlfr.eff~ ~override~                              // Lower Fire Resistance immunity EFF (for Fire Elementals, Fire Salamanders, Efreet etc.)
+COPY ~atweaks/spl/elementals/rr#enlfr.spl~ ~override~                              // Lower Fire Resistance
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
+      READ_LONG  ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "param1"
+        PATCH_IF (("%opcode%" = 139) AND ("%param1%" = 14790)) BEGIN // display string
+          SAY ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) @2102  // Fire Resistance Lowered
+        END
+    END
+  END
 
 COPY ~atweaks/vvc/rr#cnstr.vvc~ ~override~                                         // Constrict/Grab/Flaming Whip ability VVC animation
 COPY ~atweaks/bam/rr#cnstr.bam~ ~override~                                         // Constrict/Grab/Flaming Whip ability BAM graphics
@@ -63,6 +82,23 @@ COPY ~atweaks/eff/rr#cnstr.eff~ ~override/rr#dgra2.eff~
   WRITE_ASCII 0x30 rr#dgrab #8
 
 
+// Clone spells into innate abilities
+
+COPY_EXISTING ~SPWI103.SPL~  ~override/RR#WI103.SPL~                               // Clone Burning Hands into an innate ability
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI303.SPL~  ~override/RR#WI303.SPL~                               // Clone Flame Arrow into an innate ability
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI304.SPL~  ~override/RR#WI304.SPL~                               // Clone Fireball into an innate ability
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~SPWI403.SPL~  ~override/RR#WI403.SPL~                               // Clone Fire Shield:Blue into an innate ability
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" functio
+
+COPY_EXISTING ~SPWI418.SPL~  ~override/RR#WI418.SPL~                               // Clone Fire Shield:Red into an innate ability
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
 
 //////////////
 // New items
@@ -83,6 +119,8 @@ COPY ~atweaks/itm/elementals/rr#efsa2.itm~ ~override~                           
 COPY ~atweaks/itm/elementals/rr#efrsa.itm~ ~override~                              // Frost Salamander claw attack
 COPY ~atweaks/itm/elementals/rr#efrs2.itm~ ~override~                              // Frost Salamander bite attack
 COPY ~atweaks/itm/elementals/rr#eista.itm~ ~override~                              // Invisible Stalker attack
+COPY ~atweaks/itm/elementals/rr#ensal.itm~ ~override~                              // Salamander Noble spear attack
+COPY ~atweaks/itm/elementals/rr#ensa2.itm~ ~override~                              // Salamander Noble tail attack
 
 
 //////////////////////////
@@ -236,6 +274,7 @@ LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                          
 END                                                                                // end FUNCTION call
 LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
 LAUNCH_PATCH_FUNCTION fire_salamander_immunities END                               // grant fire salamander immunities
+LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -399,6 +438,91 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+// Salamander Noble
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~salgrfir~                                                             // Salamander Noble
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_MEMORIZED_SPELL ~rr#wi103~ #0 ~innate~ ( 3 )                                   // adds 3x Burning Hands
+ADD_MEMORIZED_SPELL ~rr#wi303~ #0 ~innate~ ( 3 )                                   // adds 3x Flame Arrow
+ADD_MEMORIZED_SPELL ~rr#wi304~ #0 ~innate~ ( 3 )                                   // adds 3x Fireball
+ADD_MEMORIZED_SPELL ~rr#wi418~ #0 ~innate~ ( 3 )                                   // adds 3x Fire Shield:Red
+ADD_MEMORIZED_SPELL ~rr#ecfir~ #0 ~innate~ ( 1 )                                   // adds 1x Conjure Fire Elemental
+ADD_MEMORIZED_SPELL ~rr#enlfr~ #0 ~innate~ ( 1 )                                   // adds 1x Lower Fire Resistance
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
+REPLACE_CRE_ITEM ~RR#ENSAL~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+REPLACE_CRE_ITEM ~RR#ENSA2~ #0 #0 #0 ~UNDROPPABLE~ ~SHIELD~ EQUIP                  // tail attack
+REMOVE_CRE_ITEM ~RING95~                                                           // Salamanders are not undead, they have their own specific set of immunities
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newxpv"   = "10000"                                                               // new XP value
+"newhp"    = "96"                                                                  // new hit point value
+"newac"    = "0"                                                                   // new Armor Class value
+"newth"    = "9"                                                                   // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "7"                                                                   // new Save vs. Death
+"newsvw"   = "9"                                                                   // new Save vs. Wand
+"newsvp"   = "8"                                                                   // new Save vs. Polymorph
+"newsvb"   = "8"                                                                   // new Save vs. Breath
+"newsvs"   = "10"                                                                  // new Save vs. Spell
+"newmr"    = "25"                                                                  // new Magic Resistance value
+"newfr"    = "100"                                                                 // new Resist Fire value
+"newcr"    = "0"                                                                   // new Resist Cold value
+"newlvl1"  = "7"                                                                   // new level (first class)
+"newstr"   = "18"                                                                  // new Strength value
+"newstrx"  = "100"                                                                 // new Exceptional Strength value
+"newdex"   = "16"                                                                  // new Dexterity value
+"newcon"   = "16"                                                                  // new Constitution value
+"newint"   = "18"                                                                  // new Intelligence value
+"newwis"   = "15"                                                                  // new Wisdom value
+"newchr"   = "17"                                                                  // new Charisma value
+"newmor"   = "18"                                                                  // new morale value
+"newmorb"  = "2"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "255"                                                                 // new general (MONSTER)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "187"                                                                 // new class (ELEMENTAL_FIRE)
+"newalign" = "19"                                                                  // new alignment (Lawful Evil)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#ENSAL"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "salgrfir"                                                          // generic shout AI script
+"script04"   = "WDASIGHT"                                                          // generic AI script
+"script05"   = "dw#melee"                                                          // SCSII melee AI script
+"script06"   = "BPWDASGT"                                                          // Big Picture generic AI script
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
+    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
+    target = "1"                                                                   // target: 1 (self)
+    timing = "9"                                                                   // timing mode: 9 (permanent after death)
+    duration = "0"                                                                 // duration: 0
+    sectype = "0"                                                                  // secondary type: none
+    parameter1 = "12"                                                              // param1: (movement rate modifier)
+    parameter2 = "1"                                                               // param2: (set)
+    probability1 = "100"                                                           // probability1: 100%
+  STR_VAR
+    effsource = ""                                                                 // effsource: none
+END                                                                                // end FUNCTION call
+LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
+LAUNCH_PATCH_FUNCTION fire_salamander_immunities END                               // grant fire salamander immunities
+LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
 
 
 //////////////////
@@ -410,6 +534,7 @@ COMPILE ~atweaks/baf/elementals/rr#easer.baf~                                   
 COMPILE ~atweaks/baf/elementals/rr#efsal.baf~                                      // Fire Salamander AI script
 COMPILE ~atweaks/baf/elementals/rr#efrsa.baf~                                      // Frost Salamander AI script
 COMPILE ~atweaks/baf/elementals/rr#eista.baf~                                      // Invisible Stalker AI script
+COMPILE ~atweaks/baf/elementals/rr#ensal.baf~                                      // Salamander Noble AI script
 
 
 
