@@ -18,7 +18,17 @@ COPY ~atweaks/spl/rr#telwe.spl~ ~override/rr#telwr~                             
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#renew" = "1" END     // Execute the "spell to innate ablity" function
 
 COPY ~atweaks/spl/rr#niinv.spl~ ~override~                                         // Natural Invisibility
-  SAY NAME1 @2100 SAY NAME2 @2100                                                  // Natural Invisibility
+  SAY NAME1 @2100 SAY NAME2 @2100
+
+COPY ~atweaks/bam/elementals/rr#hcold.bam~ ~override~                              // cold damage hit BAM animation
+COPY ~atweaks/vvc/rr#hcold.vvc~ ~override~                                         // cold damage hit VVC animation
+COPY ~atweaks/wav/rr#hcold.wav~ ~override~                                         // cold damage hit WAV sound
+COPY ~atweaks/vvc/rr#ecems.vvc~ ~override~                                         // Cold Aura VVC animation
+COPY ~atweaks/bam/elementals/rr#ecems.bam~ ~override~                              // Cold Aura BAM animation
+COPY ~atweaks/spl/elementals/rr#ecems.spl~ ~override~                              // Cold Aura
+  SAY NAME1 @2101 SAY NAME2 @2101
+
+COPY ~atweaks/spl/elementals/rr#track.spl~ ~override~                              // Tracking
 
 
 COPY ~atweaks/vvc/rr#cnstr.vvc~ ~override~                                         // Constrict/Grab/Flaming Whip ability VVC animation
@@ -70,6 +80,9 @@ BUT_ONLY_IF_IT_CHANGES
 COPY ~atweaks/itm/elementals/rr#easer.itm~ ~override~                              // Aerial Servant attack
 COPY ~atweaks/itm/elementals/rr#efsal.itm~ ~override~                              // Fire Salamander spear attack
 COPY ~atweaks/itm/elementals/rr#efsa2.itm~ ~override~                              // Fire Salamander tail attack
+COPY ~atweaks/itm/elementals/rr#efrsa.itm~ ~override~                              // Frost Salamander claw attack
+COPY ~atweaks/itm/elementals/rr#efrs2.itm~ ~override~                              // Frost Salamander bite attack
+COPY ~atweaks/itm/elementals/rr#eista.itm~ ~override~                              // Invisible Stalker attack
 
 
 //////////////////////////
@@ -93,7 +106,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EASER~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
-REMOVE_CRE_ITEM ~MAGE01~                                                           // removes MAGE01.ITM (initial invisibility is handled via weapon)
+REMOVE_CRE_ITEM ~MAGE01~                                                           // initial invisibility is handled via weapon
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "9000"                                                                // new XP value
@@ -167,7 +180,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 REPLACE_CRE_ITEM ~RR#EFSAL~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~RR#EFSA2~ #0 #0 #0 ~UNDROPPABLE~ ~SHIELD~ EQUIP                  // tail attack
-REMOVE_CRE_ITEM ~RING95~                                                           // removes RING95.ITM (Salamanders are not undead, they have their own specific set of immunities)
+REMOVE_CRE_ITEM ~RING95~                                                           // Salamanders are not undead, they have their own specific set of immunities
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "2000"                                                                // new XP value
@@ -229,6 +242,161 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+// Frost Salamander
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~salgrice~                                                             // Frost Salamander
+            ~icsalcol~                                                             // Ice Salamander (Planar Sphere)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+SAY NAME1 #72145 SAY NAME2 #72146                                                  // Frost Salamander
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
+REPLACE_CRE_ITEM ~RR#EFRSA~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+REPLACE_CRE_ITEM ~RR#EFRS2~ #0 #0 #0 ~UNDROPPABLE~ ~SHIELD~ EQUIP                  // bite attack
+REMOVE_CRE_ITEM ~RING95~                                                           // Salamanders are not undead, they have their own specific set of immunities
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newxpv"   = "9000"                                                                // new XP value
+"newhp"    = "96"                                                                  // new hit point value
+"newac"    = "3"                                                                   // new Armor Class value
+"newth"    = "9"                                                                   // new THAC0 value
+"newapr"   = "4"                                                                   // new number of attacks per round
+"newsvd"   = "7"                                                                   // new Save vs. Death
+"newsvw"   = "9"                                                                   // new Save vs. Wand
+"newsvp"   = "8"                                                                   // new Save vs. Polymorph
+"newsvb"   = "8"                                                                   // new Save vs. Breath
+"newsvs"   = "10"                                                                  // new Save vs. Spell
+"newfr"    = "-50"                                                                 // new Resist Fire value
+"newcr"    = "100"                                                                 // new Resist Cold value
+"newlvl1"  = "12"                                                                  // new level (first class)
+"newstr"   = "17"                                                                  // new Strength value
+"newdex"   = "14"                                                                  // new Dexterity value
+"newcon"   = "12"                                                                  // new Constitution value
+"newint"   = "7"                                                                   // new Intelligence value
+"newwis"   = "6"                                                                   // new Wisdom value
+"newchr"   = "7"                                                                   // new Charisma value
+"newmor"   = "12"                                                                  // new morale value
+"newmorb"  = "2"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "255"                                                                 // new general (MONSTER)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "187"                                                                 // new class (ELEMENTAL_FIRE, note: leaving this as is in order for The Wave to function properly)
+"newalign" = "51"                                                                  // new alignment (Chaotic Evil)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#EFRSA"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "GRPSHT01"                                                          // generic shout AI script
+"script04"   = "GENSHT01"                                                          // generic shout AI script
+"script05"   = "WDASIGHT"                                                          // generic AI script
+"script06"   = "dw#melee"                                                          // SCSII melee AI script
+"script07"   = "BPWDASGT"                                                          // Big Picture generic AI script
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
+    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
+    target = "1"                                                                   // target: 1 (self)
+    timing = "9"                                                                   // timing mode: 9 (permanent after death)
+    duration = "0"                                                                 // duration: 0
+    sectype = "0"                                                                  // secondary type: none
+    parameter1 = "10"                                                              // param1: (statistic modifier)
+    parameter2 = "1"                                                               // param2: 1 (type)
+    probability1 = "100"                                                           // probability1: 100%
+  STR_VAR
+    effsource = ""                                                                 // effsource: none
+END                                                                                // end FUNCTION call
+LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
+LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                    // grant immunities to cold-based area effect spells
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Invisible Stalker
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~stalke~                                                             // Invisible Stalker
+            ~senstalk~                                                             // Invisible Stalker (Sendai's lair)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_MEMORIZED_SPELL ~rr#track~ #0 ~innate~ ( 1 )                                   // adds 1x Tracking
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
+ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
+REPLACE_CRE_ITEM ~RR#EISTA~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+REMOVE_CRE_ITEM ~MAGE01~                                                           // initial invisibility is handled via weapon
+REMOVE_CRE_ITEM ~STALKESU~                                                         // original CRE had two copies of this attack
+REMOVE_CRE_ITEM ~STALKER~                                                          // immunities are handled differently
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newxpv"   = "3000"                                                                // new XP value
+"newhp"    = "64"                                                                  // new hit point value
+"newac"    = "3"                                                                   // new Armor Class value
+"newth"    = "13"                                                                  // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "10"                                                                  // new Save vs. Death
+"newsvw"   = "12"                                                                  // new Save vs. Wand
+"newsvp"   = "11"                                                                  // new Save vs. Polymorph
+"newsvb"   = "12"                                                                  // new Save vs. Breath
+"newsvs"   = "13"                                                                  // new Save vs. Spell
+"newlvl1"  = "8"                                                                   // new level (first class)
+"newstr"   = "16"                                                                  // new Strength value
+"newdex"   = "17"                                                                  // new Dexterity value
+"newcon"   = "14"                                                                  // new Constitution value
+"newint"   = "14"                                                                  // new Intelligence value
+"newwis"   = "14"                                                                  // new Wisdom value
+"newchr"   = "11"                                                                  // new Charisma value
+"newmor"   = "14"                                                                  // new morale value
+"newmorb"  = "3"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "255"                                                                 // new general (MONSTER)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "186"                                                                 // new class (ELEMENTAL_AIR)
+"newalign" = "34"                                                                  // new alignment (True Neutral)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#EISTA"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "WTASIGHT"                                                          // generic AI script
+"script04"   = "dw#melee"                                                          // SCSII melee AI script
+"script05"   = "BPWTASGT"                                                          // Big Picture generic AI script
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
+    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
+    target = "1"                                                                   // target: 1 (self)
+    timing = "9"                                                                   // timing mode: 9 (permanent after death)
+    duration = "0"                                                                 // duration: 0
+    sectype = "0"                                                                  // secondary type: none
+    parameter1 = "10"                                                              // param1: (movement rate modifier)
+    parameter2 = "1"                                                               // param2: (set)
+    probability1 = "100"                                                           // probability1: 100%
+  STR_VAR
+    effsource = ""                                                                 // effsource: none
+END                                                                                // end FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
 
 
 
@@ -240,6 +408,8 @@ END                                                                             
 
 COMPILE ~atweaks/baf/elementals/rr#easer.baf~                                      // Aerial Servant AI script
 COMPILE ~atweaks/baf/elementals/rr#efsal.baf~                                      // Fire Salamander AI script
+COMPILE ~atweaks/baf/elementals/rr#efrsa.baf~                                      // Frost Salamander AI script
+COMPILE ~atweaks/baf/elementals/rr#eista.baf~                                      // Invisible Stalker AI script
 
 
 
