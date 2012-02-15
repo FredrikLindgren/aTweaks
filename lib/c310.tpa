@@ -2702,6 +2702,33 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+// Frost Salamander
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~salgrice~                                                             // Frost Salamander (Abazigal's Lair)
+            ~icsalcol~                                                             // Ice Salamander (Planar Sphere)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "8" END                                               // mark opcode #8 (Colour: Change by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "9" END                                               // mark opcode #9 (Colour Glow Pulse) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  WRITE_BYTE 0x2E 58                                                               // major color (Dark Blue)
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
 // Salamander Noble
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files

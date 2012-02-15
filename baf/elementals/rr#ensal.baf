@@ -39,21 +39,8 @@ END
 
 IF
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    See([GOODCUTOFF])
-    CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
-    HaveSpell(WIZARD_LOWER_RESISTANCE)
-    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-    !StateCheck(Myself,STATE_SILENCED)
-THEN
-    RESPONSE #100
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        Spell(LastSeenBy(Myself),WIZARD_LOWER_RESISTANCE)
-END
-
-IF
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     See(Player1)
-    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
     CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
     !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
@@ -69,8 +56,8 @@ END
 
 IF
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     See(Player2)
-    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
     CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
     !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
@@ -86,8 +73,8 @@ END
 
 IF
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     See(Player3)
-    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
     CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
     !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
@@ -103,8 +90,8 @@ END
 
 IF
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     See(Player4)
-    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
     CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
     !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
@@ -120,8 +107,8 @@ END
 
 IF
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     See(Player5)
-    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
     CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
     !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
@@ -137,8 +124,8 @@ END
 
 IF
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     See(Player6)
-    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
     !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
     CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
     !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
@@ -154,10 +141,105 @@ END
 
 IF
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    See([GOODCUTOFF])
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
+    See(NearestEnemyOf(Myself))
     !Class(LastSeenBy(Myself),ELEMENTAL_FIRE)
     !Class(LastSeenBy(Myself),GENIE_EFREETI)
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    !CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#enlfr",LastSeenBy(Myself)) // Lower Fire Resistance
+        RemoveSpellRES("rr#enlfr") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
     HaveSpellRES("rr#enlfr") // Lower Fire Resistance
+    See(SecondNearestEnemyOf(Myself))
+    !Class(LastSeenBy(Myself),ELEMENTAL_FIRE)
+    !Class(LastSeenBy(Myself),GENIE_EFREETI)
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    !CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#enlfr",LastSeenBy(Myself)) // Lower Fire Resistance
+        RemoveSpellRES("rr#enlfr") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
+    See(ThirdNearestEnemyOf(Myself))
+    !Class(LastSeenBy(Myself),ELEMENTAL_FIRE)
+    !Class(LastSeenBy(Myself),GENIE_EFREETI)
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    !CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#enlfr",LastSeenBy(Myself)) // Lower Fire Resistance
+        RemoveSpellRES("rr#enlfr") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
+    See(FourthNearestEnemyOf(Myself))
+    !Class(LastSeenBy(Myself),ELEMENTAL_FIRE)
+    !Class(LastSeenBy(Myself),GENIE_EFREETI)
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    !CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#enlfr",LastSeenBy(Myself)) // Lower Fire Resistance
+        RemoveSpellRES("rr#enlfr") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
+    See(FifthNearestEnemyOf(Myself))
+    !Class(LastSeenBy(Myself),ELEMENTAL_FIRE)
+    !Class(LastSeenBy(Myself),GENIE_EFREETI)
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    !CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#enlfr",LastSeenBy(Myself)) // Lower Fire Resistance
+        RemoveSpellRES("rr#enlfr") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#enlfr") // Lower Fire Resistance
+    See(SixthNearestEnemyOf(Myself))
+    !Class(LastSeenBy(Myself),ELEMENTAL_FIRE)
+    !Class(LastSeenBy(Myself),GENIE_EFREETI)
     !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
     CheckStatGT(LastSeenBy(Myself),49,RESISTFIRE)
     !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
@@ -218,7 +300,7 @@ END
 IF
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
     HaveSpellRES("rr#wi304") // Fireball
-    See(SecondNearestEnemyOf(Myself))    
+    See(SecondNearestEnemyOf(Myself))
     CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
     CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
     !CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)

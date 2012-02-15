@@ -61,14 +61,6 @@ THEN
         Rest()
 END
 
-IF
-    !GlobalTimerNotExpired("rr#ecems","LOCALS") // Cold Emmision
-THEN
-    RESPONSE #100
-        SetGlobalTimer("rr#ecems","LOCALS",6)
-        ReallyForceSpellRES("rr#ecems",Myself) // Cold Emission
-END
-
 IF         // Note: Frost Salamanders have deliberately poor targeting. As per PnP they simply attack the closest creature. They do know how to avoid panicked and immune creatures though
     OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
       See(Player1)
@@ -158,7 +150,6 @@ THEN
 END
 
 IF
-    GlobalTimerNotExpired("rr#ecems","LOCALS") // check for Cold Emission once per round
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
     !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
 THEN

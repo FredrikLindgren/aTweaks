@@ -235,3 +235,24 @@ BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
+
+// Restore Frost Salamander soundsets (the creatures appear to be silent in the original game)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~salgrice~                                                             // Frost Salamander (Abazigal's Lair)
+            ~icsalcol~                                                             // Ice Salamander (Planar Sphere)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY                                              // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                     // Null soundset (code borrowed from Nythrun with thanks)
+      WRITE_LONG s1 ~-1~
+  END
+  SAY BATTLE_CRY1 #55438 SAY BATTLE_CRY2 #55437 SAY ATTACK1 #55440 SAY ATTACK2 #55439 SAY DAMAGE #55441 SAY DYING #55442 SAY SELECT_COMMON1 #55437 SAY SELECT_ACTION1 #55438
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
