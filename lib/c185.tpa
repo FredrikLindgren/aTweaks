@@ -159,6 +159,7 @@ ADD_MEMORIZED_SPELL ~rr#ddoor~ #0 ~innate~ ( 1 )                                
 WRITE_BYTE 0x6f 1                                                                  // BG1 Proficiency slot (small sword)
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "9"                                                                   // new movement rate
 "newxpv"   = "975"                                                                 // new XP value
 "newhp"    = "16"                                                                  // new hit point value
 "newac"    = "9"                                                                   // new Armor Class value
@@ -209,19 +210,6 @@ END                                                                             
   PATCH_IF (("%SOURCE_RES%" STRING_EQUAL_CASE ~DRYAD~) OR ("%SOURCE_RES%" STRING_EQUAL_CASE ~_DRYAD~)) BEGIN // special case, Dryad of the Cloudpeaks
     WRITE_BYTE 0x273 155                                                           // class = INNOCENT
   END
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
-    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
-    target = "1"                                                                   // target: 1 (self)
-    timing = "9"                                                                   // timing mode: 9 (permanent after death)
-    duration = "0"                                                                 // duration: 0
-    sectype = "0"                                                                  // secondary type: none
-    parameter1 = "9"                                                               // param1: 9 (statistic modifier)
-    parameter2 = "1"                                                               // param2: 1 (type)
-    probability1 = "100"                                                           // probability1: 100%
-  STR_VAR
-    effsource = ""                                                                 // effsource: none
-END                                                                                // end FUNCTION call
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -254,6 +242,7 @@ WRITE_BYTE 0x6f 1                                                               
 WRITE_SHORT 0x4c 0                                                                 // remove missile AC modifier (was -5)
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "11"                                                                  // new movement rate
 "newxpv"   = "1400"                                                                // new XP value
 "newhp"    = "32"                                                                  // new hit point value
 "newac"    = "7"                                                                   // new Armor Class value
@@ -299,19 +288,6 @@ STR_VAR                                                                         
 "script11"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~entangle_immunities~ END                                    // add immunity to Entangle spells and abilities
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
-    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
-    target = "1"                                                                   // target: 1 (self)
-    timing = "9"                                                                   // timing mode: 9 (permanent after death)
-    duration = "0"                                                                 // duration: 0
-    sectype = "0"                                                                  // secondary type: none
-    parameter1 = "9"                                                               // param1: 9 (statistic modifier)
-    parameter2 = "1"                                                               // param2: 1 (type)
-    probability1 = "100"                                                           // probability1: 100%
-  STR_VAR
-    effsource = ""                                                                 // effsource: none
-END                                                                                // end FUNCTION call
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -455,6 +431,7 @@ REPLACE_CRE_ITEM ~rr#nymp~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~                     
 REPLACE_CRE_ITEM ~rr#nymp~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON2~                        // replace defaul weapon with a non-damaging attack
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "9"                                                                   // new movement rate
 "newxpv"   = "1400"                                                                // new XP value
 "newhp"    = "24"                                                                  // new hit point value
 "newac"    = "9"                                                                   // new Armor Class value
@@ -505,19 +482,6 @@ END                                                                             
 PATCH_IF (("%SOURCE_RES%" STRING_EQUAL_CASE ~NYMPHSU~) OR ("%SOURCE_RES%" STRING_EQUAL_CASE ~dvnymph~)) BEGIN // special case, summoned Nymphs need a different script
   WRITE_ASCII 0x248 ~RR#SNYMP~ #8                                                  // override AI script
 END
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
-    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
-    target = "1"                                                                   // target: 1 (self)
-    timing = "9"                                                                   // timing mode: 9 (permanent after death)
-    duration = "0"                                                                 // duration: 0
-    sectype = "0"                                                                  // secondary type: none
-    parameter1 = "9"                                                               // param1: 9 (statistic modifier)
-    parameter2 = "1"                                                               // param2: 1 (type)
-    probability1 = "100"                                                           // probability1: 100%
-  STR_VAR
-    effsource = ""                                                                 // effsource: none
-END                                                                                // end FUNCTION call
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block

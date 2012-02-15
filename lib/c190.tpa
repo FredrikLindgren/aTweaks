@@ -117,6 +117,7 @@ LAUNCH_PATCH_FUNCTION ~bleeding_immunity~ END                                   
 LAUNCH_PATCH_FUNCTION ~disease_immunity~ END                                       // add disease immunity
 LAUNCH_PATCH_FUNCTION ~poison_immunity~ END                                        // add poison immunity
 LAUNCH_PATCH_FUNCTION ~poison_spell_immunities~ END                                // add immunity to poison-based spells
+LAUNCH_PATCH_FUNCTION ~insect_spell_immunities~ END                                // add immunity to insect spells
 BUT_ONLY_IF_IT_CHANGES                                                   
 
 
@@ -147,13 +148,13 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // mark opcode #101 (Protection from Opcode) for deletion (remove spurious Maze immunity)
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EASER~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REMOVE_CRE_ITEM ~MAGE01~                                                           // initial invisibility is handled via weapon
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
 "newxpv"   = "9000"                                                                // new XP value
 "newhp"    = "128"                                                                 // new hit point value
 "newac"    = "3"                                                                   // new Armor Class value
@@ -190,19 +191,6 @@ STR_VAR                                                                         
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
 "script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
-    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
-    target = "1"                                                                   // target: 1 (self)
-    timing = "9"                                                                   // timing mode: 9 (permanent after death)
-    duration = "0"                                                                 // duration: 0
-    sectype = "0"                                                                  // secondary type: none
-    parameter1 = "18"                                                              // param1: (movement rate modifier)
-    parameter2 = "1"                                                               // param2: (set)
-    probability1 = "100"                                                           // probability1: 100%
-  STR_VAR
-    effsource = ""                                                                 // effsource: none
-END                                                                                // end FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
@@ -221,18 +209,18 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 REPLACE_CRE_ITEM ~RR#EFSAL~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~RR#EFSA2~ #0 #0 #0 ~UNDROPPABLE~ ~SHIELD~ EQUIP                  // tail attack
 REMOVE_CRE_ITEM ~RING95~                                                           // Salamanders are not undead, they have their own specific set of immunities
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "7"                                                                   // new movement rate
 "newxpv"   = "2000"                                                                // new XP value
 "newhp"    = "63"                                                                  // new hit point value
 "newac"    = "3"                                                                   // new Armor Class value
 "newth"    = "13"                                                                  // new THAC0 value
 "newapr"   = "1"                                                                   // new number of attacks per round
+"rr#ptwf"  = "1"                                                                   // perfect two weapon fighting (1 = enable)
 "newsvd"   = "10"                                                                  // new Save vs. Death
 "newsvw"   = "12"                                                                  // new Save vs. Wand
 "newsvp"   = "11"                                                                  // new Save vs. Polymorph
@@ -266,19 +254,6 @@ STR_VAR                                                                         
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
 "script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
-    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
-    target = "1"                                                                   // target: 1 (self)
-    timing = "9"                                                                   // timing mode: 9 (permanent after death)
-    duration = "0"                                                                 // duration: 0
-    sectype = "0"                                                                  // secondary type: none
-    parameter1 = "7"                                                               // param1: (movement rate modifier)
-    parameter2 = "1"                                                               // param2: (set)
-    probability1 = "100"                                                           // probability1: 100%
-  STR_VAR
-    effsource = ""                                                                 // effsource: none
-END                                                                                // end FUNCTION call
 LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
 LAUNCH_PATCH_FUNCTION fire_salamander_immunities END                               // grant fire salamander immunities
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
@@ -308,11 +283,14 @@ REPLACE_CRE_ITEM ~RR#EFRS2~ #0 #0 #0 ~UNDROPPABLE~ ~SHIELD~ EQUIP               
 REMOVE_CRE_ITEM ~RING95~                                                           // Salamanders are not undead, they have their own specific set of immunities
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "9"                                                                   // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
 "newxpv"   = "9000"                                                                // new XP value
 "newhp"    = "96"                                                                  // new hit point value
 "newac"    = "3"                                                                   // new Armor Class value
 "newth"    = "9"                                                                   // new THAC0 value
 "newapr"   = "4"                                                                   // new number of attacks per round
+"rr#ptwf"  = "1"                                                                   // perfect two weapon fighting (1 = enable)
 "newsvd"   = "7"                                                                   // new Save vs. Death
 "newsvw"   = "9"                                                                   // new Save vs. Wand
 "newsvp"   = "8"                                                                   // new Save vs. Polymorph
@@ -347,19 +325,6 @@ STR_VAR                                                                         
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
-    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
-    target = "1"                                                                   // target: 1 (self)
-    timing = "9"                                                                   // timing mode: 9 (permanent after death)
-    duration = "0"                                                                 // duration: 0
-    sectype = "0"                                                                  // secondary type: none
-    parameter1 = "10"                                                              // param1: (statistic modifier)
-    parameter2 = "1"                                                               // param2: 1 (type)
-    probability1 = "100"                                                           // probability1: 100%
-  STR_VAR
-    effsource = ""                                                                 // effsource: none
-END                                                                                // end FUNCTION call
 LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
 LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                    // grant immunities to cold-based area effect spells
 PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~salgrice~) BEGIN                       // special case, the Frost Salamanders in Abazigal's lair need a diferent script setup
@@ -394,6 +359,8 @@ REMOVE_CRE_ITEM ~STALKESU~                                                      
 REMOVE_CRE_ITEM ~STALKER~                                                          // immunities are handled differently
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "9"                                                                   // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
 "newxpv"   = "3000"                                                                // new XP value
 "newhp"    = "64"                                                                  // new hit point value
 "newac"    = "3"                                                                   // new Armor Class value
@@ -429,19 +396,6 @@ STR_VAR                                                                         
 "script04"   = "dw#melee"                                                          // SCSII melee AI script
 "script05"   = "BPWTASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
-    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
-    target = "1"                                                                   // target: 1 (self)
-    timing = "9"                                                                   // timing mode: 9 (permanent after death)
-    duration = "0"                                                                 // duration: 0
-    sectype = "0"                                                                  // secondary type: none
-    parameter1 = "10"                                                              // param1: (movement rate modifier)
-    parameter2 = "1"                                                               // param2: (set)
-    probability1 = "100"                                                           // probability1: 100%
-  STR_VAR
-    effsource = ""                                                                 // effsource: none
-END                                                                                // end FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
@@ -473,11 +427,14 @@ REPLACE_CRE_ITEM ~RR#ENSA2~ #0 #0 #0 ~UNDROPPABLE~ ~SHIELD~ EQUIP               
 REMOVE_CRE_ITEM ~RING95~                                                           // Salamanders are not undead, they have their own specific set of immunities
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "14"                                                                  // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
 "newxpv"   = "10000"                                                               // new XP value
 "newhp"    = "96"                                                                  // new hit point value
 "newac"    = "0"                                                                   // new Armor Class value
 "newth"    = "9"                                                                   // new THAC0 value
 "newapr"   = "1"                                                                   // new number of attacks per round
+"rr#ptwf"  = "1"                                                                   // perfect two weapon fighting (1 = enable)
 "newsvd"   = "7"                                                                   // new Save vs. Death
 "newsvw"   = "9"                                                                   // new Save vs. Wand
 "newsvp"   = "8"                                                                   // new Save vs. Polymorph
@@ -513,19 +470,6 @@ STR_VAR                                                                         
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
 "script06"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
-  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
-    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
-    target = "1"                                                                   // target: 1 (self)
-    timing = "9"                                                                   // timing mode: 9 (permanent after death)
-    duration = "0"                                                                 // duration: 0
-    sectype = "0"                                                                  // secondary type: none
-    parameter1 = "12"                                                              // param1: (movement rate modifier)
-    parameter2 = "1"                                                               // param2: (set)
-    probability1 = "100"                                                           // probability1: 100%
-  STR_VAR
-    effsource = ""                                                                 // effsource: none
-END                                                                                // end FUNCTION call
 LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
 LAUNCH_PATCH_FUNCTION fire_salamander_immunities END                               // grant fire salamander immunities
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells

@@ -6,6 +6,7 @@ DEFINE_PATCH_FUNCTION ~RR#MDCRE~
 
 INT_VAR                                                                            // initialize starting variables
 "enforce"  = "0"                                                                   // values are not enforced by default
+"newmove"  = "999"                                                                 // new movement rate
 "newxpv"   = "0"                                                                   // new XP value
 "newhp"    = "0"                                                                   // new hit point value
 "newac"    = "10"                                                                  // new Armor Class value
@@ -46,6 +47,10 @@ INT_VAR                                                                         
 "newalign" = "99"                                                                  // new alignment
 "newhide"  = "999"                                                                 // new Hide in Shadows value
 "newmsil"  = "999"                                                                 // new Move Silently value
+"rr#ptwf"  = "0"                                                                   // perfect two weapon fighting (for creatures with multiple weapons)
+"rr#bump"  = "0"                                                                   // NPC bump (allows the creature to movee others out of its way)
+
+
 
 
 STR_VAR                                                                            // initialize strings
@@ -244,6 +249,57 @@ END
 PATCH_IF (("%oldsex%" != "%newsex%") AND ("%newsex%" != "99")) OR (("%enforce%" = "1") AND ("%newsex%" != "99")) BEGIN
   WRITE_BYTE 0x237 "%newsex%"                                                      // set new Sex value
 END
+
+PATCH_IF ("%newmove%" != "999") BEGIN                                              // creature movement rate
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END   // mark opcode #126 (Movement Modifier) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END   // mark opcode #176 (Movement Modifier II) for deletion
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
+    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
+    target = "1"                                                                   // target: 1 (self)
+    timing = "9"                                                                   // timing mode: 9 (permanent after death)
+    duration = "0"                                                                 // duration: 0
+    sectype = "0"                                                                  // secondary type: none
+    parameter1 = "%newmove%"                                                       // param1: (statistic modifier)
+    parameter2 = "1"                                                               // param2: 1 (type)
+    probability1 = "100"                                                           // probability1: 100%
+  STR_VAR
+    effsource = ""                                                                 // effsource: none
+END                                                                                // end FUNCTION call
+END                                                                                // end PATCH_IF
+
+PATCH_IF ("%rr#ptwf%" = "1") BEGIN                                                 // perfect two weapon fighting (for creatures with multiple weapons)
+SET_BG2_PROFICIENCY ~PROFICIENCY2WEAPON~ 3                                         // grant 3 stars in Two Weapon Fighting
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
+    opcode = "305"                                                                 // effect: #305 (Off-Hand THAC0 Modifier)
+    target = "1"                                                                   // target: 1 (self)
+    timing = "9"                                                                   // timing mode: 9 (permanent after death)
+    duration = "0"                                                                 // duration: 0
+    sectype = "0"                                                                  // secondary type: none
+    parameter1 = "2"                                                               // param1: 2 (statistic modifier)
+    parameter2 = "0"                                                               // param2: 0 (type)
+    probability1 = "100"                                                           // probability1: 100%
+  STR_VAR
+    effsource = ""                                                                 // effsource: none
+END                                                                                // end FUNCTION call
+END                                                                                // end PATCH_IF
+
+PATCH_IF ("%rr#bump%" = "1") BEGIN                                                 // NPC bump (allows the creature to move others out of its way)
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                       // Starts FUNCTION call (add new creature effect built-in function)
+        INT_VAR
+          opcode = "300"                                                           // effect: #300 (NPC Bump)
+          target = "1"                                                             // target: 1 (self)
+          timing = "9"                                                             // timing mode: 9 (permanent after death)
+          "duration" = "0"                                                         // duration: 0
+          "sectype" = "0"                                                          // secondary type: none
+          parameter2 = "1"                                                         // param2: 1 (constant value)
+          probability1 = "100"                                                     // probability1: 100%
+        STR_VAR
+          "effsource" = ""                                                         // effsource: none
+      END
+END                                                                                // end PATCH_IF
+
 
 
 END                                                                                // End FUNCTION
