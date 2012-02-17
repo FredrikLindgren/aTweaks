@@ -1,0 +1,940 @@
+IF
+    Global("RR#Active","LOCALS",0)
+    OR(4)
+      AttackedBy([ANYONE],DEFAULT)
+      TookDamage()
+      Help([EVILCUTOFF.0.ELEMENTAL]) // elementals
+      Help([EVILCUTOFF.0.FAIRY]) // fey creatures (Nereids will respond to their calls for help too)
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        Enemy()
+        Help()
+        Continue()
+END
+
+IF
+    Global("RR#Active","LOCALS",0)
+    Allegiance(Myself,EVILCUTOFF)
+    See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        Enemy()
+        Help()
+        Continue()
+END
+
+IF
+    OR(4)
+      Global("RR#Active","LOCALS",0)
+      !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+      StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+      StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Global("RR#Active","LOCALS",1)
+    !InActiveArea(Myself)
+    !See([GOODCUTOFF])
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+  RESPONSE #100
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+        Rest()
+END
+
+IF
+    Name("Shoal",Myself) // Shoal the Nereid
+    !Dead("Droth")
+    HitBy([PC],CRUSHING)
+THEN
+    RESPONSE #100
+        SetGlobal("ShoalHit","GLOBAL",1)
+        StartDialogueNoSet([PC])
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+    See([GOODCUTOFF])
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Help","LOCALS",12)
+        Help()
+        Continue()
+END
+
+IF
+    !See([GOODCUTOFF])
+    InMyArea(Player1)
+    !Detect(Player1)
+    OR(2)
+      StateCheck(Myself,STATE_INVISIBLE)
+      RandomNum(8,1)
+THEN
+    RESPONSE #100
+        MoveToObject(Player1)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enbga","LOCALS")
+    !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to trigger Beguiling Aura
+    See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#enbga","LOCALS",6)
+        ReallyForceSpellRES("rr#enbga",Myself) // Beguiling Aura
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ensww") // Summon Water Weird
+    See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ensww",Myself) // Summon Water Weird
+        RemoveSpellRES("rr#ensww") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See([PC.0.0.MAGE]) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(SecondNearest([PC.0.0.MAGE])) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(ThirdNearest([PC.0.0.MAGE])) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See([PC.0.0.MAGE_THIEF]) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(SecondNearest([PC.0.0.MAGE_THIEF])) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(ThirdNearest([PC.0.0.MAGE_THIEF])) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See([PC.0.0.BARD_ALL]) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(SecondNearest([PC.0.0.BARD_ALL])) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(ThirdNearest([PC.0.0.BARD_ALL])) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See([PC.0.0.THIEF]) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(SecondNearest([PC.0.0.THIEF])) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(ThirdNearest([PC.0.0.THIEF])) // generally have poor saves vs. death
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSDEATH) // target the most susceptible victims first
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See([GOODCUTOFF])
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(SecondNearest([GOODCUTOFF]))
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(ThirdNearest([GOODCUTOFF]))
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(FourthNearest([GOODCUTOFF]))
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(FifthNearest([GOODCUTOFF]))
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    See(SixthNearest([GOODCUTOFF]))
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    !StateCheck(LastSeenBy(Myself),STATE_POISONED)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("RR#ENVSP",LastSeenBy(Myself)) // Venom Spit
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See([EVILCUTOFF.HUMANOID.0.0.0.MALE])
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),11,SAVEVSBREATH) // target the most susceptible victims first
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(SecondNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),11,SAVEVSBREATH) // target the most susceptible victims first
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(ThirdNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),11,SAVEVSBREATH) // target the most susceptible victims first
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(FourthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),11,SAVEVSBREATH) // target the most susceptible victims first
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(FifthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),11,SAVEVSBREATH) // target the most susceptible victims first
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(SixthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),11,SAVEVSBREATH) // target the most susceptible victims first
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(SeventhNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),11,SAVEVSBREATH) // target the most susceptible victims first
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(EighthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),11,SAVEVSBREATH) // target the most susceptible victims first
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(NinthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),11,SAVEVSBREATH) // target the most susceptible victims first
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(TenthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),11,SAVEVSBREATH) // target the most susceptible victims first
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See([EVILCUTOFF.HUMANOID.0.0.0.MALE])
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(SecondNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(ThirdNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(FourthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(FifthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(SixthNearest([EVILCUTOFF.HUMANOID.0.0.0.MALE]))
+    StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        FaceObject(LastSeenBy(Myself))
+        ActionOverride(LastSeenBy(Myself),FaceObject([EVILCUTOFF.0.FAIRY.FAIRY_NEREID.0.FEMALE.CHAOTIC_NEUTRAL]))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(Player1)
+    Gender(LastSeenBy(Myself),MALE)
+    OR(2)
+      StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+      StateCheck(LastSeenBy(Myself),STATE_HELPLESS) // helpless male PCs can be drowned by a Nereid's kiss too
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(Player2)
+    Gender(LastSeenBy(Myself),MALE)
+    OR(2)
+      StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+      StateCheck(LastSeenBy(Myself),STATE_HELPLESS) // helpless male PCs can be drowned by a Nereid's kiss too
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(Player3)
+    Gender(LastSeenBy(Myself),MALE)
+    OR(2)
+      StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+      StateCheck(LastSeenBy(Myself),STATE_HELPLESS) // helpless male PCs can be drowned by a Nereid's kiss too
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(Player4)
+    Gender(LastSeenBy(Myself),MALE)
+    OR(2)
+      StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+      StateCheck(LastSeenBy(Myself),STATE_HELPLESS) // helpless male PCs can be drowned by a Nereid's kiss too
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(Player5)
+    Gender(LastSeenBy(Myself),MALE)
+    OR(2)
+      StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+      StateCheck(LastSeenBy(Myself),STATE_HELPLESS) // helpless male PCs can be drowned by a Nereid's kiss too
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+END
+
+IF
+    !GlobalTimerNotExpired("rr#enkis","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(Player6)
+    Gender(LastSeenBy(Myself),MALE)
+    OR(2)
+      StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+      StateCheck(LastSeenBy(Myself),STATE_HELPLESS) // helpless male PCs can be drowned by a Nereid's kiss too
+    !StateCheck(LastSeenBy(Myself),STATE_PANIC)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-2,SAVEVSBREATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#enkis","LOCALS",6)
+        MoveToObjectNoInterrupt(LastSeenBy(Myself))
+        ForceSpellRES("rr#enkis",LastSeenBy(Myself)) // Drowning Kiss
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+    OR(2)
+      Help([EVILCUTOFF.0.FAIRY]) // fey creatures
+      Help([EVILCUTOFF.0.ELEMENTAL]) // elementals
+    InMyArea(LastHelp(Myself))
+    !StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Move","LOCALS",6)
+        MoveToObject(LastHelp(Myself))
+END
+
+IF
+    Range(NearestEnemyOf(Myself),10) // Nereids avoid melee combat
+THEN
+    RESPONSE #100
+        RandomWalkContinuous()
+END

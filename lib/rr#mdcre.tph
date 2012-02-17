@@ -64,6 +64,16 @@ STR_VAR                                                                         
 "enfc08"   = "RR#NOENF"                                                            // enforced creature 8
 "enfc09"   = "RR#NOENF"                                                            // enforced creature 9
 "enfc10"   = "RR#NOENF"                                                            // enforced creature 10
+"notenf01" = "RR#XENFD"                                                            // non-enforced creature 1
+"notenf02" = "RR#XENFD"                                                            // non-enforced creature 2
+"notenf03" = "RR#XENFD"                                                            // non-enforced creature 3
+"notenf04" = "RR#XENFD"                                                            // non-enforced creature 4
+"notenf05" = "RR#XENFD"                                                            // non-enforced creature 5
+"notenf06" = "RR#XENFD"                                                            // non-enforced creature 6
+"notenf07" = "RR#XENFD"                                                            // non-enforced creature 7
+"notenf08" = "RR#XENFD"                                                            // non-enforced creature 8
+"notenf09" = "RR#XENFD"                                                            // non-enforced creature 9
+"notenf10" = "RR#XENFD"                                                            // non-enforced creature 10
 
 
 
@@ -115,6 +125,12 @@ READ_BYTE  0x68  "oldmsil"                                                      
 PATCH_FOR_EACH ~enfcre~ IN ~%enfc01%~ ~%enfc02%~ ~%enfc03%~ ~%enfc04%~ ~%enfc05%~ ~%enfc06%~ ~%enfc07%~ ~%enfc08%~ ~%enfc09%~ ~%enfc10%~ BEGIN // checks for enforced creatures
   PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE "%enfcre%") BEGIN             
     SET "enforce" = "1"                                                           // mark creature as enforced (will always use specified values, even if the existing ones are better)
+  END
+END
+
+PATCH_FOR_EACH ~notenf~ IN ~%notenf01%~ ~%notenf02%~ ~%notenf03%~ ~%notenf04%~ ~%notenf05%~ ~%notenf06%~ ~%notenf07%~ ~%notenf08%~ ~%notenf09%~ ~%notenf10%~ BEGIN // checks for enforced creatures
+  PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE "%notenf%") BEGIN             
+    SET "enforce" = "0"                                                           // mark creature as non-enforced
   END
 END
 

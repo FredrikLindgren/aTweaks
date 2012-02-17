@@ -66,16 +66,6 @@ THEN
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Hems","LOCALS")
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Hems","LOCALS",6)
-		ForceSpellRES("RR#MMAHE",Myself) // Heat Emission
-                CreateVisualEffectObject("ICFIRSDI",Myself)
-                Continue()
-END
-
-IF
 	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other mephits may hear it and join the battle
 	See([GOODCUTOFF])
 THEN
@@ -647,7 +637,7 @@ IF
         CheckStatLT(LastSeenBy(Myself),100,RESISTFIRE)
 THEN
 	RESPONSE #100
-		AttackReevaluate(LastSeenBy(Myself),30)
+		AttackReevaluate(LastSeenBy(Myself),15)
 END
 
 IF

@@ -20,17 +20,13 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#renew" = "1" END  
 COPY ~atweaks/spl/rr#niinv.spl~ ~override~                                         // Natural Invisibility
   SAY NAME1 @2100 SAY NAME2 @2100
 
-COPY ~atweaks/bam/elementals/rr#hcold.bam~ ~override~                              // cold damage hit BAM animation
-COPY ~atweaks/vvc/rr#hcold.vvc~ ~override~                                         // cold damage hit VVC animation
-COPY ~atweaks/wav/rr#hcold.wav~ ~override~                                         // cold damage hit WAV sound
-COPY ~atweaks/vvc/rr#ecems.vvc~ ~override~                                         // Cold Aura VVC animation
-COPY ~atweaks/bam/elementals/rr#ecems.bam~ ~override~                              // Cold Aura BAM animation
-COPY ~atweaks/spl/elementals/rr#ecems.spl~ ~override~                              // Cold Aura
-
 COPY ~atweaks/spl/elementals/rr#track.spl~ ~override~                              // Tracking
 COPY ~atweaks/spl/elementals/rr#ecfir.spl~ ~override~                              // Conjure Fire Elemental
 
+COPY ~atweaks/spl/elementals/rr#endis.spl~ ~override~                              // Displacement (Nereid)
+SAY NAME1 @2105 SAY NAME2 @2105
 
+COPY ~atweaks/spl/elementals/rr#ecems.spl~ ~override~                              // Cold Aura
 
 COPY ~atweaks/eff/elementals/rr#enlfr.eff~ ~override~                              // Lower Fire Resistance immunity EFF (for Fire Elementals, Fire Salamanders, Efreet etc.)
 COPY ~atweaks/spl/elementals/rr#enlfr.spl~ ~override~                              // Lower Fire Resistance
@@ -88,6 +84,99 @@ COPY ~atweaks/spl/rr#icew.spl~ ~override~                                       
     WRITE_SHORT (ab_off+i*0x28+0x26) %rr#icew%                                     // use new projectile
   END
 
+COPY ~atweaks/spl/elementals/rr#enbga.spl~ ~override~                              // Beguiling Aura (part 1)
+  SAY NAME1 @2104 SAY NAME2 @2104
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %rr#fcsng%                                    // use new projectile
+  END
+
+
+COPY ~atweaks/spl/elementals/rr#enbg2.spl~ ~override~                              // Beguiling Aura (part 2)
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
+      READ_LONG  ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "param1"
+        PATCH_IF (("%opcode%" = 139) AND ("%param1%" = 1476)) BEGIN // display string
+          SAY ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) @2106  // Fascinated
+        END
+    END
+  END
+
+COPY ~atweaks/eff/elementals/rr#enbga.eff~ ~override~                              // Beguiling Aura EFF 1 (for targeting only male characters)
+COPY ~atweaks/eff/elementals/rr#enbg2.eff~ ~override~                              // Beguiling Aura EFF 2 (for elven and half-elven charm immunity)
+  SAY 0x1C @1903                                                                   // Resists charm effect
+
+// Add immunity to Beguiling Aura to items and spells which use blindness
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+                ~spdr101.spl~
+                ~spin595.spl~
+                ~spin878.spl~
+                ~spin893.spl~
+                ~spin929.spl~
+                ~spin931.spl~
+                ~sppr704.spl~
+                ~sppr707.spl~
+                ~spwi106.spl~
+                ~spwi118.spl~
+                ~spwi224.spl~
+                ~spwi714.spl~
+                ~spwi815.spl~
+                ~spwi958.spl~
+                ~spwm178.spl~
+                ~chalcy2.itm~
+                ~gorwom4.itm~
+                 ~halb06.itm~
+                   ~sorb.itm~
+                 ~sw1h51.itm~
+                 ~wand19.itm~
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%~ BEGIN                                       // if the designated file with a SPL extension exists
+COPY_EXISTING ~%file%~ ~override~
+  PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
+// =============================================================================== // the actual work starts from here
+  LPF add_conditional_immunity INT_VAR f_Condition = 74 STR_VAR f_Spell = rr#enbg2 END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+COPY ~aTweaks/VVC/RR#SKISS.VVC~ ~override~                                         // Kiss VVC animation
+COPY ~aTweaks/BAM/RR#SKISS.BAM~ ~override~                                         // Kiss BAM graphics
+COPY ~atweaks/bam/elementals/rr#enkis.bam~ ~override~                              // Drowning Kiss bam
+COPY ~atweaks/spl/elementals/rr#enkis.spl~ ~override~                              // Drowning Kiss (Nereid)
+  SAY NAME1 @2107 SAY NAME2 @2107
+
+COPY ~atweaks/spl/elementals/rr#envsp.spl~ ~override~                              // Venom Spit (Nereid)
+  SAY NAME1 @2108 SAY NAME2 @2108
+
+COPY ~atweaks/spl/elementals/rr#ensww.spl~ ~override~                              // Summon Water Weird (Nereid)
+  SAY NAME1 @2109 SAY NAME2 @2109
+COPY ~atweaks/eff/elementals/rr#ensww.eff~ ~override~                              // Summon Water Weird EFF
+
+
+COPY ~atweaks/spl/elementals/rr#envlp.spl~ ~override~                              // Envelop
+  SAY NAME1 @2111 SAY NAME2 @2111
+COPY ~atweaks/eff/elementals/rr#envlp.eff~ ~override~                              // Envelop immunity EFF (for large and incorporeal creatures)
+COPY ~atweaks/bam/elementals/rr#envlp.bam~ ~override~                              // Envelop BAM animation
+COPY ~atweaks/vvc/rr#envlp.vvc~ ~override~                                         // Envelop VVC animation
+
+COPY ~atweaks/spl/elementals/rr#drown.spl~ ~override~                              // Drown
+SAY NAME1 @2112 SAY NAME2 @2112
+
+COPY ~atweaks/spl/elementals/rr#ewwde.spl~ ~override~                              // Dominate Elemental
+SAY NAME1 @2113 SAY NAME2 @2113
+
+COPY ~atweaks/spl/elementals/rr#ewwsl.spl~ ~override~                              // 1 round Slow (Water Weirds are slowed by cold damage)
+
 
 // Clone spells into innate abilities
 
@@ -105,6 +194,7 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END  
 
 COPY_EXISTING ~SPWI418.SPL~  ~override/RR#WI418.SPL~                               // Clone Fire Shield:Red into an innate ability
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
 
 
 //////////////
@@ -129,6 +219,8 @@ COPY ~atweaks/itm/elementals/rr#efrs2.itm~ ~override~                           
 COPY ~atweaks/itm/elementals/rr#eista.itm~ ~override~                              // Invisible Stalker attack
 COPY ~atweaks/itm/elementals/rr#ensal.itm~ ~override~                              // Salamander Noble spear attack
 COPY ~atweaks/itm/elementals/rr#ensa2.itm~ ~override~                              // Salamander Noble tail attack
+COPY ~atweaks/itm/elementals/rr#ewwei.itm~ ~override~                              // Water Weird attack
+
 
 
 //////////////////////////
@@ -276,8 +368,6 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 SAY NAME1 #72145 SAY NAME2 #72146                                                  // Frost Salamander
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 REPLACE_CRE_ITEM ~RR#EFRSA~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~RR#EFRS2~ #0 #0 #0 ~UNDROPPABLE~ ~SHIELD~ EQUIP                  // bite attack
 REMOVE_CRE_ITEM ~RING95~                                                           // Salamanders are not undead, they have their own specific set of immunities
@@ -350,8 +440,6 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_MEMORIZED_SPELL ~rr#track~ #0 ~innate~ ( 1 )                                   // adds 1x Tracking
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EISTA~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REMOVE_CRE_ITEM ~MAGE01~                                                           // initial invisibility is handled via weapon
@@ -403,6 +491,90 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+// Nereid
+
+COPY ~atweaks/cre/elementals/rr#enere.cre~ ~override~                              // Nereid (hostile)
+  SAY NAME1 @2103 SAY NAME2 @2103
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+               ~shoal~                                                             // Shoal the Nereid (BGT)
+              ~_shoal~                                                             // Shoal the Nereid (Tutu)
+            ~rr#enere~                                                             // aTweaks' Nereid
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_MEMORIZED_SPELL ~rr#enkis~ #0 ~innate~ ( 1 )                                   // adds 1x Drowning Kiss
+ADD_MEMORIZED_SPELL ~rr#envsp~ #0 ~innate~ ( 1 )                                   // adds 1x Venom Spit
+ADD_MEMORIZED_SPELL ~rr#ensww~ #0 ~innate~ ( 1 )                                   // adds 1x Summon Water Weird
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newmove"  = "9"                                                                   // new movement rate
+"newxpv"   = "975"                                                                 // new XP value
+"newhp"    = "32"                                                                  // new hit point value
+"newac"    = "10"                                                                  // new Armor Class value
+"newth"    = "17"                                                                  // new THAC0 value
+"newapr"   = "0"                                                                   // new number of attacks per round
+"newsvd"   = "13"                                                                  // new Save vs. Death
+"newsvw"   = "15"                                                                  // new Save vs. Wand
+"newsvp"   = "14"                                                                  // new Save vs. Polymorph
+"newsvb"   = "16"                                                                  // new Save vs. Breath
+"newsvs"   = "16"                                                                  // new Save vs. Spell
+"newmr"    = "50"                                                                  // new Magic Resistance value
+"newlvl1"  = "4"                                                                   // new level (first class)
+"newstr"   = "9"                                                                   // new Strength value
+"newdex"   = "17"                                                                  // new Dexterity value
+"newcon"   = "12"                                                                  // new Constitution value
+"newint"   = "12"                                                                  // new Intelligence value
+"newwis"   = "12"                                                                  // new Wisdom value
+"newchr"   = "18"                                                                  // new Charisma value
+"newmor"   = "11"                                                                  // new morale value
+"newmorb"  = "4"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "1"                                                                   // new general (HUMANOID)
+"newrace"  = "120"                                                                 // new race (FAIRY)
+"newclass" = "132"                                                                 // new class (FAIRY_NEREID)
+"newalign" = "50"                                                                  // new alignment (Chaotic Neutral)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+STR_VAR                                                                            // initialize strings
+"notenf01"   = "shoal"                                                             // non-enforced creature 1 (uses best stat values)
+"notenf02"   = "_shoal"                                                            // non-enforced creature 2 (uses best stat values)
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#ENERE"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "SHOAL"                                                             // Shoal the Nereid's AI script (BGT)
+"script04"   = "_SHOAL"                                                            // Shoal the Nereid's AI script(BGT)
+"script05"   = "WTASIGHT"                                                          // generic AI script(BGT)
+"script06"   = "_TASIGHT"                                                          // generic AI script(Tutu)
+"script07"   = "dw#melee"                                                          // SCSII melee AI script
+"script08"   = "BPWDASGT"                                                          // Big Picture generic AI script
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR
+    opcode = "232"                                                                 // effect: #232 (Cast Spell on Condition)
+    target = "1"                                                                   // target: 1 (self)
+    timing = "9"                                                                   // timing mode: 9 (permanent after death)
+    "duration" = "0"                                                               // duration: 0
+    "parameter1" = "0"                                                             // param1: (target)
+    "parameter2" = "7"                                                             // param2: (condition)
+    "sectype" = "0"                                                                // secondary type: none
+    probability1 = "100"                                                           // probability1: 100%
+    STR_VAR
+    "resource"  = "RR#ENDIS"                                                       // resref: (Nereid's Displacement ability)
+    "effsource" = ""                                                               // effsource: none
+    END
+LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
 // Salamander Noble
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
@@ -420,8 +592,6 @@ ADD_MEMORIZED_SPELL ~rr#wi304~ #0 ~innate~ ( 3 )                                
 ADD_MEMORIZED_SPELL ~rr#wi418~ #0 ~innate~ ( 3 )                                   // adds 3x Fire Shield:Red
 ADD_MEMORIZED_SPELL ~rr#ecfir~ #0 ~innate~ ( 1 )                                   // adds 1x Conjure Fire Elemental
 ADD_MEMORIZED_SPELL ~rr#enlfr~ #0 ~innate~ ( 1 )                                   // adds 1x Lower Fire Resistance
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
-LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 REPLACE_CRE_ITEM ~RR#ENSAL~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~RR#ENSA2~ #0 #0 #0 ~UNDROPPABLE~ ~SHIELD~ EQUIP                  // tail attack
 REMOVE_CRE_ITEM ~RING95~                                                           // Salamanders are not undead, they have their own specific set of immunities
@@ -479,6 +649,65 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+// Water Weird
+
+COPY ~atweaks/cre/elementals/rr#ewwei.cre~ ~override~                              // Water Weird (hostile)
+  SAY NAME1 @2110 SAY NAME2 @2110 SAY SELECT_COMMON1 @471 SAY BATTLE_CRY1 @471 SAY BATTLE_CRY2 @472 SAY ATTACK1 @473 SAY ATTACK2 @474 SAY DAMAGE @475 SAY DYING @476 SAY SELECT_ACTION1 @477
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~rr#ewwei~                                                           // Water Weird
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
+REPLACE_CRE_ITEM ~RR#EWWEI~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newmove"  = "9"                                                                   // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
+"newxpv"   = "420"                                                                 // new XP value
+"newhp"    = "27"                                                                  // new hit point value
+"newac"    = "4"                                                                   // new Armor Class value
+"newth"    = "15"                                                                  // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "13"                                                                  // new Save vs. Death
+"newsvw"   = "15"                                                                  // new Save vs. Wand
+"newsvp"   = "14"                                                                  // new Save vs. Polymorph
+"newsvb"   = "16"                                                                  // new Save vs. Breath
+"newsvs"   = "16"                                                                  // new Save vs. Spell
+"newlvl1"  = "3"                                                                   // new level (first class)
+"newstr"   = "13"                                                                  // new Strength value
+"newdex"   = "15"                                                                  // new Dexterity value
+"newcon"   = "16"                                                                  // new Constitution value
+"newint"   = "12"                                                                  // new Intelligence value
+"newwis"   = "10"                                                                  // new Wisdom value
+"newchr"   = "12"                                                                  // new Charisma value
+"newmor"   = "13"                                                                  // new morale value
+"newmorb"  = "4"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "255"                                                                 // new general (MONSTER)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "255"                                                                 // new class (NO_CLASS)
+"newalign" = "51"                                                                  // new alignment (Chaotic Evil)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#EWWEI"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+END                                                                                // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
 
 //////////////////
 // New AI Scripts
@@ -489,7 +718,10 @@ COMPILE ~atweaks/baf/elementals/rr#easer.baf~                                   
 COMPILE ~atweaks/baf/elementals/rr#efsal.baf~                                      // Fire Salamander AI script
 COMPILE ~atweaks/baf/elementals/rr#efrsa.baf~                                      // Frost Salamander AI script
 COMPILE ~atweaks/baf/elementals/rr#eista.baf~                                      // Invisible Stalker AI script
+COMPILE ~atweaks/baf/elementals/rr#enere.baf~                                      // Nereid AI script
 COMPILE ~atweaks/baf/elementals/rr#ensal.baf~                                      // Salamander Noble AI script
+COMPILE ~atweaks/baf/elementals/rr#ewwei.baf~                                      // Water Weird AI script
+
 
 
 
@@ -511,3 +743,20 @@ DECOMPILE_BCS_TO_BAF
   REPLACE_TEXTUALLY EXACT_MATCH ~Dead("Abazigal")~ ~Dead("Abazigal") AreaCheck("AR6005")~
 COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
+
+
+// Shoal's kiss should not be forced upon the party
+
+ACTION_IF GAME_IS ~bgt tutu tutu_totsc~ THEN BEGIN
+  COMPILE EVALUATE_BUFFER ~atweaks/dlg/shoal.d~
+END
+
+// Give Water Weird a soundset (in case Distinctive Creature Soundsets isn't installed)
+
+COPY    ~atweaks/wav/rr#ewa01.wav~ ~override~                                      // IWD Water Elemental Select Common 1 and Battle Cry 1
+COPY    ~atweaks/wav/rr#ewa02.wav~ ~override~                                      // IWD Water Elemental Battle Cry 2
+COPY    ~atweaks/wav/rr#ewa03.wav~ ~override~                                      // IWD Water Elemental Attack 1
+COPY    ~atweaks/wav/rr#ewa04.wav~ ~override~                                      // IWD Water Elemental Attack 2
+COPY    ~atweaks/wav/rr#ewa05.wav~ ~override~                                      // IWD Water Elemental Damage
+COPY    ~atweaks/wav/rr#ewa06.wav~ ~override~                                      // IWD Water Elemental Dying
+COPY    ~atweaks/wav/rr#ewa07.wav~ ~override~                                      // IWD Water Elemental Action Acknowledgement 1
