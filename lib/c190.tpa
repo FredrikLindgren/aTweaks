@@ -509,6 +509,13 @@ REMOVE_MEMORIZED_SPELLS                                                         
 ADD_MEMORIZED_SPELL ~rr#enkis~ #0 ~innate~ ( 1 )                                   // adds 1x Drowning Kiss
 ADD_MEMORIZED_SPELL ~rr#envsp~ #0 ~innate~ ( 1 )                                   // adds 1x Venom Spit
 ADD_MEMORIZED_SPELL ~rr#ensww~ #0 ~innate~ ( 1 )                                   // adds 1x Summon Water Weird
+PATCH_IF (("%SOURCE_RES%" STRING_EQUAL_CASE ~SHOAL~) OR ("%SOURCE_RES%" STRING_EQUAL_CASE ~_SHOAL~)) BEGIN // special case, Shoal the Nereid
+  READ_ASCII  0x248 ~ovrscr~                                                       // old override script
+  PATCH_IF ("%ovrscr%" STRING_EQUAL_CASE "None") OR ("%ovrscr%" STRING_EQUAL_CASE "") BEGIN            
+    WRITE_EVALUATED_ASCII 0x248 "%TUTU_VAR%SHOAL" #8                               // new override script
+    WRITE_EVALUATED_ASCII 0x250 "None" #8                                          // new class script
+   END
+END
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "9"                                                                   // new movement rate
@@ -543,16 +550,16 @@ STR_VAR                                                                         
 "notenf02"   = "_shoal"                                                            // non-enforced creature 2 (uses best stat values)
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+INT_VAR
+"ovrempty" = "3"                                                                   // special case, do not use the override script slot for Nereids because of Shoal
 STR_VAR                                                                            // Initialize strings
 "newscript"  = "RR#ENERE"                                                          // new AI script
 "script01"   = ""                                                                  // first AI script name
 "script02"   = "None"                                                              // second AI script name
-"script03"   = "SHOAL"                                                             // Shoal the Nereid's AI script (BGT)
-"script04"   = "_SHOAL"                                                            // Shoal the Nereid's AI script(BGT)
-"script05"   = "WTASIGHT"                                                          // generic AI script(BGT)
-"script06"   = "_TASIGHT"                                                          // generic AI script(Tutu)
-"script07"   = "dw#melee"                                                          // SCSII melee AI script
-"script08"   = "BPWDASGT"                                                          // Big Picture generic AI script
+"script03"   = "WTASIGHT"                                                          // generic AI script(BGT)
+"script04"   = "_TASIGHT"                                                          // generic AI script(Tutu)
+"script05"   = "dw#melee"                                                          // SCSII melee AI script
+"script06"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
   INT_VAR
@@ -679,6 +686,9 @@ INT_VAR                                                                         
 "newsvp"   = "14"                                                                  // new Save vs. Polymorph
 "newsvb"   = "16"                                                                  // new Save vs. Breath
 "newsvs"   = "16"                                                                  // new Save vs. Spell
+"newfr"    = "50"                                                                  // new Resist Fire value
+"newrs"    = "99"                                                                  // new Resist Slashing
+"newrp"    = "99"                                                                  // new Resist Piercing
 "newlvl1"  = "3"                                                                   // new level (first class)
 "newstr"   = "13"                                                                  // new Strength value
 "newdex"   = "15"                                                                  // new Dexterity value
@@ -747,9 +757,59 @@ BUT_ONLY_IF_IT_CHANGES
 
 // Shoal's kiss should not be forced upon the party
 
-ACTION_IF GAME_IS ~bgt tutu tutu_totsc~ THEN BEGIN
-  COMPILE EVALUATE_BUFFER ~atweaks/dlg/shoal.d~
+<<<<<<<<atweaks/inlined/baf/elementals/shoal.baf
+IF
+    Global("rr#intd","LOCALS",1)
+    !Dead("Droth")
+    HPPercentLT(Myself,51)
+    See([PC])    
+THEN
+	RESPONSE #100
+        SetGlobal("rr#intd","LOCALS",2)
+        FaceObject([PC])
+        StartDialogueNoSet([PC])
 END
+>>>>>>>>
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+               ~shoal~                                                             // Shoal's script (BGT)
+              ~_shoal~                                                             // Shoal's script (Tutu)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.bcs~ BEGIN                                   // if the designated file with a BCS extension exists
+COPY_EXISTING ~%file%.bcs~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x01) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~HitBy([PC],CRUSHING)~ ~AttackedBy([PC],DEFAULT) Global("rr#intd","LOCALS",0)~
+  REPLACE_TEXTUALLY EXACT_MATCH ~Dialogue([PC])~ ~SetGlobal("rr#intd","LOCALS",1) FaceObject([PC]) StartDialogueNoSet([PC])~
+  REPLACE_TEXTUALLY EXACT_MATCH ~Dialog([PC])~ ~SetGlobal("rr#intd","LOCALS",1) FaceObject([PC]) StartDialogueNoSet([PC])~
+COMPILE_BAF_TO_BCS
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+EXTEND_BOTTOM ~%file%.bcs~  ~atweaks/inlined/baf/elementals/shoal.baf~             // extend Shoal's script
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+<<<<<<<<atweaks/inlined/dlg/elementals/shoal.d
+ALTER_TRANS ~%TUTU_VAR%SHOAL~ BEGIN 3 END BEGIN 0 END BEGIN
+  "REPLY" ~#70151~ // Alright...
+END
+
+EXTEND_BOTTOM ~%TUTU_VAR%SHOAL~ 3 
+  IF ~~ THEN REPLY #33428 GOTO rr#shl01 // I said no and I mean it.
+END
+
+APPEND ~%TUTU_VAR%SHOAL~
+  IF ~~ THEN BEGIN rr#shl01
+    SAY @2114 // So be it, then! I do not wish to fight you <RACE>, but I have little choice in the matter.
+  IF ~~ THEN DO ~SetGlobal("ShoalHit","GLOBAL",1) SetGlobal("rr#intd","LOCALS",1) Enemy()~ EXIT
+  END
+END
+>>>>>>>>
+
+ACTION_IF GAME_IS ~bgt tutu tutu_totsc~ THEN BEGIN
+  COMPILE EVALUATE_BUFFER ~atweaks/inlined/dlg/elementals/shoal.d~
+END
+
 
 // Give Water Weird a soundset (in case Distinctive Creature Soundsets isn't installed)
 
