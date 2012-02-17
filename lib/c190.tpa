@@ -689,6 +689,7 @@ INT_VAR                                                                         
 "newfr"    = "50"                                                                  // new Resist Fire value
 "newrs"    = "99"                                                                  // new Resist Slashing
 "newrp"    = "99"                                                                  // new Resist Piercing
+"newrm"    = "99"                                                                  // new Resist Missiles
 "newlvl1"  = "3"                                                                   // new level (first class)
 "newstr"   = "13"                                                                  // new Strength value
 "newdex"   = "15"                                                                  // new Dexterity value
@@ -759,13 +760,15 @@ BUT_ONLY_IF_IT_CHANGES
 
 <<<<<<<<atweaks/inlined/baf/elementals/shoal.baf
 IF
-    Global("rr#intd","LOCALS",1)
+    NumTimesTalkedToGT(0)
+    Global("rr#intd","LOCALS",0)
     !Dead("Droth")
     HPPercentLT(Myself,51)
     See([PC])    
 THEN
 	RESPONSE #100
-        SetGlobal("rr#intd","LOCALS",2)
+        SetGlobal("rr#intd","LOCALS",1)
+        SetGlobal("ShoalHit","GLOBAL",1)
         FaceObject([PC])
         StartDialogueNoSet([PC])
 END
@@ -779,9 +782,9 @@ ACTION_IF FILE_EXISTS_IN_GAME ~%file%.bcs~ BEGIN                                
 COPY_EXISTING ~%file%.bcs~ ~override~
 PATCH_IF (%SOURCE_SIZE% > 0x01) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
 DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~HitBy([PC],CRUSHING)~ ~AttackedBy([PC],DEFAULT) Global("rr#intd","LOCALS",0)~
-  REPLACE_TEXTUALLY EXACT_MATCH ~Dialogue([PC])~ ~SetGlobal("rr#intd","LOCALS",1) FaceObject([PC]) StartDialogueNoSet([PC])~
-  REPLACE_TEXTUALLY EXACT_MATCH ~Dialog([PC])~ ~SetGlobal("rr#intd","LOCALS",1) FaceObject([PC]) StartDialogueNoSet([PC])~
+  REPLACE_TEXTUALLY EXACT_MATCH ~HitBy([PC],CRUSHING)~ ~AttackedBy([PC],DEFAULT) NumTimesTalkedTo(0)~
+  REPLACE_TEXTUALLY EXACT_MATCH ~Dialogue([PC])~ ~FaceObject([PC]) StartDialogueNoSet([PC])~
+  REPLACE_TEXTUALLY EXACT_MATCH ~Dialog([PC])~ ~FaceObject([PC]) StartDialogueNoSet([PC])~
 COMPILE_BAF_TO_BCS
 END                                                                                // ends file size check
 BUT_ONLY_IF_IT_CHANGES
@@ -801,7 +804,7 @@ END
 APPEND ~%TUTU_VAR%SHOAL~
   IF ~~ THEN BEGIN rr#shl01
     SAY @2114 // So be it, then! I do not wish to fight you <RACE>, but I have little choice in the matter.
-  IF ~~ THEN DO ~SetGlobal("ShoalHit","GLOBAL",1) SetGlobal("rr#intd","LOCALS",1) Enemy()~ EXIT
+  IF ~~ THEN DO ~SetGlobal("ShoalHit","GLOBAL",1) Enemy()~ EXIT
   END
 END
 >>>>>>>>
