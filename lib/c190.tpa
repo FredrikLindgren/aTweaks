@@ -20,6 +20,8 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#renew" = "1" END  
 COPY ~atweaks/spl/rr#niinv.spl~ ~override~                                         // Natural Invisibility
   SAY NAME1 @2100 SAY NAME2 @2100
 
+COPY ~atweaks/spl/rr#uchrm.spl~ ~override~                                         // Remove Enchantment Spell School (uncharm)
+
 COPY ~atweaks/spl/elementals/rr#track.spl~ ~override~                              // Tracking
 COPY ~atweaks/spl/elementals/rr#ecfir.spl~ ~override~                              // Conjure Fire Elemental
 
@@ -811,6 +813,10 @@ END
 
 ACTION_IF GAME_IS ~bgt tutu tutu_totsc~ THEN BEGIN
   COMPILE EVALUATE_BUFFER ~atweaks/inlined/dlg/elementals/shoal.d~
+  COPY_EXISTING ~%TUTU_VAR%shoal.dlg~ ~override~
+  DECOMPILE_DLG_TO_D
+    REPLACE_TEXTUALLY EXACT_MATCH ~ForceSpell(Myself,SHOAL_REVIVE)~ ~ForceSpell(Myself,SHOAL_REVIVE) ReallyForceSpellRES("rr#uchrm",Myself)~ // Shoal should uncharm all party members before they face Droth
+  COMPILE_D_TO_DLG
 END
 
 
