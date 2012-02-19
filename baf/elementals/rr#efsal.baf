@@ -16,7 +16,10 @@ END
 IF
     Global("RR#Active","LOCALS",0)
     Allegiance(Myself,EVILCUTOFF)
-    See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
+    OR(3)
+      See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
+      See("icsalcol") // Frost Salamander
+      See("salgrice") // Frost Salamander
 THEN
     RESPONSE #100
         SetGlobal("RR#Active","LOCALS",1)
@@ -398,6 +401,15 @@ IF
     StateCheck(Player1,STATE_IMMOBILE)
     CheckStatLT(Player1,100,RESISTPIERCING)
     See(Player1)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    HasItemEquiped("RR#EFRSA",[0.0.ELEMENTAL.ELEMENTAL_FIRE]) // Frost Salamander
+    See([0.0.ELEMENTAL.ELEMENTAL_FIRE])
     False()
 THEN
     RESPONSE #100

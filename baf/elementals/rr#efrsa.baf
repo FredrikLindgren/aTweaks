@@ -15,7 +15,10 @@ END
 IF
     Global("RR#Active","LOCALS",0)
     Allegiance(Myself,EVILCUTOFF)
-    See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
+	OR(3)
+      See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
+      See("icsalfir") // Fire Salamander
+      See("salgrfir") // Salamander Noble
 THEN
     RESPONSE #100
         SetGlobal("RR#Active","LOCALS",1)
@@ -59,6 +62,31 @@ THEN
         SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
         ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
         Rest()
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Taunt","LOCALS")
+    OR(2)
+      See("icsalfir") // Fire Salamander
+      See("salgrfir") // Salamander Noble
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    !StateCheck(Myself,STATE_INVISIBLE)
+THEN
+    RESPONSE #40
+        SetGlobalTimer("RR#Taunt","LOCALS",12)
+        FaceObject(LastSeenBy(Myself))
+        DisplayStringHead(Myself,@2001) // Hsss! The fiery one mussst die!
+        DisplayStringHead(LastSeenBy(Myself),@2002) // The flame will consume you!
+    RESPONSE #30
+        SetGlobalTimer("RR#Taunt","LOCALS",12)
+        FaceObject(LastSeenBy(Myself))
+        DisplayStringHead(Myself,@2003) // Hated flamessss... mussst sssnuff them out!
+        DisplayStringHead(LastSeenBy(Myself),@2004) // The fire shall cleanse your impurity!
+    RESPONSE #30
+        SetGlobalTimer("RR#Taunt","LOCALS",12)
+        FaceObject(LastSeenBy(Myself))
+        DisplayStringHead(Myself,@2005) // Mussst... kill... warm-blood!
+        DisplayStringHead(LastSeenBy(Myself),@2006) // I shall burn you to ashes, worm!
 END
 
 IF         // Note: Frost Salamanders have deliberately poor targeting. As per PnP they simply attack the closest creature. They do know how to avoid panicked and immune creatures though
@@ -143,6 +171,17 @@ IF
     !StateCheck([GOODCUTOFF],STATE_PANIC)
     CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
     See([GOODCUTOFF])
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    OR(2)
+      HasItemEquiped("RR#EFSAL",[0.0.ELEMENTAL.ELEMENTAL_FIRE]) // Fire Salamander
+      HasItemEquiped("RR#ENSAL",[0.0.ELEMENTAL.ELEMENTAL_FIRE]) // Salamander Noble
+    See([0.0.ELEMENTAL.ELEMENTAL_FIRE])
     False()
 THEN
     RESPONSE #100

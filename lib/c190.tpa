@@ -302,6 +302,7 @@ ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                
 COPY_EXISTING ~%file%.cre~ ~override~
 LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
 // =============================================================================== // the actual work starts from here
+SAY NAME1 #73254 SAY NAME2 #73255                                                  // Fire Salamander
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 REPLACE_CRE_ITEM ~RR#EFSAL~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
@@ -354,6 +355,7 @@ END                                                                             
 LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
 LAUNCH_PATCH_FUNCTION fire_salamander_immunities END                               // grant fire salamander immunities
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+WRITE_ASCII 0x280 ~icsalfir~ #32                                                   // assign new death variable
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -425,6 +427,9 @@ LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                 
 PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~salgrice~) BEGIN                       // special case, the Frost Salamanders in Abazigal's lair need a diferent script setup
   WRITE_ASCII 0x248 ~DEADABAZ~ #8                                                  // override script (already set in ARE file so we can't use that slot)
   WRITE_ASCII 0x250 ~RR#EFRSA~ #8                                                  // class script
+END
+PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~icsalcol~) BEGIN                       // special case, add a death variable to SoA Frost Salamanders
+  WRITE_ASCII 0x280 ~icsalcol~ #32                                                 // assign new death variable
 END
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
@@ -848,14 +853,14 @@ END
 >>>>>>>>
 
 ACTION_IF GAME_IS ~tutu_totsc~ THEN BEGIN
-  EXTEND_BOTTOM ~FW1500.BCS~  ~atweaks/inlined/baf/elementals/bg1500.baf~          // extend the Balduran's Isle North area script (Tutu)
+  EXTEND_BOTTOM ~fw1500.bcs~  ~atweaks/inlined/baf/elementals/bg1500.baf~          // extend the Balduran's Isle North area script (Tutu)
 END
 
 ACTION_IF GAME_IS ~bgt~ THEN BEGIN
-  EXTEND_BOTTOM ~ARW500.BCS~  ~atweaks/inlined/baf/elementals/bg1500.baf~          // extend the Balduran's Isle North area script (BGT)
+  EXTEND_BOTTOM ~arw500.bcs~  ~atweaks/inlined/baf/elementals/bg1500.baf~          // extend the Balduran's Isle North area script (BGT)
 END
 
-<<<<<<<<atweaks/inlined/baf/elementals/AR1700.baf
+<<<<<<<<atweaks/inlined/baf/elementals/ar1700.baf
 IF
     Global("rr#spw01","AR1700",0)
 THEN
@@ -867,10 +872,9 @@ THEN
 END
 >>>>>>>>
 
-EXTEND_BOTTOM ~AR1700.BCS~  ~atweaks/inlined/baf/elementals/AR1700.baf~            // extend the Small Teeth Pass area script (BG2)
+EXTEND_BOTTOM ~ar1700.bcs~  ~atweaks/inlined/baf/elementals/ar1700.baf~            // extend the Small Teeth Pass area script (BG2)
 
-
-<<<<<<<<atweaks/inlined/baf/elementals/AR2300.baf
+<<<<<<<<atweaks/inlined/baf/elementals/ar2300.baf
 IF
     Global("rr#spw01","AR2300",0)
 THEN
@@ -882,7 +886,7 @@ THEN
 END
 >>>>>>>>
 
-EXTEND_BOTTOM ~AR2300.BCS~  ~atweaks/inlined/baf/elementals/AR2300.baf~            // extend the Sahuagin City area script (BG2)
+EXTEND_BOTTOM ~ar2300.bcs~  ~atweaks/inlined/baf/elementals/ar2300.baf~            // extend the Sahuagin City area script (BG2)
 
 
 // Replace regular Fire Salamanders with Salamander Nobles in the Fire Giant temple
@@ -903,6 +907,32 @@ DECOMPILE_BCS_TO_BAF
   REPLACE_TEXTUALLY EXACT_MATCH ~icsalfir~ ~icsalcol~
 COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
+
+
+// Add a Salamander Noble to the Planar Sphere's fire chamber
+
+<<<<<<<<atweaks/inlined/baf/elementals/ar0412.baf
+IF
+    Global("rr#spw01","AR0412",0)
+THEN
+    RESPONSE #100
+        SetGlobal("rr#spw01","AR0412",1)
+        CreateCreature("SALGRFIR",[2070.1020],4) // Salamander Noble
+END
+>>>>>>>>
+
+COPY_EXISTING ~ar0412.are~ ~override~                                                                 // AR0412 is missing its area script in the unmodded game
+READ_ASCII 0x94 ~areascript~
+  PATCH_IF ~%areascript%~ STRING_EQUAL_CASE ~~ OR ~%areascript%~ STRING_EQUAL_CASE ~None~ THEN BEGIN  // if no area script has been assigned
+    WRITE_ASCII 0x94 ~AR0412~ #8                                                                      // assign the default area script
+    SPRINT ~areascript~ ~AR0412~                                                                      // assign the AR0306 string to the %areascript% variable
+  END
+BUT_ONLY_IF_IT_CHANGES
+ACTION_IF !FILE_EXISTS_IN_GAME ~%areascript%.bcs~ THEN BEGIN                                          // if the area script doesn't exist
+  COMPILE ~atweaks/inlined/baf/elementals/ar0412.baf~                                                 // compile it from scratch
+END ELSE BEGIN
+  EXTEND_BOTTOM ~%areascript%.bcs~ ~atweaks/inlined/baf/elementals/ar0412.baf~                        // otherwise just extend it
+END
 
 
 // Give Water Weird a soundset (in case Distinctive Creature Soundsets isn't installed)
