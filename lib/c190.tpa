@@ -296,6 +296,7 @@ END                                                                             
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
              ~hgsal01~                                                             // Fire Salamander
+            ~icsalfir~                                                             // Fire Salamander (Planar Sphere)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -345,8 +346,10 @@ STR_VAR                                                                         
 "script02"   = "None"                                                              // second AI script name
 "script03"   = "GRPSHT01"                                                          // generic shout AI script
 "script04"   = "WTASIGHT"                                                          // generic AI script
-"script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script05"   = "GENSHT01"                                                          // generic shout AI script
+"script06"   = "WDASIGHT"                                                          // generic AI script
+"script07"   = "dw#melee"                                                          // SCSII melee AI script
+"script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
 LAUNCH_PATCH_FUNCTION fire_salamander_immunities END                               // grant fire salamander immunities
@@ -768,7 +771,7 @@ IF
     HPPercentLT(Myself,51)
     See([PC])    
 THEN
-	RESPONSE #100
+    RESPONSE #100
         SetGlobal("rr#intd","LOCALS",1)
         SetGlobal("ShoalHit","GLOBAL",1)
         FaceObject([PC])
@@ -818,6 +821,88 @@ ACTION_IF GAME_IS ~bgt tutu tutu_totsc~ THEN BEGIN
     REPLACE_TEXTUALLY EXACT_MATCH ~ForceSpell(Myself,SHOAL_REVIVE)~ ~ForceSpell(Myself,SHOAL_REVIVE) ReallyForceSpellRES("rr#uchrm",Myself)~ // Shoal should uncharm all party members before they face Droth
   COMPILE_D_TO_DLG
 END
+
+
+// Add more Nereids to the game
+
+<<<<<<<<atweaks/inlined/baf/elementals/bg3600.baf
+IF
+    Global("rr#spw01","MYAREA",0)
+THEN
+    RESPONSE #100
+        SetGlobal("rr#spw01","MYAREA",1)
+        CreateCreature("rr#enere",[175.1780],13) // Nereid (left)
+        CreateCreature("rr#enere",[400.1820],8) // Nereid (right)
+END
+>>>>>>>>
+
+<<<<<<<<atweaks/inlined/baf/elementals/bg1500.baf
+IF
+    Global("rr#spw01","MYAREA",0)
+THEN
+    RESPONSE #100
+        SetGlobal("rr#spw01","MYAREA",1)
+        CreateCreature("rr#enere",[1125.585],15) // Nereid (top)
+        CreateCreature("rr#enere",[1155.730],13) // Nereid (bottom)
+END
+>>>>>>>>
+
+ACTION_IF GAME_IS ~tutu_totsc~ THEN BEGIN
+  EXTEND_BOTTOM ~FW1500.BCS~  ~atweaks/inlined/baf/elementals/bg1500.baf~          // extend the Balduran's Isle North area script (Tutu)
+END
+
+ACTION_IF GAME_IS ~bgt~ THEN BEGIN
+  EXTEND_BOTTOM ~ARW500.BCS~  ~atweaks/inlined/baf/elementals/bg1500.baf~          // extend the Balduran's Isle North area script (BGT)
+END
+
+<<<<<<<<atweaks/inlined/baf/elementals/AR1700.baf
+IF
+    Global("rr#spw01","AR1700",0)
+THEN
+    RESPONSE #100
+        SetGlobal("rr#spw01","AR1700",1)
+        CreateCreature("rr#enere",[1200.2530],0) // Nereid (top)
+        CreateCreature("rr#enere",[1150.2600],14) // Nereid (middle)
+        CreateCreature("rr#enere",[1240.2650],13) // Nereid (bottom)
+END
+>>>>>>>>
+
+EXTEND_BOTTOM ~AR1700.BCS~  ~atweaks/inlined/baf/elementals/AR1700.baf~            // extend the Small Teeth Pass area script (BG2)
+
+
+<<<<<<<<atweaks/inlined/baf/elementals/AR2300.baf
+IF
+    Global("rr#spw01","AR2300",0)
+THEN
+    RESPONSE #100
+        SetGlobal("rr#spw01","AR2300",1)
+        CreateCreature("rr#enere",[2470.1110],0) // Nereid (top)
+        CreateCreature("rr#enere",[2340.1135],14) // Nereid (middle)
+        CreateCreature("rr#enere",[2395.1220],13) // Nereid (bottom)
+END
+>>>>>>>>
+
+EXTEND_BOTTOM ~AR2300.BCS~  ~atweaks/inlined/baf/elementals/AR2300.baf~            // extend the Sahuagin City area script (BG2)
+
+
+// Replace regular Fire Salamanders with Salamander Nobles in the Fire Giant temple
+
+COPY_EXISTING ~itiwall1.bcs~ ~override~
+              ~itiwall2.bcs~ ~override~
+               ~yssumm3.bcs~ ~override~
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~HGSAL01~ ~SALGRFIR~
+COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Remove Fire Salamanders from Mekrath's lair since they don't get along with Frost Salamanders
+
+COPY_EXISTING ~spwnmon.bcs~ ~override~
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~icsalfir~ ~icsalcol~
+COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
 
 
 // Give Water Weird a soundset (in case Distinctive Creature Soundsets isn't installed)
