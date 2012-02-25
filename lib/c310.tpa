@@ -2372,6 +2372,49 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
  INT_VAR do_message = 1
 END
 // =============================================================================== // the actual work starts from here
+  WRITE_BYTE 0x2E 6                                                                // major color (Dark Silver)
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Air Elemental (16 HD)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~ELAIRSU2~                                                             // Air Elemental (16 HD, wizard version)
+            ~SWAAIR01~                                                             // Air Elemental (16 HD, Elemental Summoning HLA)
+ELAIRSU2.cre
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "8" END                                               // mark opcode #8 (Colour: Change by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "9" END                                               // mark opcode #9 (Colour Glow Pulse) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "66" END                                              // mark opcode #66 (transparency fade) for deletion
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "33686016"                                                        // param1: (RGB colour)
+  "parameter2" = "2"                                                               // param2: (location)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+END
   WRITE_BYTE 0x2E 5                                                                // major color (Light Silver)
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
@@ -2379,10 +2422,12 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
-// Greater Air Elemental
+// Air Elemental (20+ HD)
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-            ~ELAIRG01~                                                             // Greater Air Elemental
+            ~ELAIRG01~                                                             // Air Elemental (20+ HD)
+            ~ELAIRSU3~                                                             // Air Elemental (20+ HD, wizard version)
+            ~SWAAIR02~                                                             // Air Elemental (20+ HD, Elemental Summoning HLA)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -2445,17 +2490,63 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
  INT_VAR do_message = 1
 END
 // =============================================================================== // the actual work starts from here
-  WRITE_BYTE 0x2E 22                                                               // major color (Dark Brown)
+  WRITE_BYTE 0x2E 8                                                                // major color (Dark Muddish Brown)
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
-// Greater Earth Elemental
+// Earth Elemental (16 HD)
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-            ~ELEARG01~                                                             // Greater Earth Elemental
+            ~ELEARPR2~                                                             // Earth Elemental (16 HD, priest version)
+            ~ELEARSU3~                                                             // Earth Elemental (16 HD, wizard version)
+            ~SWAEAR01~                                                             // Earth Elemental (16 HD, Elemental Summoning HLA)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "8" END                                               // mark opcode #8 (Colour: Change by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "9" END                                               // mark opcode #9 (Colour Glow Pulse) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "66" END                                              // mark opcode #66 (transparency fade) for deletion
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "16909312"                                                        // param1: (RGB colour)
+  "parameter2" = "2"                                                               // param2: (location)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+END
+  WRITE_BYTE 0x2E 9                                                                // major color (Light Muddish Brown)
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Earth Elemental (20+ HD)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~ELEARG01~                                                             // Earth Elemental (20+ HD)
+            ~ELEARPR3~                                                             // Earth Elemental (20+ HD, priest version)
+            ~ELEARSU4~                                                             // Earth Elemental (20+ HD, wizard version)
+            ~SWAEAR02~                                                             // Earth Elemental (20+ HD, Elemental Summoning HLA)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -2534,7 +2625,7 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
-// Fire Elemental
+// Fire Elemental (12 HD)
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
              ~ELFIR01~                                                             // Fire Elemental
@@ -2552,10 +2643,54 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
-// Greater Fire Elemental
+// Fire Elemental (16 HD)
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-            ~ELFIRG01~                                                             // Greater Fire Elemental
+            ~ELFIRPR2~                                                             // Fire Elemental (16 HD)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "8" END                                               // mark opcode #8 (Colour: Change by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "9" END                                               // mark opcode #9 (Colour Glow Pulse) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "66" END                                              // mark opcode #66 (transparency fade) for deletion
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "52"                                                                  // effect: #52 (Colour: Very Bright by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "197376"                                                          // param1: (RGB colour)
+  "parameter2" = "2"                                                               // param2: (location)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+END
+  WRITE_BYTE 0x2E 24                                                               // major color (Dark Gold)
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Fire Elemental (20+ HD)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~ELFIRG01~                                                             // Fire Elemental (20+ HD)
+            ~ELFIRPR3~                                                             // Fire Elemental (20+ HD, priest version)
+            ~ELFIRSU4~                                                             // Fire Elemental (20+ HD, wizard version)
+            ~SWAFIR02~                                                             // Fire Elemental (20+ HD, Elemental Summoning HLA)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
