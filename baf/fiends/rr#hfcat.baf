@@ -66,31 +66,13 @@ THEN
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	OR(2)
-          AreaCheck("AR3004") // Dead Magic zone
-          AreaCheck("AR3008") // Dead Magic zone
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",600) // no spellcasting in Dead Magic zones
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#niinv","LOCALS") // Natural Invisibility is automatically re-applied once per round (note: this is not a spell and shouldn't be treated as such)
 	!StateCheck(Myself,STATE_INVISIBLE)
-	!Global("dvgldust","LOCALS",1)
-	!CheckStatGT(Player1,0,TRUE_SIGHT)
-	!CheckStatGT(Player2,0,TRUE_SIGHT)
-	!CheckStatGT(Player3,0,TRUE_SIGHT)
-	!CheckStatGT(Player4,0,TRUE_SIGHT)
-	!CheckStatGT(Player5,0,TRUE_SIGHT)
-	!CheckStatGT(Player6,0,TRUE_SIGHT)
-	!CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
-	!CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
+	!Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust but not True Seeing as it's automatically re-applied
 THEN
 	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ApplySpellRES("RR#WI405",Myself) // Improved Invisibility
+        SetGlobalTimer("rr#niinv","LOCALS",6)
+        ApplySpellRES("rr#niinv",Myself) // Natural Invisibility
 END
 
 IF

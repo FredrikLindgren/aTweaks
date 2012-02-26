@@ -428,6 +428,9 @@ COPY ~atweaks/spl/rr#pyrot.spl~ ~override~                                      
     WRITE_SHORT (ab_off+i*0x28+0x26) %rr#pyrot%                                    // use new projectile (party friendly)
   END 
 
+COPY ~atweaks/spl/rr#niinv.spl~ ~override~                                         // Natural Invisibility (for Hellcats)
+
+
 
 // Clone spells into innate abilities
 
@@ -642,7 +645,7 @@ INT_VAR                                                                         
 "probability1" = "100"                                                             // probability1: 100%
 END                                                                                // ends FUNCTION
 END                                                                                // ends PATCH_FOR_EACH block
-LAUNCH_PATCH_FUNCTION cure_spell_immunities END                                    // grant immunities to cure/cause wound spells
+LAUNCH_PATCH_FUNCTION extraplanar_traits END                                       // grant extraplanar traits
 LAUNCH_PATCH_FUNCTION poison_spell_immunities END                                  // grant immunities to poison-based area effect spells
 BUT_ONLY_IF_IT_CHANGES                                                   
 
@@ -898,7 +901,8 @@ COPY "atweaks/spl/base.spl" "override/fl#clrsp.spl"
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target power parameter1 = 14674 resist_dispel timing = 1 dicenumber dicesize savingthrow header END //display string: blinded
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target power parameter2 = 8 resist_dispel duration dicenumber dicesize savingthrow header END //portrait icon: blind
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 174 target power timing = 4 duration resist_dispel dicenumber dicesize savingthrow header STR_VAR resource = eff_e07 END //play sound
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power duration resist_dispel dicenumber dicesize savingthrow header STR_VAR resource = EVAL "%DEST_RES%" END //non-cumulativity if you're blinded
+    //Apparently this causes more problems than it is worth
+    //LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target power duration resist_dispel dicenumber dicesize savingthrow header STR_VAR resource = EVAL "%DEST_RES%" END //non-cumulativity if you're blinded
   END
   duration = 6
   FOR (header=1;header<=20;++header) BEGIN //Confusion with save, for those whose level >= (yours +3)

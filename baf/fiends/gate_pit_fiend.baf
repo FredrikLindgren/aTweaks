@@ -10,13 +10,15 @@ IF
   OR(2)
     NumCreatureLT([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],6) // sanity check, otherwise you end up with a practically unlimited number of fiends!
     Name("GorBat1",Myself) // Ka'rashur should open gates regardles of the number of Baatezu that are currently present
-OR(2)
-  See([GOODCUTOFF]) // another safeguard, don't open gates while off-screen from the party
-  See([0.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // or a Tanar'ri is nearby
+  OR(3)
+    GlobalLT("RR#DPFGT","LOCALS",6) // can gate offscreen but only up to 6 times
+    See([GOODCUTOFF]) // gate normally while a party member/summon is nearby
+    See([0.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // or a Tanar'ri is nearby
 THEN
   RESPONSE #100
     SetGlobalTimer("RR#Cast","LOCALS",6)
     SetGlobalTimer("flGatingTimer","LOCALS",6) //Being the rulers of hell evidently has its perks
+    IncrementGlobal("RR#DPFGT","LOCALS",1) // gating count
     DisplayStringHead(Myself,10000759) //Attempts to open a gate to Baator
     ForceSpellRES("fl#gtpit",Myself)
 END

@@ -8,7 +8,7 @@
 
 BACKUP ~atweaks/backup~
 AUTHOR "Wisp, shsforums.net"                                                       // Author and e-mail address
-VERSION ~v3.71~                                                                    // Mod version
+VERSION ~v3.72~                                                                    // Mod version
 ALWAYS                                                                             // Always do this block
   INCLUDE ~aTweaks/LIB/RR#AGLEF.TPH~                                               // Include my custom "Add Global Effect" function
   INCLUDE ~aTweaks/LIB/RR#SP2IN.TPH~                                               // Include my custom "Spell to Innate" function
@@ -53,8 +53,11 @@ LANGUAGE ~Russian (by the Aerie.ru team and the Arcanecoast.ru team)~ ~RUSSIAN~ 
 
 BEGIN @100 DESIGNATED 100 // Restore innate infravision to Half-Orc characters
 GROUP @1   // PnP tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
+
+// Add ToB scripting actions/triggers to SoA (borrowed from the G3 BG2 Fixpack with thanks) 
+INCLUDE ~atweaks/lib/tob2soa.tph~
 
 COPY    ~aTweaks/SPL/RR#HOINF.SPL~ ~override~                                      // spell which grants permament infravision
 EXTEND_BOTTOM ~dplayer3.bcs~  ~aTweaks/BAF/DPLAYER.BAF~                            // extend the party script for Player1
@@ -69,7 +72,8 @@ EXTEND_BOTTOM ~dplayer2.bcs~  ~aTweaks/BAF/DPLAYER.BAF~                         
 
 BEGIN @101 DESIGNATED 101 // Prevent skeletal undead from being affected by Illithids' Devour Brain attack
 GROUP @1   // PnP tweaks 
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 
 
 INCLUDE "atweaks/lib/c101.tpa"
@@ -81,7 +85,7 @@ INCLUDE "atweaks/lib/c101.tpa"
 
 BEGIN @102 DESIGNATED 102 // Make Spiritual Hammer into a ranged force weapon and remove its strength bonus to damage
 GROUP @1   // PnP tweaks 
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                                 // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                             // SoA or ToB engine required
 REQUIRE_PREDICATE !MOD_IS_INSTALLED spell_rev.tp2 0 @98
 
 
@@ -161,7 +165,7 @@ BUT_ONLY
 
 BEGIN @103 DESIGNATED 103 // Allow Dispel/Remove Magic to take down Globes of Invulnerability
 GROUP @1   // PnP tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 REQUIRE_PREDICATE !MOD_IS_INSTALLED spell_rev.tp2 0 @98
 
 // The Major and Minor Globes of Invulnerability should be dispellable by Dispel Magic, as per the spell's description and per PnP rules
@@ -203,38 +207,52 @@ END                                                                             
 
 BEGIN @104 DESIGNATED 104 // PnP Color Spray
 GROUP @1   // PnP tweaks
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
-COPY ~atweaks/spl/spwi105.spl~ ~override~                                         // Color Spray
+COPY ~atweaks/spl/spwi105.spl~ ~override~                                          // Color Spray
   SAY UNIDENTIFIED_DESC @1890 SAY DESC @1890
-COPY ~atweaks/spl/mephits/rr#mracs.spl~ ~override/spin937.spl~                    // Color Spray (Radiant Mephit version)
+COPY ~atweaks/spl/mephits/rr#mracs.spl~ ~override/spin937.spl~                     // Color Spray (Radiant Mephit version)
   SAY UNIDENTIFIED_DESC @1890 SAY DESC @1890
 
 // Patch immunity to both Color Spray versions into spells, items that cause blindness
+// Note: Color Spray should not protect the target from its own effects. It's clunky and can often cause more harm than good. 
+// The drawbacks outweigh the benefits in this case.
 
-COPY_EXISTING spdr101.spl  override
-              spin595.spl  override
-              spin878.spl  override
-              spin893.spl  override
-              spin929.spl  override
-              spin931.spl  override
-              sppr704.spl  override
-              sppr707.spl  override
-              spwi106.spl  override
-              spwi118.spl  override
-              spwi224.spl  override
-              spwi714.spl  override
-              spwi815.spl  override
-              spwi958.spl  override
-              spwm178.spl  override
-              chalcy2.itm  override
-              gorwom4.itm  override
-              halb06.itm   override
-              sorb.itm     override
-              sw1h51.itm   override
-              wand19.itm   override
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+                ~spdr101.spl~
+                ~spin595.spl~
+                ~spin878.spl~
+                ~spin893.spl~
+                ~spin929.spl~
+                ~spin931.spl~
+                ~sppr704.spl~
+                ~sppr707.spl~
+                ~spwi106.spl~
+                ~spwi118.spl~
+                ~spwi224.spl~
+                ~spwi714.spl~
+                ~spwi815.spl~
+                ~spwi958.spl~
+                ~spwm178.spl~
+                ~chalcy2.itm~
+                ~gorwom4.itm~
+                 ~halb06.itm~
+                   ~sorb.itm~
+                 ~sw1h51.itm~
+                 ~wand19.itm~
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%~ BEGIN                                       // if the designated file with a SPL extension exists
+COPY_EXISTING ~%file%~ ~override~
+  PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
+// =============================================================================== // the actual work starts from here
   LPF add_conditional_immunity INT_VAR f_Condition = 74 STR_VAR f_Spell = spwi105 END
   LPF add_conditional_immunity INT_VAR f_Condition = 74 STR_VAR f_Spell = spin937 END
-BUT_ONLY
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
 
 
 //////////////////////
@@ -243,6 +261,7 @@ BUT_ONLY
 
 BEGIN @105 DESIGNATED 105 // PnP Dimension Door
 GROUP @1   // PnP tweaks
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DDOOR.BAM~ THEN BEGIN                        // Checks for the Icewind Dale's Dimension Door animation component
   COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override/RR#DDOOR.BAM~                     // IWD1's Dimension Door animation (custom file name)
@@ -260,7 +279,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~BGSCRL1V~                                                           // Dimension Door scroll (BGT)
               ~D0SCRLDD~                                                           // Dimension Door scroll (D0 Tweaks)
 BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN                                   // if the designated file with a SPL extension exists
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN                                   // if the designated file with an ITM extension exists
 COPY_EXISTING ~%file%.itm~ ~override~
   PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
 // =============================================================================== // the actual work starts from here
@@ -320,24 +339,32 @@ END
 
 BEGIN @110 DESIGNATED 110 // Magical arrows and bolts deal bonus damage equal to their enchantment level
 GROUP @1   // PnP tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
-REQUIRE_PREDICATE !FILE_EXISTS_IN_GAME ~_sw1h01.itm~ @91                           // Forbid installation on Tutu
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~tutu tutu_totsc~ @91                                   // Forbid installation on Tutu
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 REQUIRE_PREDICATE !MOD_IS_INSTALLED item_rev.tp2 0 
               AND !MOD_IS_INSTALLED bgttweak.tp2 2204
               AND !GAME_IS ca                         @98                          //Avoid content duplication
 
 // This tweak adds a damage bonus to magical arrows and bolts equal to their enchantment level, as per PnP rules and as in BG1/IWD1
 
-COPY_EXISTING ~AROW02.ITM~ ~override~                                              // Arrow +1
-              ~AROW11.ITM~ ~override~                                              // Arrow +2
-              ~AROW15.ITM~ ~override~                                              // Arrow +3
-              ~BOLT02.ITM~ ~override~                                              // Bolt +1
-              ~BOLT06.ITM~ ~override~                                              // Bolt +2
-              ~BOLT09.ITM~ ~override~                                              // Bolt +3
-              ~QUIVER01.ITM~ ~override~                                            // Quiver of Plenty +1 (arrows)
-              ~QUIVER02.ITM~ ~override~                                            // Case of Plenty +1 (bolts)
-              ~QUIVER03.ITM~ ~override~                                            // Quiver of Plenty +2 (arrows)
-              ~QUIVER04.ITM~ ~override~                                            // Case of Plenty +2 (bolts)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+                ~AROW02~                                                           // Arrow +1
+                ~AROW11~                                                           // Arrow +2
+                ~AROW15~                                                           // Arrow +3
+                ~BOLT02~                                                           // Bolt +1
+                ~BOLT06~                                                           // Bolt +2
+                ~BOLT09~                                                           // Bolt +3
+              ~QUIVER01~                                                           // Quiver of Plenty +1 (arrows)
+              ~QUIVER02~                                                           // Case of Plenty +1 (bolts)
+              ~QUIVER03~                                                           // Quiver of Plenty +2 (arrows)
+              ~QUIVER04~                                                           // Case of Plenty +2 (bolts)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN                                   // if the designated file with a ITM extension exists
+COPY_EXISTING ~%file%.itm~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+// =============================================================================== // the actual work starts from here
 READ_LONG 0x60 enchantment                                                         // enchantment level
 READ_LONG 0x64 abil_off                                                            // ability offset
 READ_SHORT 0x68 abil_num                                                           // ability number
@@ -346,19 +373,22 @@ READ_LONG 0x6a fx_off
     READ_BYTE (%abil_off% + %i% * 0x38) abil_type                                  // read ability type
     PATCH_IF (%abil_type% = 2) BEGIN                                               // only patch the ranged ability header (2)
       READ_SHORT ("%abil_off%" + 0x1a) dmg_bonus                                   // damage bonus
-        PATCH_IF (%dmg_bonus% < %enchantment%) BEGIN                               // if the damage bonus is lower than the enchantment bonus       
+      PATCH_IF (%dmg_bonus% < %enchantment%) BEGIN                                 // if the damage bonus is lower than the enchantment bonus       
         WRITE_SHORT ("%abil_off%" + 0x1a) %enchantment%                            // raise the damage bonus to the enchantment level
-  READ_STRREF IDENTIFIED_DESC temp_desc                                            // description update
-  INNER_PATCH_SAVE new_desc "%temp_desc%" BEGIN
-    REPLACE_TEXTUALLY ~1D6~ ~1D6 + %enchantment%~                                  // change arrow description to include enchantment damage bonus
-    REPLACE_TEXTUALLY ~1D8~ ~1D8 + %enchantment%~                                  // change bolt description to include enchantment damage bonus
-  END
-  SAY_EVALUATED IDENTIFIED_DESC "%new_desc%"
+        READ_STRREF IDENTIFIED_DESC temp_desc                                      // description update
+        INNER_PATCH_SAVE new_desc "%temp_desc%" BEGIN
+          REPLACE_TEXTUALLY ~1D6~ ~1D6 + %enchantment%~                            // change arrow description to include enchantment damage bonus
+          REPLACE_TEXTUALLY ~1D8~ ~1D8 + %enchantment%~                            // change bolt description to include enchantment damage bonus
+        END
+        SAY_EVALUATED IDENTIFIED_DESC "%new_desc%"
+      END
     END
-END
-END
+  END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
 BUT_ONLY_IF_IT_CHANGES
-
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
 
 
 
@@ -368,7 +398,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 BEGIN @116 SUBCOMPONENT @115 DESIGNATED 115 // Scrolls can be scribed everywhere
 GROUP @1   // PnP tweaks 
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 OUTER_SPRINT AreaType ~True()~
 OUTER_SET Restrictions = 0
@@ -379,7 +409,7 @@ INCLUDE "atweaks/lib/c115.tpa"
 
 BEGIN @117 SUBCOMPONENT @115 DESIGNATED 117 // Scrolls can only be scribed at inns and strongholds
 GROUP @1   // PnP tweaks 
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 OUTER_SET Restrictions = 1
 
@@ -393,7 +423,7 @@ INCLUDE "atweaks/lib/c115.tpa"
 
 BEGIN @120 DESIGNATED 120 // Restore innate disease immunity to Paladins
 GROUP @1   // PnP tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 REQUIRE_PREDICATE !FILE_EXISTS_IN_GAME k0pa001.spl @98
 
 COPY_EXISTING ~SPPR317.SPL~ ~override/RR#PALCD.SPL~                                // Clone Cure Disease into an innate ability
@@ -473,7 +503,7 @@ END                                                                             
 BEGIN @125 DESIGNATED 125 // Rangers' Animal Empathy improves with experience
 GROUP @1   // PnP tweaks
 
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 
 INCLUDE "atweaks/lib/c125.tpa"
@@ -485,8 +515,10 @@ INCLUDE "atweaks/lib/c125.tpa"
 
 BEGIN @130 DESIGNATED 130 // Additional racial traits for Dwarves
 GROUP @1   // PnP tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
+// Add ToB scripting actions/triggers to SoA (borrowed from the G3 BG2 Fixpack with thanks) 
+INCLUDE ~atweaks/lib/tob2soa.tph~
 
 INCLUDE "atweaks/lib/c130.tpa"
 
@@ -497,8 +529,10 @@ INCLUDE "atweaks/lib/c130.tpa"
 
 BEGIN @140 DESIGNATED 140 // Additional racial traits for Gnomes
 GROUP @1   // PnP tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
+// Add ToB scripting actions/triggers to SoA (borrowed from the G3 BG2 Fixpack with thanks) 
+INCLUDE ~atweaks/lib/tob2soa.tph~
 
 INCLUDE "atweaks/lib/c140.tpa"
 
@@ -510,7 +544,7 @@ INCLUDE "atweaks/lib/c140.tpa"
 
 BEGIN @170 DESIGNATED 170 //Revised saving throws
 GROUP @1 //PnP Tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 INCLUDE "atweaks/lib/c170.tpa"
 */
@@ -523,9 +557,9 @@ INCLUDE "atweaks/lib/c170.tpa"
 BEGIN @151 DESIGNATED 150 // PnP Fiends, Mod-added fiends are not affected
 GROUP @1   // PnP tweaks 
 SUBCOMPONENT @150
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
-COPY_EXISTING sw1h01.itm "override/fl#atfiends1.mrk"                               //Installation marker 
+COPY_EXISTING sw1h01.itm "override/fl#atfiends1.mrk"                               // Installation marker 
 OUTER_SET FiendsOriginal = 1
 OUTER_SET FiendsScripts = 0
 
@@ -541,7 +575,7 @@ INCLUDE "atweaks/lib/c150.tpa"                                                  
 BEGIN @152 DESIGNATED 152 //PnP Fiends, mod-added fiends are also affected
 GROUP @1   //PnP Tweaks
 SUBCOMPONENT @150
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 COPY_EXISTING sw1h01.itm "override/fl#atfiends1.mrk"                               //Installation marker 
 OUTER_SET FiendsOriginal = 0
@@ -558,7 +592,7 @@ INCLUDE "atweaks/lib/c150.tpa"                                                  
 BEGIN @153 DESIGNATED 153 //PnP Fiends, only scripts
 GROUP @1   //PnP Tweaks
 SUBCOMPONENT @150
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 COPY_EXISTING sw1h01.itm "override/fl#atfiends1.mrk"                               //Installation marker 
 OUTER_SET FiendsOriginal = 0
@@ -580,7 +614,7 @@ INCLUDE "atweaks/lib/c150.tpa"                                                  
 
 BEGIN @155 DESIGNATED 155 // Revised Fiend summoning
 GROUP @1   // PnP tweaks 
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 REQUIRE_PREDICATE FILE_EXISTS_IN_GAME fl#atfiends1.mrk @94
 
 INCLUDE ~aTweaks/LIB/RR#MDCRE.TPH~                                                 // Include the Creature Modification function
@@ -596,7 +630,7 @@ INCLUDE "atweaks/lib/c155.tpa"
 
 BEGIN @156 DESIGNATED 156 //Fiendish Gating
 GROUP @1
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 REQUIRE_PREDICATE FILE_EXISTS_IN_GAME fl#atfiends1.mrk @94
 
 INCLUDE "atweaks/lib/c156.tpa"
@@ -611,7 +645,7 @@ INCLUDE "atweaks/lib/c156.tpa"
 
 BEGIN @160 DESIGNATED 160 // PnP Undead
 GROUP @1
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 
 INCLUDE "atweaks/lib/c160.tpa"
@@ -626,7 +660,8 @@ INCLUDE "atweaks/lib/c160.tpa"
 
 BEGIN @180 DESIGNATED 180 // PnP Mephits
 GROUP @1 // PnP Tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 
 INCLUDE "atweaks/lib/c180.tpa"
 
@@ -639,7 +674,7 @@ INCLUDE "atweaks/lib/c180.tpa"
 
 BEGIN @185 DESIGNATED 185 // PnP Fey creatures
 GROUP @1 // PnP Tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 INCLUDE "atweaks/lib/c185.tpa"
 
@@ -652,7 +687,7 @@ INCLUDE "atweaks/lib/c185.tpa"
 
 BEGIN @186 DESIGNATED 186 // Revised Call Woodland Beings spell
 GROUP @1 // PnP Tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~rr#fdrya.bcs~ @1908                         // PnP Fey creatures required
 
 COPY    ~atweaks/spl/fey/sppr410.spl~   ~override~                                 // Call Woodland Beings spell
@@ -695,7 +730,7 @@ COMPILE ~atweaks/baf/fey/rr#snymp.baf~                                          
 
 BEGIN @187 DESIGNATED 187 // PnP Spiders and Ettercaps
 GROUP @1 // PnP Tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 INCLUDE "atweaks/lib/c187.tpa"
 
@@ -707,7 +742,7 @@ INCLUDE "atweaks/lib/c187.tpa"
 
 BEGIN @188 DESIGNATED 188 // PnP Ooze creatures
 GROUP @1 // PnP Tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 INCLUDE "atweaks/lib/c188.tpa"
 
@@ -719,7 +754,7 @@ INCLUDE "atweaks/lib/c188.tpa"
 
 BEGIN @189 DESIGNATED 189 // PnP Ooze creatures
 GROUP @1 // PnP Tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 INCLUDE "atweaks/lib/c189.tpa"
 
@@ -731,7 +766,7 @@ INCLUDE "atweaks/lib/c189.tpa"
 
 BEGIN @190 DESIGNATED 190 // PnP Elementals
 GROUP @1 // PnP Tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 INCLUDE "atweaks/lib/c190.tpa"
 
@@ -745,10 +780,10 @@ INCLUDE "atweaks/lib/c190.tpa"
 
 BEGIN @200 DESIGNATED 200 // Allow Breach to take down Stoneskin effects applied by items
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 
-COPY_EXISTING ~stonskin.itm~ ~override~ // ring which grants the stonesking effect while equippet (used by Mekrath, Rayic Gethras, Terminsel... etc.)
+COPY_EXISTING ~stonskin.itm~ ~override~ // ring which grants the stoneskin effect while equipped (used by Mekrath, Rayic Gethras, Terminsel... etc.)
   PATCH_IF SOURCE_SIZE > 0x71 BEGIN
     READ_LONG   0x64 "abil_off"
     READ_SHORT  0x68 "abil_num"
@@ -780,6 +815,8 @@ BUT_ONLY_IF_IT_CHANGES
 COPY_EXISTING ~spwi408.spl~  ~override/RR#STONS.SPL~
 PATCH_IF (%SOURCE_SIZE%>0x71) THEN BEGIN
 SAY NAME1 #0 // null spell name to remove combat log feedback
+WRITE_SHORT   0x22  0    // remove casting graphics
+WRITE_ASCII   0x10 ~~ #8 // remove casting sound
 READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
   READ_LONG  0x6a "fx_off"
@@ -808,8 +845,10 @@ END
 BUT_ONLY_IF_IT_CHANGES
 
 
-// Make the Gargoyle Boots cast a proper Stoneskn spell instead of mimicking its effect
+// Make the Gargoyle Boots cast a proper Stoneskin spell instead of mimicking its effect
 
+
+ACTION_IF ENGINE_IS ~tob~ THEN BEGIN                                               // ToB engine required
 ACTION_IF NOT MOD_IS_INSTALLED ITEM_REV.TP2 0 THEN BEGIN                           // Item Revisions mod check
 COPY    ~aTweaks/SPL/RR#BT12.SPL~ ~override~                                       // Empty Stoneskin spell shell (used for inheriting item effects)
 COPY_EXISTING ~boot12.itm~ ~override~                                              // Gargoyle Boots
@@ -834,7 +873,8 @@ SET savingthrow = "0"                                                           
 SET savebonus = "0"                                                                // save bonus: 0
 SPRINT ~resource~ ~RR#BT12~                                                        // resref: RR#BT12.SPL (newly created custom Stoneskin spell)
 LAUNCH_PATCH_MACRO ~ADD_ITEM_EFFECT~                                               // add a new effect
-END                                                                                // ends the ACTION_IF Item Revisions check block
+END                                                                                // ends the ACTION_IF Item Revisions check
+END                                                                                // ends the ACTION_IF ToB Engine check
 
 
 
@@ -844,7 +884,7 @@ END                                                                             
 
 BEGIN @201 DESIGNATED 201 // Instant casting for warrior innates
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 // This tweak reduces the casting time of warrior innate abilities to 0
 // It also flags these abilities as non-magical which prevents Wild Magic and Dead Magic zones from affecting them
@@ -878,7 +918,9 @@ BUT_ONLY_IF_IT_CHANGES
 BEGIN @240 DESIGNATED 202 // Enhance the Bhaalpowers and standardize their casting time
 SUBCOMPONENT @202  // Revised Bhaalpowers
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~ca~ @92                                                // Do not install this component on Classic Adventures
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 
 COPY    ~aTweaks/BAM/RR#BP1E.BAM~   ~override~                                     // Drain Life icon
 COPY    ~aTweaks/BAM/RR#BP1G.BAM~   ~override~                                     // Healing Touch icon
@@ -928,8 +970,14 @@ COPY ~aTweaks/SPL/RR#BP2ED.SPL~ ~override~                                      
 
 // Divine Might (formerly Draw Upon Holy Might)
 
-COPY_EXISTING ~spin103.spl~ ~override~                                            // Draw Upon Holy Might Bhaalpower (BG1 & SoA)
-              ~bhaal2a.spl~ ~override~                                            // Draw Upon Holy Might Bhaalpower (ToB)
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~spin103~                                                            // Draw Upon Holy Might Bhaalpower (BG1 & SoA)
+              ~bhaal2a~                                                            // Draw Upon Holy Might Bhaalpower (ToB)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN                                   // if the designated file with a SPL extension exists
+COPY_EXISTING ~%file%.spl~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+// =============================================================================== // the actual work starts from here
 SAY NAME1 @246 SAY NAME2 @246                                                     // change name to Divine Might
 WRITE_LONG  0x34 1                                                                // set spell level to 1 (prevents scripting issues)
 WRITE_ASCII 0x3a ~RR#BP3G~ #8                                                     // assign a new spellbook icon
@@ -939,7 +987,11 @@ READ_SHORT  0x68 "abil_num"
     WRITE_ASCII ("%abil_off%" + 0x04 + ("%index%" * 0x28)) ~RR#BP3G~ #8           // assign a new casting icon
     WRITE_SHORT ("%abil_off%" + 0x12 + ("%index%" * 0x28)) 1                      // set casting time to 1
   END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
 BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
 
 
 // Divine Wrath (formerly Vampiric Touch)
@@ -970,7 +1022,7 @@ END
 
 // Ensure that the "Gained Special Ability X" strings are correctly displaying on BGT
 
-ACTION_IF FILE_EXISTS_IN_GAME ~bg1start.2da~ THEN BEGIN                           // BGT check
+ACTION_IF GAME_IS ~bgt~ THEN BEGIN                                                // BGT check
 COPY_EXISTING ~PLAYER1D.BCS~  ~override~                                          // Player 1 dream script
   DECOMPILE_BCS_TO_BAF
 REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpellRES("GOODDRM2",Player1)~ ~AddSpecialAbility("SPIN101")~
@@ -986,7 +1038,7 @@ END // ends BGT check
 
 // Ensure that the "Gained Special Ability X" strings are correctly displaying on Tutu
 
-ACTION_IF FILE_EXISTS_IN_GAME ~fw0100.are~ THEN BEGIN                             // Tutu check
+ACTION_IF GAME_IS ~tutu tutu_totsc~ THEN BEGIN                                    // Tutu check
 COPY_EXISTING ~BALDUR.BCS~  ~override~                                            // Main game script
   DECOMPILE_BCS_TO_BAF
 REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride(Player1,ApplySpellRES("jpglvl1",Myself))~ ~ActionOverride(Player1,AddSpecialAbility("SPIN101"))~
@@ -1030,7 +1082,9 @@ END                                                                             
 BEGIN @241 DESIGNATED 241 // Only standardize the Bhaalpowers' casting time
 SUBCOMPONENT @202  // Revised Bhaalpowers
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~ca~ @92                                                // Do not install this component on Classic Adventures
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 
 // This tweak reduces the casting time of all SoA Bhaalpowers to 1 in order to match the ToB Bhaalpowers
 
@@ -1057,6 +1111,8 @@ BEGIN @218 DESIGNATED 218 //Regain Bhaalpowers in ToB
 GROUP @2 
 REQUIRE_PREDICATE GAME_IS tob @90
 REQUIRE_PREDICATE !GAME_IS ~tutu tutu_totsc~ @91
+REQUIRE_PREDICATE !GAME_IS ~ca~ @92                                                // Do not install this component on Classic Adventures
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
 
 ACTION_IF BGT BEGIN
   OUTER_SPRINT BG2Check ~Global("ENDOFBG1","GLOBAL",2)~
@@ -1084,27 +1140,35 @@ OUTER_SPRINT ToBCheck ~GGT("DefeatedJon",0)~
 EXTEND_BOTTOM ar3000.bcs "atweaks/baf/regainbhaalpowers2.baf" EVAL
 
 
+
 //////////////////////////////////////////////
 // Make druidic shapeshifting uninterruptable
 //////////////////////////////////////////////
 
 BEGIN @203 DESIGNATED 203 // Make druidic shapeshifting uninterruptable
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 // This tweak reduces the casting time of the druidic shapeshifting abilities to 0 which effectively makes them uninterruptable
 // It also flags these abilities as non-magical which prevents Wild Magic and Dead Magic zones from affecting them
 
-COPY_EXISTING ~spcl611.spl~ ~override~ // Druid Shapeshift Brown Bear
-              ~spcl612.spl~ ~override~ // Druid Shapeshift Wolf
-              ~spcl613.spl~ ~override~ // Druid Shapeshift Black Bear
-              ~spcl632.spl~ ~override~ // Avenger Shapeshift Spider
-              ~spcl633.spl~ ~override~ // Avenger Shapeshift Baby Wyvern
-              ~spcl634.spl~ ~override~ // Avenger Shapeshift Fire Salamander
-              ~spcl643.spl~ ~override~ // Shapeshifter Werewolf Transformation
-              ~spcl644.spl~ ~override~ // Shapeshifter Greater Werewolf Transformation
-              ~sppr731.spl~ ~override~ // Druid Fire Elemental Transformation
-              ~sppr732.spl~ ~override~ // Druid Earth Elemental Transformation
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~spwi406~                                                            // Minor Globe of Invulnrability
+              ~spcl611~                                                            // Druid Shapeshift Brown Bear
+              ~spcl612~                                                            // Druid Shapeshift Wolf
+              ~spcl613~                                                            // Druid Shapeshift Black Bear
+              ~spcl632~                                                            // Avenger Shapeshift Spider
+              ~spcl633~                                                            // Avenger Shapeshift Baby Wyvern
+              ~spcl634~                                                            // Avenger Shapeshift Fire Salamander
+              ~spcl643~                                                            // Shapeshifter Werewolf Transformation
+              ~spcl644~                                                            // Shapeshifter Greater Werewolf Transformation
+              ~sppr731~                                                            // Druid Fire Elemental Transformation
+              ~sppr732~                                                            // Druid Earth Elemental Transformation
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN                                   // if the designated file with a SPL extension exists
+COPY_EXISTING ~%file%.spl~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+// =============================================================================== // the actual work starts from here
   READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
   READ_BYTE  0x19 "flags"
@@ -1114,7 +1178,11 @@ COPY_EXISTING ~spcl611.spl~ ~override~ // Druid Shapeshift Brown Bear
     FOR ("index" = 0; "%index%" < "%abil_num%"; "index" = ("%index%" + 1)) BEGIN  // cycle through abilities
       WRITE_SHORT ("%abil_off%" + 0x12 + ("%index%" * 0x28)) 0                    // set casting time to 0
   END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
 BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
 
 
 
@@ -1124,7 +1192,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 BEGIN @204 DESIGNATED 204 // Prevent Mislead clones from singing Bard songs
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 REQUIRE_PREDICATE !MOD_IS_INSTALLED spell_rev.tp2 0 @98
 
 // This tweak prevents illusionary Mislead clones from singing Bard songs
@@ -1160,7 +1228,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 BEGIN @205 DESIGNATED 205 // Prevent Project Image and Simulacrum clones from using quickslot items
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 REQUIRE_PREDICATE !MOD_IS_INSTALLED spell_rev.tp2 0 @98
 
 // This tweak prevents Project Image and Simulacrum clones from using quickslot items
@@ -1230,7 +1298,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 BEGIN @211 DESIGNATED 211 // Make Death Ward protect against Vorpal Hits
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 REQUIRE_PREDICATE !MOD_IS_INSTALLED spell_rev.tp2 0 @98                            // Spell Revisions already does this
 
 
@@ -1267,7 +1335,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 BEGIN @210 DESIGNATED 210 // Restore the Dispel Magic vulnerability to Nishruu and Hakeashars
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 // Dispel Magic and Remove Magic are supposed to destroy Nishruu and Hakeashar. However, due to targeting issues, this doesn't work for player characters in the unmodded game. To circumvent this, a dispellable equipped effect (Detect Illusion skill modifier) is added to the Nishruu/Hakeashar attack and is then checked by the creature's script.
 
@@ -1319,7 +1387,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 BEGIN @212 DESIGNATED 212 // Make alignment detection spells more accurate
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 
 INCLUDE "atweaks/lib/c212.tpa"
@@ -1334,7 +1402,7 @@ INCLUDE "atweaks/lib/c212.tpa"
 
 BEGIN @213 DESIGNATED 213 // Expanded saving throw bonus tables for Dwarves, Gnomes and Halflings
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                           // SoA or ToB engine required
 
 // Dwarf and Halfling table
 
@@ -1386,7 +1454,7 @@ BUT_ONLY_IF_IT_CHANGES
 BEGIN @216 DESIGNATED 216 // Only the Jester song breaks invisibility
 SUBCOMPONENT @215  // Bard songs break invisibility
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 COPY_EXISTING ~sw1h01.itm~ ~override/RR#BSBI1.RR~                                  // component marker (needed for the "Simple Bard Script" component)
 
@@ -1422,7 +1490,7 @@ END                                                                             
 BEGIN @217 DESIGNATED 217 // All Bard songs break invisibility
 SUBCOMPONENT @215  // Bard songs break invisibility
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 COPY_EXISTING ~sw1h01.itm~ ~override/RR#BSBI2.RR~                                  // component marker (needed for the "Simple Bard Script" component)
 
@@ -1475,7 +1543,7 @@ END
 
 BEGIN @261 SUBCOMPONENT @260 DESIGNATED 261                                        //Improved XP rewards from locks, traps and scrolls
 GROUP @2 //Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 ACTION_DEFINE_ARRAY xpbonus_locks BEGIN 0 20  20  50  50  50  100  100  100  200  200  300  300  400  400  400  500 END
 ACTION_DEFINE_ARRAY xpbonus_traps BEGIN 0 50  50  100 100 100 200  200  200  400  400  600  600  800  800  800  1000 END
@@ -1502,7 +1570,7 @@ BUT_ONLY
 
 BEGIN @262 SUBCOMPONENT @260 DESIGNATED 262                                        //No XP rewards from locks, traps and scrolls
 GROUP @2 //Gameplay tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME mel01.cre @90
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 COPY_EXISTING xpbonus.2da override
   COUNT_2DA_COLS num_col
@@ -1523,7 +1591,7 @@ BUT_ONLY
 
 BEGIN @220 DESIGNATED 220 // Simple Thief script
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE GAME_IS ~tutu tutu_totsc bgt soa tob totlm iwd2~ @92
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob totlm iwd2~ @92                              // Works on SoA, ToB, IWD1 +TotLM and IWD2
 
 ACTION_IF GAME_IS iwd2 BEGIN
   OUTER_SPRINT SeeDead ~,0~
@@ -1554,7 +1622,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 BEGIN @230 DESIGNATED 230 // Simple Bard script
 GROUP @2 // Gameplay tweaks
-REQUIRE_PREDICATE GAME_IS ~tutu tutu_totsc bgt soa tob totlm iwd2~ @92
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob totlm iwd2~ @92                              // Works on SoA, ToB, IWD1 +TotLM and IWD2
 
 ACTION_IF GAME_IS iwd2 BEGIN
   OUTER_SPRINT SeeDead ~,0~
@@ -1600,26 +1668,56 @@ BUT_ONLY_IF_IT_CHANGES
 BEGIN @321 DESIGNATED 300 // Fast animation speed (matches IWD)
 SUBCOMPONENT @300  // Use Icewind Dale's Dimension Door animation and sound effect
 GROUP @3 // Cosmetic tweaks
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override~                                    // IWD1's Dimension Door animation
 COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override~                                    // IWD1's Dimension Door sound effect
+COPY    ~atweaks/bam/rr#ddbg2.bam~   ~override~                                    // Default BG2 Dimension Door animation (needed for a few static animations)
 
+// Ensure that the portal in Sendai's lair always uses the BG2-style Dimension Door animation (IWD-style doesn't look so good here)
+
+COPY_EXISTING ~ar6108.are~ ~override~
+  READ_LONG 0xac "anim_num"
+  READ_LONG 0xb0 "anim_off"
+  FOR (index = 0 ; index < anim_num ; index = index + 1) BEGIN
+    READ_ASCII ("%anim_off%" + ("%index%" * 0x4c)) "anim_name"
+    PATCH_IF ("%anim_name%" STRING_EQUAL_CASE "SPDIMNDR") BEGIN
+      WRITE_ASCII ("%anim_off%" + 0x28 + ("%index%" * 0x4c)) "rr#ddbg2" #8 // Animation resref (BAM)
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
 
 
 BEGIN @322 DESIGNATED 322 // Slow animation speed (matches BG2)
 SUBCOMPONENT @300  // Use Icewind Dale's Dimension Door animation and sound effect
 GROUP @3 // Cosmetic tweaks
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override~                                    // IWD1's Dimension Door animation
 COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override~                                    // IWD1's Dimension Door sound effect
+COPY    ~atweaks/bam/rr#ddbg2.bam~   ~override~                                    // Default BG2 Dimension Door animation (needed for a few static animations)
 COPY_EXISTING ~SPDIMNDR.VVC~ ~override~                                            // Dimension Door VVC
   WRITE_LONG  0x34 "5"                                                             // Set the frame rate to 5
+BUT_ONLY_IF_IT_CHANGES
+
+// Ensure that the portal in Sendai's lair always uses the BG2-style Dimension Door animation (IWD-style doesn't look so good here)
+
+COPY_EXISTING ~ar6108.are~ ~override~
+  READ_LONG 0xac "anim_num"
+  READ_LONG 0xb0 "anim_off"
+  FOR (index = 0 ; index < anim_num ; index = index + 1) BEGIN
+    READ_ASCII ("%anim_off%" + ("%index%" * 0x4c)) "anim_name"
+    PATCH_IF ("%anim_name%" STRING_EQUAL_CASE "SPDIMNDR") BEGIN
+      WRITE_ASCII ("%anim_off%" + 0x28 + ("%index%" * 0x4c)) "rr#ddbg2" #8 // Animation resref (BAM)
+    END
+  END
 BUT_ONLY_IF_IT_CHANGES
 
 
 BEGIN @323 DESIGNATED 323 // Use IWD animation for spells, retain BG2 animation for other visuals
 SUBCOMPONENT @300  // Use Icewind Dale's Dimension Door animation and sound effect
 GROUP @3 // Cosmetic tweaks
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DDOOR.BAM~ THEN BEGIN                        // Checks for the Icewind Dale's Dimension Door animation component
   COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override/RR#DDOOR.BAM~                     // IWD1's Dimension Door animation (custom file name)
@@ -1680,9 +1778,25 @@ END                                                                             
 BEGIN @324 DESIGNATED 324 //Fast animation speed, shorter delay between animation start and creature appearance/disappearance
 SUBCOMPONENT @300 // Use Icewind Dale's Dimension Door animation and sound effect
 GROUP @3 // Cosmetic tweaks
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override~                                    // IWD1's Dimension Door animation
 COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override~                                    // IWD1's Dimension Door sound effect
+COPY    ~atweaks/bam/rr#ddbg2.bam~   ~override~                                    // Default BG2 Dimension Door animation (needed for a few static animations)
+
+// Ensure that the portal in Sendai's lair always uses the BG2-style Dimension Door animation (IWD-style doesn't look so good here)
+
+COPY_EXISTING ~ar6108.are~ ~override~
+  READ_LONG 0xac "anim_num"
+  READ_LONG 0xb0 "anim_off"
+  FOR (index = 0 ; index < anim_num ; index = index + 1) BEGIN
+    READ_ASCII ("%anim_off%" + ("%index%" * 0x4c)) "anim_name"
+    PATCH_IF ("%anim_name%" STRING_EQUAL_CASE "SPDIMNDR") BEGIN
+      WRITE_ASCII ("%anim_off%" + 0x28 + ("%index%" * 0x4c)) "rr#ddbg2" #8 // Animation resref (BAM)
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
 
 COPY_EXISTING_REGEXP GLOB ~.*\.dlg$~ override
   DECOMPILE_DLG_TO_D
@@ -1726,7 +1840,10 @@ END
 
 BEGIN @301 DESIGNATED 301 // Change the appearance of Valygar's armor
 GROUP @3 // Cosmetic tweaks
-FORBID_FILE ~override/_sw1h01.itm~ @91                                             // Forbid installation on Tutu
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
+REQUIRE_PREDICATE !GAME_IS ~ca~ @92                                                // Do not install this component on Classic Adventures
+REQUIRE_PREDICATE !GAME_IS ~tutu tutu_totsc~ @91                                   // Forbid installation on Tutu
 
 
 // This tweak changes the appearance of Valygar's armor to leather (rather than chain) and changes its colorization in order to match its inventory picture
@@ -1763,6 +1880,9 @@ BUT_ONLY_IF_IT_CHANGES
 
 BEGIN @302 DESIGNATED 302 // Change the appearance of the Robe of Vecna
 GROUP @3 // Cosmetic tweaks
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
+REQUIRE_PREDICATE !GAME_IS ~iwd-in-bg2~ @92                                        // Do not install this component on IWD-in-BG2
+REQUIRE_PREDICATE !GAME_IS ~tutu tutu_totsc~ @91                                   // Forbid installation on Tutu
 
 COPY_EXISTING ~wa2robe.itm~ ~override~                                             // Robe of Vecna
   WRITE_ASCII 0x22 ~4W~ #2                                                         // set the paperdoll animation ID to hooded robe (4W)
@@ -1776,7 +1896,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 BEGIN @303 DESIGNATED 303 // Give Shambling Mounds their proper soundset
 GROUP @3 // Cosmetic tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 DEPRECATED @93 // Note: now a part of Distinctive creature soundsets
 
 
@@ -1787,7 +1907,7 @@ DEPRECATED @93 // Note: now a part of Distinctive creature soundsets
 
 BEGIN @304 DESIGNATED 304 // Give Mariliths their Icewind Dale soundset
 GROUP @3 // Cosmetic tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 DEPRECATED @93 // Note: now a part of Distinctive creature soundsets
 
 
@@ -1798,7 +1918,7 @@ DEPRECATED @93 // Note: now a part of Distinctive creature soundsets
 
 BEGIN @310 DESIGNATED 310 // Distinctive creature coloring
 GROUP @3 // Cosmetic tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 
 INCLUDE "atweaks/lib/c310.tpa"
@@ -1811,7 +1931,7 @@ INCLUDE "atweaks/lib/c310.tpa"
 
 BEGIN @315 DESIGNATED 315 // Distinctive creature soundsets
 GROUP @3 // Cosmetic tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 INCLUDE "atweaks/lib/c315.tpa"
 
@@ -1825,7 +1945,7 @@ INCLUDE "atweaks/lib/c315.tpa"
 BEGIN @501 DESIGNATED 500 // Use the recommended storage capacity value
 SUBCOMPONENT @500  // Slightly expanded storage capacity for containers
 GROUP @4 // Miscellaneous tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 // This tweak raises the storage capacity of all containers in the game to 999, but only in case the container's capacity is currently lower than that
 
@@ -1846,7 +1966,7 @@ BUT_ONLY_IF_IT_CHANGES
 BEGIN @502 DESIGNATED 502 // Manually enter the storage capacity value
 SUBCOMPONENT @500  // Slightly expanded storage capacity for containers
 GROUP @4 // Miscellaneous tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 // This tweak raises the storage capacity of all containers in the game to the designated value
 
@@ -1880,7 +2000,7 @@ PRINT ~%man_cap%~
 
 BEGIN @510 DESIGNATED 510 // Expanded temple services
 GROUP @4 // Miscellaneous tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                          // SoA or ToB engine required
 
 
 INCLUDE "atweaks/lib/c510.tpa"
@@ -1893,7 +2013,7 @@ INCLUDE "atweaks/lib/c510.tpa"
 
 BEGIN @520 DESIGNATED 520 // Blackrazor does not override haste
 GROUP @4 // Miscellaneous tweaks
-REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~mel01.cre~ @90                              // ToB installation check
+REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 
 */
 

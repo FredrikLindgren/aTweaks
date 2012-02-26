@@ -1,6 +1,6 @@
-///////////
-// PnP Fey
-///////////
+/////////////////////
+// PnP Fey Creatures
+/////////////////////
 
 
 INCLUDE "atweaks/lib/dsandstuff.tpa"                                               // Detectable Spells
@@ -347,10 +347,11 @@ ADD_MEMORIZED_SPELL ~rr#fcld~ #0 ~innate~ ( 1 )                                 
 ADD_MEMORIZED_SPELL ~rr#wi405~ #0 ~innate~ ( 1 )                                   // adds 1x Improved Invisibility
 ADD_MEMORIZED_SPELL ~rr#pjell~ #0 ~innate~ ( 1 )                                   // adds 1x Polymorph Mustard Jelly
 ADD_CRE_ITEM ~rr#fsiri~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~boots~                 // add boots which increase Movement Rate to 9 (Sirines only because of Polymorph)
+REPLACE_CRE_ITEM ~BOW05~ #5 #0 #0 ~UNSTEALABLE~ ~WEAPON1~                          // make sure that all Sirines have Shortbows
+REPLACE_CRE_ITEM ~rr#ftrnq~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON2~                       // add Touch of Tranquility
 ADD_CRE_ITEM ~AROW01~ #40 #0 #0 ~UNSTEALABLE~ ~quiver3~                            // add 40 normal arrows
 ADD_CRE_ITEM ~AROW10~ #10 #0 #0 ~UNSTEALABLE~ ~quiver2~                            // add 10 Arrows of Piercing
 REPLACE_CRE_ITEM ~AROW05~ #5 #0 #0 ~UNSTEALABLE~ ~quiver1~  EQUIP                  // make the Arrows of Biting unstealable
-REPLACE_CRE_ITEM ~rr#ftrnq~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON2~                       // add Touch of Tranquility
 WRITE_BYTE 0x6f 1                                                                  // BG1 Proficiency slot (small sword)
 WRITE_BYTE 0x70 1                                                                  // BG1 Proficiency slot (bow)
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
@@ -661,6 +662,20 @@ COPY_EXISTING ~AR1200.BCS~ ~override~                                           
  DECOMPILE_BCS_TO_BAF
   REPLACE_TEXTUALLY EXACT_MATCH ~SIRINE01~ ~rr#fdrya~
  COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
+
+
+// The Spellhold Asylum door should be unlocked and opened once (note: remove this fix once it's included in the BG2 Fixpack)
+
+
+
+COPY_EXISTING ~ar1500.bcs~ ~override~
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~RR#Door1501~) BEGIN         // prevent duplication in case the Fixpack version is installed
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~GlobalGT("AsylumPlot","GLOBAL",55)~ ~GlobalGT("AsylumPlot","GLOBAL",55) Global("RR#Door1501","AR1500",0)~
+  REPLACE_TEXTUALLY EXACT_MATCH ~Unlock("Door1501")~ ~SetGlobal("RR#Door1501","AR1500",1) Unlock("Door1501")~
+COMPILE_BAF_TO_BCS
+END
 BUT_ONLY_IF_IT_CHANGES
 
 

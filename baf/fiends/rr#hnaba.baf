@@ -112,9 +112,17 @@ END
 
 IF
         Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
+	See([GOODCUTOFF]) // run away from players, if possible
 THEN
 	RESPONSE #100
 		RandomWalkContinuous()
+END
+
+IF
+        Global("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
+THEN
+	RESPONSE #100
+		NoAction() // don't execute anything below this while on the Ethereal Plane
 END
 
 IF
@@ -144,25 +152,6 @@ THEN
 		FaceObject(LastSeenBy(Myself))
 		DisplayStringHead(Myself,@712) // Embrace the darkness fleshling! You now serve only me.
                 DisplayStringHead(LastSeenBy(Myself),@713) // Yes, Master!
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	Exists(LastAttackerOf(Myself))
-	!Range(LastAttackerOf(Myself),6)
-        InMyArea(LastAttackerOf(Myself))
-        Allegiance(LastAttackerOf(Myself),GOODCUTOFF)
-	!StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
-        !StateCheck(LastAttackerOf(Myself),STATE_INVISIBLE)
-	!CheckStatGT(LastAttackerOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
-        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
-	!See(NearestEnemyOf(Myself))
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
 		SetInterrupt(TRUE)
 END
 
@@ -462,6 +451,25 @@ THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Exists(LastAttackerOf(Myself))
+	!Range(LastAttackerOf(Myself),6)
+        InMyArea(LastAttackerOf(Myself))
+        Allegiance(LastAttackerOf(Myself),GOODCUTOFF)
+	!StateCheck(LastAttackerOf(Myself),STATE_REALLY_DEAD)
+        !StateCheck(LastAttackerOf(Myself),STATE_INVISIBLE)
+	!CheckStatGT(LastAttackerOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+        CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
+	!See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
+		SetInterrupt(TRUE)
 END
 
 IF
