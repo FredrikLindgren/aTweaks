@@ -73,6 +73,10 @@ THEN
 END
 
 IF
+    Allegiance(Myself,GOODCUTOFF)
+	OR(2)
+      ActionListEmpty()
+      See(NearestEnemyOf(Myself))
     !GlobalTimerNotExpired("rr#niinv","LOCALS") // Natural Invisibility is automatically re-applied once per round (note: this is not a spell and shouldn't be treated as such)
     !StateCheck(Myself,STATE_INVISIBLE)
     !Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust but not True Seeing as it's automatically re-applied
@@ -80,6 +84,26 @@ THEN
     RESPONSE #100
         SetGlobalTimer("rr#niinv","LOCALS",6)
         ReallyForceSpellRES("rr#niinv",Myself) // Natural Invisibility
+END
+
+IF
+    !Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("rr#niinv","LOCALS") // Natural Invisibility is automatically re-applied once per round (note: this is not a spell and shouldn't be treated as such)
+    !StateCheck(Myself,STATE_INVISIBLE)
+    !Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust but not True Seeing as it's automatically re-applied
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#niinv","LOCALS",6)
+        ReallyForceSpellRES("rr#niinv",Myself) // Natural Invisibility
+END
+
+IF
+    !GlobalTimerNotExpired("rr#clear","LOCALS") // prevent the creature from getting stuck in an attack pattern because ActionListEmpty() is used above
+    See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#clear","LOCALS",6)
+        ClearActions(Myself)
 END
 
 IF
@@ -171,7 +195,19 @@ THEN
         NoAction()
 END
 
-
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    !StateCheck(WorstAC([PC]),STATE_PANIC)
+    !StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
+    !CheckStatGT(WorstAC([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    CheckStatLT(WorstAC([PC]),100,RESISTCRUSHING)
+    CheckStatLT(WorstAC([PC]),1,STONESKINS)
+    See(WorstAC([PC]))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
 
 IF
     !CheckStatGT(SixthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
@@ -265,6 +301,22 @@ THEN
 END
 
 IF
+    Allegiance(Myself,EVILCUTOFF)
+    !StateCheck(WorstAC([PC]),STATE_PANIC)
+    !StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
+    !CheckStatGT(WorstAC([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    CheckStatLT(WorstAC([PC]),100,RESISTCRUSHING)
+    CheckStatLT(WorstAC([PC]),1,STONESKINS)
+    CheckStatGT(WorstAC([PC]),-3,ARMORCLASS) // try to filter out targets with relatively poor AC
+    CheckStatGT(WorstAC([PC]),-4,ACCRUSHINGMOD) // try to avoid targets with good AC vs. blunt weapons
+    See(WorstAC([PC]))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)
     !CheckStatGT(LastAttackerOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
     !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
@@ -294,8 +346,6 @@ THEN
     RESPONSE #100
         NoAction()
 END
-
-
 
 IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)

@@ -1609,3 +1609,54 @@ READ_ASCII 0 sig (3)
 END                                                                                    // ends PATCH_MATCH
 END                                                                                    // ends DEFINE_PATCH_FUNCTION
 
+
+//Air Affinity
+
+DEFINE_PATCH_FUNCTION air_affinity BEGIN
+  DEFINE_ASSOCIATIVE_ARRAY flyers BEGIN
+    118 => 4  // Wyvern
+    123 => 4  // Beholder
+    136 => 4  // Mist
+    146 => 4  // Dragon
+    147 => 4  // Genie
+    156 => 4  // Solar
+    157 => 4  // Antisolar
+    158 => 4  // Planatar
+    159 => 4  // Darkplanatar
+    159 => 4  // Darkplanatar
+    186 => 5  // Elemental_Air
+  END
+  PATCH_PHP_EACH flyers AS p1 => p2 BEGIN
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "179"                                                               // effect: #179 (Damage vs. Creature Type Modifier)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "9"                                                                 // timing mode: 9 (permanent after death)
+        "parameter1" = EVALUATE_BUFFER "%p1%"                                          // param1: IDS Entry
+        "parameter2" = EVALUATE_BUFFER "%p2%"                                          // param2: IDS File
+        "parameter3" = "4"                                                             // param3: damage bonus
+        "duration" = "0"                                                               // duration: 0
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = ""                                                               // resref: none
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "178"                                                               // effect: #178 (THAC0 vs. Creature Type Modifier)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "9"                                                                 // timing mode: 9 (permanent after death)
+        "parameter1" = EVALUATE_BUFFER "%p1%"                                          // param1: IDS Entry
+        "parameter2" = EVALUATE_BUFFER "%p2%"                                          // param2: IDS File
+        "parameter3" = "1"                                                             // param3: THAC0 bonus
+        "duration" = "0"                                                               // duration: 0
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = ""                                                               // resref: none
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+  END                                                                                  // ends PATCH_PHP_EACH
+END                                                                                    // ends DEFINE_PATCH_FUNCTION
+
