@@ -98,12 +98,28 @@ THEN
 END
 
 IF
+    Allegiance(Myself,GOODCUTOFF) // only needed for summoned creatures
     !GlobalTimerNotExpired("rr#clear","LOCALS") // prevent the creature from getting stuck in an attack pattern because ActionListEmpty() is used above
     See(NearestEnemyOf(Myself))
 THEN
     RESPONSE #100
         SetGlobalTimer("rr#clear","LOCALS",6)
         ClearActions(Myself)
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+	OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
+	  See(Player1)
+	  See(Player2)
+	  See(Player3)
+	  See(Player4)
+	  See(Player5)
+	  See(Player6)
+	False()
+THEN
+	RESPONSE #100
+		NoAction()
 END
 
 IF
@@ -434,6 +450,78 @@ IF
     StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
     CheckStatLT(NearestEnemyOf(Myself),100,RESISTCRUSHING)
     See(NearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player6,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    StateCheck(Player6,STATE_IMMOBILE)
+    CheckStatLT(Player6,100,RESISTCRUSHING)
+    See(Player6)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player5,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    StateCheck(Player5,STATE_IMMOBILE)
+    CheckStatLT(Player5,100,RESISTCRUSHING)
+    See(Player5)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player4,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    StateCheck(Player4,STATE_IMMOBILE)
+    CheckStatLT(Player4,100,RESISTCRUSHING)
+    See(Player4)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player3,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    StateCheck(Player3,STATE_IMMOBILE)
+    CheckStatLT(Player3,100,RESISTCRUSHING)
+    See(Player3)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player2,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    StateCheck(Player2,STATE_IMMOBILE)
+    CheckStatLT(Player2,100,RESISTCRUSHING)
+    See(Player2)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player1,1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    StateCheck(Player1,STATE_IMMOBILE)
+    CheckStatLT(Player1,100,RESISTCRUSHING)
+    See(Player1)
     False()
 THEN
     RESPONSE #100

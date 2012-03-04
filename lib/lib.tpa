@@ -1355,6 +1355,7 @@ DEFINE_PATCH_FUNCTION hover_immunities BEGIN
                  ~SPIN914~                                                             // Mimic Glue
                 ~SPOGRE01~                                                             // Earthquake (Ogremoch)
                  ~SPPR720~                                                             // Earthquake (Priest version)
+                ~rr#equak~                                                             // Earthquake (aTweaks)
                  ~SPWI101~                                                             // Grease
 BEGIN                                                                                  // execute the following
 READ_ASCII 0 sig (3)
@@ -1610,19 +1611,19 @@ END                                                                             
 END                                                                                    // ends DEFINE_PATCH_FUNCTION
 
 
-//Air Affinity
+// Air Affinity
 
 DEFINE_PATCH_FUNCTION air_affinity BEGIN
   DEFINE_ASSOCIATIVE_ARRAY flyers BEGIN
     118 => 4  // Wyvern
     123 => 4  // Beholder
     136 => 4  // Mist
+    139 => 4  // Mephit
     146 => 4  // Dragon
     147 => 4  // Genie
     156 => 4  // Solar
     157 => 4  // Antisolar
     158 => 4  // Planatar
-    159 => 4  // Darkplanatar
     159 => 4  // Darkplanatar
     186 => 5  // Elemental_Air
   END
@@ -1658,5 +1659,88 @@ DEFINE_PATCH_FUNCTION air_affinity BEGIN
         "effsource" = ""                                                               // effsource: none
       END                                                                              // ends LAUNCH_PATCH_FUNCTION
   END                                                                                  // ends PATCH_PHP_EACH
+END                                                                                    // ends DEFINE_PATCH_FUNCTION
+
+
+// Earth Affinity
+
+DEFINE_PATCH_FUNCTION earth_affinity BEGIN
+      PATCH_FOR_EACH ~spell~ IN                                                        // grant immunity to each of the following spells
+                  ~SPOGRE01~                                                           // Earthquake (Ogremoch)
+                   ~SPPR720~                                                           // Earthquake (Priest version)
+                  ~rr#equak~                                                           // Earthquake (aTweaks)
+      BEGIN
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "206"                                                               // effect: #206 (Protection from Spell)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "9"                                                                 // timing mode: 9 (permanent after death)
+        "duration" = "0"                                                               // duration: 0
+        "parameter1" = "4742"                                                          // param1: string (Spell Ineffective)
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = EVALUATE_BUFFER "%spell%"                                        // resref: the current spell
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+      END                                                                              // ends PATCH_FOR_EACH
+  DEFINE_ASSOCIATIVE_ARRAY air_and_water BEGIN
+    118 => 4  // Wyvern
+    123 => 4  // Beholder
+    131 => 4  // Sahuagin
+    135 => 4  // Kuo-Toa
+    136 => 4  // Mist
+    139 => 4  // Mephit
+    146 => 4  // Dragon
+    147 => 4  // Genie
+    156 => 4  // Solar
+    157 => 4  // Antisolar
+    158 => 4  // Planatar
+    159 => 4  // Darkplanatar
+    186 => 5  // Elemental_Air
+    132 => 5  // Fairy_Nereid
+  END
+  PATCH_PHP_EACH air_and_water AS p1 => p2 BEGIN
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "179"                                                               // effect: #179 (Damage vs. Creature Type Modifier)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "9"                                                                 // timing mode: 9 (permanent after death)
+        "parameter1" = EVALUATE_BUFFER "%p1%"                                          // param1: IDS Entry
+        "parameter2" = EVALUATE_BUFFER "%p2%"                                          // param2: IDS File
+        "parameter3" = "-2"                                                            // param3: damage bonus
+        "duration" = "0"                                                               // duration: 0
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = ""                                                               // resref: none
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "178"                                                               // effect: #178 (THAC0 vs. Creature Type Modifier)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "9"                                                                 // timing mode: 9 (permanent after death)
+        "parameter1" = EVALUATE_BUFFER "%p1%"                                          // param1: IDS Entry
+        "parameter2" = EVALUATE_BUFFER "%p2%"                                          // param2: IDS File
+        "parameter3" = "-2"                                                            // param3: THAC0 bonus
+        "duration" = "0"                                                               // duration: 0
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = ""                                                               // resref: none
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+  END                                                                                  // ends PATCH_PHP_EACH
+  READ_BYTE 0x234 "level" ELSE 0                                                       // note: this was added to fix the broken param3 values (WeiDU bug?)
+  READ_LONG 0x2c4 "fx_off" ELSE 0
+  READ_LONG 0x2c8 "fx_num" ELSE 0
+  FOR (index = 0 ; index < fx_num ; index = index + 1) BEGIN
+    READ_LONG ("%fx_off%" + 0x08 + ("%index%" * 0x108)) "opcode"
+    READ_LONG ("%fx_off%" + 0x58 + ("%index%" * 0x108)) "param3"
+    PATCH_IF ((("%opcode%" = 178) OR ("%opcode%" = 179)) AND ("%param3%" != "-2")) BEGIN
+      WRITE_LONG ("%fx_off%" + 0x58 + ("%index%" * 0x108)) "-2"
+    END
+  END
 END                                                                                    // ends DEFINE_PATCH_FUNCTION
 

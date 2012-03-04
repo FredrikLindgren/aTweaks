@@ -25,6 +25,28 @@ THEN
 END
 
 IF
+    Global("rr#earth","LOCALS",0) // area type check (0 - contains earth, 1 - inappropriate area, 2 - check done)
+    HaveSpellRES("rr#ecncl") // Elemental Concealment
+    OR(4)
+      AreaCheck("AR2800") // Suldanesselar
+      AreaCheck("AR2806") // Tree of Life
+      AreaCheck("AR0516") // Planar Prison
+      AreaType(CITY)
+THEN
+    RESPONSE #100
+        SetGlobal("rr#earth","LOCALS",1)
+END
+
+IF
+    Global("rr#earth","LOCALS",1) // area type check (0 - contains earth, 1 - inappropriate area, 2 - check done)
+    HaveSpellRES("rr#ecncl") // Elemental Concealment
+THEN
+    RESPONSE #100
+        SetGlobal("rr#earth","LOCALS",2)
+        RemoveSpellRES("rr#ecncl") // remove the spell from memory
+END
+
+IF
     OR(3)
       Global("RR#Active","LOCALS",0)
       StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
@@ -73,197 +95,91 @@ THEN
 END
 
 IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,7,LEVEL) // 8 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),3,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),3,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),3,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,11,LEVEL) // 12 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),4,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),4,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),4,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,11,LEVEL) // 12 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),4,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),4,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),4,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,15,LEVEL) // 16 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),5,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),5,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),5,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,19,LEVEL) // 20 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),6,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),6,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),6,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,23,LEVEL) // 24 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),7,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),7,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),7,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    Allegiance(Myself,GOODCUTOFF)
-    HaveSpellRES("rr#eairw") // Whirlwind
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    NumCreatureGT([EVILCUTOFF],2) // at least three opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
-    Range([EVILCUTOFF],12)
-    Range(SecondNearest([EVILCUTOFF]),12)
-    Range(ThirdNearest([EVILCUTOFF]),12)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
     Allegiance(Myself,EVILCUTOFF)
-    HaveSpellRES("rr#eairw") // Whirlwind
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#equak") // Earthquake
     NumCreatureGT([GOODCUTOFF],2) // at least three opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
     Range([GOODCUTOFF],12)
     Range(SecondNearest([GOODCUTOFF]),12)
     Range(ThirdNearest([GOODCUTOFF]),12)
+    OR(3)
+      CheckStatGT([GOODCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
+      CheckStatGT([GOODCUTOFF],4,LEVEL2)
+      CheckStatGT([GOODCUTOFF],4,LEVEL3)
 THEN
     RESPONSE #100
         SetInterrupt(FALSE)
         SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    Allegiance(Myself,GOODCUTOFF)
-    HaveSpellRES("rr#eairw") // Whirlwind
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#eairw","LOCALS") // whirlwind timer
-    NumCreatureGT([EVILCUTOFF],1) // at least two opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
-    Range([EVILCUTOFF],12)
-    Range(SecondNearest([EVILCUTOFF]),12)
-    Range(ThirdNearest([EVILCUTOFF]),12)
-THEN
-    RESPONSE #70
-        SetGlobalTimer("rr#eairw","LOCALS",12) // whirlwind timer
-    RESPONSE #30
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+        ForceSpellRES("rr#equak",Myself) // Earthquake
+        RemoveSpellRES("rr#equak") // remove one instance of the spell upon casting
         SetInterrupt(TRUE)
 END
 
 IF
     Allegiance(Myself,EVILCUTOFF)
-    HaveSpellRES("rr#eairw") // Whirlwind
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#eairw","LOCALS") // whirlwind timer
+    !GlobalTimerNotExpired("rr#equak","LOCALS") // Earthquake timer
+    HaveSpellRES("rr#equak") // Earthquake
     NumCreatureGT([GOODCUTOFF],1) // at least two opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
     Range([GOODCUTOFF],12)
     Range(SecondNearest([GOODCUTOFF]),12)
-    Range(ThirdNearest([GOODCUTOFF]),12)
+    OR(3)
+      CheckStatGT([GOODCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
+      CheckStatGT([GOODCUTOFF],4,LEVEL2)
+      CheckStatGT([GOODCUTOFF],4,LEVEL3)
 THEN
     RESPONSE #70
-        SetGlobalTimer("rr#eairw","LOCALS",12) // whirlwind timer
+        SetGlobalTimer("rr#equak","LOCALS",12) // Earthquake timer
     RESPONSE #30
         SetInterrupt(FALSE)
         SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+        ForceSpellRES("rr#equak",Myself) // Earthquake
+        RemoveSpellRES("rr#equak") // remove one instance of the spell upon casting
         SetInterrupt(TRUE)
 END
 
 IF
-    ActionListEmpty()
-    HaveSpellRES("rr#eairw") // Whirlwind
+    Allegiance(Myself,EVILCUTOFF)
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#eairw","LOCALS") // whirlwind timer
-    Range(NearestEnemyOf(Myself),12) // at least one opponent is nearby
+    !GlobalTimerNotExpired("rr#equak","LOCALS") // Earthquake timer
+    HaveSpellRES("rr#equak") // Earthquake
+    Range([GOODCUTOFF],12) // at least one opponent is nearby
+    OR(3)
+      CheckStatGT([GOODCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
+      CheckStatGT([GOODCUTOFF],4,LEVEL2)
+      CheckStatGT([GOODCUTOFF],4,LEVEL3)
 THEN
     RESPONSE #85
-        SetGlobalTimer("rr#eairw","LOCALS",12) // whirlwind timer
+        SetGlobalTimer("rr#equak","LOCALS",12) // Earthquake timer
     RESPONSE #15
         SetInterrupt(FALSE)
         SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+        ForceSpellRES("rr#equak",Myself) // Earthquake
+        RemoveSpellRES("rr#equak") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#equak","LOCALS") // Earthquake timer
+    HaveSpellRES("rr#equak") // Earthquake
+    Range([PC],12) // special block, for targeting singled-out party members (i.e. solo players)
+    OR(2)
+      NumCreatureGT([PC],1) // at least two party members are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
+      NumInPartyAlive(1) // or a solo player has been detected
+    See([PC])
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatGT(LastSeenBy(Myself),-6,SAVEVSSPELL)
+    !CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+    !CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#equak",Myself) // Earthquake
+        RemoveSpellRES("rr#equak") // remove one instance of the spell upon casting
         SetInterrupt(TRUE)
 END
 
@@ -287,6 +203,74 @@ THEN
         SetGlobalTimer("RR#Cast","LOCALS",6)
         ForceSpellRES("rr#ecncl",Myself) // Elemental Concealment
         RemoveSpellRES("rr#ecncl") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#equak") // Earthquake
+    NumCreatureGT([EVILCUTOFF],2) // at least three opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
+    Range([EVILCUTOFF],12)
+    Range(SecondNearest([EVILCUTOFF]),12)
+    Range(ThirdNearest([EVILCUTOFF]),12)
+    OR(3)
+      CheckStatGT([EVILCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
+      CheckStatGT([EVILCUTOFF],4,LEVEL2)
+      CheckStatGT([EVILCUTOFF],4,LEVEL3)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#equak",Myself) // Earthquake
+        RemoveSpellRES("rr#equak") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#equak","LOCALS") // Earthquake timer
+    HaveSpellRES("rr#equak") // Earthquake
+    NumCreatureGT([EVILCUTOFF],1) // at least two opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
+    Range([EVILCUTOFF],12)
+    Range(SecondNearest([EVILCUTOFF]),12)
+    OR(3)
+      CheckStatGT([EVILCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
+      CheckStatGT([EVILCUTOFF],4,LEVEL2)
+      CheckStatGT([EVILCUTOFF],4,LEVEL3)
+THEN
+    RESPONSE #70
+        SetGlobalTimer("rr#equak","LOCALS",12) // Earthquake timer
+    RESPONSE #30
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#equak",Myself) // Earthquake
+        RemoveSpellRES("rr#equak") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#equak","LOCALS") // Earthquake timer
+    HaveSpellRES("rr#equak") // Earthquake
+    Range([EVILCUTOFF],12) // at least one opponent is nearby
+    OR(3)
+      CheckStatGT([EVILCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
+      CheckStatGT([EVILCUTOFF],4,LEVEL2)
+      CheckStatGT([EVILCUTOFF],4,LEVEL3)
+THEN
+    RESPONSE #85
+        SetGlobalTimer("rr#equak","LOCALS",12) // Earthquake timer
+    RESPONSE #15
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#equak",Myself) // Earthquake
+        RemoveSpellRES("rr#equak") // remove one instance of the spell upon casting
         SetInterrupt(TRUE)
 END
 
@@ -318,6 +302,7 @@ THEN
 END
 
 IF
+    Allegiance(Myself,GOODCUTOFF) // only needed for summoned elementals
     !GlobalTimerNotExpired("rr#clear","LOCALS") // prevent the creature from getting stuck in an attack pattern because ActionListEmpty() is used above
     See(NearestEnemyOf(Myself))
 THEN
@@ -342,7 +327,7 @@ THEN
 END
 
 IF
-    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
     See(NearestEnemyOf(Myself))
     False()
@@ -352,7 +337,7 @@ THEN
 END
 
 IF
-    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
     CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
     CheckStatLT(SixthNearestEnemyOf(Myself),1,STONESKINS)
@@ -475,7 +460,7 @@ THEN
 END
 
 IF
-    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
     CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
     See(SixthNearestEnemyOf(Myself))
