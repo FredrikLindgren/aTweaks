@@ -3,16 +3,23 @@
 //////////////////////////////////////////////
 
 
-// Elemental Princes with 192 hp (24 HD)
-
-ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-            ~elemzaam~                                                             // Zaaman Rul
-BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
+ACTION_DEFINE_ASSOCIATIVE_ARRAY 24HD_princes BEGIN
+    elemzaam => 192  // Zaaman Rul (24 HD)
+    elemyanc => 197  // Yan-C-Bin (24+5 HD)
+    finsol02 => 197  // Yan-C-Bin in ToB (24+5 HD)
+    elemchan => 202  // Chan (24+10 HD)
+    elemcryo => 202  // Cryonax (24+10 HD)
+    finsol03 => 202  // Cryonax in ToB (24+10 HD)
+    elemhydr => 202  // Olhydra (24+10 HD)
+    elemimix => 202  // Imix (24+10 HD)
+    elemogre => 222  // Ogremoch (24+30 HD)
+    elemsunn => 230  // Sunnis (24+38 HD)
+END
+ACTION_PHP_EACH 24HD_princes AS prince => rr#newhp BEGIN
+ACTION_IF FILE_EXISTS_IN_GAME ~%prince%.cre~ BEGIN                                 // if the file exists
+COPY_EXISTING ~%prince%.cre~ ~override~
 LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
 // =============================================================================== // the actual work starts from here
-  SET rr#newhp = "192"                                                             // new hit point value
   SET rr#newth = "-3"                                                              // new THAC0 value
   PATCH_IF SHORT_AT 0x24 < "%rr#newhp%" BEGIN                                      // current hp < newhp
     WRITE_SHORT 0x24 EVALUATE_BUFFER "%rr#newhp%"                                  // current hit points
@@ -26,113 +33,4 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
-END                                                                                // ends ACTION_FOR_EACH block
-
-
-// Elemental Princes with 197 hp (24+5 HD)
-
-ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-              ~elemyanc~                                                           // Yan-C-Bin
-              ~finsol02~                                                           // Yan-C-Bin (ToB)              
-BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-// =============================================================================== // the actual work starts from here
-  SET rr#newhp = "197"                                                             // new hit point value
-  SET rr#newth = "-3"                                                              // new THAC0 value
-  PATCH_IF SHORT_AT 0x24 < "%rr#newhp%" BEGIN                                      // current hp < newhp
-    WRITE_SHORT 0x24 EVALUATE_BUFFER "%rr#newhp%"                                  // current hit points
-  END
-  PATCH_IF SHORT_AT 0x26 < "%rr#newhp%" BEGIN                                      // current hp < newhp
-    WRITE_SHORT 0x26 EVALUATE_BUFFER "%rr#newhp%"                                  // current hit points
-  END
-  PATCH_IF BYTE_AT 0x52 > "%rr#newth%" BEGIN                                       // old THAC0 > new THAC0
-    WRITE_BYTE 0x52 EVALUATE_BUFFER "%rr#newth%"                                   // THAC0    
-  END
-// =============================================================================== // the actual work ends here
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
-END                                                                                // ends ACTION_FOR_EACH block
-
-
-// Elemental Princes with 202 hp (24+10 HD)
-
-ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-              ~elemchan~                                                           // Chan
-              ~elemcryo~                                                           // Cryonax
-              ~elemhydr~                                                           // Olhydra
-              ~elemimix~                                                           // Imix
-              ~finsol03~                                                           // Cryonax (ToB)
-BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-// =============================================================================== // the actual work starts from here
-  SET rr#newhp = "202"                                                             // new hit point value
-  SET rr#newth = "-3"                                                              // new THAC0 value
-  PATCH_IF SHORT_AT 0x24 < "%rr#newhp%" BEGIN                                      // current hp < newhp
-    WRITE_SHORT 0x24 EVALUATE_BUFFER "%rr#newhp%"                                  // current hit points
-  END
-  PATCH_IF SHORT_AT 0x26 < "%rr#newhp%" BEGIN                                      // current hp < newhp
-    WRITE_SHORT 0x26 EVALUATE_BUFFER "%rr#newhp%"                                  // current hit points
-  END
-  PATCH_IF BYTE_AT 0x52 > "%rr#newth%" BEGIN                                       // old THAC0 > new THAC0
-    WRITE_BYTE 0x52 EVALUATE_BUFFER "%rr#newth%"                                   // THAC0    
-  END
-// =============================================================================== // the actual work ends here
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
-END                                                                                // ends ACTION_FOR_EACH block
-              
-
-// Elemental Princes with 222 hp (24+30 HD)
-
-ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-              ~elemogre~                                                           // Ogremoch
-BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-// =============================================================================== // the actual work starts from here
-  SET rr#newhp = "222"                                                             // new hit point value
-  SET rr#newth = "-3"                                                              // new THAC0 value
-  PATCH_IF SHORT_AT 0x24 < "%rr#newhp%" BEGIN                                      // current hp < newhp
-    WRITE_SHORT 0x24 EVALUATE_BUFFER "%rr#newhp%"                                  // current hit points
-  END
-  PATCH_IF SHORT_AT 0x26 < "%rr#newhp%" BEGIN                                      // current hp < newhp
-    WRITE_SHORT 0x26 EVALUATE_BUFFER "%rr#newhp%"                                  // current hit points
-  END
-  PATCH_IF BYTE_AT 0x52 > "%rr#newth%" BEGIN                                       // old THAC0 > new THAC0
-    WRITE_BYTE 0x52 EVALUATE_BUFFER "%rr#newth%"                                   // THAC0    
-  END
-// =============================================================================== // the actual work ends here
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
-END                                                                                // ends ACTION_FOR_EACH block
-
-
-// Elemental Princes with 230 hp (24+38 HD)
-
-ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-              ~elemsunn~                                                           // Sunnis
-BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
-COPY_EXISTING ~%file%.cre~ ~override~
-LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
-// =============================================================================== // the actual work starts from here
-  SET rr#newhp = "230"                                                             // new hit point value
-  SET rr#newth = "-3"                                                              // new THAC0 value
-  PATCH_IF SHORT_AT 0x24 < "%rr#newhp%" BEGIN                                      // current hp < newhp
-    WRITE_SHORT 0x24 EVALUATE_BUFFER "%rr#newhp%"                                  // current hit points
-  END
-  PATCH_IF SHORT_AT 0x26 < "%rr#newhp%" BEGIN                                      // current hp < newhp
-    WRITE_SHORT 0x26 EVALUATE_BUFFER "%rr#newhp%"                                  // current hit points
-  END
-  PATCH_IF BYTE_AT 0x52 > "%rr#newth%" BEGIN                                       // old THAC0 > new THAC0
-    WRITE_BYTE 0x52 EVALUATE_BUFFER "%rr#newth%"                                   // THAC0    
-  END
-// =============================================================================== // the actual work ends here
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
-END                                                                                // ends ACTION_FOR_EACH block
+END                                                                                // ends ACTION_PHP_EACH
