@@ -28,7 +28,8 @@ COPY ~atweaks/spl/elementals/rr#ecfir.spl~ ~override~                           
 COPY ~atweaks/spl/elementals/rr#endis.spl~ ~override~                              // Displacement (Nereid)
 SAY NAME1 @2105 SAY NAME2 @2105
 
-COPY ~atweaks/spl/elementals/rr#ecems.spl~ ~override~                              // Cold Aura
+COPY ~atweaks/spl/elementals/rr#ecems.spl~ ~override~                              // Cold Aura (Frost Salamander)
+COPY ~atweaks/spl/elementals/rr#eceic.spl~ ~override~                              // Cold Aura (Ice Paraelemental and Cryonax)
 
 COPY ~atweaks/eff/elementals/rr#enlfr.eff~ ~override~                              // Lower Fire Resistance immunity EFF (for Fire Elementals, Fire Salamanders, Efreet etc.)
 COPY ~atweaks/spl/elementals/rr#enlfr.spl~ ~override~                              // Lower Fire Resistance
@@ -281,6 +282,8 @@ COPY ~atweaks/itm/elementals/rr#efirl.itm~ ~override~                           
 COPY ~atweaks/itm/elementals/rr#efirr.itm~ ~override~                              // Fire Elemental attack
 COPY ~atweaks/itm/elementals/rr#efirg.itm~ ~override~                              // Greater Fire Elemental attack
 COPY ~atweaks/itm/elementals/rr#efire.itm~ ~override~                              // Elder Fire Elemental attack
+
+COPY ~atweaks/itm/elementals/rr#eicer.itm~ ~override~                              // Ice Paraelemental attack
 
 
 
@@ -1678,6 +1681,64 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+// Ice Paraelemental (12 HD)
+
+COPY    ~atweaks/cre/elementals/rr#eicer.cre~ ~override~                           // Ice Paraelemental (hostile)
+SAY NAME1 @2120 SAY NAME2 @2120 SAY SELECT_COMMON1 @481 SAY BATTLE_CRY1 @481 SAY BATTLE_CRY2 @482 SAY ATTACK1 @483 SAY ATTACK2 @484 SAY DAMAGE @487 SAY HURT @488 SAY DYING @489 SAY SELECT_ACTION1 @482
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~rr#eicer~                                                             // Ice Paraelemental (aTweaks)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newmove"  = "5"                                                                   // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
+"newxpv"   = "11000"                                                               // new XP value
+"newhp"    = "96"                                                                  // new hit point value
+"newac"    = "3"                                                                   // new Armor Class value
+"newth"    = "9"                                                                   // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "7"                                                                   // new Save vs. Death
+"newsvw"   = "9"                                                                   // new Save vs. Wand
+"newsvp"   = "8"                                                                   // new Save vs. Polymorph
+"newsvb"   = "8"                                                                   // new Save vs. Breath
+"newsvs"   = "10"                                                                  // new Save vs. Spell
+"newfr"    = "-100"                                                                // new Resist Fire value
+"newcr"    = "127"                                                                 // new Resist Cold value
+"newlvl1"  = "12"                                                                  // new level (first class)
+"newstr"   = "18"                                                                  // new Strength value
+"newdex"   = "12"                                                                  // new Dexterity value
+"newcon"   = "16"                                                                  // new Constitution value
+"newint"   = "14"                                                                  // new Intelligence value
+"newwis"   = "13"                                                                  // new Wisdom value
+"newchr"   = "12"                                                                  // new Charisma value
+"newmor"   = "16"                                                                  // new morale value
+"newmorb"  = "2"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "5"                                                                   // new general (GIANT HUMANOID)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "255"                                                                 // new class (NO_CLASS)
+"newalign" = "34"                                                                  // new alignment (True Neutral)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#EICE"                                                           // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+END                                                                                // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
 
 //////////////////
 // New AI Scripts
@@ -1694,9 +1755,9 @@ COMPILE ~atweaks/baf/elementals/rr#ewwei.baf~                                   
 COMPILE ~atweaks/baf/elementals/rr#eair.baf~                                       // Air Elemental AI script
 COMPILE ~atweaks/baf/elementals/rr#eear.baf~                                       // Earth Elemental AI script
 COMPILE ~atweaks/baf/elementals/rr#efir.baf~                                       // Fire Elemental AI script
+COMPILE ~atweaks/baf/elementals/rr#eice.baf~                                       // Ice Paraelemental AI script
 /*
 COMPILE ~atweaks/baf/elementals/rr#ewat.baf~                                       // Water Elemental AI script
-COMPILE ~atweaks/baf/elementals/rr#eice.baf~                                       // Ice Paraelemental AI script
 */
 
 
@@ -1926,7 +1987,7 @@ COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
 
 
-// Add a Salamander Noble to the Planar Sphere's fire chamber
+// Add an Ice Paraelemental and a Salamander Noble to the Planar Sphere's ice and fire chambers
 
 <<<<<<<<atweaks/inlined/baf/elementals/ar0412.baf
 IF
@@ -1934,6 +1995,7 @@ IF
 THEN
     RESPONSE #100
         SetGlobal("rr#spw01","AR0412",1)
+        CreateCreature("rr#eicer",[850.480],0) // Ice Paraelemental
         CreateCreature("SALGRFIR",[2070.1020],4) // Salamander Noble
 END
 >>>>>>>>
@@ -2026,3 +2088,24 @@ RESPONSE #20
 CreateCreature("udfire",[2738.2993],0) CreateCreature("elfirg01",[2800.3040],4) CreateCreature("elfir01",[2738.3080],6)~ // 2x greater, 1x regular
 COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
+
+
+// Add an Ice Paraelemental to the Ice Island's dungeon in BG1
+
+<<<<<<<<atweaks/inlined/baf/elementals/bg1009.baf
+IF
+    Global("rr#spw01","MYAREA",0)
+THEN
+    RESPONSE #100
+        SetGlobal("rr#spw01","MYAREA",1)
+        CreateCreature("rr#eicer",[340.680],11) // Ice Paraelemental
+END
+>>>>>>>>
+
+ACTION_IF GAME_IS ~tutu_totsc~ THEN BEGIN
+  EXTEND_BOTTOM ~_ar1009.bcs~  ~atweaks/inlined/baf/elementals/bg1009.baf~         // extend the Ice Island dungeon area script (Tutu)
+END
+
+ACTION_IF GAME_IS ~bgt~ THEN BEGIN
+  EXTEND_BOTTOM ~aru009.bcs~  ~atweaks/inlined/baf/elementals/bg1009.baf~          // extend the Ice Island dungeon area script (BGT)
+END

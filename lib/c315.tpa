@@ -314,3 +314,28 @@ END
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Give Ice Paraelementals and Ice Golems a proper soundset
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~elemcryo~                                                             // Cryonax
+            ~finsol03~                                                             // Cryonax in ToB
+            ~golice01~                                                             // Ice Golem
+            ~gorgoli~                                                              // Ice Golem (Watcher's Keep)
+            ~rr#eicer~                                                             // aTweaks' Ice Paraelemental
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY                                              // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                     // Null soundset (code borrowed from Nythrun with thanks)
+      WRITE_LONG s1 ~-1~
+  END
+  SAY NAME1 @2120 SAY NAME2 @2120 SAY SELECT_COMMON1 @481 SAY BATTLE_CRY1 @481 SAY BATTLE_CRY2 @482 SAY ATTACK1 @483 SAY ATTACK2 @484 SAY DAMAGE @487 SAY HURT @488 SAY DYING @489 SAY SELECT_ACTION1 @482
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block

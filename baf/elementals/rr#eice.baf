@@ -5,7 +5,7 @@ IF
       See(NearestEnemyOf(Myself))
       AttackedBy([ANYONE],DEFAULT)
       TookDamage()
-      Help([EVILCUTOFF.0.ELEMENTAL.ELEMENTAL_FIRE])
+      Help([EVILCUTOFF.0.ELEMENTAL])
 THEN
     RESPONSE #100
         SetGlobal("RR#Active","LOCALS",1)
@@ -22,20 +22,6 @@ THEN
     RESPONSE #100
         SetGlobal("RR#Active","LOCALS",1)
         Continue()
-END
-
-IF
-    Global("rr#fire","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains fire, 2 - check done)
-    HaveSpellRES("rr#ecncl") // Elemental Concealment
-    !AreaCheck("AR0412") // Planar Sphere (Fire and Ice room)
-    !AreaCheck("AR1502") // Fire Room (Spellhold Test)
-    !AreaCheck("AR5200") // Marching Mountains
-    !AreaCheck("AR5201") // Fire Giant temple
-    !AreaCheck("AR5204") // Yaga-Shura's lair
-THEN
-    RESPONSE #100
-        SetGlobal("rr#fire","LOCALS",1)
-        RemoveSpellRES("rr#ecncl") // remove the spell from memory
 END
 
 IF
@@ -87,66 +73,6 @@ END
 
 IF
     Allegiance(Myself,EVILCUTOFF)
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#ecncl") // Elemental Concealment
-    !StateCheck(Myself,STATE_INVISIBLE)
-    !Global("dvgldust","LOCALS",1)
-    !CheckStatGT(Player1,0,TRUE_SIGHT)
-    !CheckStatGT(Player2,0,TRUE_SIGHT)
-    !CheckStatGT(Player3,0,TRUE_SIGHT)
-    !CheckStatGT(Player4,0,TRUE_SIGHT)
-    !CheckStatGT(Player5,0,TRUE_SIGHT)
-    !CheckStatGT(Player6,0,TRUE_SIGHT)
-    !CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
-    !CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#ecncl",Myself) // Elemental Concealment
-        RemoveSpellRES("rr#ecncl") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    Allegiance(Myself,GOODCUTOFF)
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#ecncl") // Elemental Concealment
-    !StateCheck(Myself,STATE_INVISIBLE)
-    !Global("dvgldust","LOCALS",1)
-    !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
-    !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
-    !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
-    !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-    !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-    !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
-    !CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-    !CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-    !CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
-    !CheckStatGT([EVILCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
-    !CheckStatGT([EVILCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#ecncl",Myself) // Elemental Concealment
-        RemoveSpellRES("rr#ecncl") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    Allegiance(Myself,GOODCUTOFF) // only needed for summoned elementals
-    !GlobalTimerNotExpired("rr#clear","LOCALS") // prevent the creature from getting stuck in an attack pattern because ActionListEmpty() is used above
-    See(NearestEnemyOf(Myself))
-THEN
-    RESPONSE #100
-        SetGlobalTimer("rr#clear","LOCALS",6)
-        ClearActions(Myself)
-END
-
-IF
-    Allegiance(Myself,EVILCUTOFF)
     OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
       See(Player1)
       See(Player2)
@@ -162,7 +88,7 @@ END
 
 IF
     !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCOLD)
     See(NearestEnemyOf(Myself))
     False()
 THEN
@@ -173,7 +99,7 @@ END
 IF
     !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCOLD)
     !StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(SixthNearestEnemyOf(Myself))
     False()
@@ -185,7 +111,7 @@ END
 IF
     !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCOLD)
     !StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(FifthNearestEnemyOf(Myself))
     False()
@@ -197,7 +123,7 @@ END
 IF
     !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCOLD)
     !StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(FourthNearestEnemyOf(Myself))
     False()
@@ -209,7 +135,7 @@ END
 IF
     !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCOLD)
     !StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(ThirdNearestEnemyOf(Myself))
     False()
@@ -221,7 +147,7 @@ END
 IF
     !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCOLD)
     !StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(SecondNearestEnemyOf(Myself))
     False()
@@ -233,7 +159,7 @@ END
 IF
     !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(NearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(NearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCOLD)
     !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(NearestEnemyOf(Myself))
     False()
@@ -247,7 +173,7 @@ IF
     !StateCheck(WorstAC([PC]),STATE_PANIC)
     !StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
     !CheckStatGT(WorstAC([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    CheckStatLT(WorstAC([PC]),100,RESISTFIRE)
+    CheckStatLT(WorstAC([PC]),100,RESISTCOLD)
     See(WorstAC([PC]))
     False()
 THEN
@@ -259,7 +185,7 @@ IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)
     !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
-    CheckStatLT(LastAttackerOf(Myself),100,RESISTFIRE)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTCOLD)
     !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
     Range(LastAttackerOf(Myself),8)
     RandomNum(3,1)
@@ -274,7 +200,7 @@ IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)
     !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
-    CheckStatLT(LastAttackerOf(Myself),100,RESISTFIRE)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTCOLD)
     !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
     Range(LastAttackerOf(Myself),4)
     See(LastAttackerOf(Myself))
@@ -287,7 +213,7 @@ END
 IF
     !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCOLD)
     See(SixthNearestEnemyOf(Myself))
     False()
 THEN
@@ -298,7 +224,7 @@ END
 IF
     !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCOLD)
     See(FifthNearestEnemyOf(Myself))
     False()
 THEN
@@ -309,7 +235,7 @@ END
 IF
     !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCOLD)
     See(FourthNearestEnemyOf(Myself))
     False()
 THEN
@@ -320,7 +246,7 @@ END
 IF
     !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCOLD)
     See(ThirdNearestEnemyOf(Myself))
     False()
 THEN
@@ -331,7 +257,7 @@ END
 IF
     !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCOLD)
     See(SecondNearestEnemyOf(Myself))
     False()
 THEN
@@ -342,7 +268,7 @@ END
 IF
     !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(NearestEnemyOf(Myself),100,RESISTFIRE)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCOLD)
     See(NearestEnemyOf(Myself))
     False()
 THEN
@@ -354,7 +280,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player6,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player6,STATE_IMMOBILE)
-    CheckStatLT(Player6,100,RESISTFIRE)
+    CheckStatLT(Player6,100,RESISTCOLD)
     See(Player6)
     False()
 THEN
@@ -366,7 +292,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player5,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player5,STATE_IMMOBILE)
-    CheckStatLT(Player5,100,RESISTFIRE)
+    CheckStatLT(Player5,100,RESISTCOLD)
     See(Player5)
     False()
 THEN
@@ -378,7 +304,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player4,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player4,STATE_IMMOBILE)
-    CheckStatLT(Player4,100,RESISTFIRE)
+    CheckStatLT(Player4,100,RESISTCOLD)
     See(Player4)
     False()
 THEN
@@ -390,7 +316,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player3,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player3,STATE_IMMOBILE)
-    CheckStatLT(Player3,100,RESISTFIRE)
+    CheckStatLT(Player3,100,RESISTCOLD)
     See(Player3)
     False()
 THEN
@@ -402,7 +328,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player2,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player2,STATE_IMMOBILE)
-    CheckStatLT(Player2,100,RESISTFIRE)
+    CheckStatLT(Player2,100,RESISTCOLD)
     See(Player2)
     False()
 THEN
@@ -414,7 +340,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player1,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player1,STATE_IMMOBILE)
-    CheckStatLT(Player1,100,RESISTFIRE)
+    CheckStatLT(Player1,100,RESISTCOLD)
     See(Player1)
     False()
 THEN
@@ -436,7 +362,7 @@ IF
     Allegiance(Myself,EVILCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
     !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)    
-    CheckStatLT(LastSeenBy(Myself),100,RESISTFIRE)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTCOLD)
 THEN
     RESPONSE #100
         AttackReevaluate(LastSeenBy(Myself),15)
@@ -449,7 +375,7 @@ IF
     !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
     !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
-    CheckStatLT(LastSeenBy(Myself),100,RESISTFIRE)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTCOLD)
 THEN
     RESPONSE #100
         AttackReevaluate(LastSeenBy(Myself),15)
@@ -458,7 +384,7 @@ END
 IF
     Allegiance(Myself,EVILCUTOFF)
     !GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
-    Help([EVILCUTOFF.0.ELEMENTAL.ELEMENTAL_FIRE])
+    Help([EVILCUTOFF.0.ELEMENTAL])
     InMyArea(LastHelp(Myself))
     !StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN
