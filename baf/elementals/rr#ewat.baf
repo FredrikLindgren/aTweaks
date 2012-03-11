@@ -5,7 +5,7 @@ IF
       See(NearestEnemyOf(Myself))
       AttackedBy([ANYONE],DEFAULT)
       TookDamage()
-      Help([EVILCUTOFF.0.ELEMENTAL.ELEMENTAL_AIR])
+      Help([EVILCUTOFF.0.ELEMENTAL])
 THEN
     RESPONSE #100
         SetGlobal("RR#Active","LOCALS",1)
@@ -72,201 +72,6 @@ THEN
 END
 
 IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,7,LEVEL) // 8 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),3,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),3,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),3,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,11,LEVEL) // 12 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),4,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),4,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),4,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,11,LEVEL) // 12 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),4,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),4,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),4,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,15,LEVEL) // 16 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),5,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),5,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),5,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,19,LEVEL) // 20 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),6,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),6,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),6,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    CheckStatGT(Myself,23,LEVEL) // 24 HD Air Elemental
-    OR(3)
-      CheckStatLT(ThirdNearestEnemyOf(Myself),7,LEVEL)
-      CheckStatLT(SecondNearestEnemyOf(Myself),7,LEVEL)
-      CheckStatLT(NearestEnemyOf(Myself),7,LEVEL)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    Allegiance(Myself,GOODCUTOFF)
-    HaveSpellRES("rr#eairw") // Whirlwind
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    NumCreatureGT([EVILCUTOFF],2) // at least three opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
-    Range([EVILCUTOFF],12)
-    Range(SecondNearest([EVILCUTOFF]),12)
-    Range(ThirdNearest([EVILCUTOFF]),12)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    Allegiance(Myself,EVILCUTOFF)
-    HaveSpellRES("rr#eairw") // Whirlwind
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    NumCreatureGT([GOODCUTOFF],2) // at least three opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
-    Range([GOODCUTOFF],12)
-    Range(SecondNearest([GOODCUTOFF]),12)
-    Range(ThirdNearest([GOODCUTOFF]),12)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    Allegiance(Myself,GOODCUTOFF)
-    HaveSpellRES("rr#eairw") // Whirlwind
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#eairw","LOCALS") // whirlwind timer
-    NumCreatureGT([EVILCUTOFF],1) // at least two opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
-    Range([EVILCUTOFF],12)
-    Range(SecondNearest([EVILCUTOFF]),12)
-    Range(ThirdNearest([EVILCUTOFF]),12)
-THEN
-    RESPONSE #70
-        SetGlobalTimer("rr#eairw","LOCALS",12) // whirlwind timer
-    RESPONSE #30
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    Allegiance(Myself,EVILCUTOFF)
-    HaveSpellRES("rr#eairw") // Whirlwind
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#eairw","LOCALS") // whirlwind timer
-    NumCreatureGT([GOODCUTOFF],1) // at least two opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
-    Range([GOODCUTOFF],12)
-    Range(SecondNearest([GOODCUTOFF]),12)
-    Range(ThirdNearest([GOODCUTOFF]),12)
-THEN
-    RESPONSE #70
-        SetGlobalTimer("rr#eairw","LOCALS",12) // whirlwind timer
-    RESPONSE #30
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    HaveSpellRES("rr#eairw") // Whirlwind
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#eairw","LOCALS") // whirlwind timer
-    Range(NearestEnemyOf(Myself),12) // at least one opponent is nearby
-THEN
-    RESPONSE #85
-        SetGlobalTimer("rr#eairw","LOCALS",12) // whirlwind timer
-    RESPONSE #15
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#eairw",Myself) // Whirlwind
-        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
     Allegiance(Myself,EVILCUTOFF)
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
     HaveSpellRES("rr#ecncl") // Elemental Concealment
@@ -290,8 +95,8 @@ THEN
 END
 
 IF
-    ActionListEmpty()
     Allegiance(Myself,GOODCUTOFF)
+    ActionListEmpty()
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
     HaveSpellRES("rr#ecncl") // Elemental Concealment
     !StateCheck(Myself,STATE_INVISIBLE)
@@ -317,8 +122,99 @@ THEN
 END
 
 IF
+    CheckStatGT(Myself,15,LEVEL) // only Greater Water Elementals and above can drown victims
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(NearestEnemyOfType([0.HUMANOID]))
+    Range(LastSeenBy(Myself),6)
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+END
+
+IF
+    CheckStatGT(Myself,15,LEVEL) // only Greater Water Elementals and above can drown victims
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(SecondNearestEnemyOfType([0.HUMANOID]))
+    Range(LastSeenBy(Myself),6)
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+END
+
+IF
+    CheckStatGT(Myself,15,LEVEL) // only Greater Water Elementals and above can drown victims
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(ThirdNearestEnemyOfType([0.HUMANOID]))
+    Range(LastSeenBy(Myself),6)
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+END
+
+IF
+    CheckStatGT(Myself,15,LEVEL) // only Greater Water Elementals and above can drown victims
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(FourthNearestEnemyOfType([0.HUMANOID]))
+    Range(LastSeenBy(Myself),6)
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+END
+
+IF
+    CheckStatGT(Myself,15,LEVEL) // only Greater Water Elementals and above can drown victims
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(FifthNearestEnemyOfType([0.HUMANOID]))
+    Range(LastSeenBy(Myself),6)
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+END
+
+IF
+    CheckStatGT(Myself,15,LEVEL) // only Greater Water Elementals and above can drown victims
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(SixthNearestEnemyOfType([0.HUMANOID]))
+    Range(LastSeenBy(Myself),6)
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF) // only needed for summoned creatures
     !GlobalTimerNotExpired("rr#clear","LOCALS") // prevent the creature from getting stuck in an attack pattern because ActionListEmpty() is used above
-    See(NearestEnemyOf(Myself)) // note: Air Elementals need this block whether they are GOODCUTOFF or EVILCUTOFF
+    See(NearestEnemyOf(Myself))
 THEN
     RESPONSE #100
         SetGlobalTimer("rr#clear","LOCALS",6)
@@ -341,8 +237,8 @@ THEN
 END
 
 IF
-    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(NearestEnemyOf(Myself))
     False()
 THEN
@@ -351,10 +247,9 @@ THEN
 END
 
 IF
-    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
-    CheckStatLT(SixthNearestEnemyOf(Myself),1,STONESKINS)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(SixthNearestEnemyOf(Myself))
     False()
@@ -366,8 +261,7 @@ END
 IF
     !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCRUSHING)
-    CheckStatLT(FifthNearestEnemyOf(Myself),1,STONESKINS)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(FifthNearestEnemyOf(Myself))
     False()
@@ -379,8 +273,7 @@ END
 IF
     !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCRUSHING)
-    CheckStatLT(FourthNearestEnemyOf(Myself),1,STONESKINS)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(FourthNearestEnemyOf(Myself))
     False()
@@ -392,8 +285,7 @@ END
 IF
     !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCRUSHING)
-    CheckStatLT(ThirdNearestEnemyOf(Myself),1,STONESKINS)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(ThirdNearestEnemyOf(Myself))
     False()
@@ -405,8 +297,7 @@ END
 IF
     !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCRUSHING)
-    CheckStatLT(SecondNearestEnemyOf(Myself),1,STONESKINS)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(SecondNearestEnemyOf(Myself))
     False()
@@ -418,8 +309,7 @@ END
 IF
     !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(NearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCRUSHING)
-    CheckStatLT(NearestEnemyOf(Myself),1,STONESKINS)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(NearestEnemyOf(Myself))
     False()
@@ -433,8 +323,7 @@ IF
     !StateCheck(WorstAC([PC]),STATE_PANIC)
     !StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
     !CheckStatGT(WorstAC([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    CheckStatLT(WorstAC([PC]),100,RESISTCRUSHING)
-    CheckStatLT(WorstAC([PC]),1,STONESKINS)
+    CheckStatLT(WorstAC([PC]),100,RESISTSLASHING)
     See(WorstAC([PC]))
     False()
 THEN
@@ -446,9 +335,8 @@ IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)
     !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
-    CheckStatLT(LastAttackerOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
     !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
-    CheckStatLT(LastAttackerOf(Myself),1,STONESKINS)
     Range(LastAttackerOf(Myself),8)
     RandomNum(3,1)
     See(LastAttackerOf(Myself))
@@ -462,9 +350,8 @@ IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)
     !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
-    CheckStatLT(LastAttackerOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
     !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
-    CheckStatLT(LastAttackerOf(Myself),1,STONESKINS)
     Range(LastAttackerOf(Myself),4)
     See(LastAttackerOf(Myself))
     False()
@@ -474,9 +361,9 @@ THEN
 END
 
 IF
-    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(SixthNearestEnemyOf(Myself))
     False()
 THEN
@@ -487,7 +374,7 @@ END
 IF
     !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(FifthNearestEnemyOf(Myself))
     False()
 THEN
@@ -498,7 +385,7 @@ END
 IF
     !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(FourthNearestEnemyOf(Myself))
     False()
 THEN
@@ -509,7 +396,7 @@ END
 IF
     !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(ThirdNearestEnemyOf(Myself))
     False()
 THEN
@@ -520,7 +407,7 @@ END
 IF
     !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(SecondNearestEnemyOf(Myself))
     False()
 THEN
@@ -531,7 +418,7 @@ END
 IF
     !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTSLASHING)
     See(NearestEnemyOf(Myself))
     False()
 THEN
@@ -543,7 +430,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player6,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player6,STATE_IMMOBILE)
-    CheckStatLT(Player6,100,RESISTCRUSHING)
+    CheckStatLT(Player6,100,RESISTSLASHING)
     See(Player6)
     False()
 THEN
@@ -555,7 +442,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player5,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player5,STATE_IMMOBILE)
-    CheckStatLT(Player5,100,RESISTCRUSHING)
+    CheckStatLT(Player5,100,RESISTSLASHING)
     See(Player5)
     False()
 THEN
@@ -567,7 +454,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player4,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player4,STATE_IMMOBILE)
-    CheckStatLT(Player4,100,RESISTCRUSHING)
+    CheckStatLT(Player4,100,RESISTSLASHING)
     See(Player4)
     False()
 THEN
@@ -579,7 +466,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player3,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player3,STATE_IMMOBILE)
-    CheckStatLT(Player3,100,RESISTCRUSHING)
+    CheckStatLT(Player3,100,RESISTSLASHING)
     See(Player3)
     False()
 THEN
@@ -591,7 +478,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player2,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player2,STATE_IMMOBILE)
-    CheckStatLT(Player2,100,RESISTCRUSHING)
+    CheckStatLT(Player2,100,RESISTSLASHING)
     See(Player2)
     False()
 THEN
@@ -603,7 +490,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player1,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player1,STATE_IMMOBILE)
-    CheckStatLT(Player1,100,RESISTCRUSHING)
+    CheckStatLT(Player1,100,RESISTSLASHING)
     See(Player1)
     False()
 THEN
@@ -625,7 +512,7 @@ IF
     Allegiance(Myself,EVILCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
     !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)    
-    CheckStatLT(LastSeenBy(Myself),100,RESISTCRUSHING)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
 THEN
     RESPONSE #100
         AttackReevaluate(LastSeenBy(Myself),15)
@@ -638,7 +525,7 @@ IF
     !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
     !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
-    CheckStatLT(LastSeenBy(Myself),100,RESISTCRUSHING)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
 THEN
     RESPONSE #100
         AttackReevaluate(LastSeenBy(Myself),15)
@@ -647,7 +534,7 @@ END
 IF
     Allegiance(Myself,EVILCUTOFF)
     !GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
-    Help([EVILCUTOFF.0.ELEMENTAL.ELEMENTAL_AIR])
+    Help([EVILCUTOFF.0.ELEMENTAL])
     InMyArea(LastHelp(Myself))
     !StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN

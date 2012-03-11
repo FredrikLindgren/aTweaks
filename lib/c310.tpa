@@ -3506,12 +3506,25 @@ LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                          
   "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
   "duration" = "0"                                                                 // duration: 0
   "sectype" = "0"                                                                  // secondary type: none
-  "parameter1" = "16777216"                                                        // param1: (RGB colour)
+  "parameter1" = "50397184"                                                        // param1: (RGB colour)
   "parameter2" = "2"                                                               // param2: (location)
   "probability1" = "100"                                                           // probability1: 100%
   STR_VAR                                                                          // initialize string variables
   "effsource" = ""                                                                 // effsource: none
 END
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "66"                                                                  // effect: #66 (transparency fade)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "75"                                                              // param1: (fade amount)
+  "parameter2" = "0"                                                               // param2: 0
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+END                                                                                // ends FUNCTION call
 PATCH_FOR_EACH ~rr#color~ IN ~9~ ~50~ BEGIN                                        // grant immunity to the color glow/pulse effects (they disrupt aTweaks' re-coloring)
 LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call
   INT_VAR                                                                          // initialize variables
@@ -3527,7 +3540,7 @@ LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                          
   "effsource" = ""                                                                 // effsource: none
 END                                                                                // ends LAUNCH_PATCH_FUNCTION
 END                                                                                // ends PATCH_FOR_EACH
-  WRITE_BYTE 0x2E 17                                                               // major color (Light Blue)
+  WRITE_BYTE 0x2E 57                                                               // major color (Light Blue)
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block

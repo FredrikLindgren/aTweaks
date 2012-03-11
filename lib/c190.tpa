@@ -282,7 +282,10 @@ COPY ~atweaks/itm/elementals/rr#efirl.itm~ ~override~                           
 COPY ~atweaks/itm/elementals/rr#efirr.itm~ ~override~                              // Fire Elemental attack
 COPY ~atweaks/itm/elementals/rr#efirg.itm~ ~override~                              // Greater Fire Elemental attack
 COPY ~atweaks/itm/elementals/rr#efire.itm~ ~override~                              // Elder Fire Elemental attack
-
+COPY ~atweaks/itm/elementals/rr#ewatl.itm~ ~override~                              // Lesser Water Elemental attack
+COPY ~atweaks/itm/elementals/rr#ewatr.itm~ ~override~                              // Water Elemental attack
+COPY ~atweaks/itm/elementals/rr#ewatg.itm~ ~override~                              // Greater Water Elemental attack
+COPY ~atweaks/itm/elementals/rr#ewate.itm~ ~override~                              // Elder Water Elemental attack
 COPY ~atweaks/itm/elementals/rr#eicer.itm~ ~override~                              // Ice Paraelemental attack
 
 
@@ -1681,6 +1684,239 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+// Lesser Water Elemental (8 HD)
+
+COPY    ~atweaks/cre/elementals/rr#ewatl.cre~ ~override~                           // Lesser Water Elemental (hostile)
+SAY NAME1 @2126 SAY NAME2 @2126 SAY SELECT_COMMON1 @471 SAY BATTLE_CRY1 @471 SAY BATTLE_CRY2 @472 SAY ATTACK1 @473 SAY ATTACK2 @474 SAY DAMAGE @475 SAY DYING @476 SAY SELECT_ACTION1 @477
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~rr#ewatl~                                                             // Lesser Water Elemental (aTweaks)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newmove"  = "5"                                                                   // new movement rate
+"newxpv"   = "2000"                                                                // new XP value
+"newhp"    = "64"                                                                  // new hit point value
+"newac"    = "4"                                                                   // new Armor Class value
+"newth"    = "13"                                                                  // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "10"                                                                  // new Save vs. Death
+"newsvw"   = "12"                                                                  // new Save vs. Wand
+"newsvp"   = "11"                                                                  // new Save vs. Polymorph
+"newsvb"   = "12"                                                                  // new Save vs. Breath
+"newsvs"   = "13"                                                                  // new Save vs. Spell
+"newlvl1"  = "8"                                                                   // new level (first class)
+"newstr"   = "13"                                                                  // new Strength value
+"newdex"   = "11"                                                                  // new Dexterity value
+"newcon"   = "18"                                                                  // new Constitution value
+"newint"   = "7"                                                                   // new Intelligence value
+"newwis"   = "7"                                                                   // new Wisdom value
+"newchr"   = "7"                                                                   // new Charisma value
+"newmor"   = "14"                                                                  // new morale value
+"newmorb"  = "4"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "255"                                                                 // new general (MONSTER)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "255"                                                                 // new class (NO_CLASS)
+"newalign" = "34"                                                                  // new alignment (True Neutral)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#EWAT"                                                           // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+END                                                                                // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Water Elemental (12 HD)
+
+COPY    ~atweaks/cre/elementals/rr#ewatr.cre~ ~override~                           // Water Elemental (hostile)
+SAY NAME1 @2119 SAY NAME2 @2119 SAY SELECT_COMMON1 @471 SAY BATTLE_CRY1 @471 SAY BATTLE_CRY2 @472 SAY ATTACK1 @473 SAY ATTACK2 @474 SAY DAMAGE @475 SAY DYING @476 SAY SELECT_ACTION1 @477
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~rr#ewatr~                                                             // Water Elemental (aTweaks)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newmove"  = "5"                                                                   // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
+"newxpv"   = "6000"                                                                // new XP value
+"newhp"    = "96"                                                                  // new hit point value
+"newac"    = "2"                                                                   // new Armor Class value
+"newth"    = "9"                                                                   // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "7"                                                                   // new Save vs. Death
+"newsvw"   = "9"                                                                   // new Save vs. Wand
+"newsvp"   = "8"                                                                   // new Save vs. Polymorph
+"newsvb"   = "8"                                                                   // new Save vs. Breath
+"newsvs"   = "10"                                                                  // new Save vs. Spell
+"newlvl1"  = "12"                                                                  // new level (first class)
+"newstr"   = "15"                                                                  // new Strength value
+"newdex"   = "12"                                                                  // new Dexterity value
+"newcon"   = "20"                                                                  // new Constitution value
+"newint"   = "7"                                                                   // new Intelligence value
+"newwis"   = "7"                                                                   // new Wisdom value
+"newchr"   = "7"                                                                   // new Charisma value
+"newmor"   = "16"                                                                  // new morale value
+"newmorb"  = "3"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "5"                                                                   // new general (GIANT HUMANOID)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "255"                                                                 // new class (NO_CLASS)
+"newalign" = "34"                                                                  // new alignment (True Neutral)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#EWAT"                                                           // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+END                                                                                // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Greater Water Elemental (16 HD)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~ELWATG01~                                                             // Greater Water Elemental
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+SAY SELECT_COMMON1 @471 SAY BATTLE_CRY1 @471 SAY BATTLE_CRY2 @472 SAY ATTACK1 @473 SAY ATTACK2 @474 SAY DAMAGE @475 SAY DYING @476 SAY SELECT_ACTION1 @477
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
+REMOVE_CRE_ITEM ~WALLPASS~                                                         // remove wallpass item
+ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
+REPLACE_CRE_ITEM ~RR#EWATG~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newmove"  = "5"                                                                   // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
+"newxpv"   = "10000"                                                               // new XP value
+"newhp"    = "128"                                                                 // new hit point value
+"newac"    = "1"                                                                   // new Armor Class value
+"newth"    = "5"                                                                   // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "4"                                                                   // new Save vs. Death
+"newsvw"   = "6"                                                                   // new Save vs. Wand
+"newsvp"   = "5"                                                                   // new Save vs. Polymorph
+"newsvb"   = "4"                                                                   // new Save vs. Breath
+"newsvs"   = "7"                                                                   // new Save vs. Spell
+"newmr"    = "25"                                                                  // new Magic Resistance value
+"newlvl1"  = "16"                                                                  // new level (first class)
+"newstr"   = "17"                                                                  // new Strength value
+"newdex"   = "14"                                                                  // new Dexterity value
+"newcon"   = "22"                                                                  // new Constitution value
+"newint"   = "10"                                                                  // new Intelligence value
+"newwis"   = "10"                                                                  // new Wisdom value
+"newchr"   = "10"                                                                  // new Charisma value
+"newmor"   = "18"                                                                  // new morale value
+"newmorb"  = "2"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "5"                                                                   // new general (GIANT HUMANOID)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "255"                                                                 // new class (NO_CLASS)
+"newalign" = "34"                                                                  // new alignment (True Neutral)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#EWAT"                                                           // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "WTASIGHT"                                                          // generic AI script
+"script04"   = "WDASIGHT"                                                          // generic AI script
+"script05"   = "GENSHT01"                                                          // generic shout script
+"script06"   = "dw#melee"                                                          // SCSII melee AI script
+"script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
+END                                                                                // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Elder Water Elemental (20 HD)
+
+COPY    ~atweaks/cre/elementals/rr#ewate.cre~ ~override~                           // Elder Water Elemental (hostile)
+SAY NAME1 @2118 SAY NAME2 @2118 SAY SELECT_COMMON1 @471 SAY BATTLE_CRY1 @471 SAY BATTLE_CRY2 @472 SAY ATTACK1 @473 SAY ATTACK2 @474 SAY DAMAGE @475 SAY DYING @476 SAY SELECT_ACTION1 @477
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~rr#ewate~                                                             // Elder Water Elemental (aTweaks)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
+ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
+"newxpv"   = "14000"                                                               // new XP value
+"newhp"    = "160"                                                                 // new hit point value
+"newac"    = "0"                                                                   // new Armor Class value
+"newth"    = "1"                                                                   // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "3"                                                                   // new Save vs. Death
+"newsvw"   = "5"                                                                   // new Save vs. Wand
+"newsvp"   = "4"                                                                   // new Save vs. Polymorph
+"newsvb"   = "4"                                                                   // new Save vs. Breath
+"newsvs"   = "6"                                                                   // new Save vs. Spell
+"newmr"    = "50"                                                                  // new Magic Resistance value
+"newlvl1"  = "20"                                                                  // new level (first class)
+"newstr"   = "18"                                                                  // new Strength value
+"newdex"   = "16"                                                                  // new Dexterity value
+"newcon"   = "23"                                                                  // new Constitution value
+"newint"   = "12"                                                                  // new Intelligence value
+"newwis"   = "12"                                                                  // new Wisdom value
+"newchr"   = "12"                                                                  // new Charisma value
+"newmor"   = "19"                                                                  // new morale value
+"newmorb"  = "1"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "5"                                                                   // new general (GIANT HUMANOID)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "255"                                                                 // new class (NO_CLASS)
+"newalign" = "34"                                                                  // new alignment (True Neutral)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#EWAT"                                                           // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+END                                                                                // ends FUNCTION call
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
 // Ice Paraelemental (12 HD)
 
 COPY    ~atweaks/cre/elementals/rr#eicer.cre~ ~override~                           // Ice Paraelemental (hostile)
@@ -1740,6 +1976,8 @@ END                                                                             
 
 
 
+
+
 //////////////////
 // New AI Scripts
 //////////////////
@@ -1755,10 +1993,9 @@ COMPILE ~atweaks/baf/elementals/rr#ewwei.baf~                                   
 COMPILE ~atweaks/baf/elementals/rr#eair.baf~                                       // Air Elemental AI script
 COMPILE ~atweaks/baf/elementals/rr#eear.baf~                                       // Earth Elemental AI script
 COMPILE ~atweaks/baf/elementals/rr#efir.baf~                                       // Fire Elemental AI script
-COMPILE ~atweaks/baf/elementals/rr#eice.baf~                                       // Ice Paraelemental AI script
-/*
 COMPILE ~atweaks/baf/elementals/rr#ewat.baf~                                       // Water Elemental AI script
-*/
+COMPILE ~atweaks/baf/elementals/rr#eice.baf~                                       // Ice Paraelemental AI script
+
 
 
 
@@ -2109,3 +2346,22 @@ END
 ACTION_IF GAME_IS ~bgt~ THEN BEGIN
   EXTEND_BOTTOM ~aru009.bcs~  ~atweaks/inlined/baf/elementals/bg1009.baf~          // extend the Ice Island dungeon area script (BGT)
 END
+
+
+// Slightly tweak Water Elemetal spawns in Abazigal's lair
+
+COPY_EXISTING ~ptelew01.bcs~ ~override~
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~ICRMPARI~ ~rr#envlp~ // use aTweaks visual effect
+  REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreatureImpassable~ ~CreateCreature~ // spawn the creatures in a passable area
+  REPLACE_TEXTUALLY EXACT_MATCH ~ELWATG01~ ~rr#ewate~ // Replace Greater with Elder Water Elementals
+COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
+
+COPY_EXISTING ~ptelew02.bcs~ ~override~
+              ~ptelew03.bcs~ ~override~
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~ICRMPARI~ ~rr#envlp~ // use aTweaks visual effect
+  REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreatureImpassable~ ~CreateCreature~ // spawn the creatures in a passable area
+COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
