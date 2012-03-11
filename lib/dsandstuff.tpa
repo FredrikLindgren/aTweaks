@@ -200,3 +200,47 @@ BUT_ONLY_IF_IT_CHANGES
 // Revised Critical Hit feedback string (removes helmet reference)
 
 STRING_SET ~20696~ @2122   // Critical Hit Averted
+
+
+// Externalize cause wound item effects to spells
+
+COPY ~atweaks/spl/rr#csw.spl~ ~override~                                           // Cause Serious Wounds (shell spell)
+COPY ~atweaks/spl/rr#ccw.spl~ ~override~                                           // Cause Critical Wounds (shell spell)
+COPY ~atweaks/spl/rr#harm.spl~ ~override~                                          // Harm (shell spell)
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY cause_wounds BEGIN
+   serious => rr#csw   // Cause Serious Wounds
+  critical => rr#ccw   // Cause Critical Wounds
+      harm => rr#harm  // Harm
+END
+ACTION_PHP_EACH cause_wounds AS rr#itm => rr#spl BEGIN
+ACTION_IF FILE_EXISTS_IN_GAME ~%rr#itm%.itm~ BEGIN                                 // if the file exists
+COPY_EXISTING ~%rr#itm%.itm~ ~override~
+PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                           // protects against invalid files
+// =============================================================================== // the actual work starts from here
+LAUNCH_PATCH_FUNCTION ~ITEM_EFFECT_TO_SPELL~
+  INT_VAR 
+    "type" = "99"                                                                  // transfer all headers
+  STR_VAR 
+    ~new_itm_spl~ = EVALUATE_BUFFER ~%rr#spl%.spl~                                 // spell file
+END                                                                                // ends LAUNCH_PATCH_FUNCTION
+LAUNCH_PATCH_FUNCTION ~DELETE_ITEM_EFFECT~ INT_VAR "opcode_to_delete" = "-1" END   // delete all effects from the item's extended header
+LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EFFECT~                                            // Starts FUNCTION call
+  INT_VAR                                                                          // initialize variables
+    "opcode" = "146"                                                               // effect: #146 (Cast Spell at Target)
+    "target" = "2"                                                                 // target: 1 (Pre-Target)
+    "timing" = "1"                                                                 // timing mode: 1 (Permanent)
+    "duration" = "0"                                                               // duration: 0
+    "sectype" = "0"                                                                // secondary type: none
+    "parameter2" = "1"                                                             // param2: 1 (Cast Instantly)
+    "probability1" = "100"                                                         // probability1: 100%
+    "type" = "99"                                                                  // header: 99 (all headers)
+  STR_VAR                                                                          // initialize strings
+    "resource"  = EVALUATE_BUFFER "%rr#spl%"                                       // resref: spell
+    "effsource" = ""                                                               // effsource: none
+  END                                                                              // ends LAUNCH_PATCH_FUNCTION
+// =============================================================================== // the actual work ends here
+END                                                                                // ends PATCH_IF block
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_PHP_EACH

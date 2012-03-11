@@ -186,7 +186,7 @@ COPY ~atweaks/spl/elementals/rr#eairw.spl~ ~override~                           
 COPY ~atweaks/spl/elementals/rr#ecncl.spl~ ~override~                              // Elemental Concealment
 SAY NAME1 @2123 SAY NAME2 @2123
 
-COPY ~atweaks/spl/elementals/rr#equak.spl~ ~override~                              // Earthquake
+COPY ~atweaks/spl/elementals/rr#equa.spl~ ~override~                               // Earthquake (note: this filename must be 7 characters or less)
 
 COPY ~atweaks/eff/elementals/rr#eburn.eff~ ~override~                              // Burn immunity EFF (for noncombustible creatures)
 COPY ~atweaks/spl/elementals/rr#eburn.spl~ ~override~                              // Burn (Fire Elemental on-hit effect)
@@ -362,6 +362,7 @@ END                                                                             
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
              ~hgsal01~                                                             // Fire Salamander
             ~icsalfir~                                                             // Fire Salamander (Planar Sphere)
+             ~plysala~                                                             // Fire Salamander (Avenger kit shapechange)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -1272,7 +1273,7 @@ PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~UDEARTH~) BEGIN                     
 END                                                                                // ends PATCH_IF
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
-ADD_MEMORIZED_SPELL ~rr#equak~ #0 ~innate~ ( 1 )                                   // adds 1x Earthquake
+ADD_MEMORIZED_SPELL ~rr#equa~ #0 ~innate~ ( 1 )                                    // adds 1x Earthquake
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EEARG~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
@@ -1344,7 +1345,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 SAY NAME1 @2116 SAY NAME2 @2116                                                    // Elder Earth Elemental
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
-ADD_MEMORIZED_SPELL ~rr#equak~ #0 ~innate~ ( 1 )                                   // adds 1x Earthquake
+ADD_MEMORIZED_SPELL ~rr#equa~ #0 ~innate~ ( 1 )                                    // adds 1x Earthquake
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EEARE~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
@@ -1431,6 +1432,7 @@ INT_VAR                                                                         
 "newsvp"   = "11"                                                                  // new Save vs. Polymorph
 "newsvb"   = "12"                                                                  // new Save vs. Breath
 "newsvs"   = "13"                                                                  // new Save vs. Spell
+"newfr"    = "100"                                                                 // new Resist Fire value
 "newlvl1"  = "8"                                                                   // new level (first class)
 "newstr"   = "10"                                                                  // new Strength value
 "newdex"   = "14"                                                                  // new Dexterity value
@@ -1459,6 +1461,8 @@ STR_VAR                                                                         
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1480,6 +1484,7 @@ ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                
 COPY_EXISTING ~%file%.cre~ ~override~
 LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
 // =============================================================================== // the actual work starts from here
+WRITE_SHORT 0x28 "29456"                                                           // use the proper avatar (ELEMENTAL_FIRE)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
@@ -1497,6 +1502,7 @@ INT_VAR                                                                         
 "newsvp"   = "8"                                                                   // new Save vs. Polymorph
 "newsvb"   = "8"                                                                   // new Save vs. Breath
 "newsvs"   = "10"                                                                  // new Save vs. Spell
+"newfr"    = "100"                                                                 // new Resist Fire value
 "newlvl1"  = "12"                                                                  // new level (first class)
 "newstr"   = "12"                                                                  // new Strength value
 "newdex"   = "15"                                                                  // new Dexterity value
@@ -1526,6 +1532,8 @@ STR_VAR                                                                         
 "skipfile01" = "SHFIRE"                                                            // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1579,6 +1587,7 @@ INT_VAR                                                                         
 "newsvb"   = "4"                                                                   // new Save vs. Breath
 "newsvs"   = "7"                                                                   // new Save vs. Spell
 "newmr"    = "25"                                                                  // new Magic Resistance value
+"newfr"    = "100"                                                                 // new Resist Fire value
 "newlvl1"  = "16"                                                                  // new level (first class)
 "newstr"   = "14"                                                                  // new Strength value
 "newdex"   = "16"                                                                  // new Dexterity value
@@ -1608,6 +1617,8 @@ STR_VAR                                                                         
 "script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1649,6 +1660,7 @@ INT_VAR                                                                         
 "newsvb"   = "4"                                                                   // new Save vs. Breath
 "newsvs"   = "6"                                                                   // new Save vs. Spell
 "newmr"    = "50"                                                                  // new Magic Resistance value
+"newfr"    = "100"                                                                 // new Resist Fire value
 "newlvl1"  = "20"                                                                  // new level (first class)
 "newstr"   = "16"                                                                  // new Strength value
 "newdex"   = "17"                                                                  // new Dexterity value
@@ -1678,6 +1690,8 @@ STR_VAR                                                                         
 "skipfile01" = "DRUFIR01"                                                          // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1733,6 +1747,8 @@ STR_VAR                                                                         
 "script01"   = ""                                                                  // first AI script name
 "script02"   = "None"                                                              // second AI script name
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1789,6 +1805,8 @@ STR_VAR                                                                         
 "script01"   = ""                                                                  // first AI script name
 "script02"   = "None"                                                              // second AI script name
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1853,6 +1871,8 @@ STR_VAR                                                                         
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1911,6 +1931,8 @@ STR_VAR                                                                         
 "script01"   = ""                                                                  // first AI script name
 "script02"   = "None"                                                              // second AI script name
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -2001,9 +2023,186 @@ COMPILE ~atweaks/baf/elementals/rr#eice.baf~                                    
 
 
 
-//////////////////////////////////////
-// Revised Conjure Elemental spells //
-//////////////////////////////////////
+////////////////////
+// Revised spells //
+////////////////////
+
+// Make shapechange spells grant the proper elemental traits
+
+COPY ~atweaks/itm/elementals/rr#eshfe.itm~ ~override~                              // Druid Fire Elemental transformation attack
+     ~atweaks/itm/elementals/rr#eshfr.itm~ ~override~                              // Shapechange Fire Elemental attack
+     ~atweaks/itm/elementals/rr#eshee.itm~ ~override~                              // Druid Earth Elemental transformation attack
+     ~atweaks/itm/elementals/rr#esher.itm~ ~override~                              // Shapechange Earth Elemental attack
+LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
+LAUNCH_PATCH_FUNCTION ~bleeding_immunity~ END                                      // add bleeding immunity
+LAUNCH_PATCH_FUNCTION ~disease_immunity~ END                                       // add disease immunity
+LAUNCH_PATCH_FUNCTION ~poison_immunity~ END                                        // add poison immunity
+LAUNCH_PATCH_FUNCTION ~poison_spell_immunities~ END                                // add immunity to poison-based spells
+LAUNCH_PATCH_FUNCTION ~insect_spell_immunities~ END                                // add immunity to insect spells
+
+COPY_EXISTING ~rr#eshfe.itm~ ~override~                                            // Druid Fire Elemental transformation attack
+              ~rr#eshfr.itm~ ~override~                                            // Shapechange Fire Elemental attack
+LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
+
+
+COPY ~atweaks/itm/elementals/rr#eshsa.itm~ ~override~                              // Avenger kit Fire Salamander transformation attack
+LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
+LAUNCH_PATCH_FUNCTION fire_salamander_immunities END                               // grant fire salamander immunities
+LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
+
+
+COPY_EXISTING ~sppr731.spl~ ~override~                                             // Fire Elemental Transformation
+              ~spin156.spl~ ~override~                                             // Shapechange Fire Elemental
+              ~spin157.spl~ ~override~                                             // Shapechange Earth Elemental
+              ~spcl634.spl~ ~override~                                             // Shapeshifts Fire Salamander
+READ_LONG  0x64 "abil_off"
+READ_SHORT 0x68 "abil_num"
+READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
+      READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "resref"
+      PATCH_IF ("%opcode%" = 111 AND "%resref%" STRING_EQUAL_CASE ~DRUFIR~) BEGIN  // effect #111: Create Magical Weapon
+       WRITE_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "rr#eshfe" #8 // use aTweaks' item
+      END
+      PATCH_IF ("%opcode%" = 111 AND "%resref%" STRING_EQUAL_CASE ~FIRERN~) BEGIN  // effect #111: Create Magical Weapon
+       WRITE_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "rr#eshfr" #8 // use aTweaks' item
+      END
+      PATCH_IF ("%opcode%" = 111 AND "%resref%" STRING_EQUAL_CASE ~EARTHRN~) BEGIN  // effect #111: Create Magical Weapon
+       WRITE_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "rr#esher" #8 // use aTweaks' item
+      END
+      PATCH_IF ("%opcode%" = 111 AND "%resref%" STRING_EQUAL_CASE ~PLYSALA~) BEGIN  // effect #111: Create Magical Weapon
+       WRITE_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "rr#eshsa" #8 // use aTweaks' item
+      END
+    END
+  END
+
+// Remove Breathe Fireball ability from Fire Salamanders
+
+COPY_EXISTING ~spcl634.spl~ ~override~                                             // Shapeshifts Fire Salamander
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  SET "delta" = 0
+  FOR ("index" = 0; "%index%" < "%abil_num%"; "index" = ("%index%" + 1)) BEGIN // loop through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + ("%index%" * 0x28)) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + ("%index%" * 0x28)) "abil_fx_idx"
+    SET "abil_fx_idx" = ("%abil_fx_idx%" + "%delta%")
+    WRITE_SHORT ("%abil_off%" + 0x20 + ("%index%" * 0x28)) "abil_fx_idx"
+    FOR ("index2" = 0; "%index2%" < "%abil_fx_num%"; "index2" = ("%index2%" + 1)) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
+      READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "resref"
+      PATCH_IF ((("%opcode%" = 171) OR ("%opcode%" = 172)) AND ("%resref%" STRING_EQUAL_CASE ~SPIN160~)) BEGIN  // effect #171 or #171
+        DELETE_BYTES ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) 0x30 // delete effect
+        SET "abil_fx_num" = ("%abil_fx_num%" - 1)
+        SET "index2" = ("%index2%" - 1)
+        SET "delta" = ("%delta%" - 1)
+      END
+    END
+    WRITE_SHORT ("%abil_off%" + 0x1e + ("%index%" * 0x28)) "%abil_fx_num%"
+  END
+  BUT_ONLY_IF_IT_CHANGES
+
+
+COPY_EXISTING ~sppr732.spl~ ~override~                                             // Earth Elemental Transformation
+READ_LONG  0x64 "abil_off"
+READ_SHORT 0x68 "abil_num"
+READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
+      READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "resref"
+      PATCH_IF ("%opcode%" = 111 AND "%resref%" STRING_EQUAL_CASE ~DRUEAR~) BEGIN  // effect #111: Create Magical Weapon
+       WRITE_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "rr#eshee" #8 // use aTweaks' item
+      END
+    END
+  END
+LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                           // Start FUNCTION call (add Spell Effect)
+  INT_VAR                                                                          // initialize variables
+    "opcode" = "171"                                                               // effect: #171 (Give Innate Ability)
+    "target" = "1"                                                                 // target: 1 (self)
+    "timing" = "0"                                                                 // timing mode: 0 (duration)
+    "probability1" = "100"                                                         // probability1: 100%
+    "duration" = "3600000"                                                         // duration
+    "sectype" = "0"                                                                // secondary type: none
+    "probability1" = "100"                                                         // probability1: 100%
+  STR_VAR
+    "resource"  = "rr#equa"                                                        // resref
+    "effsource" = ""                                                               // effsource: none
+END                                                                                // ends LAUNCH_PATCH_FUNCTION
+
+
+
+
+// Make sure the aTweaks' weapons and special abilities are removed when shapeshifing back to natural form
+// Note: it appears that opcode #172 won't remove spells that have more than 7 characters in their filename
+
+COPY_EXISTING ~spinhum.spl~ ~override~                                             // Shapeshifts Natural Form
+PATCH_FOR_EACH ~weapon~ IN                                                         // grant the following innate abilities
+             ~rr#eshee~                                                            // Elder Earth Elemental
+             ~rr#eshfe~                                                            // Elder Fire Elemental
+BEGIN
+LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                           // Start FUNCTION call (add Spell Effect)
+  INT_VAR                                                                          // initialize variables
+    "opcode" = "112"                                                               // effect: #112 (Remove Item)
+    "target" = "1"                                                                 // target: 1 (self)
+    "timing" = "1"                                                                 // timing mode: 1 (permanent)
+    "probability1" = "100"                                                         // probability1: 100%
+    "duration" = "0"                                                               // duration: 0
+    "sectype" = "0"                                                                // secondary type: none
+    "probability1" = "100"                                                         // probability1: 100%
+  STR_VAR
+    "resource"  = EVALUATE_BUFFER "%weapon%"                                       // resref
+    "effsource" = ""                                                               // effsource: none
+END                                                                                // ends LAUNCH_PATCH_FUNCTION
+END                                                                                // ends PATCH_FOR_EACH
+LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                           // Start FUNCTION call (add Spell Effect)
+  INT_VAR                                                                          // initialize variables
+    "opcode" = "172"                                                               // effect: #172 (Remove Spell)
+    "target" = "1"                                                                 // target: 1 (self)
+    "timing" = "1"                                                                 // timing mode: 1 (permanent)
+    "probability1" = "100"                                                         // probability1: 100%
+    "duration" = "0"                                                               // duration
+    "sectype" = "0"                                                                // secondary type: none
+    "probability1" = "100"                                                         // probability1: 100%
+  STR_VAR
+    "resource"  = "rr#equa"                                                        // resref
+    "effsource" = ""                                                               // effsource: none
+END                                                                                // ends LAUNCH_PATCH_FUNCTION
+
+
+COPY_EXISTING ~spin151.spl~ ~override~                                             // Shapeshifts Natural Form
+              ~spin152.spl~ ~override~                                             // Shapeshifts Natural Form
+PATCH_FOR_EACH ~weapon~ IN                                                         // grant the following innate abilities
+             ~rr#esher~                                                            // Earth Elemental
+             ~rr#eshfr~                                                            // Fire Elemental
+             ~rr#eshsa~                                                            // Fire Salamander
+BEGIN
+LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                           // Start FUNCTION call (add Spell Effect)
+  INT_VAR                                                                          // initialize variables
+    "opcode" = "112"                                                               // effect: #112 (Remove Item)
+    "target" = "1"                                                                 // target: 1 (self)
+    "timing" = "1"                                                                 // timing mode: 1 (permanent)
+    "probability1" = "100"                                                         // probability1: 100%
+    "duration" = "0"                                                               // duration: 0
+    "sectype" = "0"                                                                // secondary type: none
+    "probability1" = "100"                                                         // probability1: 100%
+  STR_VAR
+    "resource"  = EVALUATE_BUFFER "%weapon%"                                       // resref
+    "effsource" = ""                                                               // effsource: none
+END                                                                                // ends LAUNCH_PATCH_FUNCTION
+END                                                                                // ends PATCH_FOR_EACH
+
+
+
+
+
 
 // Make conjure elemental spells use IWD graphics for the summoning circles
 
@@ -2139,6 +2338,7 @@ ACTION_IF GAME_IS ~bgt tutu tutu_totsc~ THEN BEGIN
   COPY_EXISTING ~%TUTU_VAR%shoal.dlg~ ~override~
   DECOMPILE_DLG_TO_D
     REPLACE_TEXTUALLY EXACT_MATCH ~ForceSpell(Myself,SHOAL_REVIVE)~ ~ForceSpell(Myself,SHOAL_REVIVE) ReallyForceSpellRES("rr#uchrm",Myself)~ // Shoal should uncharm all party members before they face Droth
+    REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride("Droth",MoveToPoint([2900.525]))~ ~ActionOverride("Droth",MoveToObject("Shoal"))~ // Make sure that Droth walks toward Shoal in case she moved away during the battle
   COMPILE_D_TO_DLG
 END
 
