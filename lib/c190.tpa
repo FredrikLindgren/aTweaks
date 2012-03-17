@@ -228,6 +228,8 @@ COPY ~atweaks/spl/elementals/rr#engl2.spl~ ~override~                           
 
 
 
+
+
 // Clone spells into innate abilities
 
 COPY_EXISTING ~SPWI103.SPL~  ~override/RR#WI103.SPL~                               // Clone Burning Hands into an innate ability
@@ -1555,6 +1557,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
             ~OBSFIR06~                                                             // Greater Fire Elemental (16 HD, Planar Sphere)
             ~SUELEW1~                                                              // Greater Fire Elemental (16 HD, summoned, unused?)
             ~SUELEW2~                                                              // Greater Fire Elemental (16 HD, summoned, unused?)
+            ~SWAFIR01~                                                             // Fire Elemental (16 HD, summoned, Elemental Summoning HLA)
             ~TELELFIR~                                                             // Greater Fire Elemental (16 HD, Watcher's Keep)
             ~YSCARA04~                                                             // Greater Fire Elemental (16 HD, unused?)
               ~UDFIRE~                                                             // Fire Elemental (Underdark portal spawn)
@@ -2131,7 +2134,6 @@ LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                        
     "probability1" = "100"                                                         // probability1: 100%
     "duration" = "3600000"                                                         // duration
     "sectype" = "0"                                                                // secondary type: none
-    "probability1" = "100"                                                         // probability1: 100%
   STR_VAR
     "resource"  = "rr#equa"                                                        // resref
     "effsource" = ""                                                               // effsource: none
@@ -2153,7 +2155,6 @@ LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                        
     "opcode" = "112"                                                               // effect: #112 (Remove Item)
     "target" = "1"                                                                 // target: 1 (self)
     "timing" = "1"                                                                 // timing mode: 1 (permanent)
-    "probability1" = "100"                                                         // probability1: 100%
     "duration" = "0"                                                               // duration: 0
     "sectype" = "0"                                                                // secondary type: none
     "probability1" = "100"                                                         // probability1: 100%
@@ -2167,7 +2168,6 @@ LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                        
     "opcode" = "172"                                                               // effect: #172 (Remove Spell)
     "target" = "1"                                                                 // target: 1 (self)
     "timing" = "1"                                                                 // timing mode: 1 (permanent)
-    "probability1" = "100"                                                         // probability1: 100%
     "duration" = "0"                                                               // duration
     "sectype" = "0"                                                                // secondary type: none
     "probability1" = "100"                                                         // probability1: 100%
@@ -2189,7 +2189,6 @@ LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                        
     "opcode" = "112"                                                               // effect: #112 (Remove Item)
     "target" = "1"                                                                 // target: 1 (self)
     "timing" = "1"                                                                 // timing mode: 1 (permanent)
-    "probability1" = "100"                                                         // probability1: 100%
     "duration" = "0"                                                               // duration: 0
     "sectype" = "0"                                                                // secondary type: none
     "probability1" = "100"                                                         // probability1: 100%
@@ -2200,6 +2199,37 @@ END                                                                             
 END                                                                                // ends PATCH_FOR_EACH
 
 
+
+// Revised Elemental summoning spells
+
+COPY ~atweaks/spl/elementals/rr#eswg.spl~ ~override~                               // Elemental Summoning secondary spell (Summon Greater Elementals)
+COPY ~atweaks/spl/elementals/rr#eswe.spl~ ~override~                               // Elemental Summoning tertiary spell (Summon Elder Elementals)
+
+COPY_EXISTING ~sppr723.spl~  ~override~                                            // Elemental Summoning
+SAY NAME1 #63746 SAY NAME2 #63746  SAY DESC @2206 SAY UNIDENTIFIED_DESC @2206      // retain old name but set new description
+LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = "-1" END                        // delete old summoning effects
+DEFINE_ASSOCIATIVE_ARRAY es_hla BEGIN
+//   prob1     prob2       resref
+     100,       91    =>   RR#ESWE                                                 // Elder Elementals
+      90,        0    =>   RR#ESWG                                                 // Greater Elementals
+END                                                                                // ends DEFINE_ASSOCIATIVE_ARRAY
+PHP_EACH es_hla AS value  => resref BEGIN
+LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                           // Start FUNCTION call (add Spell Effect)
+  INT_VAR                                                                          // initialize variables
+    "opcode" = "146"                                                               // effect: #146 (Cast Spell at Target)
+    "target" = "1"                                                                 // target
+    "timing" = "1"                                                                 // timing mode
+    "parameter2" = "1"                                                             // param2
+    "duration" = "0"                                                               // duration
+    "sectype" = "0"                                                                // secondary type
+    "probability1" = EVALUATE_BUFFER "%value_0%"                                   // probability1
+    "probability2" = EVALUATE_BUFFER "%value_1%"                                   // probability2
+    "insert_point" = "0"                                                           // insert point (0 = add new effect to the top)
+  STR_VAR
+    "resource"  =  EVALUATE_BUFFER "%resref%"                                      // resref
+    "effsource" = ""                                                               // effsource: none
+END                                                                                // ends LAUNCH_PATCH_FUNCTION
+END                                                                                // ends PHP_EACH
 
 
 
@@ -2267,6 +2297,7 @@ COPY_EXISTING ~swaair02.cre~ ~override/rr#eaire.cre~                            
                 ~servsu.cre~ ~override/rr#easer.cre~                               // Aerial Servant
   WRITE_ASCII_LIST 0x248 $script("%DEST_RES%") ~~ ~~ ~~ ~~                         // assign new override script, null other scripts
   WRITE_BYTE   0x270 255                                                           // allegiance = ENEMY
+  WRITE_BYTE   0x275   4                                                           // gender = NEITHER
   WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32                                              // death variable
   WRITE_ASCII  0x2cc ~~ #8                                                         // dialog file
 
@@ -2338,7 +2369,9 @@ ACTION_IF GAME_IS ~bgt tutu tutu_totsc~ THEN BEGIN
   COPY_EXISTING ~%TUTU_VAR%shoal.dlg~ ~override~
   DECOMPILE_DLG_TO_D
     REPLACE_TEXTUALLY EXACT_MATCH ~ForceSpell(Myself,SHOAL_REVIVE)~ ~ForceSpell(Myself,SHOAL_REVIVE) ReallyForceSpellRES("rr#uchrm",Myself)~ // Shoal should uncharm all party members before they face Droth
-    REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride("Droth",MoveToPoint([2900.525]))~ ~ActionOverride("Droth",MoveToObject("Shoal"))~ // Make sure that Droth walks toward Shoal in case she moved away during the battle
+    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("DROTH",[2500.500],6)~ ~Wait(2) CreateCreatureObjectDoor("DROTH","Shoal",0,0,0)~ // BGT, make Droth appear next to Shoal instead of spawning at a fixed location
+    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("_DROTH",[2500.500],0)~ ~Wait(2) CreateCreatureObjectDoor("_DROTH","Shoal",0,0,0)~ // Tutu, make Droth appear next to Shoal instead of spawning at a fixed location
+    REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride("Droth",MoveToPoint([2900.525]))~ ~~ // movement action made unnecessary via different spawning method
   COMPILE_D_TO_DLG
 END
 
