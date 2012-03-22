@@ -43,13 +43,18 @@ END ELSE BEGIN
   OUTER_SPRINT SCSIISpellImmunity ~~
 END
 
-ACTION_IF FILE_EXISTS_IN_GAME d0scrldd.itm BEGIN
-  OUTER_SPRINT D0DimensionDoor
+ACTION_IF FILE_EXISTS_IN_GAME rr#scr1v.itm AND !VARIABLE_IS_SET RR#DimensionDoor BEGIN // aTweaks' Dimension Door
+  OUTER_SPRINT RR#DimensionDoor
+~~~~~
++ ~HaveSpell(2402)~ + #12082 DO ~TakePartyGold(250) DestroyGold(250) RemoveSpell(2402) GiveItemCreate("rr#scr1v",Myself,1,1,1)~ EXIT //Dimension Door
+~~~~~
+END
+
+ACTION_IF FILE_EXISTS_IN_GAME d0scrldd.itm AND !VARIABLE_IS_SET RR#DimensionDoor BEGIN
+  OUTER_SPRINT RR#DimensionDoor
 ~~~~~
 + ~HaveSpell(2402)~ + #12082 DO ~TakePartyGold(250) DestroyGold(250) RemoveSpell(2402) GiveItemCreate("d0scrldd",Myself,1,1,1)~ EXIT //Dimension Door
 ~~~~~
-END ELSE BEGIN
-  OUTER_SPRINT D0DimensionDoor ~~
 END
 
 ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
@@ -84,6 +89,12 @@ ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
 ~~~~~
 + ~HaveSpell(2320)~ + #7539 DO ~TakePartyGold(500) DestroyGold(500) RemoveSpell(2320) GiveItemCreate("SCRL6I",Myself,1,1,1)~ EXIT // Protection from Cold
 ~~~~~
+ACTION_IF !VARIABLE_IS_SET RR#DimensionDoor BEGIN
+  OUTER_SPRINT RR#DimensionDoor
+~~~~~
++ ~HaveSpell(2402)~ + #12082 DO ~TakePartyGold(250) DestroyGold(250) RemoveSpell(2402) GiveItemCreate("scrl1v",Myself,1,1,1)~ EXIT //Dimension Door
+~~~~~
+END
 END ELSE BEGIN
   OUTER_SPRINT InfravisionText #12039
   OUTER_SPRINT KnowAlignmentText #12043
@@ -191,6 +202,10 @@ END ELSE BEGIN
   OUTER_SPRINT PfMWText #7610
 END
 */
+
+ACTION_IF !VARIABLE_IS_SET RR#DimensionDoor BEGIN
+  OUTER_SPRINT RR#DimensionDoor ~~
+END
 
 APPEND ~STATE.IDS~ ~0x80101FEF CD_STATE_NOTVALID~ UNLESS ~CD_STATE_NOTVALID~       // CamDawg's custom IsValidForPartyDialogue() state
 //APPEND action.ids ~147 RemoveSpellRES(S:RES*)~
