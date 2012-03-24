@@ -1833,6 +1833,17 @@ THEN
 END
 
 IF
+    Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !Range(NearestEnemyOf(Myself),30)
+    See(NearestDoor) // note: this seems to auto-skip locked doors
+    OpenState(NearestDoor,FALSE)
+THEN
+    RESPONSE #100
+        MoveToObject(NearestDoor)
+        OpenDoor(NearestDoor)
+END
+
+IF
 	!HaveAnySpells()
         !Range(NearestEnemyOf(Myself),30) // if no enemies are in sight, do nothing
 THEN

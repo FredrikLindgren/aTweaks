@@ -1959,6 +1959,17 @@ THEN
 END
 
 IF
+    Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !Range(NearestEnemyOf(Myself),30)
+    See(NearestDoor) // note: this seems to auto-skip locked doors
+    OpenState(NearestDoor,FALSE)
+THEN
+    RESPONSE #100
+        MoveToObject(NearestDoor)
+        OpenDoor(NearestDoor)
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Move","LOCALS")
 	!StateCheck([EVILCUTOFF.HUMANOID.0.0.0.MALE],STATE_CHARMED)
 THEN

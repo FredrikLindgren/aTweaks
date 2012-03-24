@@ -299,16 +299,25 @@ BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends SR check
 
 ACTION_IF FILE_EXISTS_IN_GAME ~d0scrldd.itm~ BEGIN                                 // Check for D0Tweaks' Dimension Door component
-COPY ~atweaks/spl/spwi402.spl~ ~override/spwi450.spl~                              // Dimension Door
+COPY ~atweaks/spl/spwi402.spl~ ~override/spwi450.spl~                              // Dimension Door (D0 Tweaks)
     SAY DESC @1891
+COPY ~atweaks/itm/rr#scr1v.itm~ ~override/d0scrldd.itm~                            // Dimension Door scroll (D0 Tweaks)
+  SAY DESC @1891
 END                                                                                // ends D0Tweaks' check
+
+ACTION_IF GAME_IS ~tutu tutu_totsc~ THEN BEGIN                                     // Tutu check
+COPY ~atweaks/spl/spwi402.spl~ ~override/spwi450.spl~                              // Dimension Door (Tutu)
+    SAY DESC @1891
+COPY ~atweaks/itm/rr#scr1v.itm~ ~override/_scrl1v.itm~                             // Dimension Door scroll (Tutu)
+  SAY DESC @1891
+END                                                                                // ends Tutu check
 
 COPY_EXISTING_REGEXP GLOB ~^.+\.sto$~ ~override~                                   // parses through all stores in the game (even those added by mods)
 PATCH_IF (%SOURCE_SIZE% > 0x9b) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
   READ_LONG 0x08 "itemtype" ELSE 0                                                 // check store type
   PATCH_IF ("%itemtype%" != 5) BEGIN                                               // if the store isn't a container
 // =============================================================================== // the actual work starts from here
-PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~d0scrldd~) AND NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~BGSCRL1V~) AND FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL1U~) BEGIN
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~d0scrldd~) AND NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~BGSCRL1V~) AND NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~_SCRL1V~) AND FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL1U~) BEGIN
   ADD_STORE_ITEM ~rr#scr1v~ AFTER ~SCRL1U~ #1 #0 #0 ~IDENTIFIED~ #2                // Add 2x Dimension Door scroll
 END
 // =============================================================================== // the actual work ends here

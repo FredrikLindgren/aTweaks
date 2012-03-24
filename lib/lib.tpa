@@ -65,17 +65,14 @@ DEFINE_PATCH_FUNCTION prep_itm_spl INT_VAR f_Type = 1 BEGIN
     READ_LONG  0x64 ao
     READ_SHORT 0x68 na
     READ_LONG  0x6a eo
-    FOR (i=0;i<na;++i) BEGIN
+    FOR (i = na - 1; i >= 0; --i) BEGIN
       READ_SHORT ao + al*i + 0x1e ne
       READ_SHORT ao + al*i + 0x20 ei
-      FOR (j=0;j<ne;++j) BEGIN
+      FOR (j = ne - 1; j >= 0; --j) BEGIN
         DELETE_BYTES eo + 0x30*(ei + j) 0x30
-        --ne
-        --j
       END
       DELETE_BYTES ao + al*i al
       --na
-      --i
       eo -= al
     END
     READ_SHORT 0x70 ne
@@ -197,11 +194,14 @@ DEFINE_PATCH_FUNCTION configure_spell_header INT_VAR
                                                      f_Level = "-1" 
                                                      f_CastTime = 1
                                                      f_Projectile = 1
+                                              STR_VAR
+                                                     f_Icon = ~~
 BEGIN
   READ_LONG  0x64 ao
   READ_SHORT 0x68 na
   FOR (i=0;i<na;++i) BEGIN
     PATCH_IF (i+1) = f_Header OR f_Header < 0 BEGIN
+     WRITE_ASCIIE ao + 0x28*i + 0x4  "%f_Icon%" #8
       WRITE_BYTE  ao + 0x28*i + 0x0  f_Type
       WRITE_SHORT ao + 0x28*i + 0x2  f_Location
       WRITE_BYTE  ao + 0x28*i + 0xc  f_Target

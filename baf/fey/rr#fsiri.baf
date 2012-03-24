@@ -2604,6 +2604,17 @@ THEN
 END
 
 IF
+    Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !Range(NearestEnemyOf(Myself),30)
+    See(NearestDoor) // note: this seems to auto-skip locked doors
+    OpenState(NearestDoor,FALSE)
+THEN
+    RESPONSE #100
+        MoveToObject(NearestDoor)
+        OpenDoor(NearestDoor)
+END
+
+IF
 	Global("RR#Melee","LOCALS",0)
 	!Allegiance(LastSeenBy(Myself),EVILCUTOFF)
 	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1

@@ -2202,6 +2202,57 @@ END                                                                             
 
 // Revised Elemental summoning spells
 
+ACTION_DEFINE_ASSOCIATIVE_ARRAY l_elmnt BEGIN
+//   file       strref            resref
+     spwi516,   24799       =>   SPLESFIR                                          // Lesser Fire Elemental
+     spwi520,   24800       =>   SPLESAIR                                          // Lesser Air Elemental
+     spwi521,   24797       =>   SPLESEAR                                          // Lesser Earth Elemental
+END                                                                                // ends ACTION_DEFINE_ASSOCIATIVE_ARRAY
+ACTION_PHP_EACH l_elmnt AS file => resref BEGIN
+COPY_EXISTING ~%file_0%.spl~  ~override~
+WRITE_LONG 0x50 "%file_1%"                                                         // unidentified description
+LPF prep_itm_spl INT_VAR f_Type = 1 END
+LPF configure_spell_header INT_VAR f_Target = 4 f_Range = 15 f_CastTime = 9 STR_VAR f_Icon = EVAL ~%SOURCE_RES%B~ END
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 114 STR_VAR resource = EVAL ~%resref%~ END  // Use EFF file
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target = 1 parameter2 = 1 duration = 18 STR_VAR resource = SPELEMND END          // Play 3D Effect
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 1 parameter2 = 131 duration = 18 END                                    // Display Special Effect Icon
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 165 target = 1 duration = 18 END                                                     // Pause Target
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  SET "new_abil" = 0
+    READ_SHORT ("%abil_off%" + 0x10 + (("%abil_num%" - 1) * 0x28)) "min_level" // min level of last ability header
+    FOR (index = min_level + 9 ; index < 21 ; index = index + 1) BEGIN
+      READ_ASCII ("%abil_off%" +        (("%abil_num%" - 1) * 0x28)) "abil_clone" (0x28) // reads last ability as block
+      READ_SHORT ("%abil_off%" + 0x1e + (("%abil_num%" - 1) * 0x28)) "abil_fx_num" // reads number of fx from last ability
+      READ_SHORT ("%abil_off%" + 0x20 + (("%abil_num%" - 1) * 0x28)) "abil_fx_idx" // reads index of last effects from last ability
+      // create effects for next level based off previous level effects
+      FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+        READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // reads entire effect
+        INSERT_BYTES ("%fx_off%" +        (("%abil_fx_idx%" + "%abil_fx_num%" + "%index2%") * 0x30)) 0x30
+        READ_SHORT ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "opcode"          // opcode
+        READ_LONG  ("%fx_off%" + 0x0e + (("%abil_fx_idx%" + "%index2%") * 0x30)) "duration"        // duration
+          WRITE_EVALUATED_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%abil_fx_num%" + "%index2%") * 0x30)) "%clone_fx%" // clones effect
+          PATCH_IF ("%opcode%" = 177) BEGIN // Use EFF file
+            WRITE_LONG  ("%fx_off%" + 0x0e + (("%abil_fx_idx%" + "%abil_fx_num%" + "%index2%") * 0x30)) ("%duration%" + 6) // increase the duration by 1 round
+          END
+      END
+      // effects created, now add new ability
+      INSERT_BYTES            ("%abil_off%" +        ("%abil_num%" * 0x28)) 0x28
+        WRITE_EVALUATED_ASCII ("%abil_off%" +        ("%abil_num%" * 0x28)) "%abil_clone%" // clones last ability
+        WRITE_SHORT           ("%abil_off%" + 0x10 + ("%abil_num%" * 0x28)) "%index%"      // min level
+        WRITE_SHORT           ("%abil_off%" + 0x20 + ("%abil_num%" * 0x28)) ("%abil_fx_num%" + "%abil_fx_idx%") // corrects fx index
+      SET "fx_off" = ("%fx_off%" + 0x28)
+      SET "abil_num" = "%abil_num%" + 1
+    END
+    WRITE_SHORT 0x68 "%abil_num%"
+    WRITE_LONG  0x6a "%fx_off%"
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_PHP_EACH
+
+
+
+
 COPY ~atweaks/spl/elementals/rr#eswg.spl~ ~override~                               // Elemental Summoning secondary spell (Summon Greater Elementals)
 COPY ~atweaks/spl/elementals/rr#eswe.spl~ ~override~                               // Elemental Summoning tertiary spell (Summon Elder Elementals)
 
@@ -2230,6 +2281,8 @@ LAUNCH_PATCH_FUNCTION ~ADD_SPELL_EFFECT~                                        
     "effsource" = ""                                                               // effsource: none
 END                                                                                // ends LAUNCH_PATCH_FUNCTION
 END                                                                                // ends PHP_EACH
+
+
 
 
 
