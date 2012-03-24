@@ -141,6 +141,7 @@ IF ~HaveSpell(2423)~ THEN REPLY #29207 DO ~TakePartyGold(250) DestroyGold(250) R
 IF ~HaveSpell(2424)~ THEN REPLY #38133 DO ~TakePartyGold(250) DestroyGold(250) RemoveSpell(2424) GiveItemCreate("SCRLAJ",Myself,1,1,1)~ EXIT // Farsight
 IF ~HaveSpell(2425)~ THEN REPLY #38596 DO ~TakePartyGold(250) DestroyGold(250) RemoveSpell(2425) GiveItemCreate("SCRLA1",Myself,1,1,1)~ EXIT // Wizard Eye
 %RR#DimensionDoor%
+%RR#DDoor450%
 %SpellPackL4%
 IF ~~ THEN REPLY @8261 GOTO RR#SCRL00 // Select a different spell level
 END
