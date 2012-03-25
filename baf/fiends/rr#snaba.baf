@@ -1632,6 +1632,18 @@ THEN
 END
 
 IF
+    Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !AreaType(OUTDOOR)
+    !Range(NearestEnemyOf(Myself),30)
+    See(NearestDoor) // note: this seems to auto-skip locked doors
+    OpenState(NearestDoor,FALSE)
+THEN
+    RESPONSE #100
+        MoveToObject(NearestDoor)
+        OpenDoor(NearestDoor)
+END
+
+IF
 	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
         !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
         CheckStat(LastSeenBy(Myself),0,PROTECTION_FROM_EVIL)
