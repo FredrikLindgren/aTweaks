@@ -75,16 +75,6 @@ THEN
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
-	See([GOODCUTOFF])
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Help","LOCALS",12)
-		Help()
-		Continue()
-END
-
-IF
 	!Detect([GOODCUTOFF])
 	!ModalState(STEALTH)
 	!StateCheck(Myself,STATE_INVISIBLE)
@@ -341,6 +331,30 @@ THEN
 END
 
 IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+                GlobalShout(5828) // aTweaks hostile global shout
+		Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!Range(NearestEnemyOf(Myself),30)
+	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5828) // Hostile Tanar'ri fiends global shout
+        InMyArea(LastHeardBy(Myself))
+	!Range(LastHeardBy(Myself),30)
+	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	HaveSpell(WIZARD_MAGIC_MISSILE)
 	See(MostDamagedOf([PC]))
@@ -538,6 +552,7 @@ IF
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -873,15 +888,17 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(SecondNearest([GOODCUTOFF]))
+	See([GOODCUTOFF])
 	Range(LastSeenBy(Myself),4)
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+        !Kit(LastSeenBy(Myself),CAVALIER)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -890,6 +907,35 @@ IF
 	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
 	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
 	!HasItemEquiped("RR#HELMD",LastSeenBy(Myself)) // Dead Man's Face (RR)
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ReallyForceSpellRES("RR#DCFEA",LastSeenBy(Myself)) // Cause Fear
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearest([GOODCUTOFF]))
+	Range(LastSeenBy(Myself),4)
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+	!Race(LastSeenBy(Myself),GOLEM)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!HasItemEquiped("CLCK30",LastSeenBy(Myself)) // Cloak of Bravery
+	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquiped("RR#HELMD",LastSeenBy(Myself)) // Dead Man's Face (RR)
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -904,9 +950,11 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+        !Kit(LastSeenBy(Myself),CAVALIER)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -929,9 +977,11 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+        !Kit(LastSeenBy(Myself),CAVALIER)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -940,6 +990,7 @@ IF
 	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
 	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
 	!HasItemEquiped("RR#HELMD",LastSeenBy(Myself)) // Dead Man's Face (RR)
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -954,9 +1005,11 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+        !Kit(LastSeenBy(Myself),CAVALIER)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -965,6 +1018,7 @@ IF
 	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
 	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
 	!HasItemEquiped("RR#HELMD",LastSeenBy(Myself)) // Dead Man's Face (RR)
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -979,9 +1033,11 @@ IF
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
 	!Race(LastSeenBy(Myself),GOLEM)
+        !Kit(LastSeenBy(Myself),CAVALIER)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	CheckStatGT(LastSeenBy(Myself),1,MORALEBREAK)
+	CheckStat(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -990,10 +1046,461 @@ IF
 	!HasItemEquipedReal("SW1H32",LastSeenBy(Myself)) // Dragonslayer
 	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
 	!HasItemEquiped("RR#HELMD",LastSeenBy(Myself)) // Dead Man's Face (RR)
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#DCFEA",LastSeenBy(Myself)) // Cause Fear
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player1)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player2)
+	HaveSpell(CLERIC_CHARM_PERSON)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player3)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player4)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player5)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player6)
+	HaveSpell(CLERIC_CHARM_PERSON)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL])
+	!Class(LastSeenBy(Myself),MONK)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL]))
+	!Class(LastSeenBy(Myself),MONK)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(ThirdNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL]))
+	!Class(LastSeenBy(Myself),MONK)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See([GOODCUTOFF.HUMANOID.0.RANGER_ALL])
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL]))
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(ThirdNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL]))
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
 END
 
 IF
@@ -1055,6 +1562,7 @@ IF
 	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
 	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
 	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1089,6 +1597,7 @@ IF
 	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
 	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
 	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1123,6 +1632,7 @@ IF
 	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
 	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
 	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1157,6 +1667,7 @@ IF
 	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
 	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
 	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1191,6 +1702,7 @@ IF
 	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
 	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
 	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -1475,6 +1987,8 @@ IF
 	OR(2)
 	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_CHAOTIC]) // Quasits
 	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC]) // Tanar'ri fiends
+        InMyArea(LastHelp(Myself))
+	!StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Move","LOCALS",6)

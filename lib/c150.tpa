@@ -1,4 +1,9 @@
 
+//////////////
+// PnP Fiends
+//////////////
+
+
 INCLUDE "atweaks/lib/c150_funs.tpa"
 INCLUDE "atweaks/lib/tactical_shared.tpa"
 INCLUDE "atweaks/lib/rr#fiend.tph"
@@ -15,6 +20,17 @@ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_imp END                                                         
     BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+ACTION_IF FiendsOriginal = 0 BEGIN
+  ACTION_FOR_EACH file IN
+               ~TCIMP01~                                                           // Imp (Classic Adventures)
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+      COPY_EXISTING "%file%.cre" override
+        LPF make_imp INT_VAR enforce = 1 END
+      BUT_ONLY
+    END
   END
 END
 
@@ -185,6 +201,18 @@ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_cambion END
     BUT_ONLY_IF_IT_CHANGES
+  END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+ACTION_IF FiendsOriginal = 0 BEGIN
+  ACTION_FOR_EACH file IN
+               ~TCCAMBI1~                                                          // Cambion (Classic Adventures)
+               ~TCCAMBI2~                                                          // Cambion (Classic Adventures)
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+      COPY_EXISTING "%file%.cre" override
+        LPF make_cambion INT_VAR enforce = 1 END
+      BUT_ONLY
+    END
   END
 END
 
@@ -272,7 +300,7 @@ ACTION_FOR_EACH ~file~ IN
               ~DEMNAB01~                                                           // Nabassu
               ~DEMNAB02~                                                           // Nabassu
 //            ~ENDDEM04~                                                           // Nabassu (unused?)
-//            ~ENDDEM05~                                                           // Nabassu (unused?)
+//            ~ENDDEM05~                                                           // Nabassu (Planar Sphere)
               ~OBSDEM05~                                                           // Nabassu
 //             ~PPNAB01~                                                           // Nabassu (cutscene only?)
 //             ~PPNAB02~                                                           // Nabassu (cutscene only?)
@@ -289,6 +317,18 @@ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_nabassu END
     BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+ACTION_IF FiendsOriginal = 0 BEGIN
+  ACTION_FOR_EACH file IN
+                ~dw#nabsu~                                                         // SCSII Nabassu
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+      COPY_EXISTING "%file%.cre" override
+        LPF make_nabassu INT_VAR enforce = 1 END
+      BUT_ONLY
+    END
   END
 END
 
@@ -480,24 +520,40 @@ COPY_EXISTING ~demnab01.cre~ ~override/fl#nabsu.cre~
   END
 
 //Commandeer SCSII's private fiend-summoning spells and have them summon SCSII-aTweaks hybrids
-ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.spl AND !FiendsOriginal BEGIN //FiendsOriginal eq "do not alter mod-added fiends"
-   
-  OUTER_SPRINT $crefile("dw#cacof") "fl#nabsu"
-  OUTER_SPRINT $crefile("dw#sumbf") "fl#corsu"  
-  OUTER_SPRINT $crefile("dw#sumgl") "fl#glasu"
-  OUTER_SPRINT $crefile("dw#sumco") "fl#gelsu"
-  OUTER_SPRINT $crefile("dw#basum") "fl#balsu"
-  OUTER_SPRINT $crefile("dw#pitsu") "fl#pitsu"
+ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND !FiendsOriginal BEGIN //FiendsOriginal eq "do not alter mod-added fiends"
+  
+  ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND FILE_EXISTS_IN_GAME dw#pitsu.eff BEGIN //If SCSII Improved Fiends is installed
+    OUTER_SPRINT $crefile("dw#cacof") "fl#nabsu"
+    OUTER_SPRINT $crefile("dw#sumbf") "fl#corsu"  
+    OUTER_SPRINT $crefile("dw#sumgl") "fl#glasu"
+    OUTER_SPRINT $crefile("dw#sumco") "fl#gelsu"
+    OUTER_SPRINT $crefile("dw#basum") "fl#balsu"
+    OUTER_SPRINT $crefile("dw#pitsu") "fl#pitsu"
     
-  COPY_EXISTING "dw#cacof.eff" override
-                "dw#sumbf.eff" override
-                "dw#sumgl.eff" override
-                "dw#sumco.eff" override
-                "dw#basum.eff" override
-                "dw#pitsu.eff" override
-    WRITE_ASCIIE 0x30 $crefile("%SOURCE_RES%") #8
-  BUT_ONLY
-END 
+    COPY_EXISTING "dw#cacof.eff" override
+                  "dw#sumbf.eff" override
+                  "dw#sumgl.eff" override
+                  "dw#sumco.eff" override
+                  "dw#basum.eff" override
+                  "dw#pitsu.eff" override
+      WRITE_ASCIIE 0x30 $crefile("%SOURCE_RES%") #8
+    BUT_ONLY
+  END /* ELSE BEGIN //Otherwise it is just SCSII Smarter Mages
+    
+    //These are copies of Mordenkainen's Sword; change them to conjure up the appropriate fiend instead
+    COPY_EXISTING dw#sumgl.spl override 
+                  dw#sumco.spl override
+                  dw#cacof.spl override
+                  dw#sumbf.spl override
+      
+      
+    //These are copies of Gate; change the other to conjure up a Balor
+    COPY_EXISTING dw#gatem.spl override
+                  dw#basum.spl override
+      
+      
+  END*/
+END
 
 //SCSII colours these dudes green, but we turn them into glabrezus and mariliths
 ACTION_IF FILE_EXISTS_IN_GAME dw#fiends_notinnate.mrk OR FILE_EXISTS_IN_GAME dw#fiends_innate.mrk BEGIN
@@ -612,6 +668,16 @@ DECOMPILE_BCS_TO_BAF
   REPLACE_TEXTUALLY EXACT_MATCH ~SetGlobal("summon","LOCALS",1)~ ~SetGlobal("summon","LOCALS",1) FaceObject([PC]) StartDialogueNoSet([PC])~
 COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
+
+
+// The Pit Fiend summoned through the portal in the maze below Spellhold should not be attacked before the gating animation is complete
+
+COPY_EXISTING ~ppportal.bcs~ ~override~ // Spellhold maze portal script
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~ReallyForceSpell(Myself,SUMMON_PIT_FIEND)~ ~SetInterrupt(FALSE) CreateVisualEffect("SPPORTAL",[245.500]) Wait(1) CreateCreature("DEMPIT01",[245.500],0) SetInterrupt(TRUE)~
+COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
+
 
 //Fix minhp items so the wearer can't be killed by the Nabassu's Death Gaze
 COPY_EXISTING ABAZRING.ITM override
@@ -909,6 +975,27 @@ DECOMPILE_BCS_TO_BAF                                                            
   REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~ ~ReallyForceSpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~
 COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
+
+
+// Dialogue changes
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~gorbat1~                                                            // Ka'rashur's dialogue (Baatezu Leader in Watcher's Keep)
+              ~gortan1~                                                            // Tahazzar's dialogue (Tanar'ri Leader in Watcher's Keep)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.dlg~ BEGIN                                   // if the designated file with a SPL extension exists
+COPY_EXISTING ~%file%.dlg~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x01) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+// =============================================================================== // the actual work starts from here
+ DECOMPILE_DLG_TO_D
+  REPLACE_TEXTUALLY EXACT_MATCH ~SetGlobal("BatEnemy","GLOBAL",1)~ ~SetGlobal("BatEnemy","GLOBAL",1) Enemy() Help()~
+  REPLACE_TEXTUALLY EXACT_MATCH ~SetGlobal("TanEnemy","GLOBAL",1)~ ~SetGlobal("TanEnemy","GLOBAL",1) Enemy() Help()~
+ COMPILE_D_TO_DLG
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
 
 
 // New load screen hints

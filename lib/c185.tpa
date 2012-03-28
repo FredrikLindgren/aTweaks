@@ -1,0 +1,758 @@
+/////////////////////
+// PnP Fey Creatures
+/////////////////////
+
+
+INCLUDE "atweaks/lib/dsandstuff.tpa"                                               // Detectable Spells
+
+//////////////
+// New spells
+//////////////
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DDOOR.BAM~ THEN BEGIN                        // Checks for the Icewind Dale's Dimension Door animation component
+  COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override/RR#DDOOR.BAM~                     // IWD1's Dimension Door animation (custom file name)
+  COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override/RR#DDOOR.WAV~                     // IWD1's Dimension Door sound effect (custom file name)
+  COPY    ~aTweaks/VVC/RR#DDOOR.VVC~   ~override~                                  // Custom Dimension Door VVC
+END                                                                                // ends ACTION_IF block
+COPY ~atweaks/spl/rr#telwe.spl~ ~override/rr#ddoor.spl~                            // Dimension Door (renewable)
+  SAY NAME1 #12082 SAY NAME2 #12082
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#renew" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY ~atweaks/spl/rr#telwe.spl~ ~override/rr#ddor2.spl~                            // Dimension Door (non-renewable, for Nymphs)
+  SAY NAME1 #12082 SAY NAME2 #12082
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
+
+COPY ~atweaks/spl/rr#telwx.spl~ ~override/rr#ddorx.spl~                            // Dimension Door (special version, breaks targeting via 1 second invisibility)
+  SAY NAME1 #12082 SAY NAME2 #12082
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
+
+
+COPY ~atweaks/spl/fey/rr#fafrn.spl~ ~override~                                     // Animal Friendship (renewable)
+  SAY NAME1 @1900 SAY NAME2 @1900
+
+COPY ~atweaks/spl/fey/rr#fbbea.spl~ ~override~                                     // Blinding Beauty (part 1)
+  SAY NAME1 @1901 SAY NAME2 @1901
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %fl#sight%                                    // use new projectile
+  END
+COPY ~atweaks/spl/fey/rr#fbbe2.spl~ ~override~                                     // Blinding Beauty (part 2)
+COPY ~atweaks/eff/fey/rr#fbbea.eff~ ~override~                                     // Blinding Beauty EFF (for targeting only humanoids)
+
+COPY ~atweaks/spl/fey/rr#fchrm.spl~ ~override~                                     // Charm Person (renewable)
+COPY ~atweaks/eff/fey/rr#fchrm.eff~ ~override~                                     // Charm Person EFF (for elven and half-elven charm immunity)
+  SAY 0x1C @1903                                                                   // Resists charm effect
+
+COPY ~atweaks/spl/fey/rr#fcsng.spl~ ~override~                                     // Charming Song (part 1)
+  SAY NAME1 @1902 SAY NAME2 @1902
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %rr#fcsng%                                    // use new projectile
+  END
+
+COPY ~atweaks/spl/fey/rr#fcsn2.spl~ ~override~                                     // Charming Song (part 2)
+COPY ~atweaks/eff/fey/rr#fcsng.eff~ ~override~                                     // Charming Song EFF 1 (for targeting only humanoids)
+COPY ~atweaks/eff/fey/rr#fcsn2.eff~ ~override~                                     // Charming Song EFF 2 (for elven and half-elven charm immunity)
+  SAY 0x1C @1903                                                                   // Resists charm effect
+
+
+// Items and spells which cause Deafness should grant immunity to the Sirine's Charming Song
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~spwi223~                                                            // Deafness
+             ~rr#bhl5a~                                                            // Resonating Weapon (RR)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN                                   // if the designated file with a SPL extension exists
+COPY_EXISTING ~%file%.spl~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN  // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+// =============================================================================== // the actual work starts from here
+  LPF add_conditional_immunity INT_VAR f_Condition = 80 f_Strref = 4742 STR_VAR f_Spell = rr#fcsng END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+COPY ~atweaks/spl/fey/rr#fdsnr.spl~ ~override~                                     // Detect Snares and Pits (renewable)
+  SAY NAME1 @1904 SAY NAME2 @1904
+
+COPY ~atweaks/vvc/rr#mmswf.vvc~ ~override~                                         // Fog Cloud animation
+COPY ~atweaks/spl/fey/rr#fcld.spl~ ~override~                                      // Fog Cloud
+
+COPY ~atweaks/spl/fey/rr#fdsnr.spl~ ~override~                                     // Detect Snares and Pits (renewable)
+  SAY NAME1 @1904 SAY NAME2 @1904
+
+COPY ~atweaks/spl/fey/rr#ftrnq.spl~ ~override~                                     // Touch of Tranquility (spell)
+  SAY NAME1 @1905 SAY NAME2 @1905
+
+COPY ~atweaks/bam/fey/rr#fspkp.bam~ ~override~                                     // Speak With Plants icon
+COPY ~atweaks/spl/fey/rr#fspkp.spl~ ~override~                                     // Speak With Plants (renewable)
+  SAY NAME1 @1907 SAY NAME2 @1907
+LPF add_conditional_immunity INT_VAR f_Condition = 169 f_Strref = 4742 STR_VAR f_Spell = SPPR105 END // Entangle (Priest)
+LPF add_conditional_immunity INT_VAR f_Condition = 169 f_Strref = 4742 STR_VAR f_Spell = SPWM111 END // Entangle (Wild Mage)
+LPF add_conditional_immunity INT_VAR f_Condition = 169 f_Strref = 4742 STR_VAR f_Spell = SPIN688 END // Plant Growth (Black Dragon)
+LPF add_conditional_immunity INT_VAR f_Condition = 169 f_Strref = 4742 STR_VAR f_Spell = RR#SMENT END // Shambler Entangle (RR)
+LPF add_conditional_immunity INT_VAR f_Condition = 169 f_Strref = 4742 STR_VAR f_Spell = RR#FENTG END // Hamadryad Entangle (aTweaks)
+
+
+ADD_PROJECTILE ~atweaks/pro/rr#fentg.pro~                                          // New projectile for Entangle (party friendly)
+COPY ~atweaks/eff/fey/rr#fentg.eff~ ~override~                                     // Entangle EFF (for incorporeal and large creature immunity)
+COPY ~atweaks/spl/fey/rr#fentg.spl~ ~override~                                     // Entangle
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %rr#fentg%                                    // use new projectile
+  END
+
+COPY ~atweaks/spl/fey/rr#fiinv.spl~ ~override~                                     // Improved Invisibility shell spell (use Casting Level 11th)
+COPY_EXISTING ~SPWI405.SPL~  ~override/rr#wi405.spl~                               // Clone Improved Invisibility into an innate ability (used by Sirine)
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
+
+COPY ~atweaks/spl/fey/rr#pjell.spl~ ~override~                                     // Polymorph Mustard Jelly (Sirine)
+ADD_PROJECTILE ~atweaks/pro/rr#ftvap.pro~                                          // New projectile for Toxic Vapors (small area cloud)
+COPY ~atweaks/spl/fey/rr#ftvap.spl~ ~override~                                     // Mustard Jelly Toxic Vapors
+  SAY NAME1 @1906 SAY NAME2 @1906
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %rr#ftvap%                                    // use new projectile
+  END
+COPY ~atweaks/cre/fey/rr#pjell.cre~ ~override~                                     // Mustard Jelly (PnP style)
+COPY ~atweaks/itm/fey/rr#pjell.itm~ ~override~                                     // Mustard Jelly attack (PnP style)
+COPY ~atweaks/itm/fey/rr#fsiri.itm~ ~override~                                     // Sirine's Boots (movement rate increase, destroyed when polymorphed)
+
+
+
+
+//////////////////////////
+// Creature modifications
+//////////////////////////
+
+
+// Dryad
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~DRYAD~                                                              // Dryad of the Cloudpeaks (BGT)
+              ~_DRYAD~                                                             // Dryad of the Cloudpeaks (Tutu)
+              ~DRY01~                                                              // Dryad (unused?)
+              ~DRYAD01~                                                            // Dryad (unused?)
+              ~DRYAD02~                                                            // Dryad (unused?)
+              ~DRYAD03~                                                            // Dryad (unused?)
+              ~IDRYAD01~                                                           // Ulene (one of Irenicus captive Dryads)
+              ~IDRYAD02~                                                           // Cania (one of Irenicus captive Dryads)
+              ~IDRYAD03~                                                           // Elyme (one of Irenicus captive Dryads)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
+ADD_MEMORIZED_SPELL ~rr#fchrm~ #0 ~innate~ ( 3 )                                   // adds 3x Charm Person
+ADD_MEMORIZED_SPELL ~rr#fspkp~ #0 ~innate~ ( 1 )                                   // adds 1x Speak With Plants
+ADD_MEMORIZED_SPELL ~rr#ddoor~ #0 ~innate~ ( 1 )                                   // adds 1x Dimension Door
+WRITE_BYTE 0x6f 1                                                                  // BG1 Proficiency slot (small sword)
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newxpv"   = "975"                                                                 // new XP value
+"newhp"    = "16"                                                                  // new hit point value
+"newac"    = "9"                                                                   // new Armor Class value
+"newth"    = "19"                                                                  // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "14"                                                                  // new Save vs. Death
+"newsvw"   = "16"                                                                  // new Save vs. Wand
+"newsvp"   = "15"                                                                  // new Save vs. Polymorph
+"newsvb"   = "17"                                                                  // new Save vs. Breath
+"newsvs"   = "17"                                                                  // new Save vs. Spell
+"newmr"    = "50"                                                                  // new Magic Resistance value
+"newlvl1"  = "2"                                                                   // new level (first class)
+"newstr"   = "10"                                                                  // new Strength value
+"newdex"   = "15"                                                                  // new Dexterity value
+"newcon"   = "12"                                                                  // new Constitution value
+"newint"   = "14"                                                                  // new Intelligence value
+"newwis"   = "14"                                                                  // new Wisdom value
+"newchr"   = "18"                                                                  // new Charisma value
+"newmor"   = "12"                                                                  // new morale value
+"newmorb"  = "4"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newgen"   = "1"                                                                   // new general (HUMANOID)
+"newrace"  = "120"                                                                 // new race (FAIRY)
+"newclass" = "131"                                                                 // new class (FAIRY_DRYAD)
+"newgendr" = "2"                                                                   // new gender (Female)
+"newsex"   = "2"                                                                   // new sex (Female)
+"newalign" = "34"                                                                  // new alignment (True Neutral)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#FDRYA"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "CDRYAD"                                                            // Dryad AI script
+"script04"   = "_CDRYAD"                                                           // Dryad AI script (Tutu)
+"script05"   = "INITDLG"                                                           // dialogue script (not needed as it's handled within the new script)
+"script06"   = "_INITDLG"                                                          // dialogue script (Tutu)
+"script07"   = "SHOUT"                                                             // generic shout script
+"script08"   = "WTASIGHT"                                                          // generic AI script
+"script09"   = "wtrunsgt"                                                          // generic AI script
+"script10"   = "_TRUNSGT"                                                          // generic AI script (Tutu)
+"script11"   = "IDRYAD01"                                                          // Ulene's dialogue script (not needed as it's handled within the new script)
+"script12"   = "ULENE"                                                             // Ulene's AI script (not needed as it's handled within the new script)
+"script13"   = "dw#melee"                                                          // SCSII melee AI script
+"script14"   = "BPWDASGT"                                                          // Big Picture generic AI script
+END                                                                                // ends FUNCTION call
+  PATCH_IF (("%SOURCE_RES%" STRING_EQUAL_CASE ~DRYAD~) OR ("%SOURCE_RES%" STRING_EQUAL_CASE ~_DRYAD~)) BEGIN // special case, Dryad of the Cloudpeaks
+    WRITE_BYTE 0x273 155                                                           // class = INNOCENT
+  END
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
+    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
+    target = "1"                                                                   // target: 1 (self)
+    timing = "9"                                                                   // timing mode: 9 (permanent after death)
+    duration = "0"                                                                 // duration: 0
+    sectype = "0"                                                                  // secondary type: none
+    parameter1 = "9"                                                               // param1: 9 (statistic modifier)
+    parameter2 = "1"                                                               // param2: 1 (type)
+    probability1 = "100"                                                           // probability1: 100%
+  STR_VAR
+    effsource = ""                                                                 // effsource: none
+END                                                                                // end FUNCTION call
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Hamadryad
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~VAELASA~                                                            // Vaelasa (Fairy Queen in Windsper Hills)
+              ~DRYADHA~                                                            // Hamadryad (BGT)
+              ~_DRYADHA~                                                           // Hamadryad (Tutu)
+              ~HAMASU~                                                             // deault summoned Hamadryad (unused?)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
+ADD_MEMORIZED_SPELL ~rr#fchrm~ #0 ~innate~ ( 3 )                                   // adds 3x Charm Person
+ADD_MEMORIZED_SPELL ~rr#fentg~ #0 ~innate~ ( 1 )                                   // adds 1x Entangle
+ADD_MEMORIZED_SPELL ~rr#fafrn~ #0 ~innate~ ( 1 )                                   // adds 1x Animal Friendship
+ADD_MEMORIZED_SPELL ~rr#fdsnr~ #0 ~innate~ ( 1 )                                   // adds 1x Detect Snares and Pits
+ADD_MEMORIZED_SPELL ~rr#fspkp~ #0 ~innate~ ( 1 )                                   // adds 1x Speak With Plants
+ADD_MEMORIZED_SPELL ~rr#ddoor~ #0 ~innate~ ( 1 )                                   // adds 1x Dimension Door
+WRITE_BYTE 0x6f 1                                                                  // BG1 Proficiency slot (small sword)
+WRITE_SHORT 0x4c 0                                                                 // remove missile AC modifier (was -5)
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newxpv"   = "1400"                                                                // new XP value
+"newhp"    = "32"                                                                  // new hit point value
+"newac"    = "7"                                                                   // new Armor Class value
+"newth"    = "17"                                                                  // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "13"                                                                  // new Save vs. Death
+"newsvw"   = "15"                                                                  // new Save vs. Wand
+"newsvp"   = "14"                                                                  // new Save vs. Polymorph
+"newsvb"   = "16"                                                                  // new Save vs. Breath
+"newsvs"   = "16"                                                                  // new Save vs. Spell
+"newmr"    = "75"                                                                  // new Magic Resistance value
+"newlvl1"  = "4"                                                                   // new level (first class)
+"newstr"   = "10"                                                                  // new Strength value
+"newdex"   = "18"                                                                  // new Dexterity value
+"newcon"   = "12"                                                                  // new Constitution value
+"newint"   = "14"                                                                  // new Intelligence value
+"newwis"   = "14"                                                                  // new Wisdom value
+"newchr"   = "18"                                                                  // new Charisma value
+"newgen"   = "1"                                                                   // new general (HUMANOID)
+"newmor"   = "12"                                                                  // new morale value
+"newmorb"  = "4"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newrace"  = "120"                                                                 // new race (FAIRY)
+"newclass" = "131"                                                                 // new class (FAIRY_DRYAD)
+"newgendr" = "2"                                                                   // new gender (Female)
+"newsex"   = "2"                                                                   // new sex (Female)
+"newalign" = "34"                                                                  // new alignment (True Neutral)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#FHAMA"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "WTASIGHT"                                                          // generic AI script
+"script04"   = "_TASIGHT"                                                          // generic AI script (Tutu)
+"script05"   = "HAMA"                                                              // default Hamadryad AI script
+"script06"   = "_HAMA"                                                             // default Hamadryad AI (Tutu)
+"script07"   = "SHOUTDLG"                                                          // dialogue script (not needed as it's handled within the new script)
+"script08"   = "vaelasa"                                                           // Vaelasa's script (not needed as it's handled within the new script)
+"script09"   = "dw#melee"                                                          // SCSII melee AI script
+"script10"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script11"   = "BPWDASGT"                                                          // Big Picture generic AI script
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~entangle_immunities~ END                                    // add immunity to Entangle spells and abilities
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
+    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
+    target = "1"                                                                   // target: 1 (self)
+    timing = "9"                                                                   // timing mode: 9 (permanent after death)
+    duration = "0"                                                                 // duration: 0
+    sectype = "0"                                                                  // secondary type: none
+    parameter1 = "9"                                                               // param1: 9 (statistic modifier)
+    parameter2 = "1"                                                               // param2: 1 (type)
+    probability1 = "100"                                                           // probability1: 100%
+  STR_VAR
+    effsource = ""                                                                 // effsource: none
+END                                                                                // end FUNCTION call
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Sirine
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+                ~SIRINE~                                                           // Sirine (BGT)
+               ~_SIRINE~                                                           // Sirine (Tutu)
+              ~SIRINE_A~                                                           // Sirine (BGT)
+              ~_IRINE_A~                                                           // Sirine (Tutu)
+              ~SIRINE_B~                                                           // Sirine (BGT)
+              ~_IRINE_B~                                                           // Sirine (Tutu)
+              ~SIRINE01~                                                           // Sirine
+              ~SIRINE02~                                                           // Sirine (BGT)
+              ~_IRINE02~                                                           // Sirine (Tutu)
+                   ~SIL~                                                           // Sil (BGT)
+                  ~_SIL~                                                           // Sil (Tutu)
+
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
+ADD_MEMORIZED_SPELL ~rr#fcsng~ #0 ~innate~ ( 1 )                                   // adds 1x Charming Song
+ADD_MEMORIZED_SPELL ~rr#fcld~ #0 ~innate~ ( 1 )                                    // adds 1x Fog Cloud
+ADD_MEMORIZED_SPELL ~rr#wi405~ #0 ~innate~ ( 1 )                                   // adds 1x Improved Invisibility
+ADD_MEMORIZED_SPELL ~rr#pjell~ #0 ~innate~ ( 1 )                                   // adds 1x Polymorph Mustard Jelly
+ADD_CRE_ITEM ~rr#fsiri~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~boots~                 // add boots which increase Movement Rate to 9 (Sirines only because of Polymorph)
+REPLACE_CRE_ITEM ~BOW05~ #5 #0 #0 ~UNSTEALABLE~ ~WEAPON1~                          // make sure that all Sirines have Shortbows
+REPLACE_CRE_ITEM ~rr#ftrnq~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON2~                       // add Touch of Tranquility
+ADD_CRE_ITEM ~AROW01~ #40 #0 #0 ~UNSTEALABLE~ ~quiver3~                            // add 40 normal arrows
+ADD_CRE_ITEM ~AROW10~ #10 #0 #0 ~UNSTEALABLE~ ~quiver2~                            // add 10 Arrows of Piercing
+REPLACE_CRE_ITEM ~AROW05~ #5 #0 #0 ~UNSTEALABLE~ ~quiver1~  EQUIP                  // make the Arrows of Biting unstealable
+WRITE_BYTE 0x6f 1                                                                  // BG1 Proficiency slot (small sword)
+WRITE_BYTE 0x70 1                                                                  // BG1 Proficiency slot (bow)
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newxpv"   = "3000"                                                                // new XP value
+"newhp"    = "40"                                                                  // new hit point value
+"newac"    = "3"                                                                   // new Armor Class value
+"newth"    = "15"                                                                  // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "11"                                                                  // new Save vs. Death
+"newsvw"   = "7"                                                                   // new Save vs. Wand
+"newsvp"   = "9"                                                                   // new Save vs. Polymorph
+"newsvb"   = "11"                                                                  // new Save vs. Breath
+"newsvs"   = "8"                                                                   // new Save vs. Spell
+"newmr"    = "20"                                                                  // new Magic Resistance value
+"newlvl1"  = "5"                                                                   // new level (first class)
+"newstr"   = "14"                                                                  // new Strength value
+"newint"   = "18"                                                                  // new Intelligence value
+"newwis"   = "16"                                                                  // new Wisdom value
+"newdex"   = "18"                                                                  // new Dexterity value
+"newcon"   = "11"                                                                  // new Constitution value
+"newchr"   = "17"                                                                  // new Charisma value
+"newmor"   = "12"                                                                  // new morale value
+"newgen"   = "1"                                                                   // new general (HUMANOID)
+"newmorb"  = "4"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newrace"  = "120"                                                                 // new race (FAIRY)
+"newclass" = "130"                                                                 // new class (FAIRY_SIRINE)
+"newgendr" = "2"                                                                   // new gender (Female)
+"newsex"   = "2"                                                                   // new sex (Female)
+"newalign" = "50"                                                                  // new alignment (Chaotic Neutral)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#FSIRI"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "SHOUT"                                                             // generic shout script
+"script04"   = "MACSHOUT"                                                          // generic shout script (Tutu)
+"script05"   = "SIRINE"                                                            // default Sirine script
+"script06"   = "SIRSPELL"                                                          // default Sirine script
+"script07"   = "_IRSPELL"                                                          // Sirine script (Tutu)
+"script08"   = "WTARSGT"                                                           // generic AI script
+"script09"   = "_WTARSGT"                                                          // generic AI script (Tutu)
+"script10"   = "SIL"                                                               // Sil's script
+"script11"   = "INITDLG"                                                           // dialogue script (not needed as it's handled within the new script)
+"script12"   = "_INITDLG"                                                          // dialogue script (Tutu)
+"script13"   = "wdarsgt"                                                           // generic AI script
+"script14"   = "_WDARSGT"                                                          // generic AI script (Tutu)
+"script15"   = "BPWTRSGT"                                                          // Big Picture generic AI script
+"script16"   = "CRESHOUT"                                                          // Big Picture shout script
+"script17"   = "dw#range"                                                          // SCSII ranged AI script
+END                                                                                
+LAUNCH_PATCH_FUNCTION cloud_spell_immunities END                                   // grant immunities to gas-based area effect spells
+PATCH_IF (("%SOURCE_RES%" STRING_EQUAL_CASE ~SIL~) OR ("%SOURCE_RES%" STRING_EQUAL_CASE ~_SIL~)) BEGIN // special case, Sil should be a 7 HD Sirine
+  WRITE_LONG 0x14 5000                                                             // XP value
+  WRITE_SHORT 0x24 56                                                              // current hit points
+  WRITE_SHORT 0x26 56                                                              // maximum hit points
+  WRITE_BYTE 0x52 13                                                               // THAC0
+  WRITE_BYTE 0x54 10                                                               // save vs. death
+  WRITE_BYTE 0x55 12                                                               // save vs. wands
+  WRITE_BYTE 0x56 11                                                               // save vs. polymorph
+  WRITE_BYTE 0x57 12                                                               // save vs. breath
+  WRITE_BYTE 0x58 13                                                               // save vs. spells
+  WRITE_BYTE 0x234 7                                                               // level (first class)
+END
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Nymph
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~ABELA~                                                              // Abela the Nymph (BGT)
+              ~_ABELA~                                                             // Abela the Nymph (Tutu)
+              ~HGNYMPH~                                                            // Nymph
+              ~NYMPHSU~                                                            // default summoned Nymph
+              ~dvnymph~                                                            // Spell Revisions' summoned Nymph
+             ~dw#nymsu~                                                            // SCSII summoned Nymph
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
+ADD_MEMORIZED_SPELL ~rr#ddor2~ #0 ~innate~ ( 1 )                                   // adds 1x Dimension Door (non-renewable)
+ADD_MEMORIZED_SPELL ~SPPR101~ #0 ~priest~ ( 2 )                                    // adds 2x Bless
+ADD_MEMORIZED_SPELL ~SPPR103~ #0 ~priest~ ( 2 )                                    // adds 2x Cure Light Wounds
+ADD_MEMORIZED_SPELL ~SPPR202~ #1 ~priest~ ( 1 )                                    // adds 1x Barkskin
+ADD_MEMORIZED_SPELL ~SPPR204~ #1 ~priest~ ( 1 )                                    // adds 1x Charm Person or Mammal
+ADD_MEMORIZED_SPELL ~SPPR302~ #2 ~priest~ ( 1 )                                    // adds 1x Call Lightning
+ADD_MEMORIZED_SPELL ~SPPR319~ #2 ~priest~ ( 1 )                                    // adds 1x Summon Insects
+ADD_MEMORIZED_SPELL ~SPPR404~ #3 ~priest~ ( 1 )                                    // adds 1x Neutralize Poison
+REPLACE_CRE_ITEM ~rr#nymp~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~                        // replace defaul weapon with a non-damaging attack
+REPLACE_CRE_ITEM ~rr#nymp~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON2~                        // replace defaul weapon with a non-damaging attack
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newxpv"   = "1400"                                                                // new XP value
+"newhp"    = "24"                                                                  // new hit point value
+"newac"    = "9"                                                                   // new Armor Class value
+"newth"    = "17"                                                                  // new THAC0 value
+"newapr"   = "0"                                                                   // new number of attacks per round
+"newsvd"   = "13"                                                                  // new Save vs. Death
+"newsvw"   = "15"                                                                  // new Save vs. Wand
+"newsvp"   = "14"                                                                  // new Save vs. Polymorph
+"newsvb"   = "16"                                                                  // new Save vs. Breath
+"newsvs"   = "16"                                                                  // new Save vs. Spell
+"newmr"    = "50"                                                                  // new Magic Resistance value
+"newlvl1"  = "7"                                                                   // new level (first class)
+"newstr"   = "10"                                                                  // new Strength value
+"newdex"   = "17"                                                                  // new Dexterity value
+"newcon"   = "12"                                                                  // new Constitution value
+"newint"   = "16"                                                                  // new Intelligence value
+"newwis"   = "12"                                                                  // new Wisdom value
+"newchr"   = "19"                                                                  // new Charisma value
+"newmor"   = "7"                                                                   // new morale value
+"newgen"   = "1"                                                                   // new general (HUMANOID)
+"newmorb"  = "2"                                                                   // new morale break value
+"newmorr"  = "15"                                                                  // new morale recovery value
+"newrace"  = "120"                                                                 // new race (FAIRY)
+"newclass" = "11"                                                                  // new class (Druid)
+"newgendr" = "2"                                                                   // new gender (Female)
+"newsex"   = "2"                                                                   // new sex (Female)
+"newalign" = "33"                                                                  // new alignment (Neutral Good)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#FNYMP"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "WTASIGHT"                                                          // generic AI script
+"script04"   = "wtrunsgt"                                                          // generic AI script
+"script05"   = "_TRUNSGT"                                                          // generic AI script (Tutu)
+"script06"   = "hgnymph"                                                           // original hostile Nymph script
+"script07"   = "nymph"                                                             // original summoned Nymph script
+"script08"   = "DVNYMPH"                                                           // Spell Revisions' summoned Nymph script
+"script09"   = "DVMELEE"                                                           // Spell Revisions' melee script
+"script10"   = "dw#nymph"                                                          // SCSII Nymph script
+"script11"   = "BPNYMPH"                                                           // Big Picture Nymph script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
+"script13"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script14"   = "dw#melee"                                                          // SCSII melee AI script
+END                                                                                // ends FUNCTION call
+PATCH_IF (("%SOURCE_RES%" STRING_EQUAL_CASE ~NYMPHSU~) OR ("%SOURCE_RES%" STRING_EQUAL_CASE ~dvnymph~)) BEGIN // special case, summoned Nymphs need a different script
+  WRITE_ASCII 0x248 ~RR#SNYMP~ #8                                                  // override AI script
+END
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // note: BG1 animations have their movement rate set too slow by default
+    opcode = "176"                                                                 // effect: #176 (Movement Modifier (II))
+    target = "1"                                                                   // target: 1 (self)
+    timing = "9"                                                                   // timing mode: 9 (permanent after death)
+    duration = "0"                                                                 // duration: 0
+    sectype = "0"                                                                  // secondary type: none
+    parameter1 = "9"                                                               // param1: 9 (statistic modifier)
+    parameter2 = "1"                                                               // param2: 1 (type)
+    probability1 = "100"                                                           // probability1: 100%
+  STR_VAR
+    effsource = ""                                                                 // effsource: none
+END                                                                                // end FUNCTION call
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+
+
+
+
+//////////////////
+// New AI Scripts
+//////////////////
+
+
+COMPILE ~atweaks/baf/fey/rr#fdrya.baf~                                             // hostile Dryad AI script
+COMPILE ~atweaks/baf/fey/rr#fhama.baf~                                             // hostile Hamadryad AI script
+COMPILE ~atweaks/baf/fey/rr#fsiri.baf~                                             // hostile Sirine AI script
+COMPILE ~atweaks/baf/fey/rr#fnymp.baf~                                             // hostile Nymph AI script
+COMPILE ~atweaks/baf/fey/rr#snymp.baf~                                             // summoned Nymph AI script
+
+
+
+/////////////
+// New Items
+/////////////
+
+COPY ~atweaks/itm/fey/rr#ftrnq.itm~ ~override~                                      // Touch of Tranquility (item)
+  SAY NAME1 @1905 SAY NAME2 @1905
+
+COPY_EXISTING ~FIST.ITM~ ~override/rr#nymp.itm~                                     // create a new weapon for the Nymph
+  WRITE_ASCII 0x3A ~IFIST~ #8                                                       // inventory icon
+  READ_LONG 0x64 abil_off
+  READ_SHORT 0x68 abil_num
+  READ_LONG 0x6a fx_off
+  FOR (i = 0; i < "%abil_num%"; i += 1) BEGIN                                       // parse each ability
+    READ_BYTE (%abil_off% + %i% * 0x38) abil_type                                   // read ability type
+    PATCH_IF (%abil_type% = 1) BEGIN                                                // only patch the melee ability header
+      WRITE_SHORT ("%abil_off%" + 0x1a) 0                                           // damage bonus
+      WRITE_SHORT ("%abil_off%" + 0x16) 0                                           // damage dice
+      WRITE_SHORT ("%abil_off%" + 0x18) 0                                           // dice rolls
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+
+
+
+//////////////
+// Misc stuff
+//////////////
+
+
+// Wild animals should not attack fey creatures unless provoked
+
+COPY_EXISTING ~BEAR.BCS~ ~override~                                                // Bear AI script
+             ~CBEAR.BCS~ ~override~                                                // Cave Bear AI script
+              ~WOLF.BCS~ ~override~                                                // Wolf AI script
+ DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~!See([PC.0.0.CLERIC_RANGER])~ ~!See([PC.0.0.CLERIC_RANGER]) !See([GOODCUTOFF.0.FAIRY])~
+  REPLACE_TEXTUALLY EXACT_MATCH ~Class(NearestEnemyOf(Myself),RANGER)~ ~OR(2) Class(NearestEnemyOf(Myself),RANGER) Race(NearestEnemyOf(Myself),FAIRY)~
+ COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
+
+
+<<<<<<<<atweaks/inlined/baf/fey/wildemp.baf
+IF
+    Race(NearestEnemyOf(Myself),FAIRY)
+    DamageTaken(0)
+THEN
+	RESPONSE #100
+		RandomWalk()
+END
+>>>>>>>>
+
+EXTEND_TOP ~HUNTER.BCS~   ~atweaks/inlined/baf/fey/wildemp.baf~
+EXTEND_TOP ~HUNTER2.BCS~  ~atweaks/inlined/baf/fey/wildemp.baf~
+EXTEND_TOP ~WARDOG.BCS~   ~atweaks/inlined/baf/fey/wildemp.baf~
+EXTEND_TOP ~WILDDOG.BCS~  ~atweaks/inlined/baf/fey/wildemp.baf~
+EXTEND_TOP ~WOLF.BCS~     ~atweaks/inlined/baf/fey/wildemp.baf~
+
+
+// Quest Pack compatibility block (for the "New Fate For The Dryads' Acorns" component)
+
+ACTION_IF ((FILE_EXISTS_IN_GAME ~sufake.itm~) AND (FILE_EXISTS ~questpack/phluafae/appendvae.baf~)) BEGIN  // Quest Pack present and installed check
+
+<<<<<<<<atweaks/inlined/baf/fey/vaelasa.baf
+IF
+	False()
+	Global("rr#ph4qpack","LOCALS",0)
+THEN
+	RESPONSE #100
+		Continue()
+END
+>>>>>>>>
+
+COPY_EXISTING ~rr#fhama.bcs~ ~override~
+  REPLACE_BCS_BLOCK ~atweaks/inlined/baf/fey/vaelasa.baf~ ~questpack/phluafae/appendvae.baf~
+
+END                                                                                                        // ends Quest Pack check
+
+
+// Replace shouts with Help() in specific dialogue files
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~sil~                                                                // Sil's dialogue (BGT)
+             ~_SIL~                                                                // Sil's dialogue (Tutu)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.dlg~ BEGIN                                   // if the designated file with a SPL extension exists
+COPY_EXISTING ~%file%.dlg~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x01) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+// =============================================================================== // the actual work starts from here
+ DECOMPILE_DLG_TO_D
+  REPLACE_TEXTUALLY EXACT_MATCH ~Shout(1)~ ~Help()~
+ COMPILE_D_TO_DLG
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Vaelasa should summond Dryads instead of Sirines
+
+COPY_EXISTING ~dry01.cre~    ~override/rr#fdrya.cre~                               // Hostile Dryad
+  WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
+  WRITE_ASCIIE 0x248 "%DEST_RES%" #8                                               // Override script
+  WRITE_ASCII  0x250 ~~ #8                                                         // disable class AI script
+  WRITE_ASCII  0x258 ~~ #8                                                         // disable race AI script
+  WRITE_ASCII  0x260 ~~ #8                                                         // disable general AI script
+  WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
+  WRITE_BYTE   0x270 255                                                           // set intial allegiance to Enemy
+  WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32                                              // death variable
+  WRITE_ASCII  0x2cc ~~ #8                                                         // dialogue file
+  READ_LONG 0x2bc io
+  FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN                                              // Make all items unstealable&undroppable
+    WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
+  END
+
+COPY_EXISTING ~AR1200.BCS~ ~override~                                              // Windsper Hills area script
+ DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~SIRINE01~ ~rr#fdrya~
+ COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
+
+
+// The Spellhold Asylum door should be unlocked and opened once (note: remove this fix once it's included in the BG2 Fixpack)
+
+
+
+COPY_EXISTING ~ar1500.bcs~ ~override~
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~RR#Door1501~) BEGIN         // prevent duplication in case the Fixpack version is installed
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~GlobalGT("AsylumPlot","GLOBAL",55)~ ~GlobalGT("AsylumPlot","GLOBAL",55) Global("RR#Door1501","AR1500",0)~
+  REPLACE_TEXTUALLY EXACT_MATCH ~Unlock("Door1501")~ ~SetGlobal("RR#Door1501","AR1500",1) Unlock("Door1501")~
+COMPILE_BAF_TO_BCS
+END
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Spawn Sirines instead of Lizardmen and Mists in Spellhold
+
+<<<<<<<<atweaks/inlined/baf/fey/rr#1500.baf
+IF
+	Global("rr#spwn","AR1500",0)
+	OR(2)
+	  XPGT(Player1,1999999)
+          DifficultyGT(EASY) // Core Rules difficulty or higher
+THEN
+	RESPONSE #100
+		SetGlobal("rr#spwn","AR1500",1)
+		SpawnPtDeactivate("Spawn Point 2") // Lizardmen
+		SpawnPtDeactivate("Spawn Point 3") // Mists
+		CreateCreature("SIRINE01",[1550.2530],0) // Sirine (center)
+		CreateCreature("SIRINE01",[1500.2550],4) // Sirine (bottom left)
+		CreateCreature("SIRINE01",[1600.2550],15) // Sirine (bottom right)
+		CreateCreature("SIRINE01",[1500.2485],9) // Sirine (top left)
+		CreateCreature("SIRINE01",[1600.2485],12) // Sirine (top right)
+END
+
+IF
+	Global("rr#spwn","AR1500",0)
+	OR(2)
+          XPGT(Player1,1499999)
+          DifficultyGT(EASIEST) // Normal difficulty or higher
+THEN
+	RESPONSE #100
+		SetGlobal("rr#spwn","AR1500",1)
+		SpawnPtDeactivate("Spawn Point 2") // Lizardmen
+		SpawnPtDeactivate("Spawn Point 3") // Mists
+		CreateCreature("SIRINE01",[1550.2530],0) // Sirine (center)
+		CreateCreature("SIRINE01",[1500.2550],4) // Sirine (bottom left)
+		CreateCreature("SIRINE01",[1500.2485],9) // Sirine (top left)
+END
+
+IF
+	Global("rr#spwn","AR1500",0)
+	OR(2)
+          XPLT(Player1,1500000)
+          Difficulty(EASIEST) // Easiest difficulty level
+THEN
+	RESPONSE #100
+		SetGlobal("rr#spwn","AR1500",1)
+		SpawnPtDeactivate("Spawn Point 2") // Lizardmen
+		SpawnPtDeactivate("Spawn Point 3") // Mists
+		CreateCreature("SIRINE01",[1550.2530],0) // Sirine (center)
+END
+>>>>>>>>
+
+EXTEND_BOTTOM ~AR1500.BCS~  ~atweaks/inlined/baf/fey/rr#1500.baf~               // extend the Spellhold area script
+
+
+// Give the Cloakwood Hamadryad a few allies
+
+<<<<<<<<atweaks/inlined/baf/fey/rr#chama.baf
+IF
+	Global("rr#chama","MYAREA",0)
+THEN
+	RESPONSE #100
+		SetGlobal("rr#chama","MYAREA",1)
+                CreateCreature("BEARCA01",[1070.3330],0) // Cave Bear
+                CreateCreature("BEARCA01",[1200.3330],0) // Cave Bear
+                CreateCreature("WOLFDI01",[1065.3390],0) // Dire Wolf
+                CreateCreature("WOLFDI01",[1110.3420],0) // Dire Wolf
+                CreateCreature("WOLFDI01",[1165.3420],0) // Dire Wolf
+                CreateCreature("WOLFDI01",[1190.3390],0) // Dire Wolf
+		Continue()
+END
+>>>>>>>>
+
+ACTION_IF FILE_EXISTS_IN_GAME ~AR8500.BCS~ BEGIN                                   // if the designated file exists
+  EXTEND_BOTTOM ~AR8500.BCS~  ~atweaks/inlined/baf/fey/rr#chama.baf~               // extend the Cloakwood 4 area script (BGT)
+END
+
+ACTION_IF FILE_EXISTS_IN_GAME ~_AR1700.BCS~ BEGIN                                  // if the designated file exists
+  EXTEND_BOTTOM ~_AR1700.BCS~  ~atweaks/inlined/baf/fey/rr#chama.baf~              // extend the Cloakwood 4 area script (Tutu)
+END

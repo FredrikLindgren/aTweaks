@@ -1,0 +1,157 @@
+
+// G3 Detectable Spells (special thanks to CamDawg, DavidW and all the other DS contributors)
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DS.RR~ THEN BEGIN                            // only install Detectable Spells once from within RR and/or aTweaks
+ COPY_EXISTING ~sw1h01.itm~ ~override/RR#DS.RR~                                    // dummy file, prevents other components from re-installing DS
+ PRINT ~Initializing Detectable Spells installation ...~                           // let the user know that DS are being installed
+ INCLUDE ~aTweaks/LIB/DS/DS.tph~
+ INCLUDE ~aTweaks/LIB/DS/ds_oldscript.tph~
+ OUTER_SPRINT ~detectfile~ ~aTweaks/LIB/DS/cddetect.2da~
+ OUTER_SPRINT ~statsfile~ ~aTweaks/LIB/DS/stats.2da~
+ OUTER_SPRINT ~khelbenfile~ ~aTweaks/LIB/DS/spwi705.spl~
+ LAUNCH_ACTION_MACRO ~detectable_spells~
+ OUTER_SPRINT ~detectfile~ ~aTweaks/LIB/DS/dw#detect.2da~
+ LAUNCH_ACTION_MACRO ~detectable_spells~
+ OUTER_SPRINT ~marker~ ~dw#fixasc.mrk~                                             // DavidW's fix for Ascension's DS scripts
+ OUTER_SPRINT ~oldfiles~ ~aTweaks/LIB/DS/oldfiles_asc.2da~
+ OUTER_SPRINT ~oldswapfile~ ~aTweaks/LIB/DS/oldds_swap.2da~
+ LAUNCH_ACTION_MACRO ~fix_old_DS_scripts~ 
+ OUTER_SPRINT ~marker~ ~dw#fixkelsey.mrk~                                          // DavidW's fix for Kelsey's DS scripts
+ OUTER_SPRINT ~oldfiles~ ~aTweaks/LIB/DS/oldfiles_kelsey.2da~
+ OUTER_SPRINT ~oldswapfile~ ~aTweaks/LIB/DS/oldds_swap.2da~
+ LAUNCH_ACTION_MACRO ~fix_old_DS_scripts~
+ APPEND stats.ids "109 CLERIC_HALLOW" UNLESS CLERIC_HALLOW                         //Ensure that CLERIC_HALLOW is in there
+ /*
+ INCLUDE "atweaks/lib/DS/label_weapons.tph"                                        //Lifted from SCSII
+ OUTER_SET ~weapon_enchantment_stat~=109
+ OUTER_SET ~weapon_enchantment_type~=233
+ /// The assumption is that slot 109 ("CLERIC_HALLOW") is used to indicate weapon enchantment. It's a proficiency,
+ /// not a scripting state - that's what
+ /// the ~type~ codes
+ LAUNCH_ACTION_MACRO ~label_weapons~*/
+END
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#EVAL.2DA~ THEN BEGIN                         // only copy the evaluation file once
+  COPY ~aTweaks/LIB/RR#EVAL.2DA~ ~override~
+END                                       
+
+ACTION_IF !FILE_EXISTS_IN_GAME rr#trat.cre BEGIN
+  COPY ~atweaks/cre/rr#trat.cre~ ~override~                                         // Targeting Rat (script aid)
+  COMPILE ~atweaks/baf/rr#trat.baf~                                                 // Targeting Rat AI script
+END
+
+// Add new secondary types
+
+ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da RR#ETHER) BEGIN
+  ADD_SECTYPE RR#ETHER @707
+  APPEND RR#EVAL.2da "RR#ETHER %RR#ETHER%"
+END
+ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
+  ADD_SECTYPE fl#Disease #2449
+  APPEND RR#EVAL.2da "fl#Disease %fl#Disease%"
+END
+
+LAF ret_from_eval STR_VAR f_Entry = RR#ETHER RET RR#ETHER = f_Value END            //Retrieve stored values from RR#EVAL.2da
+LAF ret_from_eval STR_VAR f_Entry = fl#Disease RET fl#Disease = f_Value END
+
+//Add new projectiles
+
+ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.pro BEGIN
+  ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                        // New projectile for Symbol Pain (party friendly)
+  APPEND RR#EVAL.2da "RR#SPAIN %RR#SPAIN%"
+END
+ACTION_IF !FILE_EXISTS_IN_GAME fl#cnenp.pro BEGIN
+  ADD_PROJECTILE ~atweaks/pro/fl#cnenp.pro~                                        //Invisible, cone-shaped projectile, party-friendly
+  APPEND RR#EVAL.2da "fl#cnenp %fl#cnenp%"
+END
+ACTION_IF !FILE_EXISTS_IN_GAME fl#sight.pro BEGIN
+  ADD_PROJECTILE ~atweaks/pro/fl#sight.pro~                                        //Like INAREANP, but extends roughly as far as you can see 
+  APPEND RR#EVAL.2da "fl#sight %fl#sight%"
+END
+ACTION_IF !FILE_EXISTS_IN_GAME rr#pyrot.pro BEGIN
+  ADD_PROJECTILE ~atweaks/pro/rr#pyrot.pro~                                        // New projectile for Pyrotechnics
+  APPEND RR#EVAL.2da "rr#pyrot %rr#pyrot%"
+END
+ACTION_IF !FILE_EXISTS_IN_GAME rr#fcsng.pro BEGIN
+  ADD_PROJECTILE ~atweaks/pro/rr#fcsng.pro~                                        // New projectile for Charming Song
+  APPEND RR#EVAL.2da "rr#fcsng %rr#fcsng%"
+END
+
+LAF ret_from_eval STR_VAR f_Entry = RR#SPAIN RET RR#SPAIN = f_Value END
+LAF ret_from_eval STR_VAR f_Entry = fl#cnenp RET fl#cnenp = f_Value END
+LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Value END
+LAF ret_from_eval STR_VAR f_Entry = rr#pyrot RET rr#pyrot = f_Value END
+LAF ret_from_eval STR_VAR f_Entry = rr#fcsng RET rr#fcsng = f_Value END
+
+
+// Assign the Enchantment school to enchantment based spell-like abilities and make them turn the caster visible
+
+COPY_EXISTING ~SPWI929.SPL~                ~override~                              // Succubus Charm Female
+              ~SPWI930.SPL~                ~override~                              // Succubus Charm Male
+WRITE_ASCII 0x10 "CAS_M05" #8                                                      // casting sound: CAS_M05.WAV
+WRITE_SHORT 0x25 "4"                                                               // spell school: 4 (Enchantment)
+WRITE_SHORT 0x22 "11"                                                              // casting graphics: 11 (Enchantment)
+WRITE_LONG  0x34 "1"                                                               // spell level: 1
+LAUNCH_PATCH_FUNCTION ~RR#AGLEF~                                                   // Start FUNCTION call (my custom "Add Global Effect" function)
+INT_VAR                                                                            // initialize variables
+  "rr#opcode" = "136"                                                              // effect: #136 (force visible)
+  "rr#target" = "1"                                                                // target: 1 (self)
+  "rr#timing" = "1"                                                                // timing mode: 1 (permanent)
+  "rr#prob1" = "100"                                                               // probability1: 100%
+ END                                                                               // end FUNCTION call
+PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                                 // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
+BUT_ONLY_IF_IT_CHANGES
+
+
+
+// STATE.IDS additions (mirrors G3 BG2 Fixpack, SCSII and IESDP code)
+
+APPEND ~STATE.IDS~ ~0x80101FEF CD_STATE_NOTVALID~ UNLESS ~CD_STATE_NOTVALID~                   // CamDawg's custom IsValidForPartyDialogue() state
+APPEND ~STATE.IDS~ ~0x00000FC0 STATE_REALLY_DEAD~ UNLESS ~0x00000FC0 STATE_REALLY_DEAD~        // includes all possible death states (normal, frozen...)
+APPEND ~STATE.IDS~ ~0x00102029 STATE_HARMLESS~ UNLESS ~0x00102029 STATE_HARMLESS~              // includes Feeblemind, Charmed, Helpless, Stunned, Sleeping
+APPEND ~STATE.IDS~ ~0x60400010 STATE_ILLUSIONS~ UNLESS ~0x60400010 STATE_ILLUSIONS~            // includes Invisible, Imp. Invisibility, Mirror Image, Blur
+APPEND ~STATE.IDS~ ~0x80040004 STATE_RANGED_TARGET~ UNLESS ~0x80040004 STATE_RANGED_TARGET~    // includes Blind, Confused, Panic
+APPEND ~STATE.IDS~ ~0x00000029 STATE_IMMOBILE~ UNLESS ~0x00000029 STATE_IMMOBILE~              // includes Helpless, Stunned, Sleeping
+APPEND ~STATE.IDS~ ~0x00400010 STATE_NOT_TARGETABLE~ UNLESS ~0x00400010 STATE_NOT_TARGETABLE~  // includes Improved Invisibility and plain Invisibility
+APPEND ~STATE.IDS~ ~0x8010202D STATE_DISABLED~ UNLESS ~0x8010202D STATE_DISABLED~              // includes Helpless, Stunned, Panic, Sleeping, Charmed, Feebleminded, Confused 
+
+
+// TRIGGER.IDS additions (mirrors G3 BG2 Fixpack code)
+
+APPEND ~TRIGGER.IDS~ ~0x00A1 SpellCastOnMeRES(S:Spell*,O:Caster*)~
+              UNLESS ~0x00A1 SpellCastOnMeRES(S:Spell\*,O:Caster\*)~
+APPEND ~TRIGGER.IDS~ ~0x0091 SpellCastRES(S:Spell*,O:Object*)~
+              UNLESS ~0x0091 SpellCastRES(S:Spell\*,O:Object\*)~
+APPEND ~TRIGGER.IDS~ ~0x00A6 SpellCastPriestRES(S:Spell*,O:Object*)~
+              UNLESS ~0x00A6 SpellCastPriestRES(S:Spell\*,O:Object\*)~
+APPEND ~TRIGGER.IDS~ ~0x00A7 SpellCastInnateRES(S:Spell*,O:Object*)~
+              UNLESS ~0x00A7 SpellCastInnateRES(S:Spell\*,O:Object\*)~
+APPEND ~TRIGGER.IDS~ ~0x4031 HaveSpellRES(S:Spell*)~
+              UNLESS ~0x4031 HaveSpellRES(S:Spell\*)~
+APPEND ~TRIGGER.IDS~ ~0x40D5 ActuallyInCombat()~
+              UNLESS ~0x40D5 ActuallyInCombat()~
+
+
+// ACTION.IDS additions (mirrors G3 BG2 Fixpack code)
+
+APPEND ~ACTION.IDS~ ~147 RemoveSpellRES(S:Spell*)~
+             UNLESS ~147 RemoveSpellRES(S:Spell\*)~
+
+
+// Fix a mistargeted opcode in the Death Ward spell which prevents Detectable Spells from noticing it correctly (mirrors G3 BG2 Fixpack code)
+
+COPY_EXISTING ~sppr409.spl~ ~override~
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR ("index" = 0; "%index%" < "%abil_num%"; "index" = ("%index%" + 1)) BEGIN // fix existing effects
+    READ_SHORT  ("%abil_off%" + 0x1e + ("%index%" * 0x28)) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + ("%index%" * 0x28)) "abil_fx_idx"
+    FOR ("index2" = 0; "%index2%" < "%abil_fx_num%"; "index2" = ("%index2%" + 1)) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
+      PATCH_IF ("%opcode%" = 282) BEGIN // Scripting State Modifier
+        WRITE_BYTE  ("%fx_off%" + 0x02 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) 2 // preset target
+      END
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES

@@ -64,11 +64,9 @@ IF
 	  RandomNum(5,1)
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
                 SetGlobal("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		ForceSpellRES("RR#PSHFT",Myself) // Plane Shift - Ethereal Plane
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -81,12 +79,10 @@ IF
 	  RandomNum(4,1)
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
                 SetGlobal("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		SetGlobalTimer("RR#Ethsc","LOCALS",12)
 		ForceSpellRES("RR#PSHFT",Myself) // Plane Shift - Ethereal Plane
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -114,11 +110,9 @@ IF
 	  See([0.0.DEMONIC.0.0.0.MASK_LAWFUL])
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
                 SetGlobal("RR#ETHPL","LOCALS",0) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Ethsc","LOCALS",4)
 		ApplySpellRES("RR#UNETH",Myself) // Leaving the Ethereal Plane
-		SetInterrupt(TRUE)
 END
 
 IF
@@ -169,6 +163,20 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
 		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Allegiance(Myself,EVILCUTOFF)
+	!Range(NearestEnemyOf(Myself),30)
+	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5827) // Tanar'ri fiends global shout
+        InMyArea(LastHeardBy(Myself))
+	!Range(LastHeardBy(Myself),16)
+	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
 END
 
 IF
@@ -290,16 +298,6 @@ IF
 THEN
 	RESPONSE #100
                 SetGlobal("RR#Bhave","LOCALS",2) // Charm Person
-		SetGlobalTimer("RR#Tactic","LOCALS",12)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Tactic","LOCALS")
-	RandomNum(3,1)
-	See([GOODCUTOFF])
-THEN
-	RESPONSE #100
-                SetGlobal("RR#Bhave","LOCALS",1) // Confusion
 		SetGlobalTimer("RR#Tactic","LOCALS",12)
 END
 
@@ -729,12 +727,43 @@ THEN
 		SetInterrupt(TRUE)
 END
 
-
-
 IF
-        Global("RR#Bhave","LOCALS",1)
+	!GlobalTimerNotExpired("rr#conf","LOCALS") // special Confusion block, triggers regardless of tactic if at least three enemies are susceptible
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(NearestEnemyOf(Myself))
+        NumCreatureGT([GOODCUTOFF],2)
+	See([GOODCUTOFF])
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	See(SecondNearest([GOODCUTOFF]))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+	See(ThirdNearest([GOODCUTOFF]))
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
@@ -753,324 +782,8 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Cast","LOCALS",12) // special Confusion timer
 		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
-END
-
-IF
-        Global("RR#Bhave","LOCALS",1)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(SecondNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD)
-        !Race(LastSeenBy(Myself),SLIME)
-	!Race(LastSeenBy(Myself),DEMONIC)
-        !Race(LastSeenBy(Myself),TROLL)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
-END
-
-IF
-        Global("RR#Bhave","LOCALS",1)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(ThirdNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD)
-        !Race(LastSeenBy(Myself),SLIME)
-	!Race(LastSeenBy(Myself),DEMONIC)
-        !Race(LastSeenBy(Myself),TROLL)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
-END
-
-IF
-        Global("RR#Bhave","LOCALS",1)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(FourthNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD)
-        !Race(LastSeenBy(Myself),SLIME)
-	!Race(LastSeenBy(Myself),DEMONIC)
-        !Race(LastSeenBy(Myself),TROLL)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
-END
-
-IF
-        Global("RR#Bhave","LOCALS",1)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(FifthNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD)
-        !Race(LastSeenBy(Myself),SLIME)
-	!Race(LastSeenBy(Myself),DEMONIC)
-        !Race(LastSeenBy(Myself),TROLL)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
-END
-
-IF
-        Global("RR#Bhave","LOCALS",1)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(SixthNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD)
-        !Race(LastSeenBy(Myself),SLIME)
-	!Race(LastSeenBy(Myself),DEMONIC)
-        !Race(LastSeenBy(Myself),TROLL)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
-END
-
-IF
-        Global("RR#Bhave","LOCALS",2)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See([GOODCUTOFF.HUMANOID])
-	!Class(LastSeenBy(Myself),MONK)
-        !Kit(LastSeenBy(Myself),INQUISITOR)
-        !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
-END
-
-IF
-        Global("RR#Bhave","LOCALS",2)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(SecondNearest([GOODCUTOFF.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-        !Kit(LastSeenBy(Myself),INQUISITOR)
-        !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
-END
-
-IF
-        Global("RR#Bhave","LOCALS",2)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(ThirdNearest([GOODCUTOFF.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-        !Kit(LastSeenBy(Myself),INQUISITOR)
-        !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
-END
-
-IF
-        Global("RR#Bhave","LOCALS",2)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(FourthNearest([GOODCUTOFF.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-        !Kit(LastSeenBy(Myself),INQUISITOR)
-        !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
-END
-
-IF
-        Global("RR#Bhave","LOCALS",2)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(FifthNearest([GOODCUTOFF.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-        !Kit(LastSeenBy(Myself),INQUISITOR)
-        !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
-END
-
-IF
-        Global("RR#Bhave","LOCALS",2)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	See(SixthNearest([GOODCUTOFF.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-        !Kit(LastSeenBy(Myself),INQUISITOR)
-        !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
 END
 
 IF
@@ -1268,13 +981,349 @@ THEN
 END
 
 IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See([GOODCUTOFF.HUMANOID])
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(ThirdNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FourthNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FifthNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+        Global("RR#Bhave","LOCALS",2)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SixthNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(NearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(ThirdNearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FourthNearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FifthNearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SixthNearestEnemyOf(Myself))
+	!General(LastSeenBy(Myself),UNDEAD)
+        !Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DEMONIC)
+        !Race(LastSeenBy(Myself),TROLL)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!HasItemEquiped("LEAT20",LastSeenBy(Myself)) // Aeger's Hide +3
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquipedReal("SW2H21",LastSeenBy(Myself)) // Psion's Blade +5
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("RR#WI401",LastSeenBy(Myself)) // Confusion
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS") // secondary dispel blocks, no cooldown i.e. if there's nothing better to do, try to dispel the enemy's buffs
 	See(NearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL) // higher level check tolerance
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1284,6 +1333,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1315,7 +1365,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1325,6 +1375,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1357,7 +1408,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1367,6 +1418,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1399,7 +1451,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1409,6 +1461,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1441,7 +1494,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1451,6 +1504,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1483,7 +1537,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1493,6 +1547,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1525,7 +1580,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1535,6 +1590,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1567,7 +1623,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1577,6 +1633,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1609,7 +1666,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1619,6 +1676,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -1651,7 +1709,7 @@ IF
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL2)
 	CheckStatLT(LastSeenBy(Myself),10,LEVEL3)
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	OR(16)
+	OR(17)
           CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
 	  StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
 	  CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
@@ -1661,6 +1719,7 @@ IF
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
 	  CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
 	  CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
 	  CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
           CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
@@ -2014,11 +2073,9 @@ IF
 	!See([0.0.DEMONIC.0.0.0.MASK_LAWFUL])
 THEN
 	RESPONSE #100
-		SetInterrupt(FALSE)
                 SetGlobal("RR#ETHPL","LOCALS",1) // Ethereal state marker (0 = Prime Material Plane, 1 = Ethereal Plane)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		ForceSpellRES("RR#PSHFT",Myself) // Plane Shift - Ethereal Plane
-		SetInterrupt(TRUE)
 END
 
 IF

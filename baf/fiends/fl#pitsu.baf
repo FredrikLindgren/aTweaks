@@ -25,6 +25,18 @@ THEN
 END
 
 IF
+        !GlobalTimerNotExpired("RR#PFear","LOCALS")
+	See(NearestEnemyOf(Myself))
+	Range(LastSeenBy(Myself),10)
+        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a fear aura
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#PFear","LOCALS",18)
+                ForceSpellRES("RR#DFA2",Myself) // Pit Fiend Aura of Fear
+                Continue()
+END
+
+IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	OR(2)
           AreaCheck("AR3004") // Dead Magic zone
@@ -32,6 +44,24 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",600) // no spellcasting in Dead Magic zones
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!StateCheck(Myself,STATE_IMPROVEDINVISIBILITY)
+	!Global("dvgldust","LOCALS",1)
+	!CheckStatGT(Player1,0,TRUE_SIGHT)
+	!CheckStatGT(Player2,0,TRUE_SIGHT)
+	!CheckStatGT(Player3,0,TRUE_SIGHT)
+	!CheckStatGT(Player4,0,TRUE_SIGHT)
+	!CheckStatGT(Player5,0,TRUE_SIGHT)
+	!CheckStatGT(Player6,0,TRUE_SIGHT)
+	!CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+	!CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
 END
 
 IF
@@ -50,6 +80,30 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#TELWE",LastAttackerOf(Myself)) // Teleport Without Error
 		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See(NearestEnemyOf(Myself))
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+                GlobalShout(5827) // aTweaks global shout
+		Continue()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	Allegiance(Myself,EVILCUTOFF)
+	!Range(NearestEnemyOf(Myself),30)
+	Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL],5827) // Baatezu fiends global shout
+        InMyArea(LastHeardBy(Myself))
+	!Range(LastHeardBy(Myself),16)
+	!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+                ForceSpellRES("RR#TELWE",LastHeardBy(Myself)) // Teleport Without Error
 END
 
 IF
@@ -187,18 +241,6 @@ THEN
 END
 
 IF
-        !GlobalTimerNotExpired("RR#PFear","LOCALS")
-	See(NearestEnemyOf(Myself))
-	Range(LastSeenBy(Myself),10)
-        !StateCheck(Myself,STATE_INVISIBLE) // must be visible in order to emit a fear aura
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#PFear","LOCALS",18)
-                ForceSpellRES("RR#DFA2",Myself) // Pit Fiend Aura of Fear
-                Continue()
-END
-
-IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         Global("RR#PFWish","LOCALS",0)
         OR(3)
@@ -213,24 +255,6 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#WISH",Myself) // Wish
 		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!StateCheck(Myself,STATE_IMPROVEDINVISIBILITY)
-	!Global("dvgldust","LOCALS",1)
-	!CheckStatGT(Player1,0,TRUE_SIGHT)
-	!CheckStatGT(Player2,0,TRUE_SIGHT)
-	!CheckStatGT(Player3,0,TRUE_SIGHT)
-	!CheckStatGT(Player4,0,TRUE_SIGHT)
-	!CheckStatGT(Player5,0,TRUE_SIGHT)
-	!CheckStatGT(Player6,0,TRUE_SIGHT)
-	!CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
-	!CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-                ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
 END
 
 IF
@@ -507,6 +531,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -535,6 +561,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -563,6 +591,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -591,6 +621,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -619,6 +651,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -647,6 +681,8 @@ IF
 	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
 	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
 	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
@@ -686,6 +722,186 @@ THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		ForceSpell(LastSeenBy(Myself),WIZARD_CHARM_PERSON)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(NearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SecondNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(ThirdNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FourthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(FifthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SixthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(SeventhNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(EighthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(NinthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(TenthNearestEnemyOf(Myself))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#pyrot",LastSeenBy(Myself)) // Pyrotechnics
 END
 
 IF
@@ -1112,6 +1328,15 @@ THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#WI405",Myself) // Improved Invisibility
+END
+
+IF
+	StateCheck(Myself,STATE_INVISIBLE) // if invisible
+        Global("RR#PFWish","LOCALS",0) // and Wish is available
+        HPPercentLT(Myself,61) // and wounded
+THEN
+	RESPONSE #100
+		NoAction() // don't break invisibility by attacking in melee
 END
 
 IF

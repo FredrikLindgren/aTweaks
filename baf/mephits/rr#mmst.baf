@@ -1142,6 +1142,7 @@ IF
         CheckStatLT(WorstAC([PC]),100,RESISTCRUSHING)
 	!StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
         CheckStatLT(WorstAC([PC]),1,STONESKINS)
+        !StateCheck(WorstAC([PC]),STATE_CHARMED)
 	See(WorstAC([PC])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
 	False()
 THEN
@@ -1324,6 +1325,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
 	Help([EVILCUTOFF.0.MEPHIT])
+        InMyArea(LastHelp(Myself))
+	!StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Move","LOCALS",6)

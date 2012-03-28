@@ -1,0 +1,1776 @@
+IF
+	Global("rr#trees","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains trees, 2 - check done) 
+	HaveSpellRES("rr#ddoor") // Dimension Door
+	AreaType(OUTDOOR)
+	!AreaType(CITY)
+	!AreaType(DUNGEON)
+THEN
+	RESPONSE #100
+		SetGlobal("rr#trees","LOCALS",1)
+END
+
+IF
+	Global("rr#trees","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains trees, 2 - check done) 
+THEN
+	RESPONSE #100
+		SetGlobal("rr#trees","LOCALS",2)
+		RemoveSpellRES("rr#ddoor") // remove the spell from memory
+		RemoveSpellRES("rr#fdsnr") // remove the spell from memory
+END
+
+IF
+	Global("RR#Intd","LOCALS",0)
+        Name("vaelasa",Myself) // Vaelasa, the Fairy Queen
+	NumTimesTalkedTo(0)
+        See([PC])
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Intd","LOCALS",1)
+		FaceObject([PC])
+		StartDialogueNoSet([PC])
+END
+
+IF
+	AreaCheck("AR1200") // Windsper Hills
+        Name("vaelasa",Myself) // Vaelasa, the Fairy Queen
+	Global("SummonDryads","AR1200",1)
+THEN
+	RESPONSE #100
+		SetGlobal("SummonDryads","AR1200",2)
+		StartCutSceneMode()
+		StartCutScene("Cut23a")
+END
+
+IF
+	AreaCheck("AR1200") // Windsper Hills
+        Name("vaelasa",Myself) // Vaelasa, the Fairy Queen
+	AttackedBy([GOODCUTOFF],DEFAULT)
+	Global("VaelasaHostile","GLOBAL",0)
+THEN
+	RESPONSE #100
+		SetGlobal("VaelasaHostile","GLOBAL",1)
+		Enemy()
+END
+
+IF
+	False()
+	Global("rr#ph4qpack","LOCALS",0)
+THEN
+	RESPONSE #100
+		Continue()
+END
+
+IF
+        Global("rr#chama","MYAREA",1) // Cloakwood Hamadryad
+	Global("rr#hamat","LOCALS",0)
+        See([PC])
+THEN
+	RESPONSE #100
+		SetGlobal("rr#hamat","LOCALS",1)
+		FaceObject([PC])
+		DisplayStringHead(Myself,5184) // Leave my wood!
+		Continue()
+END
+
+IF
+	Global("RR#Active","LOCALS",0)
+	OR(3)
+	  AttackedBy([ANYONE],DEFAULT)
+	  TookDamage()
+	  Help([EVILCUTOFF.0.FAIRY]) // other fey creatures
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	Global("RR#Active","LOCALS",0)
+        Allegiance(Myself,EVILCUTOFF)
+	See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
+THEN
+	RESPONSE #100
+		SetGlobal("RR#Active","LOCALS",1)
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+		Enemy()
+		Help()
+		Continue()
+END
+
+IF
+	OR(4)
+	  Global("RR#Active","LOCALS",0)
+          !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	Global("RR#Active","LOCALS",1)
+	!InActiveArea(Myself)
+	!See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		NoAction()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+  RESPONSE #100
+		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+                ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+                Rest()
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+	See([GOODCUTOFF])
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Help","LOCALS",12)
+		Help()
+		Continue()
+END
+
+IF
+	!See([GOODCUTOFF])
+        InMyArea(Player1)
+        !Detect(Player1)
+        OR(2)
+          StateCheck(Myself,STATE_INVISIBLE)
+          RandomNum(8,1)
+THEN
+	RESPONSE #100
+		MoveToObject(Player1)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#fspkp","LOCALS") // Speak With Plants timer
+	See([EVILCUTOFF])
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+	CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	Range(LastSeenBy(Myself),12)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#fspkp","LOCALS",12) // attempt Speak With Plants once per two rounds
+		ForceSpellRES("rr#fspkp",Myself) // Speak With Plants
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#fspkp","LOCALS") // Speak With Plants timer
+	See(SecondNearest([EVILCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+	CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	Range(LastSeenBy(Myself),12)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#fspkp","LOCALS",12) // attempt Speak With Plants once per two rounds
+		ForceSpellRES("rr#fspkp",Myself) // Speak With Plants
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#fspkp","LOCALS") // Speak With Plants timer
+	See(ThirdNearest([EVILCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+	CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	Range(LastSeenBy(Myself),12)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#fspkp","LOCALS",12) // attempt Speak With Plants once per two rounds
+		ForceSpellRES("rr#fspkp",Myself) // Speak With Plants
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#fspkp","LOCALS") // Speak With Plants timer
+	See(FourthNearest([EVILCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+	CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	Range(LastSeenBy(Myself),12)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#fspkp","LOCALS",12) // attempt Speak With Plants once per two rounds
+		ForceSpellRES("rr#fspkp",Myself) // Speak With Plants
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#fspkp","LOCALS") // Speak With Plants timer
+	See(FifthNearest([EVILCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+	CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	Range(LastSeenBy(Myself),12)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#fspkp","LOCALS",12) // attempt Speak With Plants once per two rounds
+		ForceSpellRES("rr#fspkp",Myself) // Speak With Plants
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#fspkp","LOCALS") // Speak With Plants timer
+	See(SixthNearest([EVILCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+	CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	Range(LastSeenBy(Myself),12)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#fspkp","LOCALS",12) // attempt Speak With Plants once per two rounds
+		ForceSpellRES("rr#fspkp",Myself) // Speak With Plants
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#fspkp","LOCALS") // Speak With Plants timer
+	See(SeventhNearest([EVILCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+	CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	Range(LastSeenBy(Myself),12)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#fspkp","LOCALS",12) // attempt Speak With Plants once per two rounds
+		ForceSpellRES("rr#fspkp",Myself) // Speak With Plants
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#fspkp","LOCALS") // Speak With Plants timer
+	See(EighthNearest([EVILCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+	CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	Range(LastSeenBy(Myself),12)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#fspkp","LOCALS",12) // attempt Speak With Plants once per two rounds
+		ForceSpellRES("rr#fspkp",Myself) // Speak With Plants
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#fspkp","LOCALS") // Speak With Plants timer
+	See(NinthNearest([EVILCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+	CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	Range(LastSeenBy(Myself),12)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#fspkp","LOCALS",12) // attempt Speak With Plants once per two rounds
+		ForceSpellRES("rr#fspkp",Myself) // Speak With Plants
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#fspkp","LOCALS") // Speak With Plants timer
+	See(TenthNearest([EVILCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+	CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	Range(LastSeenBy(Myself),12)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#fspkp","LOCALS",12) // attempt Speak With Plants once per two rounds
+		ForceSpellRES("rr#fspkp",Myself) // Speak With Plants
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Entg","LOCALS") // Entangle refresh timer
+	See([GOODCUTOFF])
+	!Race(LastSeenBy(Myself),ELEMENTAL)
+	!Race(LastSeenBy(Myself),SHADOW)
+	!Race(LastSeenBy(Myself),SPECTRE)
+	!Race(LastSeenBy(Myself),MIST)
+	!Race(LastSeenBy(Myself),WRAITH)
+	!Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DRAGON)
+	!Class(LastSeenBy(Myself),GIANT)
+	!Class(LastSeenBy(Myself),GOLEM_IRON)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquiped("NPPLAT",LastSeenBy(Myself)) // Firecam Full-Plate Armor
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Entg","LOCALS",18)  // Entangle refresh timer
+                ForceSpellRES("rr#fentg",LastSeenBy(Myself)) // Entangle
+		RemoveSpellRES("rr#fentg") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Entg","LOCALS") // Entangle refresh timer
+	See(SecondNearest([GOODCUTOFF]))
+	!Race(LastSeenBy(Myself),ELEMENTAL)
+	!Race(LastSeenBy(Myself),SHADOW)
+	!Race(LastSeenBy(Myself),SPECTRE)
+	!Race(LastSeenBy(Myself),MIST)
+	!Race(LastSeenBy(Myself),WRAITH)
+	!Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DRAGON)
+	!Class(LastSeenBy(Myself),GIANT)
+	!Class(LastSeenBy(Myself),GOLEM_IRON)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquiped("NPPLAT",LastSeenBy(Myself)) // Firecam Full-Plate Armor
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Entg","LOCALS",18)  // Entangle refresh timer
+                ForceSpellRES("rr#fentg",LastSeenBy(Myself)) // Entangle
+		RemoveSpellRES("rr#fentg") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Entg","LOCALS") // Entangle refresh timer
+	See(ThirdNearest([GOODCUTOFF]))
+	!Race(LastSeenBy(Myself),ELEMENTAL)
+	!Race(LastSeenBy(Myself),SHADOW)
+	!Race(LastSeenBy(Myself),SPECTRE)
+	!Race(LastSeenBy(Myself),MIST)
+	!Race(LastSeenBy(Myself),WRAITH)
+	!Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DRAGON)
+	!Class(LastSeenBy(Myself),GIANT)
+	!Class(LastSeenBy(Myself),GOLEM_IRON)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquiped("NPPLAT",LastSeenBy(Myself)) // Firecam Full-Plate Armor
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Entg","LOCALS",18)  // Entangle refresh timer
+                ForceSpellRES("rr#fentg",LastSeenBy(Myself)) // Entangle
+		RemoveSpellRES("rr#fentg") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Entg","LOCALS") // Entangle refresh timer
+	See(FourthNearest([GOODCUTOFF]))
+	!Race(LastSeenBy(Myself),ELEMENTAL)
+	!Race(LastSeenBy(Myself),SHADOW)
+	!Race(LastSeenBy(Myself),SPECTRE)
+	!Race(LastSeenBy(Myself),MIST)
+	!Race(LastSeenBy(Myself),WRAITH)
+	!Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DRAGON)
+	!Class(LastSeenBy(Myself),GIANT)
+	!Class(LastSeenBy(Myself),GOLEM_IRON)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquiped("NPPLAT",LastSeenBy(Myself)) // Firecam Full-Plate Armor
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Entg","LOCALS",18)  // Entangle refresh timer
+                ForceSpellRES("rr#fentg",LastSeenBy(Myself)) // Entangle
+		RemoveSpellRES("rr#fentg") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Entg","LOCALS") // Entangle refresh timer
+	See(FifthNearest([GOODCUTOFF]))
+	!Race(LastSeenBy(Myself),ELEMENTAL)
+	!Race(LastSeenBy(Myself),SHADOW)
+	!Race(LastSeenBy(Myself),SPECTRE)
+	!Race(LastSeenBy(Myself),MIST)
+	!Race(LastSeenBy(Myself),WRAITH)
+	!Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DRAGON)
+	!Class(LastSeenBy(Myself),GIANT)
+	!Class(LastSeenBy(Myself),GOLEM_IRON)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquiped("NPPLAT",LastSeenBy(Myself)) // Firecam Full-Plate Armor
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Entg","LOCALS",18)  // Entangle refresh timer
+                ForceSpellRES("rr#fentg",LastSeenBy(Myself)) // Entangle
+		RemoveSpellRES("rr#fentg") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Entg","LOCALS") // Entangle refresh timer
+	See(SixthNearest([GOODCUTOFF]))
+	!Race(LastSeenBy(Myself),ELEMENTAL)
+	!Race(LastSeenBy(Myself),SHADOW)
+	!Race(LastSeenBy(Myself),SPECTRE)
+	!Race(LastSeenBy(Myself),MIST)
+	!Race(LastSeenBy(Myself),WRAITH)
+	!Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DRAGON)
+	!Class(LastSeenBy(Myself),GIANT)
+	!Class(LastSeenBy(Myself),GOLEM_IRON)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquiped("NPPLAT",LastSeenBy(Myself)) // Firecam Full-Plate Armor
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Entg","LOCALS",18)  // Entangle refresh timer
+                ForceSpellRES("rr#fentg",LastSeenBy(Myself)) // Entangle
+		RemoveSpellRES("rr#fentg") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Entg","LOCALS") // Entangle refresh timer
+	See(SeventhNearest([GOODCUTOFF]))
+	!Race(LastSeenBy(Myself),ELEMENTAL)
+	!Race(LastSeenBy(Myself),SHADOW)
+	!Race(LastSeenBy(Myself),SPECTRE)
+	!Race(LastSeenBy(Myself),MIST)
+	!Race(LastSeenBy(Myself),WRAITH)
+	!Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DRAGON)
+	!Class(LastSeenBy(Myself),GIANT)
+	!Class(LastSeenBy(Myself),GOLEM_IRON)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquiped("NPPLAT",LastSeenBy(Myself)) // Firecam Full-Plate Armor
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Entg","LOCALS",18)  // Entangle refresh timer
+                ForceSpellRES("rr#fentg",LastSeenBy(Myself)) // Entangle
+		RemoveSpellRES("rr#fentg") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Entg","LOCALS") // Entangle refresh timer
+	See(EighthNearest([GOODCUTOFF]))
+	!Race(LastSeenBy(Myself),ELEMENTAL)
+	!Race(LastSeenBy(Myself),SHADOW)
+	!Race(LastSeenBy(Myself),SPECTRE)
+	!Race(LastSeenBy(Myself),MIST)
+	!Race(LastSeenBy(Myself),WRAITH)
+	!Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DRAGON)
+	!Class(LastSeenBy(Myself),GIANT)
+	!Class(LastSeenBy(Myself),GOLEM_IRON)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquiped("NPPLAT",LastSeenBy(Myself)) // Firecam Full-Plate Armor
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Entg","LOCALS",18)  // Entangle refresh timer
+                ForceSpellRES("rr#fentg",LastSeenBy(Myself)) // Entangle
+		RemoveSpellRES("rr#fentg") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Entg","LOCALS") // Entangle refresh timer
+	See(NinthNearest([GOODCUTOFF]))
+	!Race(LastSeenBy(Myself),ELEMENTAL)
+	!Race(LastSeenBy(Myself),SHADOW)
+	!Race(LastSeenBy(Myself),SPECTRE)
+	!Race(LastSeenBy(Myself),MIST)
+	!Race(LastSeenBy(Myself),WRAITH)
+	!Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DRAGON)
+	!Class(LastSeenBy(Myself),GIANT)
+	!Class(LastSeenBy(Myself),GOLEM_IRON)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquiped("NPPLAT",LastSeenBy(Myself)) // Firecam Full-Plate Armor
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Entg","LOCALS",18)  // Entangle refresh timer
+                ForceSpellRES("rr#fentg",LastSeenBy(Myself)) // Entangle
+		RemoveSpellRES("rr#fentg") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+        !GlobalTimerNotExpired("RR#Entg","LOCALS") // Entangle refresh timer
+	See(TenthNearest([GOODCUTOFF]))
+	!Race(LastSeenBy(Myself),ELEMENTAL)
+	!Race(LastSeenBy(Myself),SHADOW)
+	!Race(LastSeenBy(Myself),SPECTRE)
+	!Race(LastSeenBy(Myself),MIST)
+	!Race(LastSeenBy(Myself),WRAITH)
+	!Race(LastSeenBy(Myself),SLIME)
+	!Race(LastSeenBy(Myself),DRAGON)
+	!Class(LastSeenBy(Myself),GIANT)
+	!Class(LastSeenBy(Myself),GOLEM_IRON)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,ENTANGLE)
+	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
+	!HasItemEquiped("NPPLAT",LastSeenBy(Myself)) // Firecam Full-Plate Armor
+	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
+	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
+	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
+	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("RR#Entg","LOCALS",18)  // Entangle refresh timer
+                ForceSpellRES("rr#fentg",LastSeenBy(Myself)) // Entangle
+		RemoveSpellRES("rr#fentg") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player1)
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)	
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player2)
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player3)
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player4)
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player5)
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	See(Player6)
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL)
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+	!Race(LastSeenBy(Myself),HALF_ELF) // high priority blocks should filter out half-elves too
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+        CheckStatGT(LastSeenBy(Myself),10,SAVEVSSPELL) // highest priority - PC warriors with poor saving throws
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL])
+	!Class(LastSeenBy(Myself),MONK)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL]))
+	!Class(LastSeenBy(Myself),MONK)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(ThirdNearest([GOODCUTOFF.HUMANOID.0.FIGHTER_ALL]))
+	!Class(LastSeenBy(Myself),MONK)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See([GOODCUTOFF.HUMANOID.0.RANGER_ALL])
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(SecondNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL]))
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(ThirdNearest([GOODCUTOFF.HUMANOID.0.RANGER_ALL]))
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See([GOODCUTOFF.HUMANOID])
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(SecondNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(ThirdNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(FourthNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(FifthNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(SixthNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(SeventhNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(EighthNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(NinthNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fchrm") // Charm Person (Dryad and Hamadryad)
+	See(TenthNearest([GOODCUTOFF.HUMANOID]))
+	!Class(LastSeenBy(Myself),MONK)
+        !Kit(LastSeenBy(Myself),INQUISITOR)
+        !Kit(LastSeenBy(Myself),CAVALIER)
+	!Race(LastSeenBy(Myself),ELF)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),-3,SAVEVSSPELL)
+	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fchrm",LastSeenBy(Myself)) // Charm Person (Dryad and Hamadryad)
+		RemoveSpellRES("rr#fchrm") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fafrn") // Animal Friendship
+	OR(2)
+	  See([NEUTRAL.ANIMAL])
+	  See([GOODCUTOFF.ANIMAL])
+        OR(2)
+          HPGT(LastSeenBy(Myself),20) // do not charm neutral squirrels, rats etc.
+          Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+        HPGT(LastSeenBy(Myself),5) // double check, do not charm summoned squirrels, rabbits etc.
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!HasItemEquiped("RING95",LastSeenBy(Myself)) // Spirit Animal immunity ring 
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fafrn",LastSeenBy(Myself)) // Animal Friendship
+		RemoveSpellRES("rr#fafrn") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fafrn") // Animal Friendship
+	OR(2)
+	  See(SecondNearest([NEUTRAL.ANIMAL]))
+	  See(SecondNearest([GOODCUTOFF.ANIMAL]))
+        OR(2)
+          HPGT(LastSeenBy(Myself),20) // do not charm neutral squirrels, rats etc.
+          Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+        HPGT(LastSeenBy(Myself),5) // double check, do not charm summoned squirrels, rabbits etc.
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!HasItemEquiped("RING95",LastSeenBy(Myself)) // Spirit Animal immunity ring 
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fafrn",LastSeenBy(Myself)) // Animal Friendship
+		RemoveSpellRES("rr#fafrn") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fafrn") // Animal Friendship
+	OR(2)
+	  See(ThirdNearest([NEUTRAL.ANIMAL]))
+	  See(ThirdNearest([GOODCUTOFF.ANIMAL]))
+        OR(2)
+          HPGT(LastSeenBy(Myself),20) // do not charm neutral squirrels, rats etc.
+          Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+        HPGT(LastSeenBy(Myself),5) // double check, do not charm summoned squirrels, rabbits etc.
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!HasItemEquiped("RING95",LastSeenBy(Myself)) // Spirit Animal immunity ring 
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fafrn",LastSeenBy(Myself)) // Animal Friendship
+		RemoveSpellRES("rr#fafrn") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fafrn") // Animal Friendship
+	OR(2)
+	  See(FourthNearest([NEUTRAL.ANIMAL]))
+	  See(FourthNearest([GOODCUTOFF.ANIMAL]))
+        OR(2)
+          HPGT(LastSeenBy(Myself),20) // do not charm neutral squirrels, rats etc.
+          Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+        HPGT(LastSeenBy(Myself),5) // double check, do not charm summoned squirrels, rabbits etc.
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!HasItemEquiped("RING95",LastSeenBy(Myself)) // Spirit Animal immunity ring 
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fafrn",LastSeenBy(Myself)) // Animal Friendship
+		RemoveSpellRES("rr#fafrn") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fafrn") // Animal Friendship
+	OR(2)
+	  See(FifthNearest([NEUTRAL.ANIMAL]))
+	  See(FifthNearest([GOODCUTOFF.ANIMAL]))
+        OR(2)
+          HPGT(LastSeenBy(Myself),20) // do not charm neutral squirrels, rats etc.
+          Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+        HPGT(LastSeenBy(Myself),5) // do not charm summoned squirrels, rabbits etc.
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!HasItemEquiped("RING95",LastSeenBy(Myself)) // Spirit Animal immunity ring 
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fafrn",LastSeenBy(Myself)) // Animal Friendship
+		RemoveSpellRES("rr#fafrn") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#fafrn") // Animal Friendship
+	OR(2)
+	  See(SixthNearest([NEUTRAL.ANIMAL]))
+	  See(SixthNearest([GOODCUTOFF.ANIMAL]))
+        OR(2)
+          HPGT(LastSeenBy(Myself),20) // do not charm neutral squirrels, rats etc.
+          Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+        HPGT(LastSeenBy(Myself),5) // do not charm summoned squirrels, rabbits etc.
+	!StateCheck(LastSeenBy(Myself),STATE_CHARMED)
+        !StateCheck(LastSeenBy(Myself),STATE_NOT_TARGETABLE)
+	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
+	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+	!HasItemEquiped("RING95",LastSeenBy(Myself)) // Spirit Animal immunity ring 
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		ForceSpellRES("rr#fafrn",LastSeenBy(Myself)) // Animal Friendship
+		RemoveSpellRES("rr#fafrn") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	HaveSpellRES("rr#ddoor") // Dimension Door
+	OR(2)
+	  Range(NearestEnemyOf(Myself),10) // Dryads and Hamadryads avoid melee combat
+	  AttackedBy([ANYONE],DEFAULT)
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		CreateCreatureOffscreen("RR#TRAT",0) // Targeting Rat (script aid)
+		ForceSpellRES("RR#DDORX","RR#TRAT") // Dimension Door (special version, breaks targeting via 1 second invisibility)
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+	Help([EVILCUTOFF.0.FAIRY]) // other fey creatures
+        InMyArea(LastHelp(Myself))
+	!StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Move","LOCALS",6)
+		MoveToObject(LastHelp(Myself))
+END
+
+IF
+        Range(NearestEnemyOf(Myself),12) // Dryads and Hamadryads avoid melee combat	
+THEN
+	RESPONSE #100
+		RandomWalkContinuous()
+END

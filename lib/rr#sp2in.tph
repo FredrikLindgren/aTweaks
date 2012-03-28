@@ -5,8 +5,9 @@ DEFINE_PATCH_FUNCTION ~RR#SP2IN~
 
 INT_VAR                                                                            // initialize starting variables
 
-"rr#ctime"   = "1"                                                                // new casting time, set to 99 to leave as is
+"rr#ctime"   = "1"                                                                 // new casting time, set to 99 to leave as is
 "rr#rinvs"   = "0"                                                                 // spell removes invisibility when cast
+"rr#renew"   = "0"                                                                 // spell renews after being cast
 
 BEGIN                                                                              // Start FUNCTION
 
@@ -28,6 +29,26 @@ WRITE_LONG 0x34 "1"                                                             
       "rr#timing" = "1"                                                             // timing mode: 1 (permanent)
       "rr#prob1" = "100"                                                            // probability1: 100%
       END                                                                           // end FUNCTION call
+    END
+    PATCH_IF ("rr#renew" = "1") BEGIN                                               // if the spell should be renewed after being cast
+      LAUNCH_PATCH_FUNCTION ~RR#AGLEF~                                              // Start FUNCTION call (my custom "Add Global Effect" function)
+      INT_VAR                                                                       // initialize variables
+      "rr#opcode" = "172"                                                           // effect: #172 (Remove Spell)
+      "rr#target" = "1"                                                             // target: 1 (self)
+      "rr#timing" = "1"                                                             // timing mode: 1 (permanent)
+      "rr#prob1" = "100"                                                            // probability1: 100%
+      STR_VAR
+      "rr#resref" = EVAL "%DEST_RES%"                                               // resref: new innate
+      END                                                                           // end FUNCTION call
+      LAUNCH_PATCH_FUNCTION ~RR#AGLEF~                                              // Start FUNCTION call (my custom "Add Global Effect" function)
+      INT_VAR                                                                       // initialize variables
+      "rr#opcode" = "171"                                                           // effect: #171 (Give Innate Ability)
+      "rr#target" = "1"                                                             // target: 1 (self)
+      "rr#timing" = "1"                                                             // timing mode: 1 (permanent)
+      "rr#prob1" = "100"                                                            // probability1: 100%
+      STR_VAR
+      "rr#resref" = EVAL "%DEST_RES%"                                               // resref: new innate
+      END                                                                           // end FUNCTION call
+     END
     PATCH_INCLUDE ~aTweaks/LIB/fj_spl_itm_reindex.tpp~                              // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
-    END                                                                             // end FUNCTION call (my custom "Add Global Effect" function)
 END                                                                                 // End FUNCTION (my custom "Spell to Innate" function)

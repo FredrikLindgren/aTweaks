@@ -103,20 +103,22 @@ THEN
 END
 
 IF
+    !GlobalTimerNotExpired("rr#ddeti","LOCALS")
 	OR(11)
-	  StateCheck([GOODCUTOFF],STATE_ILLUSIONS)
-	  StateCheck(SecondNearest([GOODCUTOFF]),STATE_ILLUSIONS)
-	  StateCheck(ThirdNearest([GOODCUTOFF]),STATE_ILLUSIONS)
-	  StateCheck(FourthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
-	  StateCheck(FifthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
-	  StateCheck(SixthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
-	  StateCheck(SeventhNearest([GOODCUTOFF]),STATE_ILLUSIONS)
-	  StateCheck(EighthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
-	  StateCheck(NinthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
-	  StateCheck(TenthNearest([GOODCUTOFF]),STATE_ILLUSIONS)
+	  StateCheck([GOODCUTOFF],1077936144) // Invisible, Improved Invisibility, Mirror Image
+	  StateCheck(SecondNearest([GOODCUTOFF]),1077936144) // Invisible, Improved Invisibility, Mirror Image
+	  StateCheck(ThirdNearest([GOODCUTOFF]),1077936144) // Invisible, Improved Invisibility, Mirror Image
+	  StateCheck(FourthNearest([GOODCUTOFF]),1077936144) // Invisible, Improved Invisibility, Mirror Image
+	  StateCheck(FifthNearest([GOODCUTOFF]),1077936144) // Invisible, Improved Invisibility, Mirror Image
+	  StateCheck(SixthNearest([GOODCUTOFF]),1077936144) // Invisible, Improved Invisibility, Mirror Image
+	  StateCheck(SeventhNearest([GOODCUTOFF]),1077936144) // Invisible, Improved Invisibility, Mirror Image
+	  StateCheck(EighthNearest([GOODCUTOFF]),1077936144) // Invisible, Improved Invisibility, Mirror Image
+	  StateCheck(NinthNearest([GOODCUTOFF]),1077936144) // Invisible, Improved Invisibility, Mirror Image
+	  StateCheck(TenthNearest([GOODCUTOFF]),1077936144) // Invisible, Improved Invisibility, Mirror Image
 	  See([GOODCUTOFF.0.0.0.0.ILLUSIONARY])
 THEN
 	RESPONSE #100
+        SetGlobalTimer("rr#ddeti","LOCALS",6)
 		ReallyForceSpellRES("RR#DDETI",Myself) // Detect Illusion
 		DisplayStringHead(Myself,31858) // Detects Illusion
 END
@@ -1468,6 +1470,7 @@ IF
         CheckStatLT(WorstAC([PC]),100,RESISTSLASHING)
 	!StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
         CheckStatLT(WorstAC([PC]),1,STONESKINS)
+        !StateCheck(WorstAC([PC]),STATE_CHARMED)
 	See(WorstAC([PC])) // these blocks are optimized for targeting low AC characters such as single-class mages and mage/thieves
 	False()
 THEN
@@ -1650,6 +1653,8 @@ END
 IF
 	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
 	Help([EVILCUTOFF.0.MEPHIT])
+        InMyArea(LastHelp(Myself))
+	!StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Move","LOCALS",6)

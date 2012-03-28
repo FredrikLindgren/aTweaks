@@ -2,9 +2,8 @@
 // PnP Mephits
 ///////////////
 
-INCLUDE "atweaks/lib/tactical_shared.tpa"
 
-
+INCLUDE "atweaks/lib/dsandstuff.tpa"                                               // Detectable Spells
 
 //////////////
 // New spells
@@ -140,7 +139,7 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END  
 
 COPY ~atweaks/itm/mephits/rr#mrg1t.itm~ ~override~                                 // Mephit regeneration (1hp/turn)
 COPY ~atweaks/itm/mephits/rr#mimun.itm~ ~override~                                 // Mephit immunities amulet (shared by all mephits)
-LAUNCH_PATCH_FUNCTION ~cure_spell_immunities~ END                                  // add immunity to cure/cause wound spells
+LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
 PATCH_FOR_EACH ~spell~ IN                                                          // for each of the following spells
            ~RR#MOZSC~                                                              // Stinking Cloud (aTweaks' Ooze Mephit)
            ~RR#MDUGD~                                                              // Glass Dust (aTweaks' Dust Mephit)
@@ -223,6 +222,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -275,6 +276,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~MEPDUS01~                                                           // Dust Mephit
               ~ELEMEP08~                                                           // Dust Mephit
 //              ~MDDUST~                                                           // Dust Mephit (unused?, don't process)
+              ~TCMMBKWM~                                                           // Book Mephit (Classic Adventures
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -288,6 +290,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -357,6 +361,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -422,6 +428,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -488,6 +496,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -554,6 +564,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -621,6 +633,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -690,6 +704,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -757,6 +773,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -824,6 +842,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -893,6 +913,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -957,6 +979,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -1028,6 +1052,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value
@@ -1094,6 +1120,8 @@ REMOVE_CRE_ITEM ~REGHP1~                                                        
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END     // mark opcode #126 (Movement Modifier) for deletion
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "420"                                                                 // new XP value

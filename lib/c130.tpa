@@ -1,3 +1,8 @@
+
+////////////////////////////////////////
+// Additional racial traits for Dwarves
+////////////////////////////////////////
+
 COPY    ~aTweaks/SPL/RR#DWRT.SPL~ ~override~                                       // spell which grants the additional dwarwen racial traits
 COPY    ~aTweaks/EFF/RR#DWGOB.EFF~ ~override~                                      // to hit bonus vs. hobgoblins (and goblins since they use the same race in BG2)
 COPY    ~aTweaks/EFF/RR#DWORC.EFF~ ~override~                                      // +1 to hit bonus vs. orcs
@@ -78,10 +83,16 @@ LAUNCH_PATCH_MACRO ~ADD_ITEM_EQEFFECT~                                          
 // Giant attack roll penalty vs. dwarves (implemented through patching giant weapons, approach borrowed from the G3 BG2 Fixpack with thanks)
 
 ACTION_IF NOT MOD_IS_INSTALLED SETUP-BG2FIXPACK.TP2 106 THEN BEGIN                 // G3 BG2 Fixpack OBC component check
-COPY_EXISTING ~giafir.itm~   ~override~
-              ~giafir2.itm~  ~override~
-              ~giafir3.itm~  ~override~
-              ~giants01.itm~ ~override~
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~giafir~
+              ~giafir2~
+              ~giafir3~
+              ~giants01~
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN                                   // if the designated file with an ITM extension exists
+COPY_EXISTING ~%file%.itm~ ~override~
+  PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
+// =============================================================================== // the actual work starts from here
 SET opcode = "177"                                                                 // effect: #177 (use EFF file)
 SET target = "1"                                                                   // target: 1 (self)
 SET timing = "2"                                                                   // timing mode: 2 (while equipped)
@@ -98,4 +109,9 @@ SET savingthrow = "0"                                                           
 SET savebonus = "0"                                                                // save bonus: 0
 SPRINT ~resource~ ~GIANT1~                                                         // resref: GIANT1.EFF (-4 to hit penalty vs. dwarves while equipped)
 LAUNCH_PATCH_MACRO ~ADD_ITEM_EQEFFECT~                                             // add new equipping effect
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
 END                                                                                // ends the ACTION_IF G3 BG2 Fixpack OBC component check block
