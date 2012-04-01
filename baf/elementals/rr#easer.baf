@@ -1,11 +1,13 @@
 IF
     Global("RR#Active","LOCALS",0)
     !Allegiance(Myself,GOODCUTOFF)
-    OR(4)
+    OR(6)
       See(NearestEnemyOf(Myself))
       AttackedBy([ANYONE],DEFAULT)
       TookDamage()
       Help([EVILCUTOFF.0.ELEMENTAL.ELEMENTAL_AIR])
+	  Gender(Myself,SUMMONED) // summoned elemental
+      Exists(LastSummonerOf(Myself)) // gated elemental
 THEN
     RESPONSE #100
         SetGlobal("RR#Active","LOCALS",1)
@@ -472,6 +474,7 @@ END
 
 IF
     Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !AreaType(OUTDOOR)
     !Range(NearestEnemyOf(Myself),30)
     See(NearestDoor) // note: this seems to auto-skip locked doors
     OpenState(NearestDoor,FALSE)
@@ -486,6 +489,7 @@ IF
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
     !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)    
     CheckStatLT(LastSeenBy(Myself),100,RESISTCRUSHING)
+    !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
 THEN
     RESPONSE #100
         AttackReevaluate(LastSeenBy(Myself),15)

@@ -175,6 +175,7 @@ DEFINE_PATCH_FUNCTION make_erinyes BEGIN
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                 // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                        // Initialize variables
            newxpv
+          "rr#sinv"  = "1"                                                             // See invisible creatures (1 = enable)
           "newhp"    = "48"                                                            // new hit point value
           "newac"    = "2"                                                             // new Armor Class value
           "newth"    = "13"                                                            // new THAC0 value
@@ -217,8 +218,6 @@ DEFINE_PATCH_FUNCTION make_erinyes BEGIN
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   // Only do this if we're not just adding aTweaks scripting
     LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
-      LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode
-        INT_VAR opcode_to_delete = "193" END                                           // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "292" END                                           // mark opcode #292 (Protection from Backstab) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode
@@ -477,6 +476,7 @@ DEFINE_PATCH_FUNCTION make_pit_fiend INT_VAR enforce = 0 BEGIN
            newxpv
           "newmove"  = "11"                                                            // new movement rate
           "rr#bump"  = "1"                                                             // NPC bump (1 = enable)
+          "rr#sinv"  = "1"                                                             // See invisible creatures (1 = enable)
           "newhp"    = "104"                                                           // new hit point value
           "newac"    = "-5"                                                            // new Armor Class value
           "newth"    = "7"                                                             // new THAC0 value
@@ -533,8 +533,6 @@ DEFINE_PATCH_FUNCTION make_pit_fiend INT_VAR enforce = 0 BEGIN
     END
     PATCH_IF FiendsScripts = 0 BEGIN                                                   // Only do this if we're not just adding aTweaks scripting
     LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
-      LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode
-        INT_VAR opcode_to_delete = "193" END                                           // mark opcode #193 (Invisible Detection by Script) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "16" END                                            // mark opcode #16 (Haste) for deletion
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode
@@ -654,6 +652,7 @@ DEFINE_PATCH_FUNCTION make_cambion BEGIN
     PATCH_IF FiendsScripts = 0 BEGIN                                                   // Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                 // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                        // Initialize variables
+         "rr#bsimm"  = "1"                                                             // Backstab immunity (1 = enable)
            newxpv
           "newmove"  = "11"                                                            // new movement rate
           "newhp"    = "48"                                                            // new hit point value
@@ -718,20 +717,6 @@ DEFINE_PATCH_FUNCTION make_cambion BEGIN
     LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                           // mark opcode #193 (Invisible Detection by Script) for deletion
-      LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode
-        INT_VAR opcode_to_delete = "292" END                                           // mark opcode #292 (Protection from Backstab) for deletion (no dupl.)
-      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
-        INT_VAR
-          opcode = "292"                                                               // effect: #292 (Protection from Backstab)
-          target = "1"                                                                 // target: 1 (self)
-          timing = "9"                                                                 // timing mode: 9 (permanent after death)
-          "duration" = "0"                                                             // duration: 0
-          "sectype" = "0"                                                              // secondary type: none
-          parameter2 = "1"                                                             // param2: 1 (constant value)
-          probability1 = "100"                                                         // probability1: 100%
-        STR_VAR
-          "effsource" = ""                                                             // effsource: none
-      END
     END
     PATCH_IF NOT ("%SOURCE_RES%" STRING_EQUAL_CASE ~GORCAMB~) BEGIN                    // special case, don't alter Aesgareth's spell selection
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -764,6 +749,7 @@ DEFINE_PATCH_FUNCTION make_alu-fiend BEGIN
     PATCH_IF FiendsScripts = 0 BEGIN                                                   // Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                 // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                        // Initialize variables
+         "rr#bsimm"  = "1"                                                             // Backstab immunity (1 = enable)
            newxpv
           "newhp"    = "48"                                                            // new hit point value
           "newac"    = "2"                                                             // new Armor Class value
@@ -819,20 +805,6 @@ DEFINE_PATCH_FUNCTION make_alu-fiend BEGIN
     LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
       LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode
         INT_VAR opcode_to_delete = "193" END                                           // mark opcode #193 (Invisible Detection by Script) for deletion
-      LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode
-        INT_VAR opcode_to_delete = "292" END                                           // mark opcode #292 (Protection from Backstab) for deletion (no dupl.)
-      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call (add new creature effect built-in function)
-        INT_VAR
-          opcode = "292"                                                               // effect: #292 (Protection from Backstab)
-          target = "1"                                                                 // target: 1 (self)
-          timing = "9"                                                                 // timing mode: 9 (permanent after death)
-          "duration" = "0"                                                             // duration: 0
-          "sectype" = "0"                                                              // secondary type: none
-          parameter2 = "1"                                                             // param2: 1 (constant value)
-          probability1 = "100"                                                         // probability1: 100%
-        STR_VAR
-          "effsource" = ""                                                             // effsource: none
-      END
     END
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
@@ -956,6 +928,7 @@ DEFINE_PATCH_FUNCTION make_succubus BEGIN
     PATCH_IF FiendsScripts = 0 BEGIN                                                   // Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                 // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                        // Initialize variables
+         "rr#bsimm"  = "1"                                                             // Backstab immunity (1 = enable)
            newxpv
           "newmove"  = "9"                                                             // new movement rate
           "newhp"    = "48"                                                            // new hit point value
@@ -1250,6 +1223,7 @@ DEFINE_PATCH_FUNCTION make_marilith BEGIN
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                 // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                        // Initialize variables
            newxpv
+         "rr#bsimm"  = "1"                                                             // Backstab immunity (1 = enable)
           "rr#bump"  = "1"                                                             // NPC bump (1 = enable)
           "newhp"    = "96"                                                            // new hit point value
           "newac"    = "-9"                                                            // new Armor Class value
@@ -1335,6 +1309,8 @@ DEFINE_PATCH_FUNCTION make_balor BEGIN
     PATCH_IF FiendsScripts = 0 BEGIN                                                   // Only do this if we're not just adding aTweaks scripting
       LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                 // Starts FUNCTION call (aTweaks' Creature Modification function)
         INT_VAR                                                                        // Initialize variables
+         "rr#sinv"  = "1"                                                              // See invisible creatures (1 = enable)
+         "rr#bsimm" = "1"                                                              // Backstab immunity (1 = enable)
          "newmove"  = "11"                                                             // new movement rate
          "rr#bump"  = "1"                                                              // NPC bump (1 = enable)
            newxpv

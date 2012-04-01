@@ -573,58 +573,6 @@ THEN
                 ReallyForceSpellRES("RR#TGAZE",LastSeenBy(Myself)) // Terrifying Gaze
 END
 
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-        Allegiance(Myself,EVILCUTOFF)
-	!See([GOODCUTOFF])
-	Detect([GOODCUTOFF])
-        !StateCheck(LastSeenBy(Myself),STATE_NONDETECTION)
-        !CheckStat(LastSeenBy(Myself),3,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Divination
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		FaceObject(LastSeenBy(Myself))
-                ForceSpellRES("RR#WI203",Myself) // Detect Invisibility
-END
-
-IF
-        Global("RR#Bhave","LOCALS",2)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-        StateCheck(NearestEnemyOf(Myself),STATE_IMPROVEDINVISIBILITY)
-        !StateCheck(NearestEnemyOf(Myself),STATE_NONDETECTION)
-        !CheckStat(NearestEnemyOf(Myself),3,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Divination
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI203",Myself) // Detect Invisibility
-END
-
-IF
-        Global("RR#Bhave","LOCALS",2)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-        StateCheck(SecondNearestEnemyOf(Myself),STATE_IMPROVEDINVISIBILITY)
-        !StateCheck(SecondNearestEnemyOf(Myself),STATE_NONDETECTION)
-        !CheckStat(SecondNearestEnemyOf(Myself),3,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Divination
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI203",Myself) // Detect Invisibility
-END
-
-IF
-        Global("RR#Bhave","LOCALS",2)
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-        StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMPROVEDINVISIBILITY)
-        !StateCheck(ThirdNearestEnemyOf(Myself),STATE_NONDETECTION)
-        !CheckStat(ThirdNearestEnemyOf(Myself),3,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Divination
-THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI203",Myself) // Detect Invisibility
-END
-
-
 IF
         Global("RR#DChrm","LOCALS",0) // Erinyes can only charm a single person
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")

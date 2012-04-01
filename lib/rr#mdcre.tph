@@ -49,6 +49,9 @@ INT_VAR                                                                         
 "newmsil"  = "999"                                                                 // new Move Silently value
 "rr#ptwf"  = "0"                                                                   // perfect two weapon fighting (for creatures with multiple weapons)
 "rr#bump"  = "0"                                                                   // NPC bump (allows the creature to movee others out of its way)
+"rr#sinv"  = "0"                                                                   // See invisible creatures
+"rr#bsimm" = "0"                                                                   // Backstab immunity
+"rr#infra" = "0"                                                                   // Infravision
 
 
 
@@ -310,6 +313,53 @@ PATCH_IF ("%rr#bump%" = "1") BEGIN                                              
           "duration" = "0"                                                         // duration: 0
           "sectype" = "0"                                                          // secondary type: none
           parameter2 = "1"                                                         // param2: 1 (constant value)
+          probability1 = "100"                                                     // probability1: 100%
+        STR_VAR
+          "effsource" = ""                                                         // effsource: none
+      END
+END                                                                                // end PATCH_IF
+
+PATCH_IF ("%rr#sinv%" = "1") BEGIN                                                 // See Invisible creatures
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "193" END     // mark opcode #193 (Invisible Detection by Script) for deletion
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                       // Starts FUNCTION call (add new creature effect built-in function)
+        INT_VAR
+          opcode = "193"                                                           // effect: #193 (Invisible Detection by Script)
+          target = "1"                                                             // target: 1 (self)
+          timing = "9"                                                             // timing mode: 9 (permanent after death)
+          "duration" = "0"                                                         // duration: 0
+          "sectype" = "0"                                                          // secondary type: none
+          parameter2 = "1"                                                         // param2: 1 (constant value)
+          probability1 = "100"                                                     // probability1: 100%
+        STR_VAR
+          "effsource" = ""                                                         // effsource: none
+      END
+END                                                                                // end PATCH_IF
+
+PATCH_IF ("%rr#bsimm%" = "1") BEGIN                                                // Backstab immunity
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "292" END     // mark opcode #292 (Protection from Backstab) for deletion
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                       // Starts FUNCTION call (add new creature effect built-in function)
+        INT_VAR
+          opcode = "292"                                                           // effect: #292 (Protection: Backstab)
+          target = "1"                                                             // target: 1 (self)
+          timing = "9"                                                             // timing mode: 9 (permanent after death)
+          "duration" = "0"                                                         // duration: 0
+          "sectype" = "0"                                                          // secondary type: none
+          parameter2 = "1"                                                         // param2: 1 (constant value)
+          probability1 = "100"                                                     // probability1: 100%
+        STR_VAR
+          "effsource" = ""                                                         // effsource: none
+      END
+END                                                                                // end PATCH_IF
+
+PATCH_IF ("%rr#infra%" = "1") BEGIN                                                // Infravision
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "63" END      // mark opcode #63 (Infravision) for deletion
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                       // Starts FUNCTION call (add new creature effect built-in function)
+        INT_VAR
+          opcode = "63"                                                            // effect: #63 (Infravision)
+          target = "1"                                                             // target: 1 (self)
+          timing = "9"                                                             // timing mode: 9 (permanent after death)
+          "duration" = "0"                                                         // duration: 0
+          "sectype" = "0"                                                          // secondary type: none
           probability1 = "100"                                                     // probability1: 100%
         STR_VAR
           "effsource" = ""                                                         // effsource: none

@@ -465,6 +465,7 @@ DEFINE_PATCH_FUNCTION cold_spell_immunities BEGIN
                ~RR#WI404~                                                              // aTweaks/RR Ice Storm
                 ~SPWI503~                                                              // Cone of Cold
                 ~rr#icew~                                                              // aTweaks' Wall of Ice
+                ~rr#efrzn~                                                             // aTweaks' Freeze (Cryonax)
 BEGIN                                                                                  // execute the following
 READ_ASCII 0 sig (3)
   PATCH_MATCH "%sig%" WITH 
@@ -1745,5 +1746,84 @@ DEFINE_PATCH_FUNCTION earth_affinity BEGIN
       WRITE_LONG ("%fx_off%" + 0x58 + ("%index%" * 0x108)) "-2"
     END
   END
+END                                                                                    // ends DEFINE_PATCH_FUNCTION
+
+
+// Petrification immunity
+DEFINE_PATCH_FUNCTION petrification_immunity BEGIN
+READ_ASCII 0 sig (3)
+  PATCH_MATCH "%sig%" WITH 
+      ~CRE~ BEGIN                                                                      // CRE file parsed
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "101"                                                               // effect: #101 (Protection from Opcode)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "9"                                                                 // timing mode: 9 (permanent after death)
+        "duration" = "0"                                                               // duration: 0
+        "parameter2" = "134"                                                           // param2: petrification opcode
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = ""                                                               // resref: none
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "267"                                                               // effect: #267 (Protection from Display Specific String)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "9"                                                                 // timing mode: 9 (permanent after death)
+        "duration" = "0"                                                               // duration: 0
+        "parameter1" = "14665"                                                         // param1: strref (Petrified)
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = ""                                                               // resref: none
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+    END                                                                                // ends WITH CRE block
+    ~ITM~ BEGIN                                                                        // ITM file parsed
+      LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                        // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "101"                                                               // effect: #101 (Protection from Opcode)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "2"                                                                 // timing mode: 2 (while equipped)
+        "duration" = "0"                                                               // duration: 0
+        "parameter2" = "134"                                                           // param2: petrification opcode
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = ""                                                               // resref: none
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+      LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                        // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "267"                                                               // effect: #267 (Protection from Display Specific String)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "9"                                                                 // timing mode: 9 (permanent after death)
+        "duration" = "0"                                                               // duration: 0
+        "parameter1" = "14665"                                                         // param1: strref (Petrified)
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = ""                                                               // resref: none
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+    END                                                                                // ends WITH ITM block
+    DEFAULT                                                                            // do nothing
+END                                                                                    // ends PATCH_MATCH
+END                                                                                    // ends DEFINE_PATCH_FUNCTION
+
+
+// Clear BG1 weapon proficiencies
+DEFINE_PATCH_FUNCTION clear_bg1_profs BEGIN
+READ_ASCII 0 sig (3)
+  PATCH_MATCH "%sig%" WITH 
+   ~CRE~ BEGIN                                                                         // CRE file parsed
+     PATCH_FOR_EACH ~bg1_prof~ IN ~0x6e~ ~0x6f~ ~0x70~ ~0x71~ ~0x72~ ~0x73~ ~0x74~ ~0x75~ BEGIN     // for all BG1 proficiency slots
+       WRITE_BYTE %bg1_prof% 0                                                         // null proficiency
+     END
+  END                                                                                  // ends WITH CRE block
+  DEFAULT                                                                              // do nothing
+END                                                                                    // ends PATCH_MATCH
 END                                                                                    // ends DEFINE_PATCH_FUNCTION
 

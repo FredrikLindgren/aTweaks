@@ -79,6 +79,7 @@ COPY ~atweaks/eff/rr#cnstr.eff~ ~override/rr#dgra2.eff~
   WRITE_LONG  0x24 1 //instant/permanent
   WRITE_ASCII 0x30 rr#dgrab #8
 
+COPY ~atweaks/bam/rr#icew.bam~ ~override~                                          // Wall of Ice BAM
 COPY ~atweaks/spl/rr#icew.spl~ ~override~                                          // Wall of Ice
   SAY NAME1 @1024 SAY NAME2 @1024
   READ_LONG  0x64 ab_off
@@ -205,6 +206,10 @@ COPY ~atweaks/spl/elementals/rr#eburn.spl~ ~override~                           
     END
   END
 
+COPY ~atweaks/eff/elementals/rr#efrzn.eff~ ~override~                              // Freeze immunity EFF
+COPY ~atweaks/spl/elementals/rr#efrzn.spl~ ~override~                              // Freeze (Cryonax on-hit effect)
+
+
 COPY ~atweaks/eff/elementals/rr#englf.eff~ ~override~                              // Engulf immunity EFF (for large, incorporeal and noncombustible creatures)
 COPY ~atweaks/spl/elementals/rr#englf.spl~ ~override~                              // Engulf, part 1(Greater Fire Elemental on-hit effect)
 SAY NAME1 @2121 SAY NAME2 @2121
@@ -224,6 +229,9 @@ SAY NAME1 @2121 SAY NAME2 @2121
   END
 COPY ~atweaks/spl/elementals/rr#engl2.spl~ ~override~                              // Engulf, part 2 (fire damage)
 
+COPY ~atweaks/eff/elementals/rr#ecry1.eff~ ~override~                              // Cryonax Allies EFF 1 (Ice Paraelemental)
+COPY ~atweaks/spl/elementals/rr#ecryo.spl~ ~override~                              // Summon Allies (Cryonax)
+SAY NAME1 @2127 SAY NAME2 @2127
 
 
 
@@ -232,20 +240,42 @@ COPY ~atweaks/spl/elementals/rr#engl2.spl~ ~override~                           
 
 // Clone spells into innate abilities
 
-COPY_EXISTING ~SPWI103.SPL~  ~override/RR#WI103.SPL~                               // Clone Burning Hands into an innate ability
+COPY_EXISTING ~spwi103.spl~  ~override/rr#wi103.spl~                               // Clone Burning Hands into an innate ability
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
-COPY_EXISTING ~SPWI303.SPL~  ~override/RR#WI303.SPL~                               // Clone Flame Arrow into an innate ability
+COPY_EXISTING ~spwi208.spl~  ~override/rr#wr208.spl~                               // Clone Know Alignment into a renewable innate ability
+LPF ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" "rr#renew" = "1" END      // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~spwi302.spl~  ~override/rr#wr302.spl~                               // Clone Remove Magic into a renewable innate ability
+LPF ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" "rr#renew" = "1" END      // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~spwi303.spl~  ~override/rr#wi303.spl~                               // Clone Flame Arrow into an innate ability
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
-COPY_EXISTING ~SPWI304.SPL~  ~override/RR#WI304.SPL~                               // Clone Fireball into an innate ability
+COPY_EXISTING ~spwi304.spl~  ~override/rr#wi304.spl~                               // Clone Fireball into an innate ability
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
-COPY_EXISTING ~SPWI403.SPL~  ~override/RR#WI403.SPL~                               // Clone Fire Shield:Blue into an innate ability
-LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" functio
-
-COPY_EXISTING ~SPWI418.SPL~  ~override/RR#WI418.SPL~                               // Clone Fire Shield:Red into an innate ability
+COPY_EXISTING ~spwi306.spl~  ~override/rr#wi306.spl~                               // Clone Hold Person into an innate ability (used by Pit Fiend)
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~spwi403.spl~  ~override/rr#wi403.spl~                               // Clone Fire Shield:Blue into an innate ability
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~spwi404.spl~  ~override/rr#wi404.spl~                               // Clone Ice Storm into an innate ability
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~spwi418.spl~  ~override/rr#wi418.spl~                               // Clone Fire Shield:Red into an innate ability
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~spwi503.spl~  ~override/rr#wi503.spl~                               // Clone Cone of Cold into an innate ability
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~spwi104.spl~  ~override/rr#ersug.spl~                               // Change Charm Person into renewable Suggestion
+  SAY NAME1 @708 SAY NAME2 @708                                                    // Suggestion
+LPF ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" "rr#renew" = "1" END      // Execute the "spell to innate ablity" function
+
+
+
 
 
 
@@ -289,6 +319,7 @@ COPY ~atweaks/itm/elementals/rr#ewatr.itm~ ~override~                           
 COPY ~atweaks/itm/elementals/rr#ewatg.itm~ ~override~                              // Greater Water Elemental attack
 COPY ~atweaks/itm/elementals/rr#ewate.itm~ ~override~                              // Elder Water Elemental attack
 COPY ~atweaks/itm/elementals/rr#eicer.itm~ ~override~                              // Ice Paraelemental attack
+COPY ~atweaks/itm/elementals/rr#ecryo.itm~ ~override~                              // Cryonax attack
 
 
 
@@ -1994,12 +2025,89 @@ STR_VAR                                                                         
 "script01"   = ""                                                                  // first AI script name
 "script02"   = "None"                                                              // second AI script name
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                    // grant immunities to cold-based area effect spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+// Cryonax (24 HD)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~elemcryo~                                                             // Cryonax
+            ~finsol03~                                                             // Cryonax in ToB
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_MEMORIZED_SPELL ~rr#wr208~ #0 ~innate~ ( 1 )                                   // adds 1x Know Alignment (renewable)
+ADD_MEMORIZED_SPELL ~rr#wr302~ #0 ~innate~ ( 1 )                                   // adds 1x Remove Magic (renewable)
+ADD_MEMORIZED_SPELL ~rr#ersug~ #0 ~innate~ ( 1 )                                   // adds 1x Suggestion (renewable)
+ADD_MEMORIZED_SPELL ~rr#telwr~ #0 ~innate~ ( 1 )                                   // adds 1x Teleport Without Error (renewable)
+ADD_MEMORIZED_SPELL ~rr#wi306~ #0 ~innate~ ( 3 )                                   // adds 3x Hold Person
+ADD_MEMORIZED_SPELL ~rr#wi404~ #0 ~innate~ ( 3 )                                   // adds 3x Ice Storm
+ADD_MEMORIZED_SPELL ~rr#wi503~ #0 ~innate~ ( 1 )                                   // adds 1x Cone of Cold
+ADD_MEMORIZED_SPELL ~rr#icew~  #0 ~innate~ ( 3 )                                   // adds 3x Wall of Ice
+ADD_MEMORIZED_SPELL ~rr#ecryo~ #0 ~innate~ ( 1 )                                   // adds 1x Summon Allies
+REMOVE_CRE_ITEM ~ELEMPRIN~                                                         // Elemental Prince traits are handled differently
+ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
+REPLACE_CRE_ITEM ~RR#ECRYO~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+ADD_CRE_ITEM ~IMMUNE2~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                              // revise weapon immunities
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newmove"  = "7"                                                                   // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
+"rr#sinv"  = "1"                                                                   // See invisible creatures (1 = enable)
+"newxpv"   = "28000"                                                               // new XP value
+"newhp"    = "90"                                                                  // new hit point value
+"newac"    = "-6"                                                                  // new Armor Class value
+"newth"    = "5"                                                                   // new THAC0 value
+"newapr"   = "2"                                                                   // new number of attacks per round
+"newsvd"   = "3"                                                                   // new Save vs. Death
+"newsvw"   = "3"                                                                   // new Save vs. Wand
+"newsvp"   = "4"                                                                   // new Save vs. Polymorph
+"newsvb"   = "4"                                                                   // new Save vs. Breath
+"newsvs"   = "4"                                                                   // new Save vs. Spell
+"newmr"    = "75"                                                                  // new Magic Resistance value
+"newfr"    = "-50"                                                                 // new Resist Fire value
+"newcr"    = "127"                                                                 // new Resist Cold value
+"newlvl1"  = "24"                                                                  // new level (first class)
+"newstr"   = "21"                                                                  // new Strength value
+"newdex"   = "12"                                                                  // new Dexterity value
+"newcon"   = "18"                                                                  // new Constitution value
+"newint"   = "17"                                                                  // new Intelligence value
+"newwis"   = "16"                                                                  // new Wisdom value
+"newchr"   = "17"                                                                  // new Charisma value
+"newmor"   = "20"                                                                  // new morale value
+"newmorb"  = "1"                                                                   // new morale break value
+"newmorr"  = "1"                                                                   // new morale recovery value
+"newgen"   = "5"                                                                   // new general (GIANT HUMANOID)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "255"                                                                 // new class (NO_CLASS)
+"newalign" = "35"                                                                  // new alignment (Neutral Evil)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#ECRYO"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "elemcryo"                                                          // unmodded Cryonax script
+"script04"   = "WTASIGHT"                                                          // generic AI script
+"script05"   = "dw#melee"                                                          // SCSII melee AI script
+"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~petrification_immunity~ END                                 // petrification immunity
+LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                    // grant immunities to cold-based area effect spells
+LAUNCH_PATCH_FUNCTION ~clear_bg1_profs~ END                                        // Clear BG1 proficiencies
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
 
 
 
@@ -2020,6 +2128,7 @@ COMPILE ~atweaks/baf/elementals/rr#eear.baf~                                    
 COMPILE ~atweaks/baf/elementals/rr#efir.baf~                                       // Fire Elemental AI script
 COMPILE ~atweaks/baf/elementals/rr#ewat.baf~                                       // Water Elemental AI script
 COMPILE ~atweaks/baf/elementals/rr#eice.baf~                                       // Ice Paraelemental AI script
+COMPILE ~atweaks/baf/elementals/rr#ecryo.baf~                                      // Cryonax AI script
 
 
 
@@ -2202,21 +2311,25 @@ END                                                                             
 
 // Revised Elemental summoning spells
 
+
+// Conjure Lesser X Elemental (arcane version)
+
 ACTION_DEFINE_ASSOCIATIVE_ARRAY l_elmnt BEGIN
-//   file       strref            resref
-     spwi516,   24799       =>   SPLESFIR                                          // Lesser Fire Elemental
-     spwi520,   24800       =>   SPLESAIR                                          // Lesser Air Elemental
-     spwi521,   24797       =>   SPLESEAR                                          // Lesser Earth Elemental
+//   rr#var0    rr#var1      rr#file
+//   resref      desc          file
+     SPLESFIR,   24799    =>  spwi516                                              // Conjure Lesser Fire Elemental
+     SPLESAIR,   24800    =>  spwi520                                              // Conjure Lesser Air Elemental
+     SPLESEAR,   24797    =>  spwi521                                              // Conjure Lesser Earth Elemental
 END                                                                                // ends ACTION_DEFINE_ASSOCIATIVE_ARRAY
-ACTION_PHP_EACH l_elmnt AS file => resref BEGIN
-COPY_EXISTING ~%file_0%.spl~  ~override~
-WRITE_LONG 0x50 "%file_1%"                                                         // unidentified description
+ACTION_PHP_EACH l_elmnt AS rr#var => rr#file BEGIN
+COPY_EXISTING ~%rr#file%.spl~  ~override~
+WRITE_LONG 0x50 "%rr#var_1%"                                                         // unidentified description
 LPF prep_itm_spl INT_VAR f_Type = 1 END
 LPF configure_spell_header INT_VAR f_Target = 4 f_Range = 15 f_CastTime = 9 STR_VAR f_Icon = EVAL ~%SOURCE_RES%B~ END
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 114 STR_VAR resource = EVAL ~%resref%~ END  // Use EFF file
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target = 1 parameter2 = 1 duration = 18 STR_VAR resource = SPELEMND END          // Play 3D Effect
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 1 parameter2 = 131 duration = 18 END                                    // Display Special Effect Icon
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 165 target = 1 duration = 18 END                                                     // Pause Target
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 114 STR_VAR resource = EVAL ~%rr#var_0%~ END  // Use EFF file
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target = 1 parameter2 = 1 duration = 18 STR_VAR resource = SPELEMND END            // Play 3D Effect
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 1 parameter2 = 131 duration = 18 END                                      // Display Special Effect Icon
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 165 target = 1 duration = 18 END                                                       // Pause Target
   READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
   READ_LONG  0x6a "fx_off"
@@ -2251,6 +2364,106 @@ BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_PHP_EACH
 
 
+// Conjure X Elemental (arcane version)
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY m_elmnt BEGIN
+//   rr#var0    rr#var1     rr#var2      rr#file
+//   resref1    resref2     resref3        file
+     SPFIR1,    SPFIR2,     SPFIR3    =>  spwi620                                  // Conjure Fire Elemental (mage)
+     SPAIR1,    SPAIR2,     SPAIR3    =>  spwi621                                  // Conjure Air Elemental (mage)
+     SPEART1,   SPEART2,    SPEART3   =>  spwi622                                  // Conjure Earth Elemental (mage)
+END                                                                                // ends ACTION_DEFINE_ASSOCIATIVE_ARRAY
+ACTION_PHP_EACH m_elmnt AS rr#var => rr#file BEGIN
+COPY_EXISTING ~%rr#file%.spl~  ~override~
+LPF prep_itm_spl INT_VAR f_Type = 1 END
+LPF configure_spell_header INT_VAR f_Target = 4 f_Range = 35 f_CastTime = 9 STR_VAR f_Icon = EVAL ~%SOURCE_RES%B~ END
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 60  probability2 = 0   STR_VAR resource = EVAL ~%rr#var_0%~ END  // Regular elemental
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 95  probability2 = 61  STR_VAR resource = EVAL ~%rr#var_1%~ END  // Greater elemental
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 100 probability2 = 96  STR_VAR resource = EVAL ~%rr#var_2%~ END  // Elder elemental
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target = 1 parameter2 = 1 duration = 18 STR_VAR resource = SPELEMND END            // Play 3D Effect
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 1 parameter2 = 131 duration = 18 END                                      // Display Special Effect Icon
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 165 target = 1 duration = 18 END                                                       // Pause Target
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  SET "new_abil" = 0
+    READ_SHORT ("%abil_off%" + 0x10 + (("%abil_num%" - 1) * 0x28)) "min_level" // min level of last ability header
+    FOR (index = min_level + 11 ; index < 21 ; index = index + 1) BEGIN
+      READ_ASCII ("%abil_off%" +        (("%abil_num%" - 1) * 0x28)) "abil_clone" (0x28) // reads last ability as block
+      READ_SHORT ("%abil_off%" + 0x1e + (("%abil_num%" - 1) * 0x28)) "abil_fx_num" // reads number of fx from last ability
+      READ_SHORT ("%abil_off%" + 0x20 + (("%abil_num%" - 1) * 0x28)) "abil_fx_idx" // reads index of last effects from last ability
+      // create effects for next level based off previous level effects
+      FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+        READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // reads entire effect
+        INSERT_BYTES ("%fx_off%" +        (("%abil_fx_idx%" + "%abil_fx_num%" + "%index2%") * 0x30)) 0x30
+        READ_SHORT ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "opcode"          // opcode
+        READ_LONG  ("%fx_off%" + 0x0e + (("%abil_fx_idx%" + "%index2%") * 0x30)) "duration"        // duration
+          WRITE_EVALUATED_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%abil_fx_num%" + "%index2%") * 0x30)) "%clone_fx%" // clones effect
+          PATCH_IF ("%opcode%" = 177) BEGIN // Use EFF file
+            WRITE_LONG  ("%fx_off%" + 0x0e + (("%abil_fx_idx%" + "%abil_fx_num%" + "%index2%") * 0x30)) ("%duration%" + 60) // increase the duration by 1 turn
+          END
+      END
+      // effects created, now add new ability
+      INSERT_BYTES            ("%abil_off%" +        ("%abil_num%" * 0x28)) 0x28
+        WRITE_EVALUATED_ASCII ("%abil_off%" +        ("%abil_num%" * 0x28)) "%abil_clone%" // clones last ability
+        WRITE_SHORT           ("%abil_off%" + 0x10 + ("%abil_num%" * 0x28)) "%index%"      // min level
+        WRITE_SHORT           ("%abil_off%" + 0x20 + ("%abil_num%" * 0x28)) ("%abil_fx_num%" + "%abil_fx_idx%") // corrects fx index
+      SET "fx_off" = ("%fx_off%" + 0x28)
+      SET "abil_num" = "%abil_num%" + 1
+    END
+    WRITE_SHORT 0x68 "%abil_num%"
+    WRITE_LONG  0x6a "%fx_off%"
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_PHP_EACH
+
+
+// Conjure X Elemental (divine version)
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY p_elmnt BEGIN
+//   rr#var0    rr#var1     rr#var2      rr#file
+//   resref1    resref2     resref3        file
+     SPFIR1P,   SPFIR2P,    SPFIR3P   =>  sppr605                                  // Conjure Fire Elemental (priest)
+     SPEART1P,  SPEART2P,   SPEART3P  =>  sppr702                                  // Conjure Earth Elemental (priest)
+END                                                                                // ends ACTION_DEFINE_ASSOCIATIVE_ARRAY
+ACTION_PHP_EACH p_elmnt AS rr#var => rr#file BEGIN
+COPY_EXISTING ~%rr#file%.spl~  ~override~
+LPF prep_itm_spl INT_VAR f_Type = 1 END
+LPF configure_spell_header INT_VAR f_Target = 4 f_Range = 35 f_CastTime = 9 STR_VAR f_Icon = EVAL ~%SOURCE_RES%B~ END
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 60  probability2 = 0   STR_VAR resource = EVAL ~%rr#var_0%~ END  // Regular elemental
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 95  probability2 = 61  STR_VAR resource = EVAL ~%rr#var_1%~ END  // Greater elemental
+LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 100 probability2 = 96  STR_VAR resource = EVAL ~%rr#var_2%~ END  // Elder elemental
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  SET "new_abil" = 0
+    READ_SHORT ("%abil_off%" + 0x10 + (("%abil_num%" - 1) * 0x28)) "min_level" // min level of last ability header
+    FOR (index = min_level + 11 ; index < 21 ; index = index + 1) BEGIN
+      READ_ASCII ("%abil_off%" +        (("%abil_num%" - 1) * 0x28)) "abil_clone" (0x28) // reads last ability as block
+      READ_SHORT ("%abil_off%" + 0x1e + (("%abil_num%" - 1) * 0x28)) "abil_fx_num" // reads number of fx from last ability
+      READ_SHORT ("%abil_off%" + 0x20 + (("%abil_num%" - 1) * 0x28)) "abil_fx_idx" // reads index of last effects from last ability
+      // create effects for next level based off previous level effects
+      FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+        READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // reads entire effect
+        INSERT_BYTES ("%fx_off%" +        (("%abil_fx_idx%" + "%abil_fx_num%" + "%index2%") * 0x30)) 0x30
+        READ_SHORT ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "opcode"          // opcode
+        READ_LONG  ("%fx_off%" + 0x0e + (("%abil_fx_idx%" + "%index2%") * 0x30)) "duration"        // duration
+          WRITE_EVALUATED_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%abil_fx_num%" + "%index2%") * 0x30)) "%clone_fx%" // clones effect
+          PATCH_IF ("%opcode%" = 177) BEGIN // Use EFF file
+            WRITE_LONG  ("%fx_off%" + 0x0e + (("%abil_fx_idx%" + "%abil_fx_num%" + "%index2%") * 0x30)) ("%duration%" + 60) // increase the duration by 1 turn
+          END
+      END
+      // effects created, now add new ability
+      INSERT_BYTES            ("%abil_off%" +        ("%abil_num%" * 0x28)) 0x28
+        WRITE_EVALUATED_ASCII ("%abil_off%" +        ("%abil_num%" * 0x28)) "%abil_clone%" // clones last ability
+        WRITE_SHORT           ("%abil_off%" + 0x10 + ("%abil_num%" * 0x28)) "%index%"      // min level
+        WRITE_SHORT           ("%abil_off%" + 0x20 + ("%abil_num%" * 0x28)) ("%abil_fx_num%" + "%abil_fx_idx%") // corrects fx index
+      SET "fx_off" = ("%fx_off%" + 0x28)
+      SET "abil_num" = "%abil_num%" + 1
+    END
+    WRITE_SHORT 0x68 "%abil_num%"
+    WRITE_LONG  0x6a "%fx_off%"
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_PHP_EACH
 
 
 COPY ~atweaks/spl/elementals/rr#eswg.spl~ ~override~                               // Elemental Summoning secondary spell (Summon Greater Elementals)
@@ -2283,8 +2496,34 @@ END                                                                             
 END                                                                                // ends PHP_EACH
 
 
+// Updated spell and item descriptions
 
+COPY_EXISTING  ~scrl6x.itm~  ~override~                                            // Conjure Lesser Fire Elemental (scroll)
+SAY UNIDENTIFIED_DESC #24799 SAY DESC #24799
 
+COPY_EXISTING  ~scrl7b.itm~  ~override~                                            // Conjure Lesser Air Elemental (scroll)
+SAY UNIDENTIFIED_DESC #24800 SAY DESC #24800
+
+COPY_EXISTING  ~scrl7c.itm~  ~override~                                            // Conjure Lesser Earth Elemental (scroll)
+SAY UNIDENTIFIED_DESC #24797 SAY DESC #24797
+
+COPY_EXISTING ~spwi620.spl~  ~override~                                            // Conjure Fire Elemental (arcane spell)
+               ~scrl7x.itm~  ~override~                                            // Conjure Fire Elemental (scroll)
+SAY UNIDENTIFIED_DESC @2200 SAY DESC @2200
+
+COPY_EXISTING ~spwi621.spl~  ~override~                                            // Conjure Air Elemental (arcane spell)
+               ~scrl7y.itm~  ~override~                                            // Conjure Air Elemental (scroll)
+SAY UNIDENTIFIED_DESC @2201 SAY DESC @2201
+
+COPY_EXISTING ~spwi622.spl~  ~override~                                            // Conjure Earth Elemental (arcane spell)
+               ~scrl7z.itm~  ~override~                                            // Conjure Earth Elemental (scroll)
+SAY UNIDENTIFIED_DESC @2202 SAY DESC @2202
+
+COPY_EXISTING ~sppr605.spl~  ~override~                                            // Conjure Fire Elemental (divine spell)
+SAY UNIDENTIFIED_DESC @2203 SAY DESC @2203
+
+COPY_EXISTING ~sppr702.spl~  ~override~                                            // Conjure Earth Elemental (divine spell)
+SAY UNIDENTIFIED_DESC @2204 SAY DESC @2204
 
 
 // Make conjure elemental spells use IWD graphics for the summoning circles
@@ -2562,9 +2801,9 @@ DECOMPILE_BCS_TO_BAF
   REPLACE_TEXTUALLY CASE_SENSITIVE EVALUATE_REGEXP ~^IF[%LNL%].+See(\[ANYONE\])\([%LNL%].+\)+[%LNL%]END$~ ~~ // remove the combat oriented block
   REPLACE_TEXTUALLY CASE_SENSITIVE EVALUATE_REGEXP ~RESPONSE #100[%LNL%].+CreateCreature("udair",\[842.2890\],0)~ // new spawns
 ~RESPONSE #20
-CreateCreature("udair",[842.2890],0) CreateCreature("elair01",[780.2865],12) CreateCreature("elair01",[780.2950],10) // 1x greater, 2x regular
+CreateCreature("udair",[842.2890],0) CreateCreature("elair01",[780.2865],12) CreateCreature("rr#easer",[780.2950],10) // 1x greater, 1x regular, 1x Aerial Servant
 RESPONSE #20
-CreateCreature("udair",[842.2890],0) CreateCreature("elair01",[780.2865],12) CreateCreature("elairl01",[780.2950],10) // 1x greater, 1x regular, 1x lesser
+CreateCreature("udair",[842.2890],0) CreateCreature("elair01",[780.2865],12) CreateCreature("rr#easer",[780.2950],10) // 1x greater, 1x regular, 1x Aerial Servant
 RESPONSE #20
 CreateCreature("udair",[842.2890],0) CreateCreature("elair01",[780.2865],12) CreateCreature("rr#eaire",[780.2950],10) // 1x greater, 1x regular, 1x elder
 RESPONSE #20
@@ -2650,4 +2889,18 @@ DECOMPILE_BCS_TO_BAF
   REPLACE_TEXTUALLY EXACT_MATCH ~ICRMPARI~ ~rr#envlp~ // use aTweaks visual effect
   REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreatureImpassable~ ~CreateCreature~ // spawn the creatures in a passable area
 COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Replace the Lesser Air Elemental spawn in Spellhold with an Aerial Servant
+
+COPY_EXISTING ~ar1500.are~ ~override~                                              // Spellhold, outside
+  READ_LONG 0x60 spawn_off
+  READ_SHORT 0x64 spawn_num
+  FOR (n=0; n < "%spawn_num%"; n+=1) BEGIN
+  READ_ASCII  ("%spawn_off%" + "%n%"*0xc8 + 0x2c) "cre_file"
+    PATCH_IF ("%cre_file%" STRING_EQUAL_CASE "ELAIRL01") BEGIN
+      WRITE_ASCII ("%spawn_off%" + "%n%"*0xc8 + 0x2c) ~rr#easer~ #8
+    END
+  END
 BUT_ONLY_IF_IT_CHANGES

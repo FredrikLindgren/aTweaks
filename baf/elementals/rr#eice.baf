@@ -1,17 +1,29 @@
 IF
     Global("RR#Active","LOCALS",0)
     !Allegiance(Myself,GOODCUTOFF)
-    OR(4)
+    OR(6)
       See(NearestEnemyOf(Myself))
       AttackedBy([ANYONE],DEFAULT)
       TookDamage()
       Help([EVILCUTOFF.0.ELEMENTAL])
+	  Gender(Myself,SUMMONED) // summoned elemental
+      Exists(LastSummonerOf(Myself)) // gated elemental
 THEN
     RESPONSE #100
         SetGlobal("RR#Active","LOCALS",1)
         SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
         Enemy()
         Help()
+        Continue()
+END
+
+IF
+    Global("RR#Active","LOCALS",0)
+    Allegiance(Myself,EVILCUTOFF)
+    Exists(LastSummonerOf(Myself)) // summoned by Cryonax
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
         Continue()
 END
 
@@ -69,6 +81,14 @@ THEN
         SetGlobalTimer("RR#Help","LOCALS",12)
         Help()
         Continue()
+END
+
+IF
+    See(Myself) // initialize/clear LastSeenByMyself(); special case, needed here due to the specifics of summoning Ice Paraelementals; otherwise don't use
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
 END
 
 IF
@@ -349,17 +369,8 @@ THEN
 END
 
 IF
-    Allegiance(Myself,EVILCUTOFF)
-    Global("Elementalcontrol","LOCALS",2) // summoned elemental out of control
-    See(LastSummonerOf(Myself))
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
-
-IF
     Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !AreaType(OUTDOOR)
     !Range(NearestEnemyOf(Myself),30)
     See(NearestDoor) // note: this seems to auto-skip locked doors
     OpenState(NearestDoor,FALSE)
@@ -372,8 +383,8 @@ END
 IF
     Allegiance(Myself,EVILCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
-    !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)    
-    CheckStatLT(LastSeenBy(Myself),100,RESISTCOLD)
+    !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
+    !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
 THEN
     RESPONSE #100
         AttackReevaluate(LastSeenBy(Myself),15)
@@ -386,7 +397,6 @@ IF
     !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
     !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
-    CheckStatLT(LastSeenBy(Myself),100,RESISTCOLD)
 THEN
     RESPONSE #100
         AttackReevaluate(LastSeenBy(Myself),15)
@@ -406,7 +416,6 @@ END
 
 IF
     Allegiance(Myself,EVILCUTOFF) // only RandomWalk if hostile
-    StateCheck(Myself,STATE_INVISIBLE) // if Natural Invisibility is active and there is nothing better to do
     !GlobalTimerNotExpired("RR#Move","LOCALS")
 THEN
     RESPONSE #100
