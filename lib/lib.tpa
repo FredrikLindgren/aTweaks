@@ -467,7 +467,8 @@ DEFINE_PATCH_FUNCTION cold_spell_immunities BEGIN
                ~RR#WI404~                                                              // aTweaks/RR Ice Storm
                 ~SPWI503~                                                              // Cone of Cold
                 ~rr#icew~                                                              // aTweaks' Wall of Ice
-                ~rr#efrzn~                                                             // aTweaks' Freeze (Cryonax)
+               ~rr#efrzn~                                                              // aTweaks' Freeze (Cryonax)
+               ~rr#ehyis~                                                              // aTweaks' Ice Storn (Olhydra's version)
 BEGIN                                                                                  // execute the following
 READ_ASCII 0 sig (3)
   PATCH_MATCH "%sig%" WITH 
@@ -1827,5 +1828,82 @@ READ_ASCII 0 sig (3)
   END                                                                                  // ends WITH CRE block
   DEFAULT                                                                              // do nothing
 END                                                                                    // ends PATCH_MATCH
+END                                                                                    // ends DEFINE_PATCH_FUNCTION
+
+
+// Missile weapon immunity
+DEFINE_PATCH_FUNCTION missile_weapon_immunity BEGIN
+    PATCH_FOR_EACH ~missile~ IN                                                        // grant immunity to each of the following missile weapons
+                        ~1~                                                            // Arrow of Slaying
+                        ~2~                                                            // Exploding Arrow
+                        ~3~                                                            // Acid Arrow
+                        ~4~                                                            // Arrow/Arrow +1
+                        ~6~                                                            // Throwing Axe
+                        ~7~                                                            // Throwing Axe
+                        ~8~                                                            // Bolt
+                        ~9~                                                            // Throwing Axe
+                       ~10~                                                            // Throwing Axe
+                       ~11~                                                            // Bolt+1, Bolt of Biting/Polymorph
+                       ~12~                                                            // Exploding Bolt
+                       ~13~                                                            // Bolt (?)
+                       ~14~                                                            // Bolt
+                       ~15~                                                            // Bolt of Lightning
+                       ~16~                                                            // Bullet
+                       ~17~                                                            // Bullet +1, Sunstone Bullet
+                       ~18~                                                            // Bullet
+                       ~19~                                                            // Bullet
+                       ~26~                                                            // Throwing Dagger
+                       ~27~                                                            // Throwing Dagger (?)
+                       ~28~                                                            // Throwing Dagger (?)
+                       ~29~                                                            // Fire Tooth +3
+                       ~30~                                                            // Throwing Dagger (?)
+                       ~31~                                                            // Asp's Nest, Dart of Stunning...
+                       ~32~                                                            // Dart
+                       ~33~                                                            // Dart (?)
+                       ~34~                                                            // Dart (?)
+                       ~35~                                                            // Dart (?)
+                       ~55~                                                            // Spear
+                       ~56~                                                            // Spear
+                       ~57~                                                            // Spear
+                       ~58~                                                            // Spear
+                       ~59~                                                            // Spear
+                      ~102~                                                            // Flame Arrow Blue
+                      ~232~                                                            // Energy Spear (Gesen's Bow)
+BEGIN                                                                                  // execute the following
+READ_ASCII 0 sig (3)
+  PATCH_MATCH "%sig%" WITH 
+      ~CRE~ BEGIN                                                                      // CRE file parsed
+      LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                           // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "83"                                                                // effect: #83 (Protection From Projectile)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "9"                                                                 // timing mode: 9 (permanent after death)
+        "duration" = "0"                                                               // duration: 0
+        "parameter2" = EVAL "%missile%"                                                // param2: the current missile
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = ""                                                               // resref: none
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+    END                                                                                // ends WITH CRE block
+    ~ITM~ BEGIN                                                                        // ITM file parsed
+      LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                        // Starts FUNCTION call
+      INT_VAR                                                                          // initialize variables
+        "opcode" = "83"                                                                // effect: #83 (Protection From Projectile)
+        "target" = "1"                                                                 // target: 1 (self)
+        "timing" = "2"                                                                 // timing mode: 2 (while equipped)
+        "duration" = "0"                                                               // duration: 0
+        "parameter2" = EVAL "%missile%"                                                // param2: the current missile
+        "sectype" = "0"                                                                // secondary type: none
+        "probability1" = "100"                                                         // probability1: 100%
+      STR_VAR                                                                          // initialize strings
+        "resource"  = ""                                                               // resref: none
+        "effsource" = ""                                                               // effsource: none
+      END                                                                              // ends LAUNCH_PATCH_FUNCTION
+    END                                                                                // ends WITH ITM block
+    DEFAULT                                                                            // do nothing
+END                                                                                    // ends PATCH_MATCH
+END                                                                                    // ends PATCH_FOR_EACH
 END                                                                                    // ends DEFINE_PATCH_FUNCTION
 

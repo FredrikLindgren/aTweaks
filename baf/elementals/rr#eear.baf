@@ -313,6 +313,14 @@ THEN
 END
 
 IF
+    See(Myself) // initialize/clear LastSeenByMyself(); special case, needed for elementals summoned by opponents out of the party's sight
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
     Allegiance(Myself,EVILCUTOFF)
     OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
       See(Player1)
@@ -328,8 +336,8 @@ THEN
 END
 
 IF
-    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCRUSHING)
     See(NearestEnemyOf(Myself))
     False()
 THEN

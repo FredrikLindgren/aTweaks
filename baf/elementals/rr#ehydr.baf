@@ -72,35 +72,19 @@ THEN
 END
 
 IF
-    Global("Display","LOCALS",0)
-    AreaCheck("AR6200") // Throne of Bhaal (final battle)
-    OR(2)
-      HPPercentLT(Myself,100)
-      Detect([GOODCUTOFF])
+	HitBy([ANYONE],COLD) // Olhydra should be slowed by large amounts of cold damage, despite being immune to it
+    HPPercentLT(Myself,51) // when low on hit points, become slowed if hit by cold damage
+    !StateCheck(Myself,STATE_SLOWED)
+    !GlobalTimerNotExpired("rr#eslow","LOCALS")
 THEN
-    RESPONSE #100
-        SetGlobal("Display","LOCALS",1)
-        DisplayStringHead(Myself,72792) // Who calls Cryonax, Prince of Ice!
-        CreateCreatureObjectEffect("SALGRICE","ICRMPARI",Myself)
-        CreateCreatureObjectEffect("SALGRICE","ICRMPARI",Myself)
-        CreateCreatureObjectEffect("TROLIC03","ICRMPARI",Myself)
-        CreateCreatureObjectEffect("TROLIC03","ICRMPARI",Myself)
-END
-
-IF
-    Global("Display","LOCALS",0)
-    !AreaCheck("AR6200") // Throne of Bhaal (final battle)
-    Detect([GOODCUTOFF])
-THEN
-    RESPONSE #100
-        SetGlobal("Display","LOCALS",1)
-        DisplayStringHead(Myself,72792) // Who calls Cryonax, Prince of Ice!
-        Continue()
+	RESPONSE #100
+        SetGlobalTimer("rr#eslow","LOCALS",12)
+		ApplySpellRES("rr#ewwsl",Myself) // Slow
 END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#ecryo") // Summon Allies (Cryonax)
+    HaveSpellRES("rr#ehydr") // Summon Allies (Olhydra)
 	See(NearestEnemyOf(Myself))
     OR(3)
       RandomNum(6,1) // this summoning block is semi-randomised
@@ -110,8 +94,168 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#ecryo",Myself) // Summon Allies (Cryonax)
-		RemoveSpellRES("rr#ecryo") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#ehydr",Myself) // Summon Allies (Olhydra)
+		RemoveSpellRES("rr#ehydr") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See([GOODCUTOFF.HUMANOID])
+    InWeaponRange(LastSeenBy(Myself))
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-4,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+		SetInterrupt(FALSE)
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+		SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(SecondNearest([GOODCUTOFF.HUMANOID]))
+    InWeaponRange(LastSeenBy(Myself))
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-4,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+		SetInterrupt(FALSE)
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+		SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(ThirdNearest([GOODCUTOFF.HUMANOID]))
+    InWeaponRange(LastSeenBy(Myself))
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-4,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+		SetInterrupt(FALSE)
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+		SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(FourthNearest([GOODCUTOFF.HUMANOID]))
+    InWeaponRange(LastSeenBy(Myself))
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-4,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+		SetInterrupt(FALSE)
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+		SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(FifthNearest([GOODCUTOFF.HUMANOID]))
+    InWeaponRange(LastSeenBy(Myself))
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-4,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+		SetInterrupt(FALSE)
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+		SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(SixthNearest([GOODCUTOFF.HUMANOID]))
+    InWeaponRange(LastSeenBy(Myself))
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-4,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+		SetInterrupt(FALSE)
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+		SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(SeventhNearest([GOODCUTOFF.HUMANOID]))
+    InWeaponRange(LastSeenBy(Myself))
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-4,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+		SetInterrupt(FALSE)
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+		SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(EighthNearest([GOODCUTOFF.HUMANOID]))
+    InWeaponRange(LastSeenBy(Myself))
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-4,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+		SetInterrupt(FALSE)
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+		SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(NinthNearest([GOODCUTOFF.HUMANOID]))
+    InWeaponRange(LastSeenBy(Myself))
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-4,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+		SetInterrupt(FALSE)
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
+		SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("rr#drown","LOCALS") // note: this isn't a regular spell, it's a 1x/round grapple attack
+    See(TenthNearest([GOODCUTOFF.HUMANOID]))
+    InWeaponRange(LastSeenBy(Myself))
+    StateCheck(LastSeenBy(Myself),STATE_IMMOBILE)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatGT(LastSeenBy(Myself),-4,SAVEVSDEATH)
+    !CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward    
+THEN
+    RESPONSE #100
+		SetInterrupt(FALSE)
+        SetGlobalTimer("rr#drown","LOCALS",6)
+        ForceSpellRES("rr#drown",LastSeenBy(Myself)) // Drown
 		SetInterrupt(TRUE)
 END
 
@@ -593,7 +737,524 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See([PC.0.0.RANGER]) // single-class ranger
+    Kit(LastSeenBy(Myself),FERALAN) // archer kit, highest priority
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(SecondNearest([PC.0.0.RANGER])) // single-class ranger
+    Kit(LastSeenBy(Myself),FERALAN) // archer kit, highest priority
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(ThirdNearest([PC.0.0.RANGER])) // single-class ranger
+    Kit(LastSeenBy(Myself),FERALAN) // archer kit, highest priority
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(StrongestOf([PC])) // try to blind the strongest party member
+	OR(3)
+          Class(LastSeenBy(Myself),FIGHTER_ALL) // if it's a warrior
+          Class(LastSeenBy(Myself),RANGER_ALL)
+          Class(LastSeenBy(Myself),PALADIN_ALL)
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See([PC.0.0.FIGHTER_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(SecondNearest([PC.0.0.FIGHTER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(ThirdNearest([PC.0.0.FIGHTER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See([PC.0.0.RANGER_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(SecondNearest([PC.0.0.RANGER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(ThirdNearest([PC.0.0.RANGER_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See([PC.0.0.PALADIN_ALL]) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(SecondNearest([PC.0.0.PALADIN_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(ThirdNearest([PC.0.0.PALADIN_ALL])) // prioritize warriors
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(StrongestOf([PC])) // try to blind the strongest party member
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	Range(SecondNearest([GOODCUTOFF]),10)
+	Range([GOODCUTOFF],10) // at least two party members are nearby
+	See([GOODCUTOFF])
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	Range(SecondNearest([GOODCUTOFF]),10)
+	Range([GOODCUTOFF],10) // at least two party members are nearby
+	See(SecondNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See([GOODCUTOFF])
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(SecondNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(ThirdNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(FourthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(FifthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+	!GlobalTimerNotExpired("rr#cloud","LOCALS")
+	HaveSpellRES("rr#mmswf") // Wall of Fog
+	See(SixthNearest([GOODCUTOFF]))
+	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_BLIND)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+	!HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+	!HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		SetGlobalTimer("rr#cloud","LOCALS",12) // use cloud spells once per 2 rounds
+		ForceSpellRES("rr#mmswf",LastSeenBy(Myself)) // Wall of Fog
+		RemoveSpellRES("rr#mmswf") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ehyis") // Ice Storm (Olhydra's version)
 	See(NearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
@@ -603,14 +1264,14 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#ehyis",LastSeenBy(Myself)) // Ice Storm (Olhydra's version)
+		RemoveSpellRES("rr#ehyis") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ehyis") // Ice Storm (Olhydra's version)
 	See(SecondNearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
@@ -620,14 +1281,14 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#ehyis",LastSeenBy(Myself)) // Ice Storm (Olhydra's version)
+		RemoveSpellRES("rr#ehyis") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ehyis") // Ice Storm (Olhydra's version)
 	See(ThirdNearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
@@ -637,14 +1298,14 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#ehyis",LastSeenBy(Myself)) // Ice Storm (Olhydra's version)
+		RemoveSpellRES("rr#ehyis") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ehyis") // Ice Storm (Olhydra's version)
 	See(FourthNearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
@@ -654,14 +1315,14 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#ehyis",LastSeenBy(Myself)) // Ice Storm (Olhydra's version)
+		RemoveSpellRES("rr#ehyis") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ehyis") // Ice Storm (Olhydra's version)
 	See(FifthNearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
@@ -671,14 +1332,14 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#ehyis",LastSeenBy(Myself)) // Ice Storm (Olhydra's version)
+		RemoveSpellRES("rr#ehyis") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ehyis") // Ice Storm (Olhydra's version)
 	See(SixthNearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
@@ -688,213 +1349,8 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(NearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(SecondNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(ThirdNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(FourthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(FifthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(SixthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(NearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(SecondNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(ThirdNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(FourthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(FifthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(SixthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#ehyis",LastSeenBy(Myself)) // Ice Storm (Olhydra's version)
+		RemoveSpellRES("rr#ehyis") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
@@ -1085,332 +1541,14 @@ THEN
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(NearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(SecondNearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(ThirdNearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(FourthNearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(FifthNearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(SixthNearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#ersug") // Suggestion
-	See(NearestEnemyOfType([0.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-    !Kit(LastSeenBy(Myself),INQUISITOR)
-    !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // susceptible targets only
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#ersug",LastSeenBy(Myself)) // Suggestion
-		RemoveSpellRES("rr#ersug") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#ersug") // Suggestion
-	See(SecondNearestEnemyOfType([0.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-    !Kit(LastSeenBy(Myself),INQUISITOR)
-    !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // susceptible targets only
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#ersug",LastSeenBy(Myself)) // Suggestion
-		RemoveSpellRES("rr#ersug") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#ersug") // Suggestion
-	See(ThirdNearestEnemyOfType([0.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-    !Kit(LastSeenBy(Myself),INQUISITOR)
-    !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // susceptible targets only
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#ersug",LastSeenBy(Myself)) // Suggestion
-		RemoveSpellRES("rr#ersug") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS") // this summoning block isn't randomises and occurs if there's nothing better to do
-    HaveSpellRES("rr#ecryo") // Summon Allies (Cryonax)
+    HaveSpellRES("rr#ehydr") // Summon Allies (Olhydra)
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#ecryo",Myself) // Summon Allies (Cryonax)
-		RemoveSpellRES("rr#ecryo") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#ehydr",Myself) // Summon Allies (Olhydra)
+		RemoveSpellRES("rr#ehydr") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
@@ -1431,7 +1569,7 @@ END
 
 IF
     !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTSLASHING)
     See(NearestEnemyOf(Myself))
     False()
 THEN
@@ -1442,7 +1580,7 @@ END
 IF
     !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(SixthNearestEnemyOf(Myself))
     False()
@@ -1454,7 +1592,7 @@ END
 IF
     !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(FifthNearestEnemyOf(Myself))
     False()
@@ -1466,7 +1604,7 @@ END
 IF
     !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(FourthNearestEnemyOf(Myself))
     False()
@@ -1478,7 +1616,7 @@ END
 IF
     !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(ThirdNearestEnemyOf(Myself))
     False()
@@ -1490,7 +1628,7 @@ END
 IF
     !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(SecondNearestEnemyOf(Myself))
     False()
@@ -1502,7 +1640,7 @@ END
 IF
     !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(NearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTSLASHING)
     !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(NearestEnemyOf(Myself))
     False()
@@ -1516,7 +1654,7 @@ IF
     !StateCheck(WorstAC([PC]),STATE_PANIC)
     !StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
     !CheckStatGT(WorstAC([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    CheckStatLT(WorstAC([PC]),100,RESISTCOLD)
+    CheckStatLT(WorstAC([PC]),100,RESISTSLASHING)
     See(WorstAC([PC]))
     False()
 THEN
@@ -1528,7 +1666,7 @@ IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)
     !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
-    CheckStatLT(LastAttackerOf(Myself),100,RESISTCOLD)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
     !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
     Range(LastAttackerOf(Myself),8)
     RandomNum(3,1)
@@ -1543,7 +1681,7 @@ IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)
     !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
-    CheckStatLT(LastAttackerOf(Myself),100,RESISTCOLD)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTSLASHING)
     !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
     Range(LastAttackerOf(Myself),4)
     See(LastAttackerOf(Myself))
@@ -1556,7 +1694,7 @@ END
 IF
     !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(SixthNearestEnemyOf(Myself))
     False()
 THEN
@@ -1567,7 +1705,7 @@ END
 IF
     !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(FifthNearestEnemyOf(Myself))
     False()
 THEN
@@ -1578,7 +1716,7 @@ END
 IF
     !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(FourthNearestEnemyOf(Myself))
     False()
 THEN
@@ -1589,7 +1727,7 @@ END
 IF
     !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(ThirdNearestEnemyOf(Myself))
     False()
 THEN
@@ -1600,7 +1738,7 @@ END
 IF
     !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTSLASHING)
     See(SecondNearestEnemyOf(Myself))
     False()
 THEN
@@ -1611,7 +1749,7 @@ END
 IF
     !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTSLASHING)
     See(NearestEnemyOf(Myself))
     False()
 THEN
@@ -1623,7 +1761,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player6,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player6,STATE_IMMOBILE)
-    CheckStatLT(Player6,100,RESISTCOLD)
+    CheckStatLT(Player6,100,RESISTSLASHING)
     See(Player6)
     False()
 THEN
@@ -1635,7 +1773,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player5,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player5,STATE_IMMOBILE)
-    CheckStatLT(Player5,100,RESISTCOLD)
+    CheckStatLT(Player5,100,RESISTSLASHING)
     See(Player5)
     False()
 THEN
@@ -1647,7 +1785,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player4,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player4,STATE_IMMOBILE)
-    CheckStatLT(Player4,100,RESISTCOLD)
+    CheckStatLT(Player4,100,RESISTSLASHING)
     See(Player4)
     False()
 THEN
@@ -1659,7 +1797,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player3,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player3,STATE_IMMOBILE)
-    CheckStatLT(Player3,100,RESISTCOLD)
+    CheckStatLT(Player3,100,RESISTSLASHING)
     See(Player3)
     False()
 THEN
@@ -1671,7 +1809,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player2,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player2,STATE_IMMOBILE)
-    CheckStatLT(Player2,100,RESISTCOLD)
+    CheckStatLT(Player2,100,RESISTSLASHING)
     See(Player2)
     False()
 THEN
@@ -1683,7 +1821,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player1,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player1,STATE_IMMOBILE)
-    CheckStatLT(Player1,100,RESISTCOLD)
+    CheckStatLT(Player1,100,RESISTSLASHING)
     See(Player1)
     False()
 THEN
@@ -1721,6 +1859,7 @@ END
 IF
     Allegiance(Myself,EVILCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
     !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
 THEN
     RESPONSE #100
@@ -1733,6 +1872,7 @@ IF
     !InParty(LastSeenBy(Myself))
     !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
 THEN
     RESPONSE #100
         AttackReevaluate(LastSeenBy(Myself),15)

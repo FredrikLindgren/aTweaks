@@ -84,7 +84,7 @@ THEN
 END
 
 IF
-    See(Myself) // initialize/clear LastSeenByMyself(); special case, needed here due to the specifics of summoning Ice Paraelementals; otherwise don't use
+    See(Myself) // initialize/clear LastSeenByMyself(); special case, needed for elementals summoned by opponents out of the party's sight
     False()
 THEN
     RESPONSE #100
@@ -107,8 +107,8 @@ THEN
 END
 
 IF
-    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCOLD)
+    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCOLD)
     See(NearestEnemyOf(Myself))
     False()
 THEN

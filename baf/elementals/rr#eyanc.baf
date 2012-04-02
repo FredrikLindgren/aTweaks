@@ -73,30 +73,44 @@ END
 
 IF
     Global("Display","LOCALS",0)
+    AreaCheck("AR6200") // Throne of Bhaal (final battle)
+    OR(2)
+      HPPercentLT(Myself,100)
+      Detect([GOODCUTOFF])
+THEN
+    RESPONSE #100
+		SetGlobal("Display","LOCALS",1)
+		DisplayStringHead(Myself,72790) // Who calls Yan-C-Bin, Prince of Air!
+		CreateCreatureObjectEffect("rr#eaire","SPFLESHS",Myself) // Elder Air Elemental
+		CreateCreatureObjectEffect("rr#eaire","SPFLESHS",Myself) // Elder Air Elemental
+		CreateCreatureObjectEffect("rr#easer","SPFLESHS",Myself) // Aerial Servant
+		CreateCreatureObjectEffect("rr#easer","SPFLESHS",Myself) // Aerial Servant
+END
+
+IF
+    Global("Display","LOCALS",0)
+    !AreaCheck("AR6200") // Throne of Bhaal (final battle)
     Detect([GOODCUTOFF])
 THEN
     RESPONSE #100
         SetGlobal("Display","LOCALS",1)
-        DisplayStringHead(Myself,72788) // Who calls Ogremoch, Prince of Earth!
+		DisplayStringHead(Myself,72790) // Who calls Yan-C-Bin, Prince of Air!
         Continue()
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi408") // Stoneskin
-	CheckStatLT(Myself,2,STONESKINS)
+    !GlobalTimerNotExpired("rr#niinv","LOCALS") // Natural Invisibility is automatically re-applied once per round (note: this is not a spell and shouldn't be treated as such)
+    !StateCheck(Myself,STATE_INVISIBLE)
+    !Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust but not True Seeing as it's automatically re-applied
 THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi408",Myself) // Stoneskin
-		RemoveSpellRES("rr#wi408") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
+    RESPONSE #100
+        SetGlobalTimer("rr#niinv","LOCALS",6)
+        ReallyForceSpellRES("rr#niinv",Myself) // Natural Invisibility
 END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#eogre") // Summon Allies (Ogremoch)
+    HaveSpellRES("rr#eyanc") // Summon Allies (Yan-C-Bin)
 	See(NearestEnemyOf(Myself))
     OR(3)
       RandomNum(6,1) // this summoning block is semi-randomised
@@ -106,8 +120,8 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#eogre",Myself) // Summon Allies (Ogremoch)
-		RemoveSpellRES("rr#eogre") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#eyanc",Myself) // Summon Allies (Yan-C-Bin)
+		RemoveSpellRES("rr#eyanc") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
@@ -588,439 +602,68 @@ THEN
 END
 
 IF
-    Allegiance(Myself,EVILCUTOFF)
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#equa") // Earthquake
+    CheckStatGT(Myself,23,LEVEL) // 24 HD Air Elemental
+    OR(3)
+      CheckStatLT(ThirdNearestEnemyOf(Myself),7,LEVEL)
+      CheckStatLT(SecondNearestEnemyOf(Myself),7,LEVEL)
+      CheckStatLT(NearestEnemyOf(Myself),7,LEVEL)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#eairw",Myself) // Whirlwind
+        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+		DisplayStringHead(Myself,72791) // Feel the wrath of Yan-C-Bin!
+        SetInterrupt(TRUE)
+END
+
+IF
+    HaveSpellRES("rr#eairw") // Whirlwind
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
     NumCreatureGT([GOODCUTOFF],2) // at least three opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
     Range([GOODCUTOFF],12)
     Range(SecondNearest([GOODCUTOFF]),12)
     Range(ThirdNearest([GOODCUTOFF]),12)
-    OR(3)
-      CheckStatGT([GOODCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
-      CheckStatGT([GOODCUTOFF],4,LEVEL2)
-      CheckStatGT([GOODCUTOFF],4,LEVEL3)
 THEN
     RESPONSE #100
         SetInterrupt(FALSE)
         SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#equa",Myself) // Earthquake
-        RemoveSpellRES("rr#equa") // remove one instance of the spell upon casting
-        DisplayStringHead(Myself,72789) // Feel the wrath of Ogremoch!
+        ForceSpellRES("rr#eairw",Myself) // Whirlwind
+        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+		DisplayStringHead(Myself,72791) // Feel the wrath of Yan-C-Bin!
         SetInterrupt(TRUE)
 END
 
 IF
-    Allegiance(Myself,EVILCUTOFF)
+    HaveSpellRES("rr#eairw") // Whirlwind
     !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#equa","LOCALS") // Earthquake timer
-    HaveSpellRES("rr#equa") // Earthquake
+    !GlobalTimerNotExpired("rr#eairw","LOCALS") // whirlwind timer
     NumCreatureGT([GOODCUTOFF],1) // at least two opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
     Range([GOODCUTOFF],12)
     Range(SecondNearest([GOODCUTOFF]),12)
-    OR(3)
-      CheckStatGT([GOODCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
-      CheckStatGT([GOODCUTOFF],4,LEVEL2)
-      CheckStatGT([GOODCUTOFF],4,LEVEL3)
+    Range(ThirdNearest([GOODCUTOFF]),12)
 THEN
     RESPONSE #70
-        SetGlobalTimer("rr#equa","LOCALS",12) // Earthquake timer
+        SetGlobalTimer("rr#eairw","LOCALS",12) // whirlwind timer
     RESPONSE #30
         SetInterrupt(FALSE)
         SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#equa",Myself) // Earthquake
-        RemoveSpellRES("rr#equa") // remove one instance of the spell upon casting
-        DisplayStringHead(Myself,72789) // Feel the wrath of Ogremoch!
+        ForceSpellRES("rr#eairw",Myself) // Whirlwind
+        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+		DisplayStringHead(Myself,72791) // Feel the wrath of Yan-C-Bin!
         SetInterrupt(TRUE)
-END
-
-IF
-    Allegiance(Myself,EVILCUTOFF)
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#equa","LOCALS") // Earthquake timer
-    HaveSpellRES("rr#equa") // Earthquake
-    Range([GOODCUTOFF],12) // at least one opponent is nearby
-    OR(3)
-      CheckStatGT([GOODCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
-      CheckStatGT([GOODCUTOFF],4,LEVEL2)
-      CheckStatGT([GOODCUTOFF],4,LEVEL3)
-THEN
-    RESPONSE #85
-        SetGlobalTimer("rr#equa","LOCALS",12) // Earthquake timer
-    RESPONSE #15
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#equa",Myself) // Earthquake
-        RemoveSpellRES("rr#equa") // remove one instance of the spell upon casting
-        DisplayStringHead(Myself,72789) // Feel the wrath of Ogremoch!
-        SetInterrupt(TRUE)
-END
-
-IF
-    Allegiance(Myself,EVILCUTOFF)
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#equa","LOCALS") // Earthquake timer
-    HaveSpellRES("rr#equa") // Earthquake
-    Range([PC],12) // special block, for targeting singled-out party members (i.e. solo players)
-    OR(2)
-      NumCreatureGT([PC],1) // at least two party members are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
-      NumInPartyAlive(1) // or a solo player has been detected
-    See([PC])
-    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-    CheckStatGT(LastSeenBy(Myself),-6,SAVEVSSPELL)
-    !CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-    !CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#equa",Myself) // Earthquake
-        RemoveSpellRES("rr#equa") // remove one instance of the spell upon casting
-        DisplayStringHead(Myself,72789) // Feel the wrath of Ogremoch!
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    Allegiance(Myself,GOODCUTOFF)
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#equa") // Earthquake
-    NumCreatureGT([EVILCUTOFF],2) // at least three opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
-    Range([EVILCUTOFF],12)
-    Range(SecondNearest([EVILCUTOFF]),12)
-    Range(ThirdNearest([EVILCUTOFF]),12)
-    OR(3)
-      CheckStatGT([EVILCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
-      CheckStatGT([EVILCUTOFF],4,LEVEL2)
-      CheckStatGT([EVILCUTOFF],4,LEVEL3)
-THEN
-    RESPONSE #100
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#equa",Myself) // Earthquake
-        RemoveSpellRES("rr#equa") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    Allegiance(Myself,GOODCUTOFF)
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#equa","LOCALS") // Earthquake timer
-    HaveSpellRES("rr#equa") // Earthquake
-    NumCreatureGT([EVILCUTOFF],1) // at least two opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
-    Range([EVILCUTOFF],12)
-    Range(SecondNearest([EVILCUTOFF]),12)
-    OR(3)
-      CheckStatGT([EVILCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
-      CheckStatGT([EVILCUTOFF],4,LEVEL2)
-      CheckStatGT([EVILCUTOFF],4,LEVEL3)
-THEN
-    RESPONSE #70
-        SetGlobalTimer("rr#equa","LOCALS",12) // Earthquake timer
-    RESPONSE #30
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#equa",Myself) // Earthquake
-        RemoveSpellRES("rr#equa") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-    ActionListEmpty()
-    Allegiance(Myself,GOODCUTOFF)
-    !GlobalTimerNotExpired("RR#Cast","LOCALS")
-    !GlobalTimerNotExpired("rr#equa","LOCALS") // Earthquake timer
-    HaveSpellRES("rr#equa") // Earthquake
-    Range([EVILCUTOFF],12) // at least one opponent is nearby
-    OR(3)
-      CheckStatGT([EVILCUTOFF],4,LEVEL) // don't waste Earthquake on low level opponents
-      CheckStatGT([EVILCUTOFF],4,LEVEL2)
-      CheckStatGT([EVILCUTOFF],4,LEVEL3)
-THEN
-    RESPONSE #85
-        SetGlobalTimer("rr#equa","LOCALS",12) // Earthquake timer
-    RESPONSE #15
-        SetInterrupt(FALSE)
-        SetGlobalTimer("RR#Cast","LOCALS",6)
-        ForceSpellRES("rr#equa",Myself) // Earthquake
-        RemoveSpellRES("rr#equa") // remove one instance of the spell upon casting
-        SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#wi604") // Flesh to Stone
-	See(NearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_PETRIFICATION)
-    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
-	!HasItemEquipedReal("SW1H71",LastSeenBy(Myself)) // Hindo's Doom +4
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi604",LastSeenBy(Myself)) // Flesh to Stone
-		RemoveSpellRES("rr#wi604") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#wi604") // Flesh to Stone
-	See(SecondNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_PETRIFICATION)
-    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
-	!HasItemEquipedReal("SW1H71",LastSeenBy(Myself)) // Hindo's Doom +4
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi604",LastSeenBy(Myself)) // Flesh to Stone
-		RemoveSpellRES("rr#wi604") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#wi604") // Flesh to Stone
-	See(ThirdNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_PETRIFICATION)
-    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
-	!HasItemEquipedReal("SW1H71",LastSeenBy(Myself)) // Hindo's Doom +4
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi604",LastSeenBy(Myself)) // Flesh to Stone
-		RemoveSpellRES("rr#wi604") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#wi604") // Flesh to Stone
-	See(FourthNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_PETRIFICATION)
-    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
-	!HasItemEquipedReal("SW1H71",LastSeenBy(Myself)) // Hindo's Doom +4
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi604",LastSeenBy(Myself)) // Flesh to Stone
-		RemoveSpellRES("rr#wi604") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#wi604") // Flesh to Stone
-	See(FifthNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_PETRIFICATION)
-    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
-	!HasItemEquipedReal("SW1H71",LastSeenBy(Myself)) // Hindo's Doom +4
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi604",LastSeenBy(Myself)) // Flesh to Stone
-		RemoveSpellRES("rr#wi604") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#wi604") // Flesh to Stone
-	See(SixthNearestEnemyOf(Myself))
-	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_PROTECTION_FROM_PETRIFICATION)
-    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
-	!HasItemEquipedReal("SW1H71",LastSeenBy(Myself)) // Hindo's Doom +4
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi604",LastSeenBy(Myself)) // Flesh to Stone
-		RemoveSpellRES("rr#wi604") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#ersug") // Suggestion
-	See(NearestEnemyOfType([0.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-    !Kit(LastSeenBy(Myself),INQUISITOR)
-    !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // susceptible targets only
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#ersug",LastSeenBy(Myself)) // Suggestion
-		RemoveSpellRES("rr#ersug") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#ersug") // Suggestion
-	See(SecondNearestEnemyOfType([0.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-    !Kit(LastSeenBy(Myself),INQUISITOR)
-    !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // susceptible targets only
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#ersug",LastSeenBy(Myself)) // Suggestion
-		RemoveSpellRES("rr#ersug") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	HaveSpellRES("rr#ersug") // Suggestion
-	See(ThirdNearestEnemyOfType([0.HUMANOID]))
-	!Class(LastSeenBy(Myself),MONK)
-    !Kit(LastSeenBy(Myself),INQUISITOR)
-    !Kit(LastSeenBy(Myself),CAVALIER)
-	!Race(LastSeenBy(Myself),ELF)
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // susceptible targets only
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
-	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
-	!HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
-	!HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
-	!HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
-	!HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
-	!HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
-	!HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#ersug",LastSeenBy(Myself)) // Suggestion
-		RemoveSpellRES("rr#ersug") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
 END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS") // this summoning block isn't randomises and occurs if there's nothing better to do
-    HaveSpellRES("rr#eogre") // Summon Allies (Ogremoch)
+    HaveSpellRES("rr#eyanc") // Summon Allies (Yan-C-Bin)
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#eogre",Myself) // Summon Allies (Ogremoch)
-		RemoveSpellRES("rr#eogre") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#eyanc",Myself) // Summon Allies (Yan-C-Bin)
+		RemoveSpellRES("rr#eyanc") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
@@ -1312,7 +955,7 @@ END
 
 IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!Range(LastSeenBy(Myself),6)
+	!Range(LastSeenBy(Myself),30) // special case for Yan-C-Bin, he moves very fast so he doesn't usually need this unles his opponents are out of sight
     InMyArea(LastSeenBy(Myself))
 	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
 	!CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW

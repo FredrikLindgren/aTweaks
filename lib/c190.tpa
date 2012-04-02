@@ -234,7 +234,7 @@ SAY NAME1 @2121 SAY NAME2 @2121
   END
 COPY ~atweaks/spl/elementals/rr#engl2.spl~ ~override~                              // Engulf, part 2 (fire damage)
 
-COPY ~atweaks/eff/elementals/rr#ecry1.eff~ ~override~                              // Cryonax Allies EFF 1 (Ice Paraelemental)
+COPY ~atweaks/eff/elementals/rr#ecry1.eff~ ~override~                              // Cryonax Summon Allies EFF 1 (Ice Paraelemental)
 COPY ~atweaks/spl/elementals/rr#ecryo.spl~ ~override~                              // Summon Allies (Cryonax)
 SAY NAME1 @2127 SAY NAME2 @2127
 
@@ -242,6 +242,13 @@ COPY ~atweaks/spl/elementals/rr#eimix.spl~ ~override~                           
 SAY NAME1 @2127 SAY NAME2 @2127
 
 COPY ~atweaks/spl/elementals/rr#eogre.spl~ ~override~                              // Summon Allies (Ogremoch)
+SAY NAME1 @2127 SAY NAME2 @2127
+
+COPY ~atweaks/eff/elementals/rr#ehyd1.eff~ ~override~                              // Olhydra Summon Allies EFF 1 (Water Elemental)
+COPY ~atweaks/spl/elementals/rr#ehydr.spl~ ~override~                              // Summon Allies (Olhydra)
+SAY NAME1 @2127 SAY NAME2 @2127
+
+COPY ~atweaks/spl/elementals/rr#eyanc.spl~ ~override~                              // Summon Allies (Yan-C-Bin)
 SAY NAME1 @2127 SAY NAME2 @2127
 
 
@@ -262,7 +269,16 @@ COPY ~atweaks/spl/rr#pyrot.spl~ ~override~                                      
   END 
 
 
+// Wall of Fog
 
+COPY ~atweaks/vvc/rr#mmswf.vvc~ ~override~                                         // Wall of Fog animation
+COPY ~atweaks/spl/mephits/rr#mmswf.spl~ ~override~                                 // Wall of Fog
+  SAY NAME1 @1855 SAY NAME2 @1855
+
+// Stun for 3 rounds (Yan-C-Bin on hit effect)
+
+COPY ~atweaks/eff/elementals/rr#estun.eff~ ~override~                              // Stun immunity EFF (for undead, constructs etc.)
+COPY ~atweaks/spl/elementals/rr#estun.spl~ ~override~                              // Stun (Yan-C-Bin on hit effect)
 
 // Clone spells into innate abilities
 
@@ -288,6 +304,9 @@ COPY_EXISTING ~spwi403.spl~  ~override/rr#wi403.spl~                            
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                      // Execute the "spell to innate ablity" function
 
 COPY_EXISTING ~spwi404.spl~  ~override/rr#wi404.spl~                               // Clone Ice Storm into an innate ability
+LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
+
+COPY_EXISTING ~spwi404.spl~  ~override/rr#ehyis.spl~                               // Clone Ice Storm into an innate ability (Olhydra's version)
 LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#rinvs" = "1" END     // Execute the "spell to innate ablity" function
 
 COPY_EXISTING ~spwi408.spl~  ~override/rr#wi408.spl~                               // Clone Stoneskin into an innate ability
@@ -354,6 +373,8 @@ COPY ~atweaks/itm/elementals/rr#eicer.itm~ ~override~                           
 COPY ~atweaks/itm/elementals/rr#ecryo.itm~ ~override~                              // Cryonax attack
 COPY ~atweaks/itm/elementals/rr#eimix.itm~ ~override~                              // Imix attack
 COPY ~atweaks/itm/elementals/rr#eogre.itm~ ~override~                              // Ogremoch attack
+COPY ~atweaks/itm/elementals/rr#ehydr.itm~ ~override~                              // Olhydra attack
+COPY ~atweaks/itm/elementals/rr#eyanc.itm~ ~override~                              // Yan-C-Bin attack
 
 
 
@@ -2122,6 +2143,8 @@ INT_VAR                                                                         
 "newgen"   = "5"                                                                   // new general (GIANT HUMANOID)
 "newrace"  = "145"                                                                 // new race (ELEMENTAL)
 "newclass" = "255"                                                                 // new class (NO_CLASS)
+"newgendr" = "1"                                                                   // new gender (MALE)
+"newsex"   = "1"                                                                   // new sex (Male)
 "newalign" = "35"                                                                  // new alignment (Neutral Evil)
 "enforce"  = "1"                                                                   // values are enforced for all creatures
 END                                                                                // ends FUNCTION call
@@ -2135,9 +2158,9 @@ STR_VAR                                                                         
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
 "script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION ~petrification_immunity~ END                                 // petrification immunity
+LAUNCH_PATCH_FUNCTION petrification_immunity  END                                  // petrification immunity
 LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                    // grant immunities to cold-based area effect spells
-LAUNCH_PATCH_FUNCTION ~clear_bg1_profs~ END                                        // Clear BG1 proficiencies
+LAUNCH_PATCH_FUNCTION clear_bg1_profs  END                                         // Clear BG1 proficiencies
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -2198,6 +2221,8 @@ INT_VAR                                                                         
 "newgen"   = "5"                                                                   // new general (GIANT HUMANOID)
 "newrace"  = "145"                                                                 // new race (ELEMENTAL)
 "newclass" = "187"                                                                 // new class (ELEMENTAL_FIRE)
+"newgendr" = "1"                                                                   // new gender (MALE)
+"newsex"   = "1"                                                                   // new sex (Male)
 "newalign" = "35"                                                                  // new alignment (Neutral Evil)
 "enforce"  = "1"                                                                   // values are enforced for all creatures
 END                                                                                // ends FUNCTION call
@@ -2212,11 +2237,11 @@ STR_VAR                                                                         
 "script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
-LAUNCH_PATCH_FUNCTION ~petrification_immunity~ END                                 // petrification immunity
+LAUNCH_PATCH_FUNCTION petrification_immunity END                                   // petrification immunity
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
 LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
 LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
-LAUNCH_PATCH_FUNCTION ~clear_bg1_profs~ END                                        // Clear BG1 proficiencies
+LAUNCH_PATCH_FUNCTION clear_bg1_profs END                                          // Clear BG1 proficiencies
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -2278,6 +2303,8 @@ INT_VAR                                                                         
 "newgen"   = "5"                                                                   // new general (GIANT HUMANOID)
 "newrace"  = "145"                                                                 // new race (ELEMENTAL)
 "newclass" = "188"                                                                 // new class (ELEMENTAL_EARTH)
+"newgendr" = "1"                                                                   // new gender (MALE)
+"newsex"   = "1"                                                                   // new sex (Male)
 "newalign" = "35"                                                                  // new alignment (Neutral Evil)
 "enforce"  = "1"                                                                   // values are enforced for all creatures
 END                                                                                // ends FUNCTION call
@@ -2295,7 +2322,169 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "16" END      // remove spurious haste opcode
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
-LAUNCH_PATCH_FUNCTION ~clear_bg1_profs~ END                                        // Clear BG1 proficiencies
+LAUNCH_PATCH_FUNCTION clear_bg1_profs END                                          // Clear BG1 proficiencies
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Olhydra (24 HD)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~elemhydr~                                                             // Olhydra
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_MEMORIZED_SPELL ~rr#wr208~ #0 ~innate~ ( 1 )                                   // adds 1x Know Alignment (renewable)
+ADD_MEMORIZED_SPELL ~rr#wr302~ #0 ~innate~ ( 1 )                                   // adds 1x Remove Magic (renewable)
+ADD_MEMORIZED_SPELL ~rr#ersug~ #0 ~innate~ ( 1 )                                   // adds 1x Suggestion (renewable)
+ADD_MEMORIZED_SPELL ~rr#telwr~ #0 ~innate~ ( 1 )                                   // adds 1x Teleport Without Error (renewable)
+ADD_MEMORIZED_SPELL ~rr#ehyis~ #0 ~innate~ ( 3 )                                   // adds 3x Ice Storm (Olhydra's version)
+ADD_MEMORIZED_SPELL ~rr#mmswf~ #0 ~innate~ ( 3 )                                   // adds 3x Wall of Fog
+ADD_MEMORIZED_SPELL ~rr#ehydr~ #0 ~innate~ ( 1 )                                   // adds 1x Summon Allies
+REMOVE_CRE_ITEM ~WALLPASS~                                                         // remove wallpass item
+REMOVE_CRE_ITEM ~ELEMPRIN~                                                         // Elemental Prince traits are handled differently
+ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
+REPLACE_CRE_ITEM ~RR#EHYDR~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+ADD_CRE_ITEM ~IMMUNE1~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                              // revise weapon immunities
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newmove"  = "5"                                                                   // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
+"rr#sinv"  = "1"                                                                   // See invisible creatures (1 = enable)
+"newxpv"   = "28000"                                                               // new XP value
+"newhp"    = "90"                                                                  // new hit point value
+"newac"    = "-6"                                                                  // new Armor Class value
+"newth"    = "5"                                                                   // new THAC0 value
+"newapr"   = "1"                                                                   // new number of attacks per round
+"newsvd"   = "3"                                                                   // new Save vs. Death
+"newsvw"   = "3"                                                                   // new Save vs. Wand
+"newsvp"   = "4"                                                                   // new Save vs. Polymorph
+"newsvb"   = "4"                                                                   // new Save vs. Breath
+"newsvs"   = "4"                                                                   // new Save vs. Spell
+"newmr"    = "70"                                                                  // new Magic Resistance value
+"newfr"    = "-50"                                                                 // new Resist Fire value
+"newcr"    = "100"                                                                 // new Resist Cold value
+"newrs"    = "50"                                                                  // new Resist Slashing
+"newlvl1"  = "24"                                                                  // new level (first class)
+"newstr"   = "20"                                                                  // new Strength value
+"newdex"   = "18"                                                                  // new Dexterity value
+"newcon"   = "24"                                                                  // new Constitution value
+"newint"   = "18"                                                                  // new Intelligence value
+"newwis"   = "16"                                                                  // new Wisdom value
+"newchr"   = "17"                                                                  // new Charisma value
+"newmor"   = "20"                                                                  // new morale value
+"newmorb"  = "1"                                                                   // new morale break value
+"newmorr"  = "1"                                                                   // new morale recovery value
+"newgen"   = "5"                                                                   // new general (GIANT HUMANOID)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "255"                                                                 // new class (NO_CLASS)
+"newgendr" = "2"                                                                   // new gender (FEMALE)
+"newsex"   = "2"                                                                   // new sex (Female)
+"newalign" = "35"                                                                  // new alignment (Neutral Evil)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#EHYDR"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "elemhydr"                                                          // original Olhydra script
+"script04"   = "WTASIGHT"                                                          // generic AI script
+"script05"   = "dw#melee"                                                          // SCSII melee AI script
+"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
+LAUNCH_PATCH_FUNCTION clear_bg1_profs END                                          // Clear BG1 proficiencies
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Yan-C-Bin (24 HD)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~elemyanc~                                                             // Yan-C-Bin
+            ~finsol02~                                                             // Yan-C-Bin in ToB
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
+REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_MEMORIZED_SPELL ~rr#wr208~ #0 ~innate~ ( 1 )                                   // adds 1x Know Alignment (renewable)
+ADD_MEMORIZED_SPELL ~rr#wr302~ #0 ~innate~ ( 1 )                                   // adds 1x Remove Magic (renewable)
+ADD_MEMORIZED_SPELL ~rr#ersug~ #0 ~innate~ ( 1 )                                   // adds 1x Suggestion (renewable)
+ADD_MEMORIZED_SPELL ~rr#telwr~ #0 ~innate~ ( 1 )                                   // adds 1x Teleport Without Error (renewable)
+ADD_MEMORIZED_SPELL ~rr#eairw~ #0 ~innate~ ( 1 )                                   // adds 1x Air Elemental Whirlwind
+ADD_MEMORIZED_SPELL ~rr#eyanc~ #0 ~innate~ ( 1 )                                   // adds 1x Summon Allies
+REMOVE_CRE_ITEM ~ELEMPRIN~                                                         // Elemental Prince traits are handled differently
+ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
+REPLACE_CRE_ITEM ~RR#EYANC~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+ADD_CRE_ITEM ~IMMUNE2~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                              // revise weapon immunities
+LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
+INT_VAR                                                                            // Initialize variables
+"newmove"  = "48"                                                                  // new movement rate
+"rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
+"rr#sinv"  = "1"                                                                   // See invisible creatures (1 = enable)
+"newxpv"   = "28000"                                                               // new XP value
+"newhp"    = "85"                                                                  // new hit point value
+"newac"    = "-6"                                                                  // new Armor Class value
+"newth"    = "5"                                                                   // new THAC0 value
+"newapr"   = "2"                                                                   // new number of attacks per round
+"newsvd"   = "3"                                                                   // new Save vs. Death
+"newsvw"   = "3"                                                                   // new Save vs. Wand
+"newsvp"   = "4"                                                                   // new Save vs. Polymorph
+"newsvb"   = "4"                                                                   // new Save vs. Breath
+"newsvs"   = "4"                                                                   // new Save vs. Spell
+"newmr"    = "95"                                                                  // new Magic Resistance value
+"newfr"    = "-25"                                                                 // new Resist Fire value
+"newer"    = "100"                                                                 // new Resist Electricity value
+"newrm"    = "100"                                                                 // new Resist Missiles
+"newlvl1"  = "24"                                                                  // new level (first class)
+"newstr"   = "26"                                                                  // new Strength value
+"newdex"   = "24"                                                                  // new Dexterity value
+"newcon"   = "18"                                                                  // new Constitution value
+"newint"   = "17"                                                                  // new Intelligence value
+"newwis"   = "17"                                                                  // new Wisdom value
+"newchr"   = "17"                                                                  // new Charisma value
+"newmor"   = "20"                                                                  // new morale value
+"newmorb"  = "1"                                                                   // new morale break value
+"newmorr"  = "1"                                                                   // new morale recovery value
+"newgen"   = "5"                                                                   // new general (GIANT HUMANOID)
+"newrace"  = "145"                                                                 // new race (ELEMENTAL)
+"newclass" = "186"                                                                 // new class (ELEMENTAL_AIR)
+"newgendr" = "1"                                                                   // new gender (MALE)
+"newsex"   = "1"                                                                   // new sex (Male)
+"newalign" = "35"                                                                  // new alignment (Neutral Evil)
+"enforce"  = "1"                                                                   // values are enforced for all creatures
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
+STR_VAR                                                                            // Initialize strings
+"newscript"  = "RR#EYANC"                                                          // new AI script
+"script01"   = ""                                                                  // first AI script name
+"script02"   = "None"                                                              // second AI script name
+"script03"   = "elemyanc"                                                          // original Yan-C-Bin script
+"script04"   = "WTASIGHT"                                                          // generic AI script
+"script05"   = "dw#melee"                                                          // SCSII melee AI script
+"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
+LAUNCH_PATCH_FUNCTION clear_bg1_profs END                                          // Clear BG1 proficiencies
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
+LAUNCH_PATCH_FUNCTION air_affinity END                                             // grant air affinity bonuses
+LAUNCH_PATCH_FUNCTION petrification_immunity END                                   // petrification immunity
+LAUNCH_PATCH_FUNCTION missile_weapon_immunity END                                  // missile weapon immunity
+WRITE_SHORT 0x4c "-99"                                                             // special case, AC vs. missile weapons modifier
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -2322,6 +2511,8 @@ COMPILE ~atweaks/baf/elementals/rr#eice.baf~                                    
 COMPILE ~atweaks/baf/elementals/rr#ecryo.baf~                                      // Cryonax AI script
 COMPILE ~atweaks/baf/elementals/rr#eimix.baf~                                      // Imix AI script
 COMPILE ~atweaks/baf/elementals/rr#eogre.baf~                                      // Ogremoch AI script
+COMPILE ~atweaks/baf/elementals/rr#ehydr.baf~                                      // Olhydra AI script
+COMPILE ~atweaks/baf/elementals/rr#eyanc.baf~                                      // Yan-C-Bin AI script
 
 
 
