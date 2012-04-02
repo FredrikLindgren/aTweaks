@@ -3165,8 +3165,6 @@ ACTION_FOR_EACH ~file~ IN                                                       
              ~SUEARTH~                                                             // Earth Elemental (Suldanesselar, Tree of Life guardian)
             ~SWAEAR02~                                                             // Earth Elemental (20+ HD, Elemental Summoning HLA)
               ~UDELDE~                                                             // Earth Elemental (Underdark portal guardian)
-            ~elemogre~                                                             // Ogremoch
-            ~elemsunn~                                                             // Sunnis
             ~rr#eeare~                                                             // Elder Earth Elemental (aTweaks)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
@@ -3214,6 +3212,117 @@ LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                          
 END                                                                                // ends LAUNCH_PATCH_FUNCTION
 END                                                                                // ends PATCH_FOR_EACH
   WRITE_BYTE 0x2E 49                                                               // major color (Dark Bronze)
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Sunnis
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~elemsunn~                                                             // Sunnis
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "8" END                                               // mark opcode #8 (Colour: Change by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "9" END                                               // mark opcode #9 (Colour Glow Pulse) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "66" END                                              // mark opcode #66 (transparency fade) for deletion
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "65280"                                                           // param1: (RGB colour)
+  "parameter2" = "2"                                                               // param2: (location)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+END
+PATCH_FOR_EACH ~rr#color~ IN ~9~ ~50~ BEGIN                                        // grant immunity to the color glow/pulse effects (they disrupt aTweaks' re-coloring)
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call
+  INT_VAR                                                                          // initialize variables
+  "opcode" = "101"                                                                 // effect: #101 (Protection from Opcode)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "parameter2" = EVALUATE_BUFFER "%rr#color%"                                      // param2: evaluated opcode
+  "sectype" = "0"                                                                  // secondary type: none
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize strings
+  "resource"  = ""                                                                 // resref: none
+  "effsource" = ""                                                                 // effsource: none
+END                                                                                // ends LAUNCH_PATCH_FUNCTION
+END                                                                                // ends PATCH_FOR_EACH
+  WRITE_BYTE 0x2E 49                                                               // major color (Dark Bronze)
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+// Ogremoch
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~elemogre~                                                             // Ogremoch
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "8" END                                               // mark opcode #8 (Colour: Change by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "9" END                                               // mark opcode #9 (Colour Glow Pulse) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "66" END                                              // mark opcode #66 (transparency fade) for deletion
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call (add new creature effect built-in function)
+  INT_VAR                                                                          // initialize numeric variables
+  "opcode" = "51"                                                                  // effect: #51 (Colour: Strong/Dark by RGB)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "sectype" = "0"                                                                  // secondary type: none
+  "parameter1" = "-16720896"                                                       // param1: (RGB colour)
+  "parameter2" = "2"                                                               // param2: (location)
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize string variables
+  "effsource" = ""                                                                 // effsource: none
+END
+PATCH_FOR_EACH ~rr#color~ IN ~9~ ~50~ BEGIN                                        // grant immunity to the color glow/pulse effects (they disrupt aTweaks' re-coloring)
+LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call
+  INT_VAR                                                                          // initialize variables
+  "opcode" = "101"                                                                 // effect: #101 (Protection from Opcode)
+  "target" = "1"                                                                   // target: 1 (self)
+  "timing" = "9"                                                                   // timing mode: 9 (permanent after death)
+  "duration" = "0"                                                                 // duration: 0
+  "parameter2" = EVALUATE_BUFFER "%rr#color%"                                      // param2: evaluated opcode
+  "sectype" = "0"                                                                  // secondary type: none
+  "probability1" = "100"                                                           // probability1: 100%
+  STR_VAR                                                                          // initialize strings
+  "resource"  = ""                                                                 // resref: none
+  "effsource" = ""                                                                 // effsource: none
+END                                                                                // ends LAUNCH_PATCH_FUNCTION
+END                                                                                // ends PATCH_FOR_EACH
+  WRITE_BYTE 0x2E 94                                                               // major color (Rhubarb)
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -3384,7 +3493,6 @@ ACTION_FOR_EACH ~file~ IN                                                       
              ~SUFIRE~                                                              // Fire Elemental (Suldanesselar, Tree of Life guardian)
             ~SWAFIR02~                                                             // Fire Elemental (20+ HD, summoned, Elemental Summoning HLA)
               ~UDELDF~                                                             // Fire Elemental (Underdark, portal guardian)
-            ~elemimix~                                                             // Imix
             ~rr#efire~                                                             // Elder Fire Elemental (aTweaks)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
@@ -3432,6 +3540,35 @@ LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                          
 END                                                                                // ends LAUNCH_PATCH_FUNCTION
 END                                                                                // ends PATCH_FOR_EACH
   WRITE_BYTE 0x2E 50                                                               // major color (Dark Yellow)
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+// Fire Elemental Princes (Imix and Zaaman Rul)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~elemimix~                                                             // Imix
+            ~elemzaam~                                                             // Zaaman Rul
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  WRITE_SHORT 0x28 "29460"                                                         // Sets avatar to BURNING_MAN
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "8" END                                               // mark opcode #8 (Colour: Change by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "9" END                                               // mark opcode #9 (Colour Glow Pulse) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "51" END                                              // mark opcode #51 (Colour: Strong/Dark by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "52" END                                              // mark opcode #52 (Colour: Very Bright by RGB) for deletion
+  LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~                                        // delete the EFF with the designated opcode (remove any existent tint)
+  INT_VAR opcode_to_delete = "66" END                                              // mark opcode #66 (transparency fade) for deletion
+  WRITE_BYTE 0x2E 25                                                               // major color (Dark Pure Gold)
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -3792,7 +3929,7 @@ LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                          
   "effsource" = ""                                                                 // effsource: none
 END                                                                                // ends LAUNCH_PATCH_FUNCTION
 END                                                                                // ends PATCH_FOR_EACH
-  WRITE_BYTE 0x2E 57                                                               // major color (Light Blue)
+  WRITE_BYTE 0x2E 18                                                               // major color (Dark Blue)
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
