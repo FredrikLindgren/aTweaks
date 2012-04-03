@@ -754,6 +754,7 @@ IF
 	See(NearestEnemyOf(Myself))
 	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+	!StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH) // don't target already petrified opponents
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
@@ -778,6 +779,7 @@ IF
 	See(SecondNearestEnemyOf(Myself))
 	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH) // don't target already petrified opponents
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
@@ -802,6 +804,7 @@ IF
 	See(ThirdNearestEnemyOf(Myself))
 	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH) // don't target already petrified opponents
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
@@ -826,6 +829,7 @@ IF
 	See(FourthNearestEnemyOf(Myself))
 	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH) // don't target already petrified opponents
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
@@ -850,6 +854,7 @@ IF
 	See(FifthNearestEnemyOf(Myself))
 	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH) // don't target already petrified opponents
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
@@ -874,6 +879,7 @@ IF
 	See(SixthNearestEnemyOf(Myself))
 	!General(LastSeenBy(Myself),UNDEAD) // Most undead creatures are immune to petrification
 	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_STONE_DEATH) // don't target already petrified opponents
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
@@ -1351,7 +1357,7 @@ IF
     Allegiance(Myself,GOODCUTOFF)
     ActionListEmpty()
     !InParty(LastSeenBy(Myself))
-    !Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+    Allegiance(LastSeenBy(Myself),EVILCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
     CheckStatLT(LastSeenBy(Myself),100,RESISTCRUSHING)
 THEN

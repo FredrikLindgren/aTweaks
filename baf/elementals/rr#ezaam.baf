@@ -73,34 +73,18 @@ END
 
 IF
     Global("Display","LOCALS",0)
-    AreaCheck("AR6200") // Throne of Bhaal (final battle)
-    OR(2)
-      HPPercentLT(Myself,100)
-      Detect([GOODCUTOFF])
+    Range([PC],30)
 THEN
     RESPONSE #100
         SetGlobal("Display","LOCALS",1)
-        DisplayStringHead(Myself,72792) // Who calls Cryonax, Prince of Ice!
-        CreateCreatureObjectEffect("SALGRICE","ICRMPARI",Myself)
-        CreateCreatureObjectEffect("SALGRICE","ICRMPARI",Myself)
-        CreateCreatureObjectEffect("TROLIC03","ICRMPARI",Myself)
-        CreateCreatureObjectEffect("TROLIC03","ICRMPARI",Myself)
-END
-
-IF
-    Global("Display","LOCALS",0)
-    !AreaCheck("AR6200") // Throne of Bhaal (final battle)
-    Detect([GOODCUTOFF])
-THEN
-    RESPONSE #100
-        SetGlobal("Display","LOCALS",1)
-        DisplayStringHead(Myself,72792) // Who calls Cryonax, Prince of Ice!
+		DisplayStringHead(Myself,72794) // Who calls Zaaman Rul, Prince of Fire!
         Continue()
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#ecryo") // Summon Allies (Cryonax)
+    HaveSpellRES("rr#ezaam") // Summon Allies (Zaaman Rul)
 	See(NearestEnemyOf(Myself))
     OR(3)
       RandomNum(6,1) // this summoning block is semi-randomised
@@ -110,16 +94,17 @@ THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#ecryo",Myself) // Summon Allies (Cryonax)
-		RemoveSpellRES("rr#ecryo") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#ezaam",Myself) // Summon Allies (Zaaman Rul)
+		RemoveSpellRES("rr#ezaam") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    Allegiance(Myself,EVILCUTOFF)
+    Allegiance(Myself,GOODCUTOFF)
     HaveSpellRES("rr#wr302") // Remove Magic
-	See([GOODCUTOFF.0.0.0.0.ILLUSIONARY.0]) // illusionary clones such as Mislead or Project Image are instantly destroyed by Dispel Magic
+	See([EVILCUTOFF.0.0.0.0.ILLUSIONARY.0]) // illusionary clones such as Mislead or Project Image are instantly destroyed by Dispel Magic
 	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
 	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
 	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
@@ -141,10 +126,11 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    Allegiance(Myself,EVILCUTOFF)
+    Allegiance(Myself,GOODCUTOFF)
     HaveSpellRES("rr#wr302") // Remove Magic
-	See([GOODCUTOFF.0.MIST.0.0.SUMMONED])
+	See([EVILCUTOFF.0.MIST.0.0.SUMMONED])
 	OR(2)
 	  HasItem("NISHRUU",LastSeenBy(Myself)) // Nishruu or Hakeashar (unmodded game)
 	  HasItem("HAKSU",LastSeenBy(Myself)) // Spell Revisions' Hakeashar
@@ -169,6 +155,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
     HaveSpellRES("rr#wr302") // Remove Magic
@@ -216,6 +203,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
     HaveSpellRES("rr#wr302") // Remove Magic
@@ -263,6 +251,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
     HaveSpellRES("rr#wr302") // Remove Magic
@@ -310,6 +299,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
     HaveSpellRES("rr#wr302") // Remove Magic
@@ -357,6 +347,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
     HaveSpellRES("rr#wr302") // Remove Magic
@@ -404,6 +395,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
     HaveSpellRES("rr#wr302") // Remove Magic
@@ -451,6 +443,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
     HaveSpellRES("rr#wr302") // Remove Magic
@@ -498,6 +491,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
     HaveSpellRES("rr#wr302") // Remove Magic
@@ -545,6 +539,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
     HaveSpellRES("rr#wr302") // Remove Magic
@@ -592,697 +587,471 @@ THEN
 END
 
 IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    Range(NearestEnemyOf(Myself),6)
+    !CheckStat(Myself,1,WIZARD_FIRE_SHIELD) // Fire Shield:Red
+    HaveSpellRES("rr#ezafs") // Fire Shield:Red
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafs",Myself) // Fire Shield:Red
+        RemoveSpellRES("rr#ezafs") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ezafa") // Flame Arow (double damage)
+	See(NearestEnemyOf(Myself))
+    OR(3)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL) // don't waste Flame Arrow on low level opponents
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafa",LastSeenBy(Myself)) // Flame Arow (double damage)
+		RemoveSpellRES("rr#ezafa") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ezafa") // Flame Arow (double damage)
+	See(SecondNearestEnemyOf(Myself))
+    OR(3)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL) // don't waste Flame Arrow on low level opponents
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafa",LastSeenBy(Myself)) // Flame Arow (double damage)
+		RemoveSpellRES("rr#ezafa") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ezafa") // Flame Arow (double damage)
+	See(ThirdNearestEnemyOf(Myself))
+    OR(3)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL) // don't waste Flame Arrow on low level opponents
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafa",LastSeenBy(Myself)) // Flame Arow (double damage)
+		RemoveSpellRES("rr#ezafa") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ezafa") // Flame Arow (double damage)
+	See(FourthNearestEnemyOf(Myself))
+    OR(3)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL) // don't waste Flame Arrow on low level opponents
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafa",LastSeenBy(Myself)) // Flame Arow (double damage)
+		RemoveSpellRES("rr#ezafa") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ezafa") // Flame Arow (double damage)
+	See(FifthNearestEnemyOf(Myself))
+    OR(3)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL) // don't waste Flame Arrow on low level opponents
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafa",LastSeenBy(Myself)) // Flame Arow (double damage)
+		RemoveSpellRES("rr#ezafa") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ezafa") // Flame Arow (double damage)
+	See(SixthNearestEnemyOf(Myself))
+    OR(3)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL) // don't waste Flame Arrow on low level opponents
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafa",LastSeenBy(Myself)) // Flame Arow (double damage)
+		RemoveSpellRES("rr#ezafa") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ezafa") // Flame Arow (double damage)
+	See(SeventhNearestEnemyOf(Myself))
+    OR(3)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL) // don't waste Flame Arrow on low level opponents
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafa",LastSeenBy(Myself)) // Flame Arow (double damage)
+		RemoveSpellRES("rr#ezafa") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ezafa") // Flame Arow (double damage)
+	See(EighthNearestEnemyOf(Myself))
+    OR(3)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL) // don't waste Flame Arrow on low level opponents
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafa",LastSeenBy(Myself)) // Flame Arow (double damage)
+		RemoveSpellRES("rr#ezafa") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ezafa") // Flame Arow (double damage)
+	See(NinthNearestEnemyOf(Myself))
+    OR(3)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL) // don't waste Flame Arrow on low level opponents
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafa",LastSeenBy(Myself)) // Flame Arow (double damage)
+		RemoveSpellRES("rr#ezafa") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ezafa") // Flame Arow (double damage)
+	See(TenthNearestEnemyOf(Myself))
+    OR(3)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL) // don't waste Flame Arrow on low level opponents
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+      CheckStatGT(LastSeenBy(Myself),5,LEVEL)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
+	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
+	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
+THEN
+	RESPONSE #100
+		SetInterrupt(FALSE)
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ezafa",LastSeenBy(Myself)) // Flame Arow (double damage)
+		RemoveSpellRES("rr#ezafa") // remove one instance of the spell upon casting
+		SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    Allegiance(Myself,GOODCUTOFF)
+	!GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ezafb") // Fireball (12d6)
+	!CheckStatLT([GOODCUTOFF],75,RESISTFIRE) // avoid friendly fire, if possible
+	!CheckStatLT(SecondNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(ThirdNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FourthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FifthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SixthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SeventhNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(EighthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(NinthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(TenthNearest([GOODCUTOFF]),75,RESISTFIRE)
 	See(NearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
 	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
 	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
+        ForceSpellRES("rr#ezafb",LastSeenBy(Myself)) // Fireball (12d6)
+		RemoveSpellRES("rr#ezafb") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ezafb") // Fireball (12d6)
+	!CheckStatLT([GOODCUTOFF],75,RESISTFIRE) // avoid friendly fire, if possible
+	!CheckStatLT(SecondNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(ThirdNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FourthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FifthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SixthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SeventhNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(EighthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(NinthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(TenthNearest([GOODCUTOFF]),75,RESISTFIRE)
 	See(SecondNearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	CheckStatLT(LastSeenBy(Myself),50,RESISTFIRE)
 	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
 	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
+        ForceSpellRES("rr#ezafb",LastSeenBy(Myself)) // Fireball (12d6)
+		RemoveSpellRES("rr#ezafb") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ezafb") // Fireball (12d6)
+	!CheckStatLT([GOODCUTOFF],75,RESISTFIRE) // avoid friendly fire, if possible
+	!CheckStatLT(SecondNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(ThirdNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FourthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FifthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SixthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SeventhNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(EighthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(NinthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(TenthNearest([GOODCUTOFF]),75,RESISTFIRE)
 	See(ThirdNearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
 	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
 	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
+        ForceSpellRES("rr#ezafb",LastSeenBy(Myself)) // Fireball (12d6)
+		RemoveSpellRES("rr#ezafb") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ezafb") // Fireball (12d6)
+	!CheckStatLT([GOODCUTOFF],75,RESISTFIRE) // avoid friendly fire, if possible
+	!CheckStatLT(SecondNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(ThirdNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FourthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FifthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SixthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SeventhNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(EighthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(NinthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(TenthNearest([GOODCUTOFF]),75,RESISTFIRE)
 	See(FourthNearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
 	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
 	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
+        ForceSpellRES("rr#ezafb",LastSeenBy(Myself)) // Fireball (12d6)
+		RemoveSpellRES("rr#ezafb") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ezafb") // Fireball (12d6)
+	!CheckStatLT([GOODCUTOFF],75,RESISTFIRE) // avoid friendly fire, if possible
+	!CheckStatLT(SecondNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(ThirdNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FourthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FifthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SixthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SeventhNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(EighthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(NinthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(TenthNearest([GOODCUTOFF]),75,RESISTFIRE)
 	See(FifthNearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
 	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
 	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
+        ForceSpellRES("rr#ezafb",LastSeenBy(Myself)) // Fireball (12d6)
+		RemoveSpellRES("rr#ezafb") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#icew") // Wall of Ice
+    HaveSpellRES("rr#ezafb") // Fireball (12d6)
+	!CheckStatLT([GOODCUTOFF],75,RESISTFIRE) // avoid friendly fire, if possible
+	!CheckStatLT(SecondNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(ThirdNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FourthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(FifthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SixthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(SeventhNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(EighthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(NinthNearest([GOODCUTOFF]),75,RESISTFIRE)
+	!CheckStatLT(TenthNearest([GOODCUTOFF]),75,RESISTFIRE)
 	See(SixthNearestEnemyOf(Myself))
 	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
+	CheckStatLT(LastSeenBy(Myself),75,RESISTFIRE)
 	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
 	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
-		RemoveSpellRES("rr#icew") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(NearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
+        ForceSpellRES("rr#ezafb",LastSeenBy(Myself)) // Fireball (12d6)
+		RemoveSpellRES("rr#ezafb") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(SecondNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(ThirdNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(FourthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(FifthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi503") // Cone of Cold
-	See(SixthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi503",LastSeenBy(Myself)) // Cone of Cold
-		RemoveSpellRES("rr#wi503") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(NearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(SecondNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(ThirdNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(FourthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(FifthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("rr#wi404") // Ice Storm
-	See(SixthNearestEnemyOf(Myself))
-	CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTCOLD)
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#wi404",LastSeenBy(Myself)) // Ice Storm
-		RemoveSpellRES("rr#wi404") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
-    HaveSpellRES("rr#wr302") // Remove Magic
-    Allegiance(Myself,EVILCUTOFF)
-	See(Player1)
-    CheckStatGT(LastSeenBy(Myself),99,RESISTCOLD) // PCs with cold 100+ cold resistance are probably using a spell/potion
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
-        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
-		RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
-    HaveSpellRES("rr#wr302") // Remove Magic
-    Allegiance(Myself,EVILCUTOFF)
-	See(Player2)
-    CheckStatGT(LastSeenBy(Myself),99,RESISTCOLD) // PCs with cold 100+ cold resistance are probably using a spell/potion
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
-        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
-		RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
-    HaveSpellRES("rr#wr302") // Remove Magic
-    Allegiance(Myself,EVILCUTOFF)
-	See(Player3)
-    CheckStatGT(LastSeenBy(Myself),99,RESISTCOLD) // PCs with cold 100+ cold resistance are probably using a spell/potion
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
-        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
-		RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
-    HaveSpellRES("rr#wr302") // Remove Magic
-    Allegiance(Myself,EVILCUTOFF)
-	See(Player4)
-    CheckStatGT(LastSeenBy(Myself),99,RESISTCOLD) // PCs with cold 100+ cold resistance are probably using a spell/potion
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
-        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
-		RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
-    HaveSpellRES("rr#wr302") // Remove Magic
-    Allegiance(Myself,EVILCUTOFF)
-	See(Player5)
-    CheckStatGT(LastSeenBy(Myself),99,RESISTCOLD) // PCs with cold 100+ cold resistance are probably using a spell/potion
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
-        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
-		RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-	!GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
-    HaveSpellRES("rr#wr302") // Remove Magic
-    Allegiance(Myself,EVILCUTOFF)
-	See(Player6)
-    CheckStatGT(LastSeenBy(Myself),99,RESISTCOLD) // PCs with cold 100+ cold resistance are probably using a spell/potion
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
-	CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
-	!CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
-	!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
-	!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
-    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
-        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
-		RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(NearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(SecondNearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(ThirdNearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(FourthNearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(FifthNearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS")
-    HaveSpellRES("RR#WI306") // Hold Person
-	See(SixthNearestEnemyOfType([0.HUMANOID]))
-    !Race(LastSeenBy(Myself),RAKSHASA)
-	!Kit(LastSeenBy(Myself),INQUISITOR)
-	!Kit(LastSeenBy(Myself),UNDEADHUNTER)
-	!StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
-	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
-	CheckStatGT(LastSeenBy(Myself),0,SAVEVSSPELL)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
-	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
-	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
-	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
-	!CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
-	!HasItem("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
-	!HasItemEquiped("RING09",LastSeenBy(Myself)) // Ring of Free Action
-	!HasItemEquipedReal("NPSW01",LastSeenBy(Myself)) // Sword of Arvoreen
-	!HasItemEquipedReal("SW1H27",LastSeenBy(Myself)) // Arbane's Sword +2
-	!HasItemEquipedReal("SW2H06",LastSeenBy(Myself)) // Spider's Bane
-	!HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
-	!HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
-	!HasItemEquipedReal("BLUN30",LastSeenBy(Myself)) // Flail of Ages +5
-	!HasItemEquipedReal("SPER12",LastSeenBy(Myself)) // Ixil's Spike +6
-THEN
-	RESPONSE #100
-		SetInterrupt(FALSE)
-		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("RR#WI306",LastSeenBy(Myself)) // Hold Person
-		RemoveSpellRES("RR#WI306") // remove one instance of the spell upon casting
-		SetInterrupt(TRUE)
-END
-
-IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	HaveSpellRES("rr#ersug") // Suggestion
 	See(NearestEnemyOfType([0.HUMANOID]))
@@ -1323,6 +1092,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	HaveSpellRES("rr#ersug") // Suggestion
 	See(SecondNearestEnemyOfType([0.HUMANOID]))
@@ -1363,6 +1133,7 @@ THEN
 END
 
 IF
+    ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	HaveSpellRES("rr#ersug") // Suggestion
 	See(ThirdNearestEnemyOfType([0.HUMANOID]))
@@ -1403,15 +1174,27 @@ THEN
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Cast","LOCALS") // this summoning block isn't randomises and occurs if there's nothing better to do
-    HaveSpellRES("rr#ecryo") // Summon Allies (Cryonax)
+    ActionListEmpty()
+	!GlobalTimerNotExpired("RR#Cast","LOCALS") // this summoning block isn't randomised and occurs if there's nothing better to do
+    HaveSpellRES("rr#ezaam") // Summon Allies (Zaaman Rul)
+    See(NearestEnemyOf(Myself))
 THEN
 	RESPONSE #100
 		SetInterrupt(FALSE)
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		ForceSpellRES("rr#ecryo",Myself) // Summon Allies (Cryonax)
-		RemoveSpellRES("rr#ecryo") // remove one instance of the spell upon casting
+		ForceSpellRES("rr#ezaam",Myself) // Summon Allies (Zaaman Rul)
+		RemoveSpellRES("rr#ezaam") // remove one instance of the spell upon casting
 		SetInterrupt(TRUE)
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF) // only needed for summoned creatures
+    !GlobalTimerNotExpired("rr#clear","LOCALS") // prevent the creature from getting stuck in an attack pattern because ActionListEmpty() is used above
+    See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#clear","LOCALS",6)
+        ClearActions(Myself)
 END
 
 IF
@@ -1431,7 +1214,7 @@ END
 
 IF
     !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTFIRE)
     See(NearestEnemyOf(Myself))
     False()
 THEN
@@ -1442,7 +1225,7 @@ END
 IF
     !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTFIRE)
     !StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(SixthNearestEnemyOf(Myself))
     False()
@@ -1454,7 +1237,7 @@ END
 IF
     !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTFIRE)
     !StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(FifthNearestEnemyOf(Myself))
     False()
@@ -1466,7 +1249,7 @@ END
 IF
     !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTFIRE)
     !StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(FourthNearestEnemyOf(Myself))
     False()
@@ -1478,7 +1261,7 @@ END
 IF
     !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTFIRE)
     !StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(ThirdNearestEnemyOf(Myself))
     False()
@@ -1490,7 +1273,7 @@ END
 IF
     !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTFIRE)
     !StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(SecondNearestEnemyOf(Myself))
     False()
@@ -1502,7 +1285,7 @@ END
 IF
     !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(NearestEnemyOf(Myself),STATE_PANIC)
-    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTFIRE)
     !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
     See(NearestEnemyOf(Myself))
     False()
@@ -1516,7 +1299,7 @@ IF
     !StateCheck(WorstAC([PC]),STATE_PANIC)
     !StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
     !CheckStatGT(WorstAC([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    CheckStatLT(WorstAC([PC]),100,RESISTCOLD)
+    CheckStatLT(WorstAC([PC]),100,RESISTFIRE)
     See(WorstAC([PC]))
     False()
 THEN
@@ -1528,7 +1311,7 @@ IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)
     !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
-    CheckStatLT(LastAttackerOf(Myself),100,RESISTCOLD)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTFIRE)
     !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
     Range(LastAttackerOf(Myself),8)
     RandomNum(3,1)
@@ -1543,7 +1326,7 @@ IF
     AttackedBy(NearestEnemyOf(Myself),DEFAULT)
     !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
-    CheckStatLT(LastAttackerOf(Myself),100,RESISTCOLD)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTFIRE)
     !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
     Range(LastAttackerOf(Myself),4)
     See(LastAttackerOf(Myself))
@@ -1556,7 +1339,7 @@ END
 IF
     !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTFIRE)
     See(SixthNearestEnemyOf(Myself))
     False()
 THEN
@@ -1567,7 +1350,7 @@ END
 IF
     !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTFIRE)
     See(FifthNearestEnemyOf(Myself))
     False()
 THEN
@@ -1578,7 +1361,7 @@ END
 IF
     !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTFIRE)
     See(FourthNearestEnemyOf(Myself))
     False()
 THEN
@@ -1589,7 +1372,7 @@ END
 IF
     !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTFIRE)
     See(ThirdNearestEnemyOf(Myself))
     False()
 THEN
@@ -1600,7 +1383,7 @@ END
 IF
     !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTFIRE)
     See(SecondNearestEnemyOf(Myself))
     False()
 THEN
@@ -1611,7 +1394,7 @@ END
 IF
     !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
-    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCOLD)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTFIRE)
     See(NearestEnemyOf(Myself))
     False()
 THEN
@@ -1623,7 +1406,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player6,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player6,STATE_IMMOBILE)
-    CheckStatLT(Player6,100,RESISTCOLD)
+    CheckStatLT(Player6,100,RESISTFIRE)
     See(Player6)
     False()
 THEN
@@ -1635,7 +1418,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player5,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player5,STATE_IMMOBILE)
-    CheckStatLT(Player5,100,RESISTCOLD)
+    CheckStatLT(Player5,100,RESISTFIRE)
     See(Player5)
     False()
 THEN
@@ -1647,7 +1430,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player4,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player4,STATE_IMMOBILE)
-    CheckStatLT(Player4,100,RESISTCOLD)
+    CheckStatLT(Player4,100,RESISTFIRE)
     See(Player4)
     False()
 THEN
@@ -1659,7 +1442,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player3,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player3,STATE_IMMOBILE)
-    CheckStatLT(Player3,100,RESISTCOLD)
+    CheckStatLT(Player3,100,RESISTFIRE)
     See(Player3)
     False()
 THEN
@@ -1671,7 +1454,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player2,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player2,STATE_IMMOBILE)
-    CheckStatLT(Player2,100,RESISTCOLD)
+    CheckStatLT(Player2,100,RESISTFIRE)
     See(Player2)
     False()
 THEN
@@ -1683,7 +1466,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
     !CheckStatGT(Player1,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
     StateCheck(Player1,STATE_IMMOBILE)
-    CheckStatLT(Player1,100,RESISTCOLD)
+    CheckStatLT(Player1,100,RESISTFIRE)
     See(Player1)
     False()
 THEN
@@ -1695,6 +1478,7 @@ IF
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	!Range(LastSeenBy(Myself),6)
     InMyArea(LastSeenBy(Myself))
+    Allegiance(LastSeenBy(Myself),EVILCUTOFF)
 	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
 	!CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
 THEN
@@ -1721,6 +1505,7 @@ END
 IF
     Allegiance(Myself,EVILCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTCRUSHING)
     !Allegiance(LastSeenBy(Myself),EVILCUTOFF)
 THEN
     RESPONSE #100
@@ -1733,6 +1518,7 @@ IF
     !InParty(LastSeenBy(Myself))
     Allegiance(LastSeenBy(Myself),EVILCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTCRUSHING)
 THEN
     RESPONSE #100
         AttackReevaluate(LastSeenBy(Myself),15)
