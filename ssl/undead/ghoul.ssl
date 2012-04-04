@@ -1,0 +1,98 @@
+INCLUDE FILE(include/definitions.ssl)
+
+IF
+  OR(2)
+    Gender(Myself,SUMMONED)
+    Gender(Myself,20)
+  AreaCheck("AR2300")
+  Allegiance(Myself,ENEMY)
+  !StateCheck(Myself,STATE_CHARMED)
+  OR(2)
+    GlobalGT("villynatyjob","GLOBAL",0)
+    Dead("sahpr2")
+THEN
+  RESPONSE #100
+    EscapeArea()
+END
+
+INCLUDE FILE(include/baseinitial.ssl)
+
+IF TRIGGER
+  TargetBlock(PCSquishy)
+  TargetBlock(EnemiesInOrder)
+  !Race(scstarget,ELF)
+  TriggerBlock(PierceRes|Disabled|Enemy|ProEvil)
+  !HPPercentGT(scstarget,25)
+  Range(scstarget,10)
+THEN DO
+  Action(Attack)
+END
+
+IF TRIGGER
+  TargetBlock(PCSquishy)
+  TargetBlock(EnemiesInOrder)
+  !Race(scstarget,ELF)
+  TriggerBlock(PierceRes|Disabled|Enemy|ProEvil)
+  Range(scstarget,10)
+THEN DO
+  Action(Attack)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  !Race(scstarget,ELF)
+  TriggerBlock(PierceRes|Disabled|Enemy|ProEvil)
+THEN DO
+  Action(Attack)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(PierceRes|Disabled|Enemy|ProEvil)
+THEN DO
+  Action(Attack)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(PierceRes|Enemy|ProEvil)
+THEN DO
+  Action(Attack)
+END
+  
+//Pursue
+BEGIN LOOP (loopvar||1;2;3;4;5;6)
+IF
+  !See([GOODCUTOFF])
+  !Detect(Playerloopvar)
+  GlobalTimerNotExpired("flChasePlayerloopvar","LOCALS")
+THEN
+  RESPONSE #100
+    MoveToObject(Playerloopvar)
+END
+END LOOP
+
+//Just keep busy
+IF TRIGGER
+  ActionListEmpty()
+  Target(NearestEnemyOf(Myself))
+  TriggerBlock(Enemy|ProEvil)
+THEN DO
+  Action(Attack)
+END
+
+IF TRIGGER
+  Target(NearestEnemyOf(Myself))
+  !CheckStatGT(NearestEnemyOf(Myself),0,PROTECTION_FROM_EVIL)
+THEN DO
+  Action(Attack)
+END
+
+IF TRIGGER
+  !Allegiance(Myself,ENEMY)
+  AttackedBy([ANYONE],DEFAULT)
+  Target(LastAttackerOf(Myself))
+  !CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
+THEN DO
+  Action(Attack)
+END

@@ -1,0 +1,23 @@
+INCLUDE FILE(include/definitions.ssl)
+
+//Fear Aura
+IF
+  !StateCheck(Myself,STATE_REALLY_DEAD)
+  !GlobalTimerNotExpired("flFearAura","LOCALS")
+  Detect(NearestEnemyOf(Myself))
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flFearAura","LOCALS",30)
+    ForceSpellRES("fl#mumfa",Myself)
+    Continue()
+END
+
+INCLUDE FILE(include/baseinitial.ssl)
+
+BEGIN LOOP(DamageRes||CrushRes)
+  INCLUDE FILE(general/melee_low.ssl)
+END LOOP
+
+INCLUDE FILE(include/baseend.ssl)
+
+

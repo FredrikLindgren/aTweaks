@@ -1,0 +1,21 @@
+
+INCLUDE FILE(include/definitions.ssl)
+
+IF
+  !StateCheck(Myself,STATE_REALLY_DEAD)
+  !GlobalTimerNotExpired("flAura","LOCALS")
+  Detect(NearestEnemyOf(Myself))
+THEN
+  RESPONSE #100
+    ForceSpellRES("fl#skelw",Myself)
+    SetGlobalTimer("flAura","LOCALS",6)
+    Continue()
+END
+
+INCLUDE FILE(include/baseinitial.ssl)
+
+BEGIN LOOP(DamageRes||SlashRes)
+  INCLUDE FILE(general/ranged_high.ssl)
+END LOOP
+
+INCLUDE FILE(include/baseend.ssl)

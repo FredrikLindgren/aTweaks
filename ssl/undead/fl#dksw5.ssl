@@ -1,0 +1,36 @@
+INCLUDE FILE(include/definitions.ssl)
+
+IF
+  Died(LastSummonerOf(Myself))
+THEN
+  RESPONSE #100
+    Kill(Myself)
+END
+
+IF
+  !Range(LastSummonerOf(Myself),25)
+THEN
+  RESPONSE #100
+    MoveToObject(LastSummonerOf(Myself))
+END
+
+BEGIN LOOP(DamageRes||SlashRes)
+BEGIN LOOP(AttackType||Attack)
+  INCLUDE FILE(general/melee_high.ssl)
+END LOOP
+END LOOP
+
+IF
+  See(NearestEnemyOf(Myself))
+THEN
+  RESPONSE #100
+    AttackOneRound(LastSeenBy(Myself))
+END
+
+IF
+  ActionListEmpty()
+  !Range(LastSummonerOf(Myself),5)
+THEN
+  RESPONSE #100
+    MoveToObject(LastSummonerOf(Myself))
+END
