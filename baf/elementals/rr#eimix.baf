@@ -1433,6 +1433,28 @@ THEN
 END
 
 IF
+    !GlobalTimerNotExpired("RR#Taunt","LOCALS")
+	See("elemzaam") // Zaaman Rul
+    !StateCheck(Myself,STATE_INVISIBLE)
+THEN
+	RESPONSE #34
+		SetGlobalTimer("RR#Taunt","LOCALS",12)
+		FaceObject(LastSeenBy(Myself))
+		DisplayStringHead(LastSeenBy(Myself),@2172) // It is time to end this, father.
+        DisplayStringHead(Myself,@2173) // Is your hatred strong enough, my son?
+	RESPONSE #33
+		SetGlobalTimer("RR#Taunt","LOCALS",12)
+		FaceObject(LastSeenBy(Myself))
+		DisplayStringHead(Myself,@2174) // What a disappointment you turned out to be.
+		DisplayStringHead(LastSeenBy(Myself),@2175) // You have no idea what I'm capable of.
+	RESPONSE #33
+		SetGlobalTimer("RR#Taunt","LOCALS",12)
+		FaceObject(LastSeenBy(Myself))
+		DisplayStringHead(Myself,@2176) // You are a disgrace to your kin.
+		DisplayStringHead(LastSeenBy(Myself),@2177) // I will forge my own destiny, father.
+END
+
+IF
     Allegiance(Myself,EVILCUTOFF)
     OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
       See(Player1)
@@ -1703,6 +1725,15 @@ IF
     StateCheck(Player1,STATE_IMMOBILE)
     CheckStatLT(Player1,100,RESISTFIRE)
     See(Player1)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT("elemzaam",3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    See("elemzaam") // Zaaman Rul
     False()
 THEN
     RESPONSE #100

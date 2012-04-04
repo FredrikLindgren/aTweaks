@@ -452,6 +452,37 @@ COPY ~atweaks/itm/elementals/rr#esunn.itm~ ~override~                           
 COPY ~atweaks/itm/elementals/rr#ezaam.itm~ ~override~                              // Zaaman Rul attack
 
 
+// Special Spell Revisions compatibility block (needs to go before aTweaks' creature modifications)
+// SR removes the mental combat script from elementals summoned by wizards. aTweaks adds it back
+
+ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
+
+COPY_EXISTING ~sppr702.spl~  ~override/rr#srbk1.spl~                               // Backup SR's Summon Shambling Mound
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~ELAIRSU1~                                                             // Air Elemental (mage summon)
+            ~ELAIRSU2~                                                             // Air Elemental (mage summon)
+            ~ELAIRSU3~                                                             // Air Elemental (mage summon)
+            ~ELEARSU1~                                                             // Earth Elemental (mage summon)
+            ~ELEARSU2~                                                             // Earth Elemental (mage summon)
+            ~ELEARSU3~                                                             // Earth Elemental (mage summon)
+            ~ELFIRSU1~                                                             // Fire Elemental (mage summon)
+            ~ELFIRSU2~                                                             // Fire Elemental (mage summon)
+            ~ELFIRSU3~                                                             // Fire Elemental (mage summon)
+            ~ELFIRSUW~                                                             // Fire Elemental (mage summon)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+// =============================================================================== // the actual work starts from here
+WRITE_ASCII 0x248 ~WIZELSU2~ #8                                                    // assign override AI script
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+END                                                                                // ends Spell Revisions compatibility block
+
+
 
 //////////////////////////
 // Creature modifications
@@ -512,6 +543,7 @@ STR_VAR                                                                         
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
 "script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script07"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
@@ -672,6 +704,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~stalke~                                                             // Invisible Stalker
             ~senstalk~                                                             // Invisible Stalker (Sendai's lair)
             ~gorstalk~                                                             // Guardian of Air (Watcher's Keep, treated as an unique Invisible Stalker)
+             ~dvstalk~                                                             // Invisible Stalker (Spell Revisions)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -725,6 +758,7 @@ STR_VAR                                                                         
 "script03"   = "WTASIGHT"                                                          // generic AI script
 "script04"   = "dw#melee"                                                          // SCSII melee AI script
 "script05"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script06"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
@@ -1031,6 +1065,7 @@ STR_VAR                                                                         
 "script06"   = "GENSHT01"                                                          // generic shout script
 "script07"   = "dw#melee"                                                          // SCSII melee AI script
 "script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 LAUNCH_PATCH_FUNCTION air_affinity END                                             // grant air affinity bonuses
@@ -1122,6 +1157,7 @@ STR_VAR                                                                         
 "script09"   = "WYVERN"                                                            // Wyvern AI script (BGT)
 "script10"   = "_WYVERN"                                                           // Wyvern AI script (Tutu)
 "script11"   = "_TASIGHT"                                                          // generic AI script (Tutu)
+"script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 LAUNCH_PATCH_FUNCTION air_affinity END                                             // grant air affinity bonuses
@@ -1201,6 +1237,7 @@ STR_VAR                                                                         
 "script06"   = "GENSHT01"                                                          // generic shout script
 "script07"   = "dw#melee"                                                          // SCSII melee AI script
 "script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 LAUNCH_PATCH_FUNCTION air_affinity END                                             // grant air affinity bonuses
@@ -1272,6 +1309,7 @@ STR_VAR                                                                         
 "script06"   = "GENSHT01"                                                          // generic shout script
 "script07"   = "dw#melee"                                                          // SCSII melee AI script
 "script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 LAUNCH_PATCH_FUNCTION air_affinity END                                             // grant air affinity bonuses
@@ -1340,6 +1378,7 @@ STR_VAR                                                                         
 "script05"   = "GENSHT01"                                                          // generic shout script
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
 // =============================================================================== // the actual work ends here
@@ -1406,6 +1445,7 @@ STR_VAR                                                                         
 "script05"   = "GENSHT01"                                                          // generic shout script
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 "skipfile01" = "SHEARTH"                                                           // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
@@ -1481,6 +1521,7 @@ STR_VAR                                                                         
 "script05"   = "GENSHT01"                                                          // generic shout script
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
 // =============================================================================== // the actual work ends here
@@ -1554,6 +1595,7 @@ STR_VAR                                                                         
 "script05"   = "GENSHT01"                                                          // generic shout script
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 "skipfile01" = "DRUEAR01"                                                          // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
@@ -1622,6 +1664,7 @@ STR_VAR                                                                         
 "script05"   = "GENSHT01"                                                          // generic shout script
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
 LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
@@ -1692,6 +1735,7 @@ STR_VAR                                                                         
 "script05"   = "GENSHT01"                                                          // generic shout script
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 "skipfile01" = "SHFIRE"                                                            // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
@@ -1779,6 +1823,7 @@ STR_VAR                                                                         
 "script06"   = "GORFIR"                                                            // Watcher's Keep Fire Elemental script (non-functional?)
 "script07"   = "dw#melee"                                                          // SCSII melee AI script
 "script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
 LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
@@ -1851,6 +1896,7 @@ STR_VAR                                                                         
 "script05"   = "GENSHT01"                                                          // generic shout script
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 "skipfile01" = "DRUFIR01"                                                          // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
@@ -2637,6 +2683,7 @@ STR_VAR                                                                         
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
 "script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script07"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
 LAUNCH_PATCH_FUNCTION clear_bg1_profs END                                          // Clear BG1 proficiencies
@@ -2718,6 +2765,7 @@ STR_VAR                                                                         
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
 "script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script07"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
 LAUNCH_PATCH_FUNCTION clear_bg1_profs END                                          // Clear BG1 proficiencies
@@ -2796,6 +2844,7 @@ STR_VAR                                                                         
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
 "script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script07"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
@@ -3698,3 +3747,98 @@ COPY_EXISTING ~ar6105.are~ ~override~                                           
     END
   END
 BUT_ONLY_IF_IT_CHANGES
+
+
+
+/////////////////////////////
+// Compatibility adjustments
+/////////////////////////////
+
+// TobEx
+
+// Add the non-dispellable flag to aTweaks' shapechange weapons if TobEx is detected
+ACTION_IF FILE_EXISTS_IN_GAME ~tobex_ini/tobexcore.ini~ BEGIN                      // if TobEx is installed
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~rr#esher~                                                             // Earth Elemental shapeshift attack
+            ~rr#eshfr~                                                             // Fire Elemental shapeshift attack
+            ~rr#eshee~                                                             // Elder Earth Elemental shapeshift attack
+            ~rr#eshfe~                                                             // Elder Fire Elemental shapeshift attack
+            ~rr#eshsa~                                                             // Fire Salamander shapeshift attack
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN                                   // if the designated file with an ITM extension exists
+COPY_EXISTING ~%file%.itm~ ~override~
+  PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
+// =============================================================================== // the actual work starts from here
+    READ_BYTE 0x1b "flags"
+    PATCH_IF (("%flags%" BAND "0b00000001") = "0b00000000") BEGIN                  // if bit 24 isn't set
+      WRITE_BYTE "0x1b" ("%flags%" BOR "0b00000001")                               // set bit 24
+    END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends second ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+END                                                                                // ends first ACTION_IF FILE_EXISTS_IN_GAME block
+
+
+// Spell Revisions
+
+// Restore the original descriptions for spells that show SR's creature stats
+
+ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
+//==================================================================================
+
+COPY_EXISTING ~sppr601.spl~  ~override~                                            // Aerial Servant
+SAY DESC #25740 SAY UNIDENTIFIED_DESC #25740                                       // restore original description
+BUT_ONLY_IF_IT_CHANGES
+
+COPY_EXISTING ~spwi601.spl~  ~override~                                            // Invisible Stalker
+               ~scrl7e.itm~  ~override~                                            // Invisible Stalker (scroll)
+SAY DESC #8062 SAY UNIDENTIFIED_DESC #8062                                         // restore original description
+BUT_ONLY_IF_IT_CHANGES
+
+COPY_EXISTING ~rr#srbk1.spl~  ~override/sppr702.spl~                               // Restore SR's Summon Shambling Mound
+
+// Allow druids to have Conjure Air and Earth elementals as level 6 spells
+
+COPY ~atweaks/spl/elementals/sr_cmpt/sppr621.spl~ ~override~                       // Conjure Air Elemental (SR)
+SAY DESC @2205 SAY UNIDENTIFIED_DESC @2205
+
+COPY ~atweaks/spl/elementals/sr_cmpt/sppr622.spl~ ~override~                       // Conjure Earth Elemental (SR)
+SAY DESC @2212 SAY UNIDENTIFIED_DESC @2212
+
+
+// Make sure that elementals are friendly when summoned by druids
+
+<<<<<<<<atweaks/inlined/baf/elementals/wizelsu.baf
+IF
+	Global("Elementalcontrol","LOCALS",0)
+    Class(LastSummonerOf(Myself),DRUID_ALL)
+THEN
+	RESPONSE #100
+		SetGlobal("Elementalcontrol","LOCALS",3)
+END
+>>>>>>>>
+
+EXTEND_TOP ~wizelsum.bcs~  ~atweaks/inlined/baf/elementals/wizelsu.baf~
+EXTEND_TOP ~wizelsu2.bcs~  ~atweaks/inlined/baf/elementals/wizelsu.baf~
+
+
+// Restore original graphics to Air Elemental summoning spells
+
+COPY_EXISTING ~splesair.eff~  ~override~                                           // Conjure Lesser Air Elemental (8 HD)
+               ~spair1.eff~   ~override~                                           // Conjure Air Elemental (12 HD, mage version)
+               ~spair2.eff~   ~override~                                           // Conjure Air Elemental (16 HD, mage version)
+               ~spair3.eff~   ~override~                                           // Conjure Air Elemental (24 HD, mage version)
+                ~staf16.eff~  ~override~                                           // Conjure Lesser Air Elemental (8 HD, Staff of Air version)
+              ~swaaire1.eff~  ~override~                                           // Elemental Summoning (16 HD, priest HLA version)
+              ~swaaire2.eff~  ~override~                                           // Elemental Summoning (24 HD, priest HLA version)
+               ~sumchan.eff~  ~override~                                           // Summon Chan (priest HLA version)
+  WRITE_ASCII 0x70 ~SPPORTAL~ #8                                                   // resref2: RR#CEART (VVC to display)
+BUT_ONLY_IF_IT_CHANGES
+
+
+//==================================================================================
+END                                                                                // ends Spell Revisions compatibility block
+
+
