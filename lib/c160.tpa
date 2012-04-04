@@ -1,5 +1,5 @@
 
-INCLUDE "atweaks/lib/tactical_shared.tpa"
+INCLUDE "atweaks/lib/dsandstuff.tpa"
 
 LAF ret_from_eval STR_VAR f_Entry = fl#Disease RET DiseaseSecType = f_Value END
 LAF ret_from_eval STR_VAR f_Entry = fl#Fear RET FearSecType = f_Value END
@@ -64,7 +64,7 @@ BEGIN
   END
 END
 
-COPY "atweaks/spl/fl#banwa.spl" override                                           //Banshee's wail
+COPY "atweaks/spl/undead/fl#banwa.spl" override                                           //Banshee's wail
   FOR(i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64+i*0x28+0x26 fl#sight
   END
@@ -178,13 +178,13 @@ COPY_EXISTING misc56.itm "override/fl#brsw.itm"                                 
   SAY 0x50 @1032
   SAY 0x54 @1032
 
-COPY ~atweaks/spl/fldkaura.spl~ override                                           // Death Knight Fear Aura
-     "atweaks/itm/fl#dksw3.itm" override                                           //Two-handed sword +4
-     "atweaks/itm/fl#dksw4.itm" override                                           //Bastard sword +2, +1 APR
-     "atweaks/itm/fl#dksw5.itm" override                                           //Bastard sword +2, of dancing
-     "atweaks/itm/fl#dksw6.itm" override                                           //Bastard sword +2, of life stealing
+COPY ~atweaks/spl/undead/fldkaura.spl~ override                                           // Death Knight Fear Aura
+     "atweaks/itm/undead/fl#dksw3.itm" override                                           //Two-handed sword +4
+     "atweaks/itm/undead/fl#dksw4.itm" override                                           //Bastard sword +2, +1 APR
+     "atweaks/itm/undead/fl#dksw5.itm" override                                           //Bastard sword +2, of dancing
+     "atweaks/itm/undead/fl#dksw6.itm" override                                           //Bastard sword +2, of life stealing
 
-COPY "atweaks/cre/fl#dksw5.cre" override                                           //Dancing sword
+COPY "atweaks/cre/undead/fl#dksw5.cre" override                                           //Dancing sword
   SAY 0x8 @1030
   SAY 0xc @1030
   WRITE_ASCII 0x248 fl#dksw5 #8
@@ -357,8 +357,8 @@ BEGIN
   END
 END
 
-COPY "atweaks/itm/fl#ghast.itm" override
-     "atweaks/spl/fl#ghaau.spl" override
+COPY "atweaks/itm/undead/fl#ghast.itm" override
+     "atweaks/spl/undead/fl#ghaau.spl" override
 
 
 
@@ -432,7 +432,7 @@ BEGIN
   END
 END
 
-COPY "atweaks/itm/fl#ghoul.itm" override
+COPY "atweaks/itm/undead/fl#ghoul.itm" override
   LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 177 target = 2 duration = 1 parameter1 = 2 parameter2 = 4 STR_VAR resource = fl#ghoul END //Protection from fl#ghoul.spl for elves
   LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 146 target = 2 timing = 1 parameter1 = 1 parameter2 = 1 STR_VAR resource = fl#ghoul END //Cast fl#ghoul.spl
 
@@ -442,7 +442,7 @@ COPY "atweaks/eff/base.eff" "override/fl#ghoul.eff"
   WRITE_LONG 0x28 1
   WRITE_ASCII 0x30 fl#ghoul #8
 
-COPY "atweaks/spl/fl#ghoul.spl" override
+COPY "atweaks/spl/undead/fl#ghoul.spl" override
 
 
 
@@ -520,7 +520,7 @@ BEGIN
   END
 END
 
-COPY "atweaks/itm/fl#glord.itm" override
+COPY "atweaks/itm/undead/fl#glord.itm" override
   LPF ADD_ITEM_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 parameter2 = 1 timing = 1 savingthrow = 4 type = 1 STR_VAR resource = fl#glor2 END
 
 COPY "atweaks/spl/base.spl" "override/fl#glor2.spl"
@@ -533,9 +533,9 @@ COPY "atweaks/spl/base.spl" "override/fl#glor2.spl"
 
 OUTER_SET $f_AddSecType(fl#glor2.spl) = DiseaseSecType
 
-COPY "atweaks/eff/fl#glord.eff" override
+COPY "atweaks/eff/undead/fl#glord.eff" override
      
-COPY "atweaks/spl/fl#glord.spl" override
+COPY "atweaks/spl/undead/fl#glord.spl" override
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64 + 0x28*i + 0x26 fl#sight
   END
@@ -607,7 +607,7 @@ BEGIN
   END
 END
 
-COPY "atweaks/itm/fl#mum.itm" override
+COPY "atweaks/itm/undead/fl#mum.itm" override
   //LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 272 target = 1 timing = 2 parameter1 = 6 parameter2 = 3 STR_VAR resource = fl#mumfa END
   //LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 232 target = 1 timing = 2 parameter1 = 0 parameter2 = 1 STR_VAR resource = fl#mumfa END //cast spell on self every round
 
@@ -620,7 +620,7 @@ COPY "atweaks/eff/base.eff" "override/fl#mumfa.eff"
   WRITE_LONG 0x28 1
   WRITE_ASCII 0x30 fl#mumfa #8*/
 
-COPY "atweaks/spl/fl#mumfa.spl" override
+COPY "atweaks/spl/undead/fl#mumfa.spl" override
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64 + 0x28*i + 0x26 fl#sight
   END
@@ -642,8 +642,8 @@ COPY "atweaks/eff/base.eff" "override/fl#mumfn.eff"
   WRITE_LONG 0x28 1
   WRITE_ASCII 0x30 fl#mumfn #8
   
-COPY "atweaks/spl/fl#mumfh.spl" override
-     "atweaks/spl/fl#mumfn.spl" override
+COPY "atweaks/spl/undead/fl#mumfh.spl" override
+     "atweaks/spl/undead/fl#mumfn.spl" override
   FOR (i=LONG_AT 0x64;i<SOURCE_SIZE;i+=0x30) BEGIN
     READ_SHORT i type
     PATCH_IF type = 139 BEGIN
@@ -654,7 +654,7 @@ COPY "atweaks/spl/fl#mumfh.spl" override
 OUTER_SET $f_AddSecType(fl#mumfh.spl) = FearSecType
 OUTER_SET $f_AddSecType(fl#mumfn.spl) = FearSecType
 
-COPY "atweaks/spl/fl#mum.spl" override
+COPY "atweaks/spl/undead/fl#mum.spl" override
   FOR (i=LONG_AT 0x6a;i<SOURCE_SIZE;i+=0x30) BEGIN
     READ_SHORT i type
     PATCH_IF type = 206 BEGIN
@@ -769,7 +769,7 @@ BEGIN
   END
 END
 
-COPY "atweaks/itm/fl#mum.itm" "override/fl#gmum.itm"
+COPY "atweaks/itm/undead/fl#mum.itm" "override/fl#gmum.itm"
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_BYTE LONG_AT 0x64 + 0x38*i + 0x16 6
     WRITE_BYTE LONG_AT 0x64 + 0x38*i + 0x18 3 //3d6
@@ -781,7 +781,7 @@ COPY "atweaks/itm/fl#mum.itm" "override/fl#gmum.itm"
     END
   END
   
-COPY "atweaks/spl/fl#mum.spl" "override/fl#gmum.spl"
+COPY "atweaks/spl/undead/fl#mum.spl" "override/fl#gmum.spl"
   FOR (i=LONG_AT 0x6a;i<SOURCE_SIZE;i+=0x30) BEGIN
     READ_SHORT i type
     PATCH_IF type = 206 BEGIN
@@ -803,7 +803,7 @@ COPY "atweaks/spl/fl#mum.spl" "override/fl#gmum.spl"
 OUTER_SET $f_AddSecType(fl#gmum.spl) = DiseaseSecType
 
 //Fear aura
-COPY "atweaks/spl/fl#mumfa.spl" "override/fl#gmumf.spl"
+COPY "atweaks/spl/undead/fl#mumfa.spl" "override/fl#gmumf.spl"
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64 + 0x28*i + 0x26 fl#sight
   END
@@ -826,8 +826,8 @@ COPY "atweaks/eff/base.eff" "override/fl#gmumn.eff"
   WRITE_LONG 0x28 1
   WRITE_ASCII 0x30 fl#gmumn #8*/
   
-COPY //"atweaks/spl/fl#mumfh.spl" "override/fl#gmumh.spl"
-     "atweaks/spl/fl#mumfn.spl" "override/fl#gmumn.spl"
+COPY //"atweaks/spl/undead/fl#mumfh.spl" "override/fl#gmumh.spl"
+     "atweaks/spl/undead/fl#mumfn.spl" "override/fl#gmumn.spl"
   READ_LONG  0x64 ao
   READ_SHORT 0x68 na
   READ_LONG  0x6a eo
@@ -956,7 +956,7 @@ BEGIN
   END
 END
 
-COPY "atweaks/spl/fl#skelw.spl" override
+COPY "atweaks/spl/undead/fl#skelw.spl" override
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64 + 0x28*i + 0x26 fl#sight
   END
