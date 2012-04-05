@@ -3310,6 +3310,12 @@ SAY UNIDENTIFIED_DESC @2203 SAY DESC @2203
 COPY_EXISTING ~sppr702.spl~  ~override~                                            // Conjure Earth Elemental (divine spell)
 SAY UNIDENTIFIED_DESC @2204 SAY DESC @2204
 
+COPY_EXISTING ~sppr731.spl~  ~override~                                            // Fire Elemental Transformation (druid HLA)
+SAY UNIDENTIFIED_DESC @2207 SAY DESC @2207
+
+COPY_EXISTING ~sppr732.spl~  ~override~                                            // Earth Elemental Transformation (druid HLA)
+SAY UNIDENTIFIED_DESC @2208 SAY DESC @2208
+
 
 // Make conjure elemental spells use IWD graphics for the summoning circles
 
@@ -3807,6 +3813,12 @@ SAY DESC @2205 SAY UNIDENTIFIED_DESC @2205
 COPY ~atweaks/spl/elementals/sr_cmpt/sppr622.spl~ ~override~                       // Conjure Earth Elemental (SR)
 SAY DESC @2212 SAY UNIDENTIFIED_DESC @2212
 
+COPY ~atweaks/spl/elementals/sr_cmpt/sppr731.spl~ ~override~                       // Fire Elemental Transformation
+SAY UNIDENTIFIED_DESC @2207 SAY DESC @2207
+
+COPY ~atweaks/spl/elementals/sr_cmpt/sppr732.spl~ ~override~                       // Earth Elemental Transformation
+SAY UNIDENTIFIED_DESC @2208 SAY DESC @2208
+
 
 // Make sure that elementals are friendly when summoned by druids
 
@@ -3841,4 +3853,29 @@ BUT_ONLY_IF_IT_CHANGES
 //==================================================================================
 END                                                                                // ends Spell Revisions compatibility block
 
+
+
+// Item Revisions
+
+ACTION_IF MOD_IS_INSTALLED ITEM_REV.TP2 0 THEN BEGIN                               // Item Revisions mod check
+//==================================================================================
+// Lesser Elementals summoned from items shold not use CREs from the wizard spells because of mental combat issues
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ir_rings BEGIN                                     // Make IR's rings summon the proper elemental versions to avoid mental combat
+//   rr#var0     rr#var1       rr#file
+//   resref1     resref2       file
+     SUMELFIR,   RR#CFIRE  =>  ring27                                              // Conjure Lesser Fire Elemental
+     SUMELAIR,   SPPORTAL  =>  ring28                                              // Conjure Lesser Air Elemental
+     SUMELEAR,   RR#CEART  =>  ring29                                              // Conjure Lesser Earth Elemental
+END                                                                                // ends ACTION_DEFINE_ASSOCIATIVE_ARRAY
+ACTION_PHP_EACH ir_rings AS rr#var => rr#file BEGIN
+ACTION_IF FILE_EXISTS_IN_GAME ~%rr#file%.eff~ BEGIN                                // if the designated file with a EFF extension exists
+COPY_EXISTING ~%rr#file%.eff~  ~override~
+  WRITE_ASCIIE 0x30 "%rr#var_0%" #8                                                // resref (creature to be summoned) 
+  WRITE_ASCIIE 0x70 "%rr#var_1%" #8                                                // resref2 (VVC to display)
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_PHP_EACH
+//==================================================================================
+END                                                                                // ends Item Revisions compatibility block
 
