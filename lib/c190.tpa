@@ -504,6 +504,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END  
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EASER~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REMOVE_CRE_ITEM ~MAGE01~                                                           // initial invisibility is handled via weapon
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "18"                                                                  // new movement rate
@@ -542,7 +543,7 @@ STR_VAR                                                                         
 "script03"   = "servsu"                                                            // Aerial Servant AI script
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script06"   = "BPWTSIGT"                                                          // Big Picture generic AI script
 "script07"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
@@ -558,6 +559,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
              ~hgsal01~                                                             // Fire Salamander
             ~icsalfir~                                                             // Fire Salamander (Planar Sphere)
              ~plysala~                                                             // Fire Salamander (Avenger kit shapechange)
+            ~wrmons01~                                                             // Fire Salamander (Hell Wrath, possibly unused?)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -611,7 +613,9 @@ STR_VAR                                                                         
 "script05"   = "GENSHT01"                                                          // generic shout AI script
 "script06"   = "WDASIGHT"                                                          // generic AI script
 "script07"   = "dw#melee"                                                          // SCSII melee AI script
-"script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script08"   = "CRESHOUT"                                                          // Big Picture shout script
+"script09"   = "BPWDASGT"                                                          // Big Picture generic AI script
+"script10"   = "BERSERK"                                                           // Hell Salamander script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
 LAUNCH_PATCH_FUNCTION fire_salamander_immunities END                               // grant fire salamander immunities
@@ -628,6 +632,7 @@ END                                                                             
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
             ~salgrice~                                                             // Frost Salamander
             ~icsalcol~                                                             // Ice Salamander (Planar Sphere)
+            ~telicesa~                                                             // Ice Salamander (unused?)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -681,7 +686,8 @@ STR_VAR                                                                         
 "script04"   = "GENSHT01"                                                          // generic shout AI script
 "script05"   = "WDASIGHT"                                                          // generic AI script
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
-"script07"   = "BPWDASGT"                                                          // Big Picture generic AI script
+"script07"   = "CRESHOUT"                                                          // Big Picture shout script
+"script08"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
 LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                    // grant immunities to cold-based area effect spells
@@ -757,8 +763,10 @@ STR_VAR                                                                         
 "script02"   = "None"                                                              // second AI script name
 "script03"   = "WTASIGHT"                                                          // generic AI script
 "script04"   = "dw#melee"                                                          // SCSII melee AI script
-"script05"   = "BPWTASGT"                                                          // Big Picture generic AI script
-"script06"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script05"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script06"   = "WBASIGHT"                                                          // Big Picture generic AI script
+"script07"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script08"   = "senstalk"                                                          // Invisible Stalker in Sendai's lair (covered via aTweaks base script)
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
@@ -921,7 +929,8 @@ STR_VAR                                                                         
 "script03"   = "salgrfir"                                                          // generic shout AI script
 "script04"   = "WDASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWDASGT"                                                          // Big Picture generic AI script
+"script06"   = "BPLEADER"                                                          // Big Picture AI script
+"script07"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                     // add extraplanar traits
 LAUNCH_PATCH_FUNCTION fire_salamander_immunities END                               // grant fire salamander immunities
@@ -1025,6 +1034,7 @@ ADD_MEMORIZED_SPELL ~rr#eairw~ #0 ~innate~ ( 1 )                                
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EAIRL~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~IMMUNE1~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                          // revise weapon immunities
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "14"                                                                  // new movement rate
@@ -1064,8 +1074,11 @@ STR_VAR                                                                         
 "script05"   = "WDASIGHT"                                                          // generic AI script
 "script06"   = "GENSHT01"                                                          // generic shout script
 "script07"   = "dw#melee"                                                          // SCSII melee AI script
-"script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script08"   = "BPWTSIGT"                                                          // Big Picture generic AI script
 "script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script10"   = "CRESHOUT"                                                          // Big Picture shout script
+"script11"   = "HUMANSHT"                                                          // Big Picture shout script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 LAUNCH_PATCH_FUNCTION air_affinity END                                             // grant air affinity bonuses
@@ -1110,6 +1123,7 @@ REMOVE_MEMORIZED_SPELLS                                                         
 ADD_MEMORIZED_SPELL ~rr#eairw~ #0 ~innate~ ( 1 )                                   // adds 1x Air Elemental Whirlwind
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EAIRR~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "36"                                                                  // new movement rate
@@ -1158,6 +1172,11 @@ STR_VAR                                                                         
 "script10"   = "_WYVERN"                                                           // Wyvern AI script (Tutu)
 "script11"   = "_TASIGHT"                                                          // generic AI script (Tutu)
 "script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script08"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script10"   = "CRESHOUT"                                                          // Big Picture shout script
+"script11"   = "HUMANSHT"                                                          // Big Picture shout script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 LAUNCH_PATCH_FUNCTION air_affinity END                                             // grant air affinity bonuses
@@ -1195,6 +1214,7 @@ ADD_MEMORIZED_SPELL ~rr#eairw~ #0 ~innate~ ( 1 )                                
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EAIRG~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "36"                                                                  // new movement rate
@@ -1238,6 +1258,10 @@ STR_VAR                                                                         
 "script07"   = "dw#melee"                                                          // SCSII melee AI script
 "script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
 "script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script10"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script11"   = "CRESHOUT"                                                          // Big Picture shout script
+"script12"   = "HUMANSHT"                                                          // Big Picture shout script
+"script13"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 LAUNCH_PATCH_FUNCTION air_affinity END                                             // grant air affinity bonuses
@@ -1267,6 +1291,7 @@ ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EAIRE~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~IMMUNE3~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                          // revise weapon immunities
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "36"                                                                  // new movement rate
@@ -1310,6 +1335,11 @@ STR_VAR                                                                         
 "script07"   = "dw#melee"                                                          // SCSII melee AI script
 "script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
 "script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script10"   = "dw#udela"                                                          // SCSII custom AI
+"script11"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script12"   = "CRESHOUT"                                                          // Big Picture shout script
+"script13"   = "HUMANSHT"                                                          // Big Picture shout script
+"script14"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 LAUNCH_PATCH_FUNCTION air_affinity END                                             // grant air affinity bonuses
@@ -1339,6 +1369,7 @@ REMOVE_MEMORIZED_SPELLS                                                         
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EEARL~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~IMMUNE1~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                          // revise weapon immunities
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "5"                                                                   // new movement rate
@@ -1379,6 +1410,10 @@ STR_VAR                                                                         
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
 "script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script09"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script10"   = "CRESHOUT"                                                          // Big Picture shout script
+"script11"   = "HUMANSHT"                                                          // Big Picture shout script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
 // =============================================================================== // the actual work ends here
@@ -1405,6 +1440,7 @@ REMOVE_KNOWN_SPELLS                                                             
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EEARR~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "5"                                                                   // new movement rate
@@ -1446,6 +1482,10 @@ STR_VAR                                                                         
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
 "script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script09"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script10"   = "CRESHOUT"                                                          // Big Picture shout script
+"script11"   = "HUMANSHT"                                                          // Big Picture shout script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
 "skipfile01" = "SHEARTH"                                                           // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
@@ -1480,6 +1520,7 @@ ADD_MEMORIZED_SPELL ~rr#equa~ #0 ~innate~ ( 1 )                                 
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EEARG~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "7"                                                                   // new movement rate
@@ -1522,6 +1563,10 @@ STR_VAR                                                                         
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
 "script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script09"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script10"   = "CRESHOUT"                                                          // Big Picture shout script
+"script11"   = "HUMANSHT"                                                          // Big Picture shout script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
 // =============================================================================== // the actual work ends here
@@ -1554,6 +1599,7 @@ ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EEARE~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~IMMUNE3~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                          // revise weapon immunities
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "7"                                                                   // new movement rate
@@ -1596,6 +1642,11 @@ STR_VAR                                                                         
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
 "script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script09"   = "dw#udele"                                                          // SCSII custom AI script
+"script10"   = "CRESHOUT"                                                          // Big Picture shout script
+"script11"   = "HUMANSHT"                                                          // Big Picture shout script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
+"script13"   = "BPWTSIGT"                                                          // Big Picture generic AI script
 "skipfile01" = "DRUEAR01"                                                          // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
@@ -1625,6 +1676,7 @@ REMOVE_MEMORIZED_SPELLS                                                         
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EFIRL~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~IMMUNE1~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                          // revise weapon immunities
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newxpv"   = "2000"                                                                // new XP value
@@ -1665,6 +1717,10 @@ STR_VAR                                                                         
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
 "script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script09"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script10"   = "CRESHOUT"                                                          // Big Picture shout script
+"script11"   = "HUMANSHT"                                                          // Big Picture shout script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
 LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
@@ -1695,6 +1751,7 @@ REMOVE_KNOWN_SPELLS                                                             
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EFIRR~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
@@ -1736,6 +1793,10 @@ STR_VAR                                                                         
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
 "script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script09"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+"script10"   = "CRESHOUT"                                                          // Big Picture shout script
+"script11"   = "HUMANSHT"                                                          // Big Picture shout script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
 "skipfile01" = "SHFIRE"                                                            // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
@@ -1781,6 +1842,7 @@ REMOVE_MEMORIZED_SPELLS                                                         
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EFIRG~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
@@ -1824,6 +1886,10 @@ STR_VAR                                                                         
 "script07"   = "dw#melee"                                                          // SCSII melee AI script
 "script08"   = "BPWTASGT"                                                          // Big Picture generic AI script
 "script09"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script10"   = "CRESHOUT"                                                          // Big Picture shout script
+"script11"   = "HUMANSHT"                                                          // Big Picture shout script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
+"script13"   = "BPWTSIGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
 LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
@@ -1855,6 +1921,7 @@ ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EFIRE~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~IMMUNE3~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                          // revise weapon immunities
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
@@ -1897,6 +1964,11 @@ STR_VAR                                                                         
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
 "script08"   = "DVMELEE"                                                           // Spell Revisions melee AI script
+"script09"   = "dw#udelf"                                                          // SCSII custom AI script
+"script10"   = "CRESHOUT"                                                          // Big Picture shout script
+"script11"   = "HUMANSHT"                                                          // Big Picture shout script
+"script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
+"script13"   = "BPWTSIGT"                                                          // Big Picture generic AI script
 "skipfile01" = "DRUFIR01"                                                          // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
@@ -2277,7 +2349,7 @@ STR_VAR                                                                         
 "script03"   = "elemcryo"                                                          // original Cryonax script
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script06"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION petrification_immunity  END                                  // petrification immunity
 LAUNCH_PATCH_FUNCTION cold_spell_immunities END                                    // grant immunities to cold-based area effect spells
@@ -2355,7 +2427,7 @@ STR_VAR                                                                         
 "script03"   = "elemimix"                                                          // original Imix script
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script06"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
 LAUNCH_PATCH_FUNCTION petrification_immunity END                                   // petrification immunity
@@ -2437,7 +2509,7 @@ STR_VAR                                                                         
 "script03"   = "elemogre"                                                          // original Ogremoch script
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script06"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "16" END      // remove spurious haste opcode
@@ -2518,7 +2590,7 @@ STR_VAR                                                                         
 "script03"   = "elemhydr"                                                          // original Olhydra script
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script06"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
 LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
@@ -2597,7 +2669,7 @@ STR_VAR                                                                         
 "script03"   = "elemyanc"                                                          // original Yan-C-Bin script
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script06"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
 LAUNCH_PATCH_FUNCTION clear_bg1_profs END                                          // Clear BG1 proficiencies
@@ -2639,6 +2711,7 @@ REMOVE_CRE_ITEM ~ELEMPRIN~                                                      
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#ECHAN~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 ADD_CRE_ITEM ~IMMUNE2~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                              // revise weapon immunities
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "48"                                                                  // new movement rate
@@ -2682,7 +2755,7 @@ STR_VAR                                                                         
 "script03"   = "elemchan"                                                          // original Chan script
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script06"   = "BPWTSIGT"                                                          // Big Picture generic AI script
 "script07"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
@@ -2719,6 +2792,7 @@ REMOVE_CRE_ITEM ~ELEMPRIN~                                                      
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#ESUNN~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 ADD_CRE_ITEM ~IMMUNE2~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                              // revise weapon immunities
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "7"                                                                   // new movement rate
@@ -2764,7 +2838,7 @@ STR_VAR                                                                         
 "script03"   = "elemsunn"                                                          // original Sunnis script
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script06"   = "BPWTSIGT"                                                          // Big Picture generic AI script
 "script07"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
@@ -2800,6 +2874,7 @@ REMOVE_CRE_ITEM ~ELEMPRIN~                                                      
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EZAAM~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 ADD_CRE_ITEM ~IMMUNE2~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                              // revise weapon immunities
+REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
@@ -2843,7 +2918,7 @@ STR_VAR                                                                         
 "script03"   = "elemzaam"                                                          // original Zaaman Rul script
 "script04"   = "WTASIGHT"                                                          // generic AI script
 "script05"   = "dw#melee"                                                          // SCSII melee AI script
-"script06"   = "BPWTASGT"                                                          // Big Picture generic AI script
+"script06"   = "WGARSGT"                                                           // Big Picture generic AI script
 "script07"   = "DVMELEE"                                                           // Spell Revisions melee AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
