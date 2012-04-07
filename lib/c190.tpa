@@ -621,6 +621,9 @@ LAUNCH_PATCH_FUNCTION ~extraplanar_traits~ END                                  
 LAUNCH_PATCH_FUNCTION fire_salamander_immunities END                               // grant fire salamander immunities
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
 WRITE_ASCII 0x280 ~icsalfir~ #32                                                   // assign new death variable
+PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~plysala~) BEGIN                        // special case, the Avenger kit Fire Salamander form needs 2 APR since it can't dual-wield
+  WRITE_BYTE 0x53 2                                                                // base number of attacks
+END
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block

@@ -259,6 +259,7 @@ IF
 	!Race(LastSeenBy(Myself),DEMONIC)
         !Race(LastSeenBy(Myself),TROLL)
         !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	!StateCheck(LastSeenBy(Myself),STATE_BERSERK)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSPOLY)
@@ -285,6 +286,7 @@ IF
 	!Race(LastSeenBy(Myself),DEMONIC)
         !Race(LastSeenBy(Myself),TROLL)
         !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	!StateCheck(LastSeenBy(Myself),STATE_BERSERK)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSPOLY)
@@ -311,6 +313,7 @@ IF
 	!Race(LastSeenBy(Myself),DEMONIC)
         !Race(LastSeenBy(Myself),TROLL)
         !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	!StateCheck(LastSeenBy(Myself),STATE_BERSERK)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSPOLY)
@@ -337,6 +340,7 @@ IF
 	!Race(LastSeenBy(Myself),DEMONIC)
         !Race(LastSeenBy(Myself),TROLL)
         !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	!StateCheck(LastSeenBy(Myself),STATE_BERSERK)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSPOLY)
@@ -363,6 +367,7 @@ IF
 	!Race(LastSeenBy(Myself),DEMONIC)
         !Race(LastSeenBy(Myself),TROLL)
         !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	!StateCheck(LastSeenBy(Myself),STATE_BERSERK)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSPOLY)
@@ -389,6 +394,7 @@ IF
 	!Race(LastSeenBy(Myself),DEMONIC)
         !Race(LastSeenBy(Myself),TROLL)
         !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	!StateCheck(LastSeenBy(Myself),STATE_DISABLED)
 	!StateCheck(LastSeenBy(Myself),STATE_BERSERK)
 	CheckStatGT(LastSeenBy(Myself),0,SAVEVSPOLY)
@@ -1070,6 +1076,9 @@ IF
     !Range(NearestEnemyOf(Myself),30)
     See(NearestDoor) // note: this seems to auto-skip locked doors
     OpenState(NearestDoor,FALSE)
+    OR(2)
+      !AreaCheck("AR0603") // Irenicus' Dungeon level 2 (avoid traps behind closed doors)
+      !See("Door04") // this door leads to the trapped corridor
 THEN
     RESPONSE #100
         MoveToObject(NearestDoor)
