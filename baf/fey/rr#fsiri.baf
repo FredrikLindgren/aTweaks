@@ -2607,7 +2607,7 @@ IF
     Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
     !AreaType(OUTDOOR)
     !Range(NearestEnemyOf(Myself),30)
-    See(NearestDoor) // note: this seems to auto-skip locked doors
+    Range(NearestDoor,15) // if the nearest door is in visual range. note: this seems to auto-skip locked doors
     OpenState(NearestDoor,FALSE)
 THEN
     RESPONSE #100
@@ -2617,7 +2617,7 @@ END
 
 IF
 	Global("RR#Melee","LOCALS",0)
-	!Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+    Allegiance(LastSeenBy(Myself),GOODCUTOFF) // safety check
 	!HasItemEquiped("shld24",LastSeenBy(Myself)) // Reflection Shield +1
 	!CheckStat(LastSeenBy(Myself),1,CLERIC_PHYSICAL_MIRROR)
 THEN
@@ -2627,7 +2627,7 @@ END
 
 IF
 	Global("RR#Melee","LOCALS",1)
-	!Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+    Allegiance(LastSeenBy(Myself),GOODCUTOFF) // safety check
 THEN
 	RESPONSE #100
 		AttackReevaluate(LastSeenBy(Myself),30)
