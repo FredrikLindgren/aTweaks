@@ -1,208 +1,46 @@
-//stuff that's pending inclusion in WeiDU
-
-//adds the effect to the item. Need parameters: ___#opcode target use_level fail_strref timing mr_bypass duration probability ~%resource%~
-		DEFINE_PATCH_MACRO ~ADD_ITEM_EFFECT~ BEGIN
-		  PATCH_IF (BUFFER_LENGTH	 > 0x71) THEN BEGIN // protects against invalid files
-		    READ_LONG   0x64 ___#abil_off //ability offset
-		    READ_SHORT  0x68 ___#abil_num //number of abilities
-		    READ_LONG   0x6a ___#fx_off //effects offset
-		    FOR (___#index1 = 0 ; ___#index1 < ___#abil_num ; ___#index1 = ___#index1 + 1) BEGIN // looks for magical ability header
-		      READ_BYTE  (___#abil_off +        (___#index1 * 0x38)) ___#type //ability type
-		      PATCH_IF ((!(VARIABLE_IS_SET ~%type%~ AND IS_AN_INT ~%type%~) && ___#type = 3) OR (VARIABLE_IS_SET ~%type%~ AND IS_AN_INT ~%type%~ AND ((___#type = type) OR type = 99))) AND ((___#index1 = (header - 1)) OR (header = 0)) BEGIN //ability is correct or unspecified and header matches
-		        READ_SHORT  (___#abil_off + 0x1e + (0x38 * ___#index1)) ___#abil_fx_num
-		        READ_SHORT  (___#abil_off + 0x20 + (0x38 * ___#index1)) ___#abil_fx_idx
+//deletes all instances of ~item_to_delete~ at current creature
+		DEFINE_PATCH_MACRO ~DELETE_CRE_ITEM~ BEGIN
+      LAUNCH_PATCH_FUNCTION ~FJ_CRE_VALIDITY~ RET valid = valid END
+		  PATCH_IF (valid) BEGIN
+		    READ_LONG 0x2bc ___#itm_off
+		    READ_LONG 0x2c0 ___#itm_num
+		    READ_LONG 0x2b8 ___#islot_off
+		    SET ___#delta = 0
+		    FOR (___#cur_itm = 0; ___#cur_itm < ___#itm_num; ___#cur_itm = (___#cur_itm + 1)) BEGIN
+		    READ_ASCII (___#itm_off + (___#cur_itm * 0x14)) ~item~
+		      PATCH_IF (~%item%~ STRING_MATCHES_REGEXP ~%item_to_delete%~ = 0) THEN BEGIN
 		
-		        ___#insert_point = !VARIABLE_IS_SET insert_point OR !IS_AN_INT insert_point OR insert_point < 0 OR insert_point > ___#abil_fx_num ? ___#abil_fx_num : insert_point
-		        
-		        INSERT_BYTES (___#fx_off +        (0x30 * (___#insert_point + ___#abil_fx_idx))) 0x30
+		        DELETE_BYTES (___#itm_off + (___#cur_itm * 0x14)) 0x14
+		        SET ___#itm_num = ___#itm_num - 1
+		        //SET ___#delta = ___#delta + 1
 		
-		        WRITE_SHORT  (___#fx_off +        (0x30 * (___#insert_point + ___#abil_fx_idx))) opcode
-		        WRITE_BYTE   (___#fx_off + 0x02 + (0x30 * (___#insert_point + ___#abil_fx_idx))) target
-		        WRITE_BYTE   (___#fx_off + 0x03 + (0x30 * (___#insert_point + ___#abil_fx_idx))) power
-		        WRITE_LONG   (___#fx_off + 0x04 + (0x30 * (___#insert_point + ___#abil_fx_idx))) parameter1
-		        WRITE_LONG   (___#fx_off + 0x08 + (0x30 * (___#insert_point + ___#abil_fx_idx))) parameter2
-		        WRITE_BYTE   (___#fx_off + 0x0c + (0x30 * (___#insert_point + ___#abil_fx_idx))) timing
-		        WRITE_BYTE   (___#fx_off + 0x0d + (0x30 * (___#insert_point + ___#abil_fx_idx))) resist_dispel
-		        WRITE_LONG   (___#fx_off + 0x0e + (0x30 * (___#insert_point + ___#abil_fx_idx))) duration
-		        WRITE_BYTE   (___#fx_off + 0x12 + (0x30 * (___#insert_point + ___#abil_fx_idx))) probability1
-		        WRITE_BYTE   (___#fx_off + 0x13 + (0x30 * (___#insert_point + ___#abil_fx_idx))) probability2
-		        WRITE_EVALUATED_ASCII (___#fx_off + 0x14 + (0x30 * (___#insert_point + ___#abil_fx_idx))) ~%resource%~ #8
-		        WRITE_LONG   (___#fx_off + 0x1c + (0x30 * (___#insert_point + ___#abil_fx_idx))) dicenumber
-		        WRITE_LONG   (___#fx_off + 0x20 + (0x30 * (___#insert_point + ___#abil_fx_idx))) dicesize
-		        WRITE_LONG   (___#fx_off + 0x24 + (0x30 * (___#insert_point + ___#abil_fx_idx))) savingthrow
-		        WRITE_LONG   (___#fx_off + 0x28 + (0x30 * (___#insert_point + ___#abil_fx_idx))) savebonus
-		
-		        //correcting effects number
-		        WRITE_SHORT (___#abil_off + 0x1e + (0x38 * ___#index1)) (___#abil_fx_num + 1)
-		
-		        //correcting 1st effect ___#index1es
-		        FOR (___#index2 = 0 ; ___#index2 < ___#abil_num ; ___#index2 = ___#index2 + 1) BEGIN
-		          READ_SHORT (___#abil_off + ___#index2 * 0x38 + 0x20) ___#1effect_index
-		          PATCH_IF (___#1effect_index > ___#abil_fx_idx) //if next abilility
-		                OR ((___#1effect_index = ___#abil_fx_idx)
-		                  AND (___#abil_fx_num = 0)
-		                  AND (___#index2 != ___#index1)) BEGIN
-		            WRITE_SHORT (___#abil_off + ___#index2 * 0x38 + 0x20) (___#1effect_index + 1) //increase 1 effect ___#index1 by 1
+		        //correct offsets
+		        PATCH_FOR_EACH ___#offset IN 0x2a0 0x2a8 0x2b0 0x2b8 0x2bc BEGIN
+		          READ_LONG ___#offset ___#current_off
+		          PATCH_IF ___#current_off > ___#itm_off BEGIN
+		            WRITE_LONG ___#offset (___#current_off - 0x14)
 		          END
 		        END
-		        //no offsets to correct
-		      END
-		    END //end of cycle
 		
-		  //reset vars
-		  SET opcode = 0
-		  SET target = 0
-		  SET timing = 0
-		  SET resist_dispel = 0
-		  SET power = 0
-		  SET parameter1 = 0
-		  SET parameter2 = 0
-		  SET duration = 0
-	    SET probability1 = 100
-	    SET probability2 = 0
-		  SPRINT resource ~%___#nil%~
-		  SET dicenumber = 0
-		  SET dicesize = 0
-		  SET savingthrow = 0
-		  SET savebonus = 0
-		
-		  END
-		END
-		
-		
-		//adds an extended effect to a specified spell
-		//essential parameters:
-		//opcode
-		//target
-		//timing
-		
-		//optional parameters:
-		//resist_dispel (magic resitance/dispel type)
-		//power
-		//parameter1
-		//parameter2
-		//duration 
-		//probability1 (default 100)
-		//probability2 (default 0)
-		//resource (ascii string 8 chars)
-		//dicenumber
-		//dicesize
-		//savingthrow
-		//savebonus
-		//header (default all)
-		//insert_point (last by default)
-		
-		DEFINE_PATCH_MACRO ~ADD_SPELL_EFFECT~ BEGIN
-		  PATCH_IF (BUFFER_LENGTH	 > 0x71) THEN BEGIN
-		    READ_LONG  0x64 ___#abil_off
-		    READ_SHORT 0x68 ___#abil_num
-		    READ_LONG  0x6a ___#fx_off
-
-		    FOR (___#index1 = 0 ; ___#index1 < ___#abil_num ; ___#index1 = ___#index1 + 1) BEGIN
-
-		      PATCH_IF (___#index1 = (header - 1)) OR (header = 0) BEGIN //header=1 means ___#index1=0
-		        READ_SHORT  (___#abil_off + 0x1e + (0x28 * ___#index1)) ___#abil_fx_num
-		        READ_SHORT  (___#abil_off + 0x20 + (0x28 * ___#index1)) ___#abil_fx_idx
-            
-            ___#insert_point = !VARIABLE_IS_SET insert_point OR !IS_AN_INT insert_point OR insert_point < 0 OR insert_point > ___#abil_fx_num ? ___#abil_fx_num : insert_point
-            
-		        INSERT_BYTES (___#fx_off +        (0x30 * (___#insert_point + ___#abil_fx_idx))) 0x30
-
-		        WRITE_SHORT  (___#fx_off +        (0x30 * (___#insert_point + ___#abil_fx_idx))) opcode
-		        WRITE_BYTE   (___#fx_off + 0x02 + (0x30 * (___#insert_point + ___#abil_fx_idx))) target
-		        WRITE_BYTE   (___#fx_off + 0x03 + (0x30 * (___#insert_point + ___#abil_fx_idx))) power
-		        WRITE_LONG   (___#fx_off + 0x04 + (0x30 * (___#insert_point + ___#abil_fx_idx))) parameter1
-		        WRITE_LONG   (___#fx_off + 0x08 + (0x30 * (___#insert_point + ___#abil_fx_idx))) parameter2
-		        WRITE_BYTE   (___#fx_off + 0x0c + (0x30 * (___#insert_point + ___#abil_fx_idx))) timing
-		        WRITE_BYTE   (___#fx_off + 0x0d + (0x30 * (___#insert_point + ___#abil_fx_idx))) resist_dispel
-		        WRITE_LONG   (___#fx_off + 0x0e + (0x30 * (___#insert_point + ___#abil_fx_idx))) duration
-		        WRITE_BYTE   (___#fx_off + 0x12 + (0x30 * (___#insert_point + ___#abil_fx_idx))) probability1
-		        WRITE_BYTE   (___#fx_off + 0x13 + (0x30 * (___#insert_point + ___#abil_fx_idx))) probability2
-		        WRITE_EVALUATED_ASCII (___#fx_off + 0x14 + (0x30 * (___#insert_point + ___#abil_fx_idx))) ~%resource%~ #8
-		        WRITE_LONG   (___#fx_off + 0x1c + (0x30 * (___#insert_point + ___#abil_fx_idx))) dicenumber
-		        WRITE_LONG   (___#fx_off + 0x20 + (0x30 * (___#insert_point + ___#abil_fx_idx))) dicesize
-		        WRITE_LONG   (___#fx_off + 0x24 + (0x30 * (___#insert_point + ___#abil_fx_idx))) savingthrow
-		        WRITE_LONG   (___#fx_off + 0x28 + (0x30 * (___#insert_point + ___#abil_fx_idx))) savebonus
-
-		        //correcting effects number
-		        WRITE_SHORT (___#abil_off + 0x1e + (0x28 * ___#index1)) (___#abil_fx_num + 1)
-
-		        //correcting 1st effect indexes
-		        FOR (___#index2 = 0 ; ___#index2 < ___#abil_num ; ___#index2 = ___#index2 + 1) BEGIN
-		          READ_SHORT (___#abil_off + ___#index2 * 0x28 + 0x20) ___#1effect_index
-		          PATCH_IF (___#1effect_index > ___#abil_fx_idx) //if abilility after current effect
-		                OR ((___#1effect_index = ___#abil_fx_idx)
-		                  AND (___#abil_fx_num = 0)
-		                  AND (___#index2 != ___#index1)) BEGIN
-		            WRITE_SHORT (___#abil_off + ___#index2 * 0x28 + 0x20) (___#1effect_index + 1) //increase 1 effect ___#index1 by 1
+		        FOR (___#cur_slot = 0; ___#cur_slot < 37; ___#cur_slot = ___#cur_slot + 1) BEGIN
+		          READ_LONG 0x2b8 ___#islot_off
+		          READ_SHORT  (___#islot_off + ___#cur_slot * 2) ___#itm_index
+		          PATCH_IF (___#itm_index = ___#cur_itm) BEGIN //if slot with deleted item
+		            WRITE_SHORT  (___#islot_off + ___#cur_slot * 2) 0xffff //nullify reference
+		          END
+		          PATCH_IF ((___#itm_index > ___#cur_itm) AND NOT (___#itm_index = 0xffff)) BEGIN //if next slot and not empty
+		            WRITE_SHORT  (___#islot_off + ___#cur_slot * 2) (___#itm_index - 1) //shift items back
 		          END
 		        END
-		        //no offsets to correct
+		
+		        SET ___#cur_itm = ___#cur_itm - 1 //step back to not miss an item
 		      END
 		    END
-		    //reset vars
-		    SET opcode = 0
-		    SET target = 0
-		    SET timing = 0
-		    SET resist_dispel = 0
-		    SET power = 0
-		    SET header = 0
-		    SET parameter1 = 0
-		    SET parameter2 = 0
-		    SET probability1 = 100
-		    SET probability2 = 0
-		    SET duration = 0
-		    SPRINT resource ~%___#nil%~
-		    SET dicenumber = 0
-		    SET dicesize = 0
-		    SET savingthrow = 0
-		    SET savebonus = 0
-
+		    //correcting number
+		    WRITE_LONG  0x02c0 ___#itm_num
+		    //no offsets to correct
+		
 		  END
 		END
-		
-		
-		DEFINE_PATCH_FUNCTION ~ADD_SPELL_EFFECT~
-  INT_VAR opcode = 0
-          target = 0
-          timing = 0
-          parameter1 = 0
-          parameter2 = 0
-          power = 0
-          resist_dispel = 0
-          duration = 0
-          probability1 = 100
-          probability2 = 0
-          dicenumber = 0
-          dicesize = 0
-          savingthrow = 0
-          savebonus = 0
-          header = 0
-          insert_point = "-1"
-  STR_VAR resource = ~~
-BEGIN
-  LAUNCH_PATCH_MACRO ~ADD_SPELL_EFFECT~
-END
 
-DEFINE_PATCH_FUNCTION ~ADD_ITEM_EFFECT~
-  INT_VAR opcode = 0
-          target = 0
-          timing = 0
-          parameter1 = 0
-          parameter2 = 0
-          power = 0
-          resist_dispel = 0
-          duration = 0
-          probability1 = 100
-          probability2 = 0
-          dicenumber = 0
-          dicesize = 0
-          savingthrow = 0
-          savebonus = 0
-          header = 0
-		  type = 3
-		  insert_point = "-1"
-  STR_VAR resource = ~~
-BEGIN
-  LAUNCH_PATCH_MACRO ~ADD_ITEM_EFFECT~
-END
+
