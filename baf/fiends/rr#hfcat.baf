@@ -8,476 +8,485 @@ THEN
 END
 
 IF
-	Global("RR#Active","LOCALS",0)
-	OR(4)
-	  AttackedBy([ANYONE],DEFAULT)
-	  TookDamage()
-	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_LAWFUL]) // Imps
-	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]) // Baatezu fiends
+    Global("RR#Active","LOCALS",0)
+    OR(4)
+      AttackedBy([ANYONE],DEFAULT)
+      TookDamage()
+      Help([EVILCUTOFF.0.IMP.0.0.0.MASK_LAWFUL]) // Imps
+      Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]) // Baatezu fiends
 THEN
-	RESPONSE #100
-		SetGlobal("RR#Active","LOCALS",1)
-		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
-		Enemy()
-		Help()
-		Continue()
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        Enemy()
+        Help()
+        Continue()
 END
 
 IF
-	Global("RR#Active","LOCALS",0)
+    Global("RR#Active","LOCALS",0)
         Allegiance(Myself,EVILCUTOFF)
-	See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
+    See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
 THEN
-	RESPONSE #100
-		SetGlobal("RR#Active","LOCALS",1)
-		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
-		Enemy()
-		Help()
-		Continue()
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        Enemy()
+        Help()
+        Continue()
 END
 
 IF
-	OR(4)
-	  Global("RR#Active","LOCALS",0)
+    OR(4)
+      Global("RR#Active","LOCALS",0)
           !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
-	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
-	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+      StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+      StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	Global("RR#Active","LOCALS",1)
-	!InActiveArea(Myself)
-	!See([GOODCUTOFF])
+    Global("RR#Active","LOCALS",1)
+    !InActiveArea(Myself)
+    !See([GOODCUTOFF])
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+    !GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
 THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+    RESPONSE #100
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
                 ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
                 Rest()
 END
 
 IF
-	!GlobalTimerNotExpired("rr#niinv","LOCALS") // Natural Invisibility is automatically re-applied once per round (note: this is not a spell and shouldn't be treated as such)
-	!StateCheck(Myself,STATE_INVISIBLE)
-	!Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust but not True Seeing as it's automatically re-applied
+    !GlobalTimerNotExpired("rr#niinv","LOCALS") // Natural Invisibility is automatically re-applied once per round (note: this is not a spell and shouldn't be treated as such)
+    !StateCheck(Myself,STATE_INVISIBLE)
+    !Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust
+    !CheckStatGT(Player1,0,TRUE_SIGHT) // also have it check for True Seeing, otherwise, it's too unbalanced
+    !CheckStatGT(Player2,0,TRUE_SIGHT)
+    !CheckStatGT(Player3,0,TRUE_SIGHT)
+    !CheckStatGT(Player4,0,TRUE_SIGHT)
+    !CheckStatGT(Player5,0,TRUE_SIGHT)
+    !CheckStatGT(Player6,0,TRUE_SIGHT)
+    !CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+    !CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
 THEN
-	RESPONSE #100
+    RESPONSE #100
         SetGlobalTimer("rr#niinv","LOCALS",6)
         ReallyForceSpellRES("rr#niinv",Myself) // Natural Invisibility
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
-	See([GOODCUTOFF])
+    !GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other allies may hear it and join the battle
+    See([GOODCUTOFF])
 THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Help","LOCALS",12)
-		Help()
+    RESPONSE #100
+        SetGlobalTimer("RR#Help","LOCALS",12)
+        Help()
                 GlobalShout(5828) // aTweaks hostile global shout
-		Continue()
+        Continue()
 END
 
 IF
-	!CheckStatGT(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !CheckStatGT(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
         CheckStatLT(NearestEnemyOf(Myself),100,RESISTSLASHING)
-	See(NearestEnemyOf(Myself))
-	False()
+    See(NearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(SixthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
+    !CheckStatGT(SixthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
         CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
-	!StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
         CheckStatLT(SixthNearestEnemyOf(Myself),1,STONESKINS)
-	See(SixthNearestEnemyOf(Myself))
-	False()
+    See(SixthNearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(FifthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
+    !CheckStatGT(FifthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
         CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTSLASHING)
-	!StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
         CheckStatLT(FifthNearestEnemyOf(Myself),1,STONESKINS)
-	See(FifthNearestEnemyOf(Myself))
-	False()
+    See(FifthNearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(FourthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
+    !CheckStatGT(FourthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
         CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTSLASHING)
-	!StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
         CheckStatLT(FourthNearestEnemyOf(Myself),1,STONESKINS)
-	See(FourthNearestEnemyOf(Myself))
-	False()
+    See(FourthNearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(ThirdNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
+    !CheckStatGT(ThirdNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
         CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTSLASHING)
-	!StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
         CheckStatLT(ThirdNearestEnemyOf(Myself),1,STONESKINS)
-	See(ThirdNearestEnemyOf(Myself))
-	False()
+    See(ThirdNearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(SecondNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
+    !CheckStatGT(SecondNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
         CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTSLASHING)
-	!StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
         CheckStatLT(SecondNearestEnemyOf(Myself),1,STONESKINS)
-	See(SecondNearestEnemyOf(Myself))
-	False()
+    See(SecondNearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !CheckStatGT(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
         !StateCheck(NearestEnemyOf(Myself),STATE_PANIC)
         CheckStatLT(NearestEnemyOf(Myself),100,RESISTSLASHING)
-	!StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
         CheckStatLT(NearestEnemyOf(Myself),1,STONESKINS)
-	See(NearestEnemyOf(Myself))
-	False()
+    See(NearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT([GOODCUTOFF.0.0.BARD_ALL],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck([GOODCUTOFF.0.0.BARD_ALL],STATE_PANIC)
+    !CheckStatGT([GOODCUTOFF.0.0.BARD_ALL],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck([GOODCUTOFF.0.0.BARD_ALL],STATE_PANIC)
         CheckStatLT([GOODCUTOFF.0.0.BARD_ALL],100,RESISTSLASHING)
-	!StateCheck([GOODCUTOFF.0.0.BARD_ALL],STATE_MIRRORIMAGE)
+    !StateCheck([GOODCUTOFF.0.0.BARD_ALL],STATE_MIRRORIMAGE)
         CheckStatLT([GOODCUTOFF.0.0.BARD_ALL],1,STONESKINS)
-	See([GOODCUTOFF.0.0.BARD_ALL])
-	False()
+    See([GOODCUTOFF.0.0.BARD_ALL])
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT([GOODCUTOFF.0.0.DRUID_ALL],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck([GOODCUTOFF.0.0.DRUID_ALL],STATE_PANIC)
+    !CheckStatGT([GOODCUTOFF.0.0.DRUID_ALL],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck([GOODCUTOFF.0.0.DRUID_ALL],STATE_PANIC)
         CheckStatLT([GOODCUTOFF.0.0.DRUID_ALL],100,RESISTSLASHING)
-	!StateCheck([GOODCUTOFF.0.0.DRUID_ALL],STATE_MIRRORIMAGE)
+    !StateCheck([GOODCUTOFF.0.0.DRUID_ALL],STATE_MIRRORIMAGE)
         CheckStatLT([GOODCUTOFF.0.0.DRUID_ALL],1,STONESKINS)
-	See([GOODCUTOFF.0.0.DRUID_ALL])
-	False()
+    See([GOODCUTOFF.0.0.DRUID_ALL])
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]),STATE_PANIC)
+    !CheckStatGT(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]),STATE_PANIC)
         CheckStatLT(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]),100,RESISTSLASHING)
-	!StateCheck(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
+    !StateCheck(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
         CheckStatLT(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]),1,STONESKINS)
-	See(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]))
-	False()
+    See(SecondNearest([GOODCUTOFF.0.0.CLERIC_ALL]))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT([GOODCUTOFF.0.0.CLERIC_ALL],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck([GOODCUTOFF.0.0.CLERIC_ALL],STATE_PANIC)
+    !CheckStatGT([GOODCUTOFF.0.0.CLERIC_ALL],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck([GOODCUTOFF.0.0.CLERIC_ALL],STATE_PANIC)
         CheckStatLT([GOODCUTOFF.0.0.CLERIC_ALL],100,RESISTSLASHING)
-	!StateCheck([GOODCUTOFF.0.0.CLERIC_ALL],STATE_MIRRORIMAGE)
+    !StateCheck([GOODCUTOFF.0.0.CLERIC_ALL],STATE_MIRRORIMAGE)
         CheckStatLT([GOODCUTOFF.0.0.CLERIC_ALL],1,STONESKINS)
-	See([GOODCUTOFF.0.0.CLERIC_ALL])
-	False()
+    See([GOODCUTOFF.0.0.CLERIC_ALL])
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]),STATE_PANIC)
+    !CheckStatGT(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]),STATE_PANIC)
         CheckStatLT(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]),100,RESISTSLASHING)
-	!StateCheck(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
+    !StateCheck(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
         CheckStatLT(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]),1,STONESKINS)
-	See(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]))
-	False()
+    See(ThirdNearest([GOODCUTOFF.0.0.MAGE_ALL]))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]),STATE_PANIC)
+    !CheckStatGT(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]),STATE_PANIC)
         CheckStatLT(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]),100,RESISTSLASHING)
-	!StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
+    !StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
         CheckStatLT(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]),1,STONESKINS)
-	See(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]))
-	False()
+    See(SecondNearest([GOODCUTOFF.0.0.MAGE_ALL]))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT([GOODCUTOFF.0.0.MAGE_ALL],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck([GOODCUTOFF.0.0.MAGE_ALL],STATE_PANIC)
+    !CheckStatGT([GOODCUTOFF.0.0.MAGE_ALL],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck([GOODCUTOFF.0.0.MAGE_ALL],STATE_PANIC)
         CheckStatLT([GOODCUTOFF.0.0.MAGE_ALL],100,RESISTSLASHING)
-	!StateCheck([GOODCUTOFF.0.0.MAGE_ALL],STATE_MIRRORIMAGE)
+    !StateCheck([GOODCUTOFF.0.0.MAGE_ALL],STATE_MIRRORIMAGE)
         CheckStatLT([GOODCUTOFF.0.0.MAGE_ALL],1,STONESKINS)
-	See([GOODCUTOFF.0.0.MAGE_ALL])
-	False()
+    See([GOODCUTOFF.0.0.MAGE_ALL])
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(SecondNearest([GOODCUTOFF.0.0.MAGE_THIEF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE_THIEF]),STATE_PANIC)
+    !CheckStatGT(SecondNearest([GOODCUTOFF.0.0.MAGE_THIEF]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE_THIEF]),STATE_PANIC)
         CheckStatLT(SecondNearest([GOODCUTOFF.0.0.MAGE_THIEF]),100,RESISTSLASHING)
-	!StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE_THIEF]),STATE_MIRRORIMAGE)
+    !StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE_THIEF]),STATE_MIRRORIMAGE)
         CheckStatLT(SecondNearest([GOODCUTOFF.0.0.MAGE_THIEF]),1,STONESKINS)
-	See(SecondNearest([GOODCUTOFF.0.0.MAGE_THIEF]))
-	False()
+    See(SecondNearest([GOODCUTOFF.0.0.MAGE_THIEF]))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT([GOODCUTOFF.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck([GOODCUTOFF.0.0.MAGE_THIEF],STATE_PANIC)
+    !CheckStatGT([GOODCUTOFF.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck([GOODCUTOFF.0.0.MAGE_THIEF],STATE_PANIC)
         CheckStatLT([GOODCUTOFF.0.0.MAGE_THIEF],100,RESISTSLASHING)
-	!StateCheck([GOODCUTOFF.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
+    !StateCheck([GOODCUTOFF.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
         CheckStatLT([GOODCUTOFF.0.0.MAGE_THIEF],1,STONESKINS)
-	See([GOODCUTOFF.0.0.MAGE_THIEF])
-	False()
+    See([GOODCUTOFF.0.0.MAGE_THIEF])
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(SecondNearest([GOODCUTOFF.0.0.MAGE]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE]),STATE_PANIC)
+    !CheckStatGT(SecondNearest([GOODCUTOFF.0.0.MAGE]),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE]),STATE_PANIC)
         CheckStatLT(SecondNearest([GOODCUTOFF.0.0.MAGE]),100,RESISTSLASHING)
-	!StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE]),STATE_MIRRORIMAGE)
+    !StateCheck(SecondNearest([GOODCUTOFF.0.0.MAGE]),STATE_MIRRORIMAGE)
         CheckStatLT(SecondNearest([GOODCUTOFF.0.0.MAGE]),1,STONESKINS)
-	See(SecondNearest([GOODCUTOFF.0.0.MAGE]))
-	False()
+    See(SecondNearest([GOODCUTOFF.0.0.MAGE]))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT([GOODCUTOFF.0.0.MAGE],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	!StateCheck([GOODCUTOFF.0.0.MAGE],STATE_PANIC)
+    !CheckStatGT([GOODCUTOFF.0.0.MAGE],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !StateCheck([GOODCUTOFF.0.0.MAGE],STATE_PANIC)
         CheckStatLT([GOODCUTOFF.0.0.MAGE],100,RESISTSLASHING)
-	!StateCheck([GOODCUTOFF.0.0.MAGE],STATE_MIRRORIMAGE)
+    !StateCheck([GOODCUTOFF.0.0.MAGE],STATE_MIRRORIMAGE)
         CheckStatLT([GOODCUTOFF.0.0.MAGE],1,STONESKINS)
-	See([GOODCUTOFF.0.0.MAGE])
-	False()
+    See([GOODCUTOFF.0.0.MAGE])
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	HitBy([GOODCUTOFF],0)
-	!CheckStatGT(LastHitter(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    HitBy([GOODCUTOFF],0)
+    !CheckStatGT(LastHitter(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
         !StateCheck(LastHitter(Myself),STATE_PANIC)
         CheckStatLT(LastHitter(Myself),100,RESISTSLASHING)
-	!StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
+    !StateCheck(LastHitter(Myself),STATE_MIRRORIMAGE)
         CheckStatLT(LastHitter(Myself),1,STONESKINS)
-	OR(3)
-	  InWeaponRange(LastHitter(Myself))
-	  Range(LastHitter(Myself),4)
-	  RandomNum(3,1)
-	See(LastHitter(Myself))
-	False()
+    OR(3)
+      InWeaponRange(LastHitter(Myself))
+      Range(LastHitter(Myself),4)
+      RandomNum(3,1)
+    See(LastHitter(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(SixthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
+    !CheckStatGT(SixthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTSLASHING)
-	See(SixthNearestEnemyOf(Myself))
-	False()
+    See(SixthNearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(FifthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
+    !CheckStatGT(FifthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTSLASHING)
-	See(FifthNearestEnemyOf(Myself))
-	False()
+    See(FifthNearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(FourthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
+    !CheckStatGT(FourthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTSLASHING)
-	See(FourthNearestEnemyOf(Myself))
-	False()
+    See(FourthNearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(ThirdNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
+    !CheckStatGT(ThirdNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTSLASHING)
-	See(ThirdNearestEnemyOf(Myself))
-	False()
+    See(ThirdNearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(SecondNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
+    !CheckStatGT(SecondNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTSLASHING)
-	See(SecondNearestEnemyOf(Myself))
-	False()
+    See(SecondNearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
+    !CheckStatGT(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
         CheckStatLT(NearestEnemyOf(Myself),100,RESISTSLASHING)
-	See(NearestEnemyOf(Myself))
-	False()
+    See(NearestEnemyOf(Myself))
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(Player6,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(Player6,STATE_IMMOBILE)
+    !CheckStatGT(Player6,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(Player6,STATE_IMMOBILE)
         CheckStatLT(Player6,100,RESISTSLASHING)
-	See(Player6)
-	False()
+    See(Player6)
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(Player5,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(Player5,STATE_IMMOBILE)
+    !CheckStatGT(Player5,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(Player5,STATE_IMMOBILE)
         CheckStatLT(Player5,100,RESISTSLASHING)
-	See(Player5)
-	False()
+    See(Player5)
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(Player4,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(Player4,STATE_IMMOBILE)
+    !CheckStatGT(Player4,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(Player4,STATE_IMMOBILE)
         CheckStatLT(Player4,100,RESISTSLASHING)
-	See(Player4)
-	False()
+    See(Player4)
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(Player3,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(Player3,STATE_IMMOBILE)
+    !CheckStatGT(Player3,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(Player3,STATE_IMMOBILE)
         CheckStatLT(Player3,100,RESISTSLASHING)
-	See(Player3)
-	False()
+    See(Player3)
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(Player2,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(Player2,STATE_IMMOBILE)
+    !CheckStatGT(Player2,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(Player2,STATE_IMMOBILE)
         CheckStatLT(Player2,100,RESISTSLASHING)
-	See(Player2)
-	False()
+    See(Player2)
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT(Player1,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
-	StateCheck(Player1,STATE_IMMOBILE)
+    !CheckStatGT(Player1,0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    StateCheck(Player1,STATE_IMMOBILE)
         CheckStatLT(Player1,100,RESISTSLASHING)
-	See(Player1)
-	False()
+    See(Player1)
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
-	!CheckStatGT([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !CheckStatGT([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
         CheckStatLT([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],100,RESISTSLASHING)
-	See([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC])
-	False()
+    See([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC])
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
+    Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
     Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
     !AreaType(OUTDOOR)
     !Range(NearestEnemyOf(Myself),30)
@@ -490,31 +499,31 @@ THEN
 END
 
 IF
-	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
         !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
-	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
+    !CheckStatGT(LastSeenBy(Myself),0,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Mantle of higher
         CheckStatLT(LastSeenBy(Myself),100,RESISTSLASHING)
 THEN
-	RESPONSE #100
-		AttackOneRound(LastSeenBy(Myself))
+    RESPONSE #100
+        AttackOneRound(LastSeenBy(Myself))
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
-	OR(2)
-	  Help([EVILCUTOFF.0.IMP.0.0.0.MASK_LAWFUL]) // Imps
-	  Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]) // Baatezu fiends
+    !GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+    OR(2)
+      Help([EVILCUTOFF.0.IMP.0.0.0.MASK_LAWFUL]) // Imps
+      Help([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_LAWFUL]) // Baatezu fiends
         InMyArea(LastHelp(Myself))
-	!StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
+    !StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
 THEN
-	RESPONSE #100
-		SetGlobalTimer("RR#Move","LOCALS",6)
-		MoveToObject(LastHelp(Myself))
+    RESPONSE #100
+        SetGlobalTimer("RR#Move","LOCALS",6)
+        MoveToObject(LastHelp(Myself))
 END
 
 IF
-	!GlobalTimerNotExpired("RR#Move","LOCALS")
+    !GlobalTimerNotExpired("RR#Move","LOCALS")
 THEN
-	RESPONSE #100
-		RandomWalkContinuous()
+    RESPONSE #100
+        RandomWalkContinuous()
 END

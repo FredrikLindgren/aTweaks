@@ -190,6 +190,7 @@ THEN
 END
 
 IF
+	Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
     Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
     !AreaType(OUTDOOR)
     !Range(NearestEnemyOf(Myself),30)
@@ -202,6 +203,7 @@ THEN
 END
 
 IF
+    Exists(LastSeenBy(Myself)) // safety check
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
     !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
     Allegiance(LastSeenBy(Myself),GOODCUTOFF) // safety check

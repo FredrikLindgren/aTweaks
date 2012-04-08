@@ -624,6 +624,7 @@ THEN
 END
 
 IF
+	Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
     Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
     !AreaType(OUTDOOR)
     !Range(NearestEnemyOf(Myself),30)
@@ -647,6 +648,7 @@ THEN
 END
 
 IF
+    Exists(LastSeenBy(Myself)) // safety check
     Allegiance(Myself,GOODCUTOFF)
     ActionListEmpty()
     !InParty(LastSeenBy(Myself))
@@ -660,6 +662,7 @@ THEN
 END
 
 IF
+    Exists(LastSeenBy(Myself)) // safety check
     Allegiance(Myself,EVILCUTOFF)
     !GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
     Help([EVILCUTOFF.0.ELEMENTAL.ELEMENTAL_AIR])

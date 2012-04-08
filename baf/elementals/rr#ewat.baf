@@ -314,14 +314,6 @@ THEN
 END
 
 IF
-    See(Myself) // initialize/clear LastSeenByMyself(); special case, needed for elementals summoned by opponents out of the party's sight
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
-
-IF
     Allegiance(Myself,EVILCUTOFF)
     OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
       See(Player1)
@@ -609,6 +601,7 @@ THEN
 END
 
 IF
+	Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
     Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
     !AreaType(OUTDOOR)
     !Range(NearestEnemyOf(Myself),30)
@@ -621,6 +614,7 @@ THEN
 END
 
 IF
+    Exists(LastSeenBy(Myself)) // safety check
     Allegiance(Myself,EVILCUTOFF)
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
     !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)    
@@ -632,6 +626,7 @@ THEN
 END
 
 IF
+    Exists(LastSeenBy(Myself)) // safety check
     Allegiance(Myself,GOODCUTOFF)
     ActionListEmpty()
     !InParty(LastSeenBy(Myself))

@@ -6,7 +6,7 @@ IF
       AttackedBy([ANYONE],DEFAULT)
       TookDamage()
       Help([EVILCUTOFF.0.ELEMENTAL.ELEMENTAL_AIR])
-	  Gender(Myself,SUMMONED) // summoned elemental
+      Gender(Myself,SUMMONED) // summoned elemental
       Exists(LastSummonerOf(Myself)) // gated elemental
 THEN
     RESPONSE #100
@@ -75,12 +75,23 @@ END
 
 IF
     Allegiance(Myself,GOODCUTOFF)
-	OR(2)
+    OR(2)
       ActionListEmpty()
       See(NearestEnemyOf(Myself))
     !GlobalTimerNotExpired("rr#niinv","LOCALS") // Natural Invisibility is automatically re-applied once per round (note: this is not a spell and shouldn't be treated as such)
     !StateCheck(Myself,STATE_INVISIBLE)
-    !Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust but not True Seeing as it's automatically re-applied
+    !Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust
+    !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT) // also have it check for True Seeing, otherwise, it's too unbalanced
+    !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT([EVILCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+    !CheckStatGT([EVILCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
 THEN
     RESPONSE #100
         SetGlobalTimer("rr#niinv","LOCALS",6)
@@ -91,7 +102,15 @@ IF
     !Allegiance(Myself,GOODCUTOFF)
     !GlobalTimerNotExpired("rr#niinv","LOCALS") // Natural Invisibility is automatically re-applied once per round (note: this is not a spell and shouldn't be treated as such)
     !StateCheck(Myself,STATE_INVISIBLE)
-    !Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust but not True Seeing as it's automatically re-applied
+    !Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust
+    !CheckStatGT(Player1,0,TRUE_SIGHT) // also have it check for True Seeing, otherwise, it's too unbalanced
+    !CheckStatGT(Player2,0,TRUE_SIGHT)
+    !CheckStatGT(Player3,0,TRUE_SIGHT)
+    !CheckStatGT(Player4,0,TRUE_SIGHT)
+    !CheckStatGT(Player5,0,TRUE_SIGHT)
+    !CheckStatGT(Player6,0,TRUE_SIGHT)
+    !CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+    !CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
 THEN
     RESPONSE #100
         SetGlobalTimer("rr#niinv","LOCALS",6)
@@ -110,17 +129,17 @@ END
 
 IF
     Allegiance(Myself,EVILCUTOFF)
-	OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
-	  See(Player1)
-	  See(Player2)
-	  See(Player3)
-	  See(Player4)
-	  See(Player5)
-	  See(Player6)
-	False()
+    OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
+      See(Player1)
+      See(Player2)
+      See(Player3)
+      See(Player4)
+      See(Player5)
+      See(Player6)
+    False()
 THEN
-	RESPONSE #100
-		NoAction()
+    RESPONSE #100
+        NoAction()
 END
 
 IF
@@ -473,6 +492,7 @@ THEN
 END
 
 IF
+    Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
     Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
     !AreaType(OUTDOOR)
     !Range(NearestEnemyOf(Myself),30)
@@ -485,6 +505,7 @@ THEN
 END
 
 IF
+    Exists(LastSeenBy(Myself)) // safety check
     Allegiance(Myself,EVILCUTOFF)
     Allegiance(LastSeenBy(Myself),GOODCUTOFF) // safety check
     !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
@@ -496,6 +517,7 @@ THEN
 END
 
 IF
+    Exists(LastSeenBy(Myself)) // safety check
     Allegiance(Myself,GOODCUTOFF)
     ActionListEmpty()
     !InParty(LastSeenBy(Myself))
