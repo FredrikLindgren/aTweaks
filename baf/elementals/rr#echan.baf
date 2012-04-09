@@ -1,0 +1,2036 @@
+IF
+    Global("RR#Active","LOCALS",0)
+    !Allegiance(Myself,GOODCUTOFF)
+    OR(4)
+      See(NearestEnemyOf(Myself))
+      AttackedBy([ANYONE],DEFAULT)
+      TookDamage()
+      Help([EVILCUTOFF.0.ELEMENTAL])
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        Enemy()
+        Help()
+        Continue()
+END
+
+IF
+    Global("RR#Active","LOCALS",0)
+    Allegiance(Myself,GOODCUTOFF)
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
+        Continue()
+END
+
+IF
+    OR(3)
+      Global("RR#Active","LOCALS",0)
+      StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+      StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    StateCheck(Myself,STATE_PANIC)  // needed because the AI can perform script actions (i.e. drink potions) while panicked, unlike the player
+THEN
+    RESPONSE #100
+        RandomWalkContinuous() // using this instead of NoAction() because otherwise panicked characters would stand in place
+END
+
+IF
+    Global("RR#Active","LOCALS",1)
+    !InActiveArea(Myself)
+    !See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+        Rest()
+END
+
+IF
+    !Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other elementals may hear it and join the battle
+    See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Help","LOCALS",12)
+        Help()
+        Continue()
+END
+
+IF
+    Global("Display","LOCALS",0)
+    Range([PC],30)
+THEN
+    RESPONSE #100
+        SetGlobal("Display","LOCALS",1)
+        DisplayStringHead(Myself,@2170) // Who calls Chan, Princess of Air!
+        Continue()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF)
+    OR(2)
+      ActionListEmpty()
+      See(NearestEnemyOf(Myself))
+    !GlobalTimerNotExpired("rr#niinv","LOCALS") // Natural Invisibility is automatically re-applied once per round (note: this is not a spell and shouldn't be treated as such)
+    !StateCheck(Myself,STATE_INVISIBLE)
+    !Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust
+    !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT) // also have it check for True Seeing, otherwise, it's too unbalanced
+    !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT([EVILCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+    !CheckStatGT([EVILCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#niinv","LOCALS",6)
+        ReallyForceSpellRES("rr#niinv",Myself) // Natural Invisibility
+END
+
+IF
+    !Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("rr#niinv","LOCALS") // Natural Invisibility is automatically re-applied once per round (note: this is not a spell and shouldn't be treated as such)
+    !StateCheck(Myself,STATE_INVISIBLE)
+    !Global("dvgldust","LOCALS",1) // Natural Invisibility should check for Glitterdust
+    !CheckStatGT(Player1,0,TRUE_SIGHT) // also have it check for True Seeing, otherwise, it's too unbalanced
+    !CheckStatGT(Player2,0,TRUE_SIGHT)
+    !CheckStatGT(Player3,0,TRUE_SIGHT)
+    !CheckStatGT(Player4,0,TRUE_SIGHT)
+    !CheckStatGT(Player5,0,TRUE_SIGHT)
+    !CheckStatGT(Player6,0,TRUE_SIGHT)
+    !CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+    !CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#niinv","LOCALS",6)
+        ReallyForceSpellRES("rr#niinv",Myself) // Natural Invisibility
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#echan") // Summon Allies (Chan)
+    See(NearestEnemyOf(Myself))
+    OR(3)
+      RandomNum(6,1) // this summoning block is semi-randomised
+      HPPercentLT(Myself,71)
+      NumCreatureGT(NearestEnemyOf(Myself),4) // if four or more enemies are nearby
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#echan",Myself) // Summon Allies (Chan)
+        RemoveSpellRES("rr#echan") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    Allegiance(Myself,GOODCUTOFF)
+    HaveSpellRES("rr#echww") // Wind Wall
+    OR(10)
+      CheckStat([GOODCUTOFF],0,179) // Wind Wall/Protection from Normal Missiles detectable stat
+      CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+      CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+      CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+      CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+      CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+      CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+      CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+      CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+      CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#echww",Myself) // Wind Wall
+        RemoveSpellRES("rr#echww") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    Allegiance(Myself,EVILCUTOFF)
+    HaveSpellRES("rr#echww") // Wind Wall
+    OR(10)
+      CheckStat([EVILCUTOFF],1,179) // Protection from Normal Missiles visual overlay
+      CheckStat(SecondNearest([EVILCUTOFF]),0,179)
+      CheckStat(ThirdNearest([EVILCUTOFF]),0,179)
+      CheckStat(FourthNearest([EVILCUTOFF]),0,179)
+      CheckStat(FifthNearest([EVILCUTOFF]),0,179)
+      CheckStat(SixthNearest([EVILCUTOFF]),0,179)
+      CheckStat(SeventhNearest([EVILCUTOFF]),0,179)
+      CheckStat(EighthNearest([EVILCUTOFF]),0,179)
+      CheckStat(NinthNearest([EVILCUTOFF]),0,179)
+      CheckStat(TenthNearest([EVILCUTOFF]),0,179)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#echww",Myself) // Wind Wall
+        RemoveSpellRES("rr#echww") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF)
+    Global("RR#Cloud","LOCALS",0) // variable indicating that a cloud spell has been seen
+    OR(8)
+      SpellCast([EVILCUTOFF.0.0.MAGE_ALL],WIZARD_INCENDIARY_CLOUD)
+      SpellCast([EVILCUTOFF.0.0.MAGE_ALL],WIZARD_STINKING_CLOUD)
+      SpellCast([EVILCUTOFF.0.0.MAGE_ALL],WIZARD_CLOUDKILL)
+      SpellCast([EVILCUTOFF.0.0.MAGE_ALL],WIZARD_DEATH_FOG)
+      SpellCast([EVILCUTOFF.0.0.BARD_ALL],WIZARD_INCENDIARY_CLOUD)
+      SpellCast([EVILCUTOFF.0.0.BARD_ALL],WIZARD_STINKING_CLOUD)
+      SpellCast([EVILCUTOFF.0.0.BARD_ALL],WIZARD_CLOUDKILL)
+      SpellCast([EVILCUTOFF.0.0.BARD_ALL],WIZARD_DEATH_FOG)
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Cloud","LOCALS",1) // set cloud variable
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF)
+    Global("RR#Cloud","LOCALS",0) // variable indicating that a cloud spell has been seen
+    OR(8)
+      SpellCast(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),WIZARD_INCENDIARY_CLOUD)
+      SpellCast(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),WIZARD_STINKING_CLOUD)
+      SpellCast(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),WIZARD_CLOUDKILL)
+      SpellCast(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),WIZARD_DEATH_FOG)
+      SpellCast(SecondNearest([EVILCUTOFF.0.0.BARD_ALL]),WIZARD_INCENDIARY_CLOUD)
+      SpellCast(SecondNearest([EVILCUTOFF.0.0.BARD_ALL]),WIZARD_STINKING_CLOUD)
+      SpellCast(SecondNearest([EVILCUTOFF.0.0.BARD_ALL]),WIZARD_CLOUDKILL)
+      SpellCast(SecondNearest([EVILCUTOFF.0.0.BARD_ALL]),WIZARD_DEATH_FOG)
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Cloud","LOCALS",1) // set cloud variable
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF)
+    Global("RR#Cloud","LOCALS",0) // variable indicating that a cloud spell has been seen
+    OR(8)
+      SpellCast(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),WIZARD_INCENDIARY_CLOUD)
+      SpellCast(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),WIZARD_STINKING_CLOUD)
+      SpellCast(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),WIZARD_CLOUDKILL)
+      SpellCast(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),WIZARD_DEATH_FOG)
+      SpellCast(ThirdNearest([EVILCUTOFF.0.0.BARD_ALL]),WIZARD_INCENDIARY_CLOUD)
+      SpellCast(ThirdNearest([EVILCUTOFF.0.0.BARD_ALL]),WIZARD_STINKING_CLOUD)
+      SpellCast(ThirdNearest([EVILCUTOFF.0.0.BARD_ALL]),WIZARD_CLOUDKILL)
+      SpellCast(ThirdNearest([EVILCUTOFF.0.0.BARD_ALL]),WIZARD_DEATH_FOG)
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Cloud","LOCALS",1) // set cloud variable
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    Global("RR#Cloud","LOCALS",1) // variable indicating that a cloud spell has been seen
+    OR(10)
+      CheckStat([GOODCUTOFF],0,179) // Wind Wall isn't active
+      CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+      CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+      CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+      CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+      CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+      CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+      CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+      CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+      CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobal("RR#Cloud","LOCALS",0) // reset cloud variable
+        ForceSpellRES("RR#MAIGW",Myself) // Gust of Wind
+        RemoveSpellRES("RR#MAIGW") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    Allegiance(Myself,GOODCUTOFF)
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See([EVILCUTOFF.0.0.0.0.ILLUSIONARY.0]) // illusionary clones such as Mislead or Project Image are instantly destroyed by Dispel Magic
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    Allegiance(Myself,GOODCUTOFF)
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See([EVILCUTOFF.0.MIST.0.0.SUMMONED])
+    OR(2)
+      HasItem("NISHRUU",LastSeenBy(Myself)) // Nishruu or Hakeashar (unmodded game)
+      HasItem("HAKSU",LastSeenBy(Myself)) // Spell Revisions' Hakeashar
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See(SecondNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    OR(17)
+      CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+      StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+      CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+      CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+      CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+      HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+      HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+      HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+      HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See(ThirdNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    OR(17)
+      CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+      StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+      CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+      CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+      CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+      HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+      HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+      HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+      HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See(FourthNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    OR(17)
+      CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+      StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+      CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+      CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+      CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+      HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+      HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+      HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+      HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See(FifthNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    OR(17)
+      CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+      StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+      CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+      CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+      CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+      HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+      HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+      HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+      HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See(SixthNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    OR(17)
+      CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+      StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+      CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+      CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+      CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+      HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+      HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+      HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+      HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See(SeventhNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    OR(17)
+      CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+      StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+      CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+      CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+      CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+      HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+      HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+      HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+      HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See(EighthNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    OR(17)
+      CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+      StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+      CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+      CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+      CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+      HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+      HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+      HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+      HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See(NinthNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    OR(17)
+      CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+      StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+      CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+      CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+      CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+      HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+      HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+      HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+      HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("RR#Displ","LOCALS") // dispel cooldown
+    HaveSpellRES("rr#wr302") // Remove Magic
+    See(TenthNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL2)
+    CheckStatLT(LastSeenBy(Myself),24,LEVEL3)
+    !CheckStat(LastSeenBy(Myself),1,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Abjuration
+    OR(17)
+      CheckStatGT(LastSeenBy(Myself),0,IMPROVEDHASTE)
+      StateCheck(LastSeenBy(Myself),STATE_MIRRORIMAGE)
+      CheckStatGT(LastSeenBy(Myself),0,TRUE_SIGHT)
+      CheckStatGT(LastSeenBy(Myself),0,STONESKINS)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_RESIST_FEAR)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_DEFENSIVE_HARMONY)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+      CheckStatGT(LastSeenBy(Myself),0,CLERIC_FREE_ACTION)
+      CheckStatGT(LastSeenBy(Myself),0,WIZARD_FIRE_SHIELD)
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE2) // Death Ward
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE5) // Barkskin, Wizard Shield, Wizard Armor, Ghost Armor, Spirit Armor
+      CheckStatGT(LastSeenBy(Myself),0,SCRIPTINGSTATE6) // Divine Power, Strength of One, Wizard Strength, Holy Power...
+      CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // PfMW
+      HasItemEquiped("BLAKBLAD",LastSeenBy(Myself)) // Black Blade of Disaster
+      HasItemEquiped("HARM",LastSeenBy(Myself)) // Harm
+      HasItemEquiped("SLAYLIVE",LastSeenBy(Myself)) // Slay Living
+      HasItemEquiped("MELFMET",LastSeenBy(Myself)) // Melf's Minute Meteors
+    !StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(SeventhNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(EighthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(NinthNearestEnemyOf(Myself),STATE_DISABLED)
+    !StateCheck(TenthNearestEnemyOf(Myself),STATE_DISABLED)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("RR#Displ","LOCALS",18) // dispel cooldown
+        ForceSpellRES("rr#wr302",LastSeenBy(Myself)) // Remove Magic
+        RemoveSpellRES("rr#wr302") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#eairw") // Whirlwind
+    OR(3)
+      CheckStatLT(ThirdNearestEnemyOf(Myself),7,LEVEL)
+      CheckStatLT(SecondNearestEnemyOf(Myself),7,LEVEL)
+      CheckStatLT(NearestEnemyOf(Myself),7,LEVEL)
+    Range(NearestEnemyOf(Myself),12)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#eairw",Myself) // Whirlwind
+        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    Allegiance(Myself,GOODCUTOFF)
+    HaveSpellRES("rr#eairw") // Whirlwind
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    NumCreatureGT([EVILCUTOFF],2) // at least three opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
+    Range([EVILCUTOFF],12)
+    Range(SecondNearest([EVILCUTOFF]),12)
+    Range(ThirdNearest([EVILCUTOFF]),12)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#eairw",Myself) // Whirlwind
+        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    HaveSpellRES("rr#eairw") // Whirlwind
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    NumCreatureGT([GOODCUTOFF],2) // at least three opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
+    Range([GOODCUTOFF],12)
+    Range(SecondNearest([GOODCUTOFF]),12)
+    Range(ThirdNearest([GOODCUTOFF]),12)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#eairw",Myself) // Whirlwind
+        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    Allegiance(Myself,GOODCUTOFF)
+    HaveSpellRES("rr#eairw") // Whirlwind
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#eairw","LOCALS") // whirlwind timer
+    NumCreatureGT([EVILCUTOFF],1) // at least two opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
+    Range([EVILCUTOFF],12)
+    Range(SecondNearest([EVILCUTOFF]),12)
+    Range(ThirdNearest([EVILCUTOFF]),12)
+THEN
+    RESPONSE #70
+        SetGlobalTimer("rr#eairw","LOCALS",12) // whirlwind timer
+    RESPONSE #30
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#eairw",Myself) // Whirlwind
+        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    HaveSpellRES("rr#eairw") // Whirlwind
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#eairw","LOCALS") // whirlwind timer
+    NumCreatureGT([GOODCUTOFF],1) // at least two opponents are nearby (note: the NumCreatureGT() trigger doesn't work with NearestEnemyOf(Myself))
+    Range([GOODCUTOFF],12)
+    Range(SecondNearest([GOODCUTOFF]),12)
+    Range(ThirdNearest([GOODCUTOFF]),12)
+THEN
+    RESPONSE #70
+        SetGlobalTimer("rr#eairw","LOCALS",12) // whirlwind timer
+    RESPONSE #30
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#eairw",Myself) // Whirlwind
+        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    HaveSpellRES("rr#eairw") // Whirlwind
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#eairw","LOCALS") // whirlwind timer
+    Range(NearestEnemyOf(Myself),12) // at least one opponent is nearby
+THEN
+    RESPONSE #85
+        SetGlobalTimer("rr#eairw","LOCALS",12) // whirlwind timer
+    RESPONSE #15
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#eairw",Myself) // Whirlwind
+        RemoveSpellRES("rr#eairw") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#sfog","LOCALS")
+    HaveSpellRES("rr#echsf") // Solid Fog
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(NearestEnemyOf(Myself))
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+    !HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#sfog","LOCALS",12) // use Solid Fog once per 2 rounds
+        ForceSpellRES("rr#echsf",LastSeenBy(Myself)) // Solid Fog
+        RemoveSpellRES("rr#echsf") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#sfog","LOCALS")
+    HaveSpellRES("rr#echsf") // Solid Fog
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(SecondNearestEnemyOf(Myself))
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+    !HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#sfog","LOCALS",12) // use Solid Fog once per 2 rounds
+        ForceSpellRES("rr#echsf",LastSeenBy(Myself)) // Solid Fog
+        RemoveSpellRES("rr#echsf") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#sfog","LOCALS")
+    HaveSpellRES("rr#echsf") // Solid Fog
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(ThirdNearestEnemyOf(Myself))
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+    !HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#sfog","LOCALS",12) // use Solid Fog once per 2 rounds
+        ForceSpellRES("rr#echsf",LastSeenBy(Myself)) // Solid Fog
+        RemoveSpellRES("rr#echsf") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#sfog","LOCALS")
+    HaveSpellRES("rr#echsf") // Solid Fog
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(FourthNearestEnemyOf(Myself))
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+    !HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#sfog","LOCALS",12) // use Solid Fog once per 2 rounds
+        ForceSpellRES("rr#echsf",LastSeenBy(Myself)) // Solid Fog
+        RemoveSpellRES("rr#echsf") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#sfog","LOCALS")
+    HaveSpellRES("rr#echsf") // Solid Fog
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(FifthNearestEnemyOf(Myself))
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+    !HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#sfog","LOCALS",12) // use Solid Fog once per 2 rounds
+        ForceSpellRES("rr#echsf",LastSeenBy(Myself)) // Solid Fog
+        RemoveSpellRES("rr#echsf") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#sfog","LOCALS")
+    HaveSpellRES("rr#echsf") // Solid Fog
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(SixthNearestEnemyOf(Myself))
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+    !HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+    !HasItemEquiped("NPMISC1",LastSeenBy(Myself)) // Jansen Spectroscopes
+    !HasItemEquiped("RR#HEL02",LastSeenBy(Myself)) // Cowl of Acuity
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#sfog","LOCALS",12) // use Solid Fog once per 2 rounds
+        ForceSpellRES("rr#echsf",LastSeenBy(Myself)) // Solid Fog
+        RemoveSpellRES("rr#echsf") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#ckill","LOCALS") // use Cloudkill once per 2 rounds
+    HaveSpellRES("rr#wi502") // Cloudkill
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(NearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_TRAP)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#ckill","LOCALS",12) // use Cloudkill once per 2 rounds
+        ForceSpellRES("rr#wi502",LastSeenBy(Myself)) // Cloudkill
+        RemoveSpellRES("rr#wi502") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#ckill","LOCALS") // use Cloudkill once per 2 rounds
+    HaveSpellRES("rr#wi502") // Cloudkill
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(SecondNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_TRAP)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#ckill","LOCALS",12) // use Cloudkill once per 2 rounds
+        ForceSpellRES("rr#wi502",LastSeenBy(Myself)) // Cloudkill
+        RemoveSpellRES("rr#wi502") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#ckill","LOCALS") // use Cloudkill once per 2 rounds
+    HaveSpellRES("rr#wi502") // Cloudkill
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(ThirdNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_TRAP)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#ckill","LOCALS",12) // use Cloudkill once per 2 rounds
+        ForceSpellRES("rr#wi502",LastSeenBy(Myself)) // Cloudkill
+        RemoveSpellRES("rr#wi502") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#ckill","LOCALS") // use Cloudkill once per 2 rounds
+    HaveSpellRES("rr#wi502") // Cloudkill
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(FourthNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_TRAP)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#ckill","LOCALS",12) // use Cloudkill once per 2 rounds
+        ForceSpellRES("rr#wi502",LastSeenBy(Myself)) // Cloudkill
+        RemoveSpellRES("rr#wi502") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#ckill","LOCALS") // use Cloudkill once per 2 rounds
+    HaveSpellRES("rr#wi502") // Cloudkill
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(FifthNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_TRAP)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#ckill","LOCALS",12) // use Cloudkill once per 2 rounds
+        ForceSpellRES("rr#wi502",LastSeenBy(Myself)) // Cloudkill
+        RemoveSpellRES("rr#wi502") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#ckill","LOCALS") // use Cloudkill once per 2 rounds
+    HaveSpellRES("rr#wi502") // Cloudkill
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(SixthNearestEnemyOf(Myself))
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTPOISON)
+    !Class(LastSeenBy(Myself),MONK)
+    !Class(LastSeenBy(Myself),DRUID_ALL)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !HasItemEquiped("CLCK26",LastSeenBy(Myself)) // Cloak of Mirroring
+    !HasItemEquiped("AMUL22",LastSeenBy(Myself)) // Periapt of Proof Against Poison
+    !HasItemEquiped("HELM30",LastSeenBy(Myself)) // Thieves' Hood
+    !HasItemEquiped("RING39",LastSeenBy(Myself)) // Ring of Gaxx
+    !HasItemEquiped("RING46",LastSeenBy(Myself)) // Ring of Anti-Venom
+    !HasItemEquiped("SW1H34",LastSeenBy(Myself)) // Bastard Sword +1: Albruin
+    !CheckStat(LastSeenBy(Myself),2,WIZARD_SPELL_TRAP)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#ckill","LOCALS",12) // use Cloudkill once per 2 rounds
+        ForceSpellRES("rr#wi502",LastSeenBy(Myself)) // Cloudkill
+        RemoveSpellRES("rr#wi502") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#wi213") // Stinking Cloud
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(NearestEnemyOf(Myself))
+    !General(LastSeenBy(Myself),UNDEAD)
+    !Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
+    !Race(LastSeenBy(Myself),SLIME)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#wi213",LastSeenBy(Myself)) // Stinking Cloud
+        RemoveSpellRES("rr#wi213") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#wi213") // Stinking Cloud
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(SecondNearestEnemyOf(Myself))
+    !General(LastSeenBy(Myself),UNDEAD)
+    !Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
+    !Race(LastSeenBy(Myself),SLIME)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#wi213",LastSeenBy(Myself)) // Stinking Cloud
+        RemoveSpellRES("rr#wi213") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#wi213") // Stinking Cloud
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(ThirdNearestEnemyOf(Myself))
+    !General(LastSeenBy(Myself),UNDEAD)
+    !Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
+    !Race(LastSeenBy(Myself),SLIME)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#wi213",LastSeenBy(Myself)) // Stinking Cloud
+        RemoveSpellRES("rr#wi213") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#wi213") // Stinking Cloud
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(FourthNearestEnemyOf(Myself))
+    !General(LastSeenBy(Myself),UNDEAD)
+    !Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
+    !Race(LastSeenBy(Myself),SLIME)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#wi213",LastSeenBy(Myself)) // Stinking Cloud
+        RemoveSpellRES("rr#wi213") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#wi213") // Stinking Cloud
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(FifthNearestEnemyOf(Myself))
+    !General(LastSeenBy(Myself),UNDEAD)
+    !Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
+    !Race(LastSeenBy(Myself),SLIME)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#wi213",LastSeenBy(Myself)) // Stinking Cloud
+        RemoveSpellRES("rr#wi213") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#wi213") // Stinking Cloud
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    See(SixthNearestEnemyOf(Myself))
+    !General(LastSeenBy(Myself),UNDEAD)
+    !Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),GOLEM)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
+    !Race(LastSeenBy(Myself),SLIME)
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),6,WIZARD_SPELL_IMMUNITY) // Spell Immunity: Evocation
+    CheckStatGT(LastSeenBy(Myself),0,SAVEVSDEATH)
+    !HasItemEquiped("MORSWORD",LastSeenBy(Myself)) // Mordenkainen's Sword
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#wi213",LastSeenBy(Myself)) // Stinking Cloud
+        RemoveSpellRES("rr#wi213") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ersug") // Suggestion
+    See(NearestEnemyOfType([0.HUMANOID]))
+    !Class(LastSeenBy(Myself),MONK)
+    !Kit(LastSeenBy(Myself),INQUISITOR)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !Race(LastSeenBy(Myself),ELF)
+    !Race(LastSeenBy(Myself),RAKSHASA)
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // susceptible targets only
+    !CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+    !CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+    !CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+    !CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+    !CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+    !CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+    !CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+    !HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+    !HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+    !HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+    !HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+    !HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+    !HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+    !HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+    !HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+    !HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+    !HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+    !HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ersug",LastSeenBy(Myself)) // Suggestion
+        RemoveSpellRES("rr#ersug") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ersug") // Suggestion
+    See(SecondNearestEnemyOfType([0.HUMANOID]))
+    !Class(LastSeenBy(Myself),MONK)
+    !Kit(LastSeenBy(Myself),INQUISITOR)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !Race(LastSeenBy(Myself),ELF)
+    !Race(LastSeenBy(Myself),RAKSHASA)
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // susceptible targets only
+    !CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+    !CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+    !CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+    !CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+    !CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+    !CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+    !CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+    !HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+    !HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+    !HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+    !HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+    !HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+    !HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+    !HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+    !HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+    !HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+    !HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+    !HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ersug",LastSeenBy(Myself)) // Suggestion
+        RemoveSpellRES("rr#ersug") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ersug") // Suggestion
+    See(ThirdNearestEnemyOfType([0.HUMANOID]))
+    !Class(LastSeenBy(Myself),MONK)
+    !Kit(LastSeenBy(Myself),INQUISITOR)
+    !Kit(LastSeenBy(Myself),CAVALIER)
+    !Race(LastSeenBy(Myself),ELF)
+    !Race(LastSeenBy(Myself),RAKSHASA)
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStatGT(LastSeenBy(Myself),9,SAVEVSSPELL) // susceptible targets only
+    !CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+    !CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
+    !CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+    !CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
+    !CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
+    !CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
+    !CheckStat(LastSeenBy(Myself),1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStatGT(LastSeenBy(Myself),0,MINORGLOBE)
+    !HasItemEquiped("MISC73",LastSeenBy(Myself)) // The Horn of Kazgaroth
+    !HasItemEquiped("HELM06",LastSeenBy(Myself)) // Helm of Charm Protection
+    !HasItemEquiped("NPCHAN",LastSeenBy(Myself)) // Corthala Family Armor
+    !HasItemEquiped("SHLD25",LastSeenBy(Myself)) // Shield of Harmony +2
+    !HasItemEquipedReal("SW2H14",LastSeenBy(Myself)) // Lilarcor
+    !HasItemEquipedReal("SPER07",LastSeenBy(Myself)) // Spear of the Unicorn +2
+    !HasItemEquipedReal("SW1H35",LastSeenBy(Myself)) // Adjatha The Drinker +2
+    !HasItemEquipedReal("STAF11",LastSeenBy(Myself)) // Staff of the Magi +5
+    !HasItemEquipedReal("MISCBC",LastSeenBy(Myself)) // Blackrazor
+    !HasItemEquipedReal("SW1H54",LastSeenBy(Myself)) // The Equalizer
+    !HasItemEquiped("IMOENHP1",LastSeenBy(Myself)) // Imoen's Belt
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ersug",LastSeenBy(Myself)) // Suggestion
+        RemoveSpellRES("rr#ersug") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS") // this summoning block isn't randomised and occurs if there's nothing better to do
+    HaveSpellRES("rr#echan") // Summon Allies (Chan)
+    See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#echan",Myself) // Summon Allies (Chan)
+        RemoveSpellRES("rr#echan") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF) // only needed for summoned creatures
+    !GlobalTimerNotExpired("rr#clear","LOCALS") // prevent the creature from getting stuck in an attack pattern because ActionListEmpty() is used above
+    See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#clear","LOCALS",6)
+        ClearActions(Myself)
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
+      See(Player1)
+      See(Player2)
+      See(Player3)
+      See(Player4)
+      See(Player5)
+      See(Player6)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCRUSHING)
+    See(NearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(SixthNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(SixthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(FifthNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(FifthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(FourthNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(FourthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(ThirdNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(SecondNearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(SecondNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(NearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCRUSHING)
+    CheckStatLT(NearestEnemyOf(Myself),1,STONESKINS)
+    !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(NearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    !StateCheck(WorstAC([PC]),STATE_PANIC)
+    !StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
+    !CheckStatGT(WorstAC([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    CheckStatLT(WorstAC([PC]),100,RESISTCRUSHING)
+    CheckStatLT(WorstAC([PC]),1,STONESKINS)
+    See(WorstAC([PC]))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    AttackedBy(NearestEnemyOf(Myself),DEFAULT)
+    !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTCRUSHING)
+    !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
+    CheckStatLT(LastAttackerOf(Myself),1,STONESKINS)
+    Range(LastAttackerOf(Myself),8)
+    RandomNum(3,1)
+    See(LastAttackerOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    AttackedBy(NearestEnemyOf(Myself),DEFAULT)
+    !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTCRUSHING)
+    !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
+    CheckStatLT(LastAttackerOf(Myself),1,STONESKINS)
+    Range(LastAttackerOf(Myself),4)
+    See(LastAttackerOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    See(SixthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    See(FifthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    See(FourthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    See(ThirdNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTCRUSHING)
+    See(SecondNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTCRUSHING)
+    See(NearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player6,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player6,STATE_IMMOBILE)
+    CheckStatLT(Player6,100,RESISTCRUSHING)
+    See(Player6)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player5,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player5,STATE_IMMOBILE)
+    CheckStatLT(Player5,100,RESISTCRUSHING)
+    See(Player5)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player4,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player4,STATE_IMMOBILE)
+    CheckStatLT(Player4,100,RESISTCRUSHING)
+    See(Player4)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player3,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player3,STATE_IMMOBILE)
+    CheckStatLT(Player3,100,RESISTCRUSHING)
+    See(Player3)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player2,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player2,STATE_IMMOBILE)
+    CheckStatLT(Player2,100,RESISTCRUSHING)
+    See(Player2)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player1,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player1,STATE_IMMOBILE)
+    CheckStatLT(Player1,100,RESISTCRUSHING)
+    See(Player1)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT("finsol02",3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    See("finsol02") // Yan-C-Bin (ToB)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT("elemyanc",3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    See("elemyanc") // Yan-C-Bin
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !Range(LastSeenBy(Myself),30) // special case for Chan/Yan-C-Bin, they move very fast so they doesn't usually need this unles their opponents are out of sight
+    InMyArea(LastSeenBy(Myself))
+    Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    !CheckStatGT(LastSeenBy(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#telwr",LastSeenBy(Myself)) // Teleport Without Error (renewable)
+        RemoveSpellRES("rr#telwr") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
+    Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !AreaType(OUTDOOR)
+    !Range(NearestEnemyOf(Myself),30)
+    Range(NearestDoor,15) // if the nearest door is in visual range. note: this seems to auto-skip locked doors
+    OpenState(NearestDoor,FALSE)
+THEN
+    RESPONSE #100
+        MoveToObject(NearestDoor)
+        OpenDoor(NearestDoor)
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    Allegiance(LastSeenBy(Myself),GOODCUTOFF) // safety check
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTCRUSHING)
+THEN
+    RESPONSE #100
+        AttackReevaluate(LastSeenBy(Myself),15)
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF)
+    ActionListEmpty()
+    !InParty(LastSeenBy(Myself))
+    Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    CheckStatLT(LastSeenBy(Myself),100,RESISTCRUSHING)
+THEN
+    RESPONSE #100
+        AttackReevaluate(LastSeenBy(Myself),15)
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    !GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+    Help([EVILCUTOFF.0.ELEMENTAL])
+    InMyArea(LastHelp(Myself))
+    !StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Move","LOCALS",6)
+        MoveToObject(LastHelp(Myself))
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // only RandomWalk if hostile
+    !GlobalTimerNotExpired("RR#Move","LOCALS")
+THEN
+    RESPONSE #100
+        RandomWalkContinuous()
+END

@@ -63,7 +63,6 @@ COPY ~atweaks/spl/mephits/rr#mmagt.spl~ ~override~                              
 COPY ~atweaks/eff/mephits/rr#mmagt.eff~ ~override~                                 // Gate EFF (Magma Mephit)
 COPY ~atweaks/spl/mephits/rr#mmamb.spl~ ~override~                                 // Magma Ball (Magma Mephit)
 COPY ~atweaks/spl/mephits/rr#mmahe.spl~ ~override~                                 // Heat Emission (Magma Mephit)
-  SAY NAME1 @1853 SAY NAME2 @1853
 
 COPY ~atweaks/spl/mephits/rr#mmigt.spl~ ~override~                                 // Gate (Mineral Mephit)
 COPY ~atweaks/eff/mephits/rr#mmigt.eff~ ~override~                                 // Gate EFF (Mineral Mephit)
@@ -239,7 +238,7 @@ REPLACE_CRE_ITEM ~RR#MAIW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP              
 REPLACE_CRE_ITEM ~RR#MRG1T~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace generic regeneration item with aTweaks' version
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
 ADD_CRE_ITEM ~RR#MGASI~ #0 #0 #0 ~UNDROPPABLE~ ~RRING~                             // add aTweaks' immunity to gas-based spells
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -248,6 +247,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "24"                                                                  // new hit point value
 "newac"    = "4"                                                                   // new Armor Class value
@@ -285,6 +285,7 @@ STR_VAR                                                                         
 "script07"   = "MEPAIR"                                                            // original Air Mephit script
 "script08"   = "HUMANSHT"                                                          // Big Picture shout script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -307,7 +308,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 REPLACE_CRE_ITEM ~RR#MDUW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~RR#MRG1T~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace generic regeneration item with aTweaks' version
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -316,6 +317,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "24"                                                                  // new hit point value
 "newac"    = "6"                                                                   // new Armor Class value
@@ -358,6 +360,7 @@ STR_VAR                                                                         
 "script07"   = "MEPDUS"                                                            // original Dust Mephit script
 "script08"   = "HUMANSHT"                                                          // Big Picture shout script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -378,7 +381,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 REPLACE_CRE_ITEM ~RR#MEAW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~RR#MRG1T~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace generic regeneration item with aTweaks' version
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -387,6 +390,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "26"                                                                  // new hit point value
 "newac"    = "5"                                                                   // new Armor Class value
@@ -445,7 +449,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REPLACE_CRE_ITEM ~RR#MFIW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -454,6 +458,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "25"                                                                  // new hit point value
 "newac"    = "5"                                                                   // new Armor Class value
@@ -494,6 +499,7 @@ STR_VAR                                                                         
 "script07"   = "MEPFIR"                                                            // original Fire Mephit script
 "script08"   = "HUMANSHT"                                                          // Big Picture shout script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -513,7 +519,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REPLACE_CRE_ITEM ~RR#MICW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -522,6 +528,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "24"                                                                  // new hit point value
 "newac"    = "5"                                                                   // new Armor Class value
@@ -563,6 +570,7 @@ STR_VAR                                                                         
 "script07"   = "MEPICE"                                                            // original Ice Mephit script
 "script08"   = "HUMANSHT"                                                          // Big Picture shout script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -581,7 +589,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REPLACE_CRE_ITEM ~RR#MLIW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -590,6 +598,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "36"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "24"                                                                  // new hit point value
 "newac"    = "4"                                                                   // new Armor Class value
@@ -650,7 +659,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REPLACE_CRE_ITEM ~RR#MMAW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -659,6 +668,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "24"                                                                  // new hit point value
 "newac"    = "6"                                                                   // new Armor Class value
@@ -721,7 +731,7 @@ REPLACE_CRE_ITEM ~RR#MMIW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP              
 REPLACE_CRE_ITEM ~RR#MRG1T~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace generic regeneration item with aTweaks' version
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
 ADD_CRE_ITEM ~RR#MGASI~ #0 #0 #0 ~UNDROPPABLE~ ~RRING~                             // add aTweaks' immunity to gas-based spells
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -730,6 +740,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "26"                                                                  // new hit point value
 "newac"    = "4"                                                                   // new Armor Class value
@@ -790,7 +801,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REPLACE_CRE_ITEM ~RR#MMSW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -799,6 +810,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "26"                                                                  // new hit point value
 "newac"    = "7"                                                                   // new Armor Class value
@@ -839,6 +851,7 @@ STR_VAR                                                                         
 "script10"   = "HUMANSHT"                                                          // Big Picture shout script
 "script11"   = "BPMEPMIS"                                                          // Big Picture Mist Mephit script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -859,7 +872,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 REPLACE_CRE_ITEM ~RR#MOZW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~RR#MRG1T~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace generic regeneration item with aTweaks' version
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -868,6 +881,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "24"                                                                  // new hit point value
 "newac"    = "6"                                                                   // new Armor Class value
@@ -910,6 +924,7 @@ STR_VAR                                                                         
 "script07"   = "MEPOOZ"                                                            // original Ooze Mephit script
 "script08"   = "HUMANSHT"                                                          // Big Picture shout script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -930,7 +945,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 REPLACE_CRE_ITEM ~RR#MRAW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~RR#MRG1T~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace generic regeneration item with aTweaks' version
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -939,6 +954,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "24"                                                                  // new hit point value
 "newac"    = "4"                                                                   // new Armor Class value
@@ -977,6 +993,7 @@ STR_VAR                                                                         
 "script07"   = "MEPRAD"                                                            // original Radiant Mephit script
 "script08"   = "HUMANSHT"                                                          // Big Picture shout script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -996,7 +1013,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 REPLACE_CRE_ITEM ~RR#MSAW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~RR#MRG1T~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace generic regeneration item with aTweaks' version
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -1005,6 +1022,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "24"                                                                  // new hit point value
 "newac"    = "6"                                                                   // new Armor Class value
@@ -1044,6 +1062,7 @@ STR_VAR                                                                         
 "script07"   = "MEPSAL"                                                            // original Salt Mephit script
 "script08"   = "HUMANSHT"                                                          // Big Picture shout script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1069,7 +1088,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 REPLACE_CRE_ITEM ~RR#MSMW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~RR#MRG1T~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                         // replace generic regeneration item with aTweaks' version
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -1078,6 +1097,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "24"                                                                  // new hit point value
 "newac"    = "4"                                                                   // new Armor Class value
@@ -1117,6 +1137,7 @@ STR_VAR                                                                         
 "script07"   = "MEPSMO"                                                            // original Smoke Mephit script
 "script08"   = "HUMANSHT"                                                          // Big Picture shout script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 READ_LONG  0x10 "flags"                                                            // special case, Smoke Mephits should vanish upon death
 WRITE_LONG 0x10 ("%flags%" BOR 0b00000010)                                         // add "no corpse" flag
@@ -1137,7 +1158,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REPLACE_CRE_ITEM ~RR#MSTW1~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 ADD_CRE_ITEM ~RR#MIMUN~ #0 #0 #0 ~UNDROPPABLE~ ~AMULET~                            // add aTweaks' shared mephit immunities
-REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled via the weapon)
+REMOVE_CRE_ITEM ~MOVRAT10~                                                         // removes MOVRAT10.ITM (movement rate is handled differently)
 REMOVE_CRE_ITEM ~REGHP1~                                                           // removes REGHP1.ITM (mephit regeneration is handled differently in aTweaks)
 REMOVE_CRE_ITEM ~IMMCLOUD~                                                         // removes IMMCLOUD.ITM (immunity to cloud spells is handled differently)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
@@ -1146,6 +1167,7 @@ LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "126" END  
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "176" END     // mark opcode #176 (Movement Modifier II) for deletion
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
+"newmove"  = "18"                                                                  // new movement rate
 "newxpv"   = "420"                                                                 // new XP value
 "newhp"    = "27"                                                                  // new hit point value
 "newac"    = "7"                                                                   // new Armor Class value
@@ -1185,6 +1207,7 @@ STR_VAR                                                                         
 "script07"   = "MEPSTE"                                                            // original Steam Mephit script
 "script08"   = "HUMANSHT"                                                          // Big Picture shout script
 END                                                                                // ends FUNCTION call
+LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1264,7 +1287,6 @@ COPY_EXISTING ~AR0601.ARE~ ~override~                                           
     READ_SHORT ("%actor_off%" + 0x22 + ("%actor_num%" * 0x110)) "y_coord"
     READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
     PATCH_IF (("%cre_file%" STRING_EQUAL_CASE "MEPMIS01") AND ("%x_coord%" = 1455)) BEGIN
-        WRITE_ASCII ("%actor_off%" +        ("%actor_num%" * 0x110)) ~Steam Mephit~ #32
         WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~MEPSTE01~ #8
       END
     END

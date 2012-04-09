@@ -1,0 +1,569 @@
+IF
+    Global("RR#Active","LOCALS",0)
+    !Allegiance(Myself,GOODCUTOFF)
+    OR(6)
+      See(NearestEnemyOf(Myself))
+      AttackedBy([ANYONE],DEFAULT)
+      TookDamage()
+      Help([EVILCUTOFF.0.ELEMENTAL.ELEMENTAL_FIRE])
+	  Gender(Myself,SUMMONED) // summoned elemental
+      Exists(LastSummonerOf(Myself)) // gated elemental
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        Enemy()
+        Help()
+        Continue()
+END
+
+IF
+    Global("RR#Active","LOCALS",0)
+    Allegiance(Myself,GOODCUTOFF)
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
+        Continue()
+END
+
+IF
+    Global("rr#fire","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains fire, 2 - check done)
+    HaveSpellRES("rr#ecncl") // Elemental Concealment
+    !AreaCheck("AR0412") // Planar Sphere (Fire and Ice room)
+    !AreaCheck("AR1502") // Fire Room (Spellhold Test)
+    !AreaCheck("AR5200") // Marching Mountains
+    !AreaCheck("AR5201") // Fire Giant temple
+    !AreaCheck("AR5204") // Yaga-Shura's lair
+THEN
+    RESPONSE #100
+        SetGlobal("rr#fire","LOCALS",1)
+        RemoveSpellRES("rr#ecncl") // remove the spell from memory
+END
+
+IF
+    OR(3)
+      Global("RR#Active","LOCALS",0)
+      StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+      StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    StateCheck(Myself,STATE_PANIC)  // needed because the AI can perform script actions (i.e. drink potions) while panicked, unlike the player
+THEN
+    RESPONSE #100
+        RandomWalkContinuous() // using this instead of NoAction() because otherwise panicked characters would stand in place
+END
+
+IF
+    Global("RR#Active","LOCALS",1)
+    !InActiveArea(Myself)
+    !See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+        Rest()
+END
+
+IF
+    !Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Help","LOCALS") // shout for help every two rounds while in combat, other elementals may hear it and join the battle
+    See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Help","LOCALS",12)
+        Help()
+        Continue()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ecncl") // Elemental Concealment
+    !StateCheck(Myself,STATE_INVISIBLE)
+    !Global("dvgldust","LOCALS",1)
+    !CheckStatGT(Player1,0,TRUE_SIGHT)
+    !CheckStatGT(Player2,0,TRUE_SIGHT)
+    !CheckStatGT(Player3,0,TRUE_SIGHT)
+    !CheckStatGT(Player4,0,TRUE_SIGHT)
+    !CheckStatGT(Player5,0,TRUE_SIGHT)
+    !CheckStatGT(Player6,0,TRUE_SIGHT)
+    !CheckStatGT([GOODCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+    !CheckStatGT([GOODCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ecncl",Myself) // Elemental Concealment
+        RemoveSpellRES("rr#ecncl") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    HaveSpellRES("rr#ecncl") // Elemental Concealment
+    !StateCheck(Myself,STATE_INVISIBLE)
+    !Global("dvgldust","LOCALS",1)
+    !CheckStatGT(NearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(SecondNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(ThirdNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(FourthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(SixthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(SeventhNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(EighthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(NinthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT(TenthNearestEnemyOf(Myself),0,TRUE_SIGHT)
+    !CheckStatGT([EVILCUTOFF.0.PLANATAR],0,TRUE_SIGHT)
+    !CheckStatGT([EVILCUTOFF.0.DARKPLANATAR],0,TRUE_SIGHT)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#ecncl",Myself) // Elemental Concealment
+        RemoveSpellRES("rr#ecncl") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF) // only needed for summoned elementals
+    !GlobalTimerNotExpired("rr#clear","LOCALS") // prevent the creature from getting stuck in an attack pattern because ActionListEmpty() is used above
+    See(NearestEnemyOf(Myself))
+THEN
+    RESPONSE #100
+        SetGlobalTimer("rr#clear","LOCALS",6)
+        ClearActions(Myself)
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
+      See(Player1)
+      See(Player2)
+      See(Player3)
+      See(Player4)
+      See(Player5)
+      See(Player6)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    See(NearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTFIRE)
+    !StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(SixthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTFIRE)
+    !StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(FifthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTFIRE)
+    !StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(FourthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTFIRE)
+    !StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(ThirdNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTFIRE)
+    !StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(SecondNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(NearestEnemyOf(Myself),STATE_PANIC)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTFIRE)
+    !StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+    See(NearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    !StateCheck(WorstAC([PC]),STATE_PANIC)
+    !StateCheck(WorstAC([PC]),STATE_MIRRORIMAGE)
+    !CheckStatGT(WorstAC([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    CheckStatLT(WorstAC([PC]),100,RESISTFIRE)
+    See(WorstAC([PC]))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    AttackedBy(NearestEnemyOf(Myself),DEFAULT)
+    !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTFIRE)
+    !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
+    Range(LastAttackerOf(Myself),8)
+    RandomNum(3,1)
+    See(LastAttackerOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    AttackedBy(NearestEnemyOf(Myself),DEFAULT)
+    !CheckStatGT(LastAttackerOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(LastAttackerOf(Myself),STATE_PANIC)
+    CheckStatLT(LastAttackerOf(Myself),100,RESISTFIRE)
+    !StateCheck(LastAttackerOf(Myself),STATE_MIRRORIMAGE)
+    Range(LastAttackerOf(Myself),4)
+    See(LastAttackerOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(SixthNearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(SixthNearestEnemyOf(Myself),100,RESISTFIRE)
+    See(SixthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(FifthNearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(FifthNearestEnemyOf(Myself),100,RESISTFIRE)
+    See(FifthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(FourthNearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(FourthNearestEnemyOf(Myself),100,RESISTFIRE)
+    See(FourthNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(ThirdNearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(ThirdNearestEnemyOf(Myself),100,RESISTFIRE)
+    See(ThirdNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(SecondNearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(SecondNearestEnemyOf(Myself),100,RESISTFIRE)
+    See(SecondNearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(NearestEnemyOf(Myself),STATE_IMMOBILE)
+    CheckStatLT(NearestEnemyOf(Myself),100,RESISTFIRE)
+    See(NearestEnemyOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF) // note: special blocks for targeting knocked down trolls
+	!InParty(SixthNearest([EVILCUTOFF.0.TROLL]))  // Check for downed trolls in order to finish them off quickly
+	CheckStat(SixthNearest([EVILCUTOFF.0.TROLL]),100,RESISTSLASHING)  // a troll has been knocked down
+	CheckStatLT(SixthNearest([EVILCUTOFF.0.TROLL]),100,RESISTFIRE)  // not immune to fire
+	!CheckStatGT(SixthNearest([EVILCUTOFF.0.TROLL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	See(SixthNearest([EVILCUTOFF.0.TROLL]))
+	False()
+THEN
+	RESPONSE #100
+		Continue()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF) // note: special blocks for targeting knocked down trolls
+	!InParty(FifthNearest([EVILCUTOFF.0.TROLL]))  // Check for downed trolls in order to finish them off quickly
+	CheckStat(FifthNearest([EVILCUTOFF.0.TROLL]),100,RESISTSLASHING)  // a troll has been knocked down
+	CheckStatLT(FifthNearest([EVILCUTOFF.0.TROLL]),100,RESISTFIRE)  // not immune to fire
+	!CheckStatGT(FifthNearest([EVILCUTOFF.0.TROLL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	See(FifthNearest([EVILCUTOFF.0.TROLL]))
+	False()
+THEN
+	RESPONSE #100
+		Continue()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF) // note: special blocks for targeting knocked down trolls
+	!InParty(FourthNearest([EVILCUTOFF.0.TROLL]))  // Check for downed trolls in order to finish them off quickly
+	CheckStat(FourthNearest([EVILCUTOFF.0.TROLL]),100,RESISTSLASHING)  // a troll has been knocked down
+	CheckStatLT(FourthNearest([EVILCUTOFF.0.TROLL]),100,RESISTFIRE)  // not immune to fire
+	!CheckStatGT(FourthNearest([EVILCUTOFF.0.TROLL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	See(FourthNearest([EVILCUTOFF.0.TROLL]))
+	False()
+THEN
+	RESPONSE #100
+		Continue()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF) // note: special blocks for targeting knocked down trolls
+	!InParty(ThirdNearest([EVILCUTOFF.0.TROLL]))  // Check for downed trolls in order to finish them off quickly
+	CheckStat(ThirdNearest([EVILCUTOFF.0.TROLL]),100,RESISTSLASHING)  // a troll has been knocked down
+	CheckStatLT(ThirdNearest([EVILCUTOFF.0.TROLL]),100,RESISTFIRE)  // not immune to fire
+	!CheckStatGT(ThirdNearest([EVILCUTOFF.0.TROLL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	See(ThirdNearest([EVILCUTOFF.0.TROLL]))
+	False()
+THEN
+	RESPONSE #100
+		Continue()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF) // note: special blocks for targeting knocked down trolls
+	!InParty(SecondNearest([EVILCUTOFF.0.TROLL]))  // Check for downed trolls in order to finish them off quickly
+	CheckStat(SecondNearest([EVILCUTOFF.0.TROLL]),100,RESISTSLASHING)  // a troll has been knocked down
+	CheckStatLT(SecondNearest([EVILCUTOFF.0.TROLL]),100,RESISTFIRE)  // not immune to fire
+	!CheckStatGT(SecondNearest([EVILCUTOFF.0.TROLL]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	See(SecondNearest([EVILCUTOFF.0.TROLL]))
+	False()
+THEN
+	RESPONSE #100
+		Continue()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF) // note: special blocks for targeting knocked down trolls
+	!InParty([EVILCUTOFF.0.TROLL])  // Check for downed trolls in order to finish them off quickly
+	CheckStat([EVILCUTOFF.0.TROLL],100,RESISTSLASHING)  // a troll has been knocked down
+	CheckStatLT([EVILCUTOFF.0.TROLL],100,RESISTFIRE)  // not immune to fire
+	!CheckStatGT([EVILCUTOFF.0.TROLL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Absolute Immunity or PfMW
+	See([EVILCUTOFF.0.TROLL])
+	False()
+THEN
+	RESPONSE #100
+		Continue()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player6,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player6,STATE_IMMOBILE)
+    CheckStatLT(Player6,100,RESISTFIRE)
+    See(Player6)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player5,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player5,STATE_IMMOBILE)
+    CheckStatLT(Player5,100,RESISTFIRE)
+    See(Player5)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player4,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player4,STATE_IMMOBILE)
+    CheckStatLT(Player4,100,RESISTFIRE)
+    See(Player4)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player3,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player3,STATE_IMMOBILE)
+    CheckStatLT(Player3,100,RESISTFIRE)
+    See(Player3)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player2,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player2,STATE_IMMOBILE)
+    CheckStatLT(Player2,100,RESISTFIRE)
+    See(Player2)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // note: special blocks for targeting unconscious PCs. The AI can See() an unconscious PlayerX, but not an unconscious [PC] etc.
+    !CheckStatGT(Player1,3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    StateCheck(Player1,STATE_IMMOBILE)
+    CheckStatLT(Player1,100,RESISTFIRE)
+    See(Player1)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    Global("Elementalcontrol","LOCALS",2) // summoned elemental out of control
+    See(LastSummonerOf(Myself))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+	Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
+    Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !AreaType(OUTDOOR)
+    !Range(NearestEnemyOf(Myself),30)
+    Range(NearestDoor,15) // if the nearest door is in visual range. note: this seems to auto-skip locked doors
+    OpenState(NearestDoor,FALSE)
+THEN
+    RESPONSE #100
+        MoveToObject(NearestDoor)
+        OpenDoor(NearestDoor)
+END
+
+IF
+    Exists(LastSeenBy(Myself)) // safety check
+    Allegiance(Myself,EVILCUTOFF)
+    Allegiance(LastSeenBy(Myself),GOODCUTOFF) // safety check
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
+THEN
+    RESPONSE #100
+        AttackReevaluate(LastSeenBy(Myself),15)
+END
+
+IF
+    Exists(LastSeenBy(Myself)) // safety check
+    Allegiance(Myself,GOODCUTOFF)
+    ActionListEmpty()
+    !InParty(LastSeenBy(Myself))
+    Allegiance(LastSeenBy(Myself),EVILCUTOFF)
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
+THEN
+    RESPONSE #100
+        AttackReevaluate(LastSeenBy(Myself),15)
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF)
+    !GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+    Help([EVILCUTOFF.0.ELEMENTAL.ELEMENTAL_FIRE])
+    InMyArea(LastHelp(Myself))
+    !StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Move","LOCALS",6)
+        MoveToObject(LastHelp(Myself))
+END
+
+IF
+    Allegiance(Myself,EVILCUTOFF) // only RandomWalk if hostile
+    !GlobalTimerNotExpired("RR#Move","LOCALS")
+THEN
+    RESPONSE #100
+        RandomWalkContinuous()
+END

@@ -251,7 +251,6 @@ THEN
 END
 
 IF
-        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
         AttackedBy([GOODCUTOFF],DEFAULT)
         !Allegiance(Myself,GOODCUTOFF)
@@ -268,9 +267,8 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 		DisplayStringHead(Myself,@663) // Foolish mortal, your petty trickery cannot deceive me.
-                ForceSpellRES("RR#WI404",Myself) // Ice Storm
+                ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
 END
 
 IF
@@ -306,7 +304,7 @@ IF
 	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -341,7 +339,7 @@ IF
 	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -376,7 +374,7 @@ IF
 	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -411,7 +409,7 @@ IF
 	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -446,7 +444,7 @@ IF
 	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -481,7 +479,7 @@ IF
 	CheckStatGT(LastSeenBy(Myself),3,SAVEVSSPELL)
 	!CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
 	!CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS) 
-	!CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
+	!CheckStat(LastSeenBy(Myself),4,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Enchantment
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_DEFLECTION)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TURNING)
 	!CheckStatGT(LastSeenBy(Myself),0,WIZARD_SPELL_TRAP)
@@ -503,7 +501,6 @@ THEN
 END
 
 IF
-        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(NearestEnemyOf(Myself))
         !Race(LastSeenBy(Myself),LICH)
@@ -515,12 +512,10 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
-		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
 END
 
 IF
-        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SecondNearestEnemyOf(Myself))
         !Race(LastSeenBy(Myself),LICH)
@@ -532,12 +527,10 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
-		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
 END
 
 IF
-        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(ThirdNearestEnemyOf(Myself))
         !Race(LastSeenBy(Myself),LICH)
@@ -549,12 +542,10 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
-		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
 END
 
 IF
-        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(FourthNearestEnemyOf(Myself))
         !Race(LastSeenBy(Myself),LICH)
@@ -566,12 +557,10 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
-		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
 END
 
 IF
-        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(FifthNearestEnemyOf(Myself))
         !Race(LastSeenBy(Myself),LICH)
@@ -583,12 +572,10 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
-		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
 END
 
 IF
-        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See(SixthNearestEnemyOf(Myself))
         !Race(LastSeenBy(Myself),LICH)
@@ -600,12 +587,10 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
-		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
 END
 
 IF
-        !GlobalTimerNotExpired("RR#CDmg","LOCALS") // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	See([0])
         !Race(LastSeenBy(Myself),LICH)
@@ -623,8 +608,7 @@ IF
 THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
-		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
-		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
 END
 
 IF
@@ -1046,7 +1030,7 @@ THEN
 	RESPONSE #100
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		SetGlobalTimer("RR#CDmg","LOCALS",12) // This timer inidicates continual damage spells (i.e. Cloudkill and Ice Storm)
-		ForceSpellRES("RR#WI404",LastSeenBy(Myself)) // Ice Storm
+		ForceSpellRES("rr#icew",LastSeenBy(Myself)) // Wall of Ice
 END
 
 IF
@@ -1063,6 +1047,19 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#TELWE",LastSeenBy(Myself)) // Teleport Without Error
 		SetInterrupt(TRUE)
+END
+
+IF
+	Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
+    Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !AreaType(OUTDOOR)
+    !Range(NearestEnemyOf(Myself),30)
+    Range(NearestDoor,15) // if the nearest door is in visual range. note: this seems to auto-skip locked doors
+    OpenState(NearestDoor,FALSE)
+THEN
+    RESPONSE #100
+        MoveToObject(NearestDoor)
+        OpenDoor(NearestDoor)
 END
 
 IF
