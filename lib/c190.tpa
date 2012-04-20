@@ -3005,6 +3005,28 @@ LAUNCH_PATCH_FUNCTION ~disease_immunity~ END                                    
 LAUNCH_PATCH_FUNCTION ~poison_immunity~ END                                        // add poison immunity
 LAUNCH_PATCH_FUNCTION ~poison_spell_immunities~ END                                // add immunity to poison-based spells
 LAUNCH_PATCH_FUNCTION ~insect_spell_immunities~ END                                // add immunity to insect spells
+LAUNCH_PATCH_FUNCTION ~hold_immunity~ END                                          // add hold immunity
+LAUNCH_PATCH_FUNCTION ~stun_immunity~ END                                          // add stun immunity
+LAUNCH_PATCH_FUNCTION ~sleep_immunity~ END                                         // add sleep immunity
+PATCH_FOR_EACH ~spell~ IN                                                          // creatures without flesh shouldn't be affected by the Flesh to Stone spell
+             ~SPWI604~                                                             // Flesh to Stone (wizard version)
+             ~SPIN984~                                                             // Flesh to Stone (Beholder ray)
+            ~RR#WI604~                                                             // Flesh to Stone (aTweaks)
+BEGIN                                                                              // execute the following
+  LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                        // Starts FUNCTION call
+  INT_VAR                                                                          // initialize variables
+    "opcode" = "206"                                                               // effect: #206 (Protection from Spell)
+    "target" = "1"                                                                 // target: 1 (self)
+    "timing" = "2"                                                                 // timing mode: 2 (while equipped)
+    "parameter1" = "4742"                                                          // param1: string (Spell Ineffective)
+    "duration" = "0"                                                               // duration: 0
+    "sectype" = "0"                                                                // secondary type: none
+    "probability1" = "100"                                                         // probability1: 100%
+  STR_VAR                                                                          // initialize strings
+    "resource"  = EVALUATE_BUFFER "%spell%"                                        // resref: the current spell
+    "effsource" = ""                                                               // effsource: none
+  END                                                                              // ends LAUNCH_PATCH_FUNCTION
+END                                                                                // ends PATCH_FOR_EACH
 
 COPY_EXISTING ~rr#eshfe.itm~ ~override~                                            // Druid Fire Elemental transformation attack
               ~rr#eshfr.itm~ ~override~                                            // Shapechange Fire Elemental attack
