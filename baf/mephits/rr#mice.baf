@@ -623,8 +623,25 @@ THEN
 END
 
 IF
+	Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
+    Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !AreaType(OUTDOOR)
+    !Range(NearestEnemyOf(Myself),30)
+    Range(NearestDoor,15) // if the nearest door is in visual range. note: this seems to auto-skip locked doors
+    OpenState(NearestDoor,FALSE)
+    OR(2)
+      !AreaCheck("AR0603") // Irenicus' Dungeon level 2 (avoid traps behind closed doors)
+      !See("Door04") // this door leads to the trapped corridor
+THEN
+    RESPONSE #100
+        MoveToObject(NearestDoor)
+        OpenDoor(NearestDoor)
+END
+
+IF
 	!StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
         !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
+    Allegiance(LastSeenBy(Myself),GOODCUTOFF) // safety check
         OR(2)
 	  !StateCheck(Myself,STATE_BLIND) // don't attack when blinded
 	  Range(LastSeenBy(Myself),2) // unless the target is extremely close by
