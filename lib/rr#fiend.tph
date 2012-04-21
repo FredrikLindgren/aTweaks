@@ -409,6 +409,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 // Pyrotechnics (for Balors, Mariliths, Abishai, Cornugons and Pit Fiends)
 
+COPY ~atweaks/bam/rr#pyrot.bam~ ~override~                                         // Pyrotechnics BAM icon
 COPY ~atweaks/spl/rr#pyrot.spl~ ~override~                                         // Pyrotechnics
   SAY NAME1 @747 SAY NAME2 @747
   READ_LONG  0x64 ab_off
@@ -419,6 +420,14 @@ COPY ~atweaks/spl/rr#pyrot.spl~ ~override~                                      
 
 COPY ~atweaks/spl/rr#niinv.spl~ ~override~                                         // Natural Invisibility (for Hellcats)
 
+COPY ~atweaks/bam/rr#icew.bam~ ~override~                                          // Wall of Ice BAM
+COPY ~atweaks/spl/rr#icew.spl~ ~override~                                          // Wall of Ice
+  SAY NAME1 @1024 SAY NAME2 @1024
+  READ_LONG  0x64 ab_off
+  READ_SHORT 0x68 ab_num
+  FOR(i=0; i<ab_num; i+=1) BEGIN
+    WRITE_SHORT (ab_off+i*0x28+0x26) %rr#icew%                                     // use new projectile
+  END
 
 
 // Clone spells into innate abilities
@@ -542,26 +551,8 @@ COPY ~aTweaks/ITM/RR#DBFND.ITM~ ~override~                                      
 COPY ~aTweaks/ITM/RR#DCORN.ITM~ ~override~                                         // Cornugon melee attack
 COPY ~atweaks/itm/rr#dmaur.itm~ ~override~                                         // Maurezhi melee attack
 
-COPY ~aTweaks/ITM/RR#DGELU.ITM~ ~override~                                         // Gelugon melee attack
-LPF DELETE_ITEM_EFFECT INT_VAR opcode_to_delete = "-1" END
-target = 2
-timing = 1
-duration = 30
-probability1 = 75
-savingthrow = BIT2 //save vs paralyzation
-type = 1
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 12 target parameter2 = 0x20000 timing probability1 dicesize = 6 dicenumber = 1 END //cold damage
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 40 target timing = 0 duration probability1 savingthrow END //slow
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 141 target parameter2 = 10 timing probability1 savingthrow END //visual, enchantment water
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 174 target timing probability1 savingthrow STR_VAR resource = eff_m29 END //play sound
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 139 target parameter1 = 335 timing probability1 savingthrow END //string: slowed
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 142 target parameter2 = 41 timing = 0 duration probability1 savingthrow END //icon: slowed
-
-duration = 18
-probability2 = 76
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 12 target parameter2 = 0x20000 timing probability2 dicesize = 4 dicenumber = 2 END //cold damage
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 175 target parameter2 = 2 timing = 0 duration probability2 savingthrow END //hold
-LPF ADD_ITEM_EFFECT INT_VAR type opcode = 174 target timing = 4 duration probability2 savingthrow STR_VAR resource = eff_e08 END //Play sound
+COPY ~atweaks/itm/rr#dgelu.itm~ ~override~                                         // Gelugon spear attack (main hand)
+COPY ~atweaks/itm/rr#dgel2.itm~ ~override~                                         // Gelugon tail attack (off-hand)
 
 
 

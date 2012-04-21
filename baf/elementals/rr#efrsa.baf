@@ -1,0 +1,231 @@
+IF
+    Global("RR#Active","LOCALS",0)
+    OR(3)
+      AttackedBy([ANYONE],DEFAULT)
+      TookDamage()
+      Help([EVILCUTOFF.0.ELEMENTAL])
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        Enemy()
+        Help()
+END
+
+IF
+    Global("RR#Active","LOCALS",0)
+    Allegiance(Myself,EVILCUTOFF)
+	OR(3)
+      See([GOODCUTOFF]) // this cannot be in the previous block, otherwise neutral creatures would go hostile upon seeing a party member
+      See("icsalfir") // Fire Salamander
+      See("salgrfir") // Salamander Noble
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Active","LOCALS",1)
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        Enemy()
+        Help()
+END
+
+IF
+    OR(4)
+      Global("RR#Active","LOCALS",0)
+      !Allegiance(Myself,EVILCUTOFF) // better way to check for charm because STATE_CHARMED persists when the creature is attacked and becomes red circled again
+      StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
+      StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+
+    StateCheck(Myself,STATE_PANIC)  // needed because the AI can perform script actions (i.e. drink potions) while panicked, unlike the player
+THEN
+    RESPONSE #100
+        RandomWalkContinuous() // using this instead of NoAction() because otherwise panicked characters would stand in place
+END
+
+IF
+    Global("RR#Active","LOCALS",1)
+    !InActiveArea(Myself)
+    !See([GOODCUTOFF])
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Rest","LOCALS") // re-initialize the rest timer
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Rest","LOCALS",2400) // 8 hours
+        ApplySpell(Myself,RESTORE_FULL_HEALTH) // heal up
+        Rest()
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Taunt","LOCALS")
+    OR(2)
+      HasItemEquiped("RR#EFSAL",[0.0.ELEMENTAL.ELEMENTAL_FIRE]) // Fire Salamander
+      HasItemEquiped("RR#ENSAL",[0.0.ELEMENTAL.ELEMENTAL_FIRE]) // Salamander Noble
+    See([0.0.ELEMENTAL.ELEMENTAL_FIRE])
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    !StateCheck(Myself,STATE_INVISIBLE)
+THEN
+    RESPONSE #40
+        SetGlobalTimer("RR#Taunt","LOCALS",12)
+        FaceObject(LastSeenBy(Myself))
+        DisplayStringHead(Myself,@2001) // Hsss! The fiery one mussst die!
+        DisplayStringHead(LastSeenBy(Myself),@2002) // The flame will consume you!
+    RESPONSE #30
+        SetGlobalTimer("RR#Taunt","LOCALS",12)
+        FaceObject(LastSeenBy(Myself))
+        DisplayStringHead(Myself,@2003) // Hated flamessss... mussst sssnuff them out!
+        DisplayStringHead(LastSeenBy(Myself),@2004) // The fire shall cleanse your impurity!
+    RESPONSE #30
+        SetGlobalTimer("RR#Taunt","LOCALS",12)
+        FaceObject(LastSeenBy(Myself))
+        DisplayStringHead(Myself,@2005) // Mussst... kill... warm-blood!
+        DisplayStringHead(LastSeenBy(Myself),@2006) // I shall burn you to ashes, worm!
+END
+
+IF         // Note: Frost Salamanders have deliberately poor targeting. As per PnP they simply attack the closest creature. They do know how to avoid panicked and immune creatures though
+    OR(6)  // note: this block specifically checks for Players in order to target unconscious opponents (if any) since they can't be seen otherwise
+      See(Player1)
+      See(Player2)
+      See(Player3)
+      See(Player4)
+      See(Player5)
+      See(Player6)
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    See([GOODCUTOFF]) // note: this block is intended to check for opponents who may be panicked or immune
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SixthNearest([GOODCUTOFF]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(SixthNearest([GOODCUTOFF]),STATE_PANIC)
+    CheckStatLT(SixthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+    See(SixthNearest([GOODCUTOFF]))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FifthNearest([GOODCUTOFF]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(FifthNearest([GOODCUTOFF]),STATE_PANIC)
+    CheckStatLT(FifthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+    See(FifthNearest([GOODCUTOFF]))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(FourthNearest([GOODCUTOFF]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(FourthNearest([GOODCUTOFF]),STATE_PANIC)
+    CheckStatLT(FourthNearest([GOODCUTOFF]),100,RESISTSLASHING)
+    See(FourthNearest([GOODCUTOFF]))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(ThirdNearest([GOODCUTOFF]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(ThirdNearest([GOODCUTOFF]),STATE_PANIC)
+    CheckStatLT(ThirdNearest([GOODCUTOFF]),100,RESISTSLASHING)
+    See(ThirdNearest([GOODCUTOFF]))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT(SecondNearest([GOODCUTOFF]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck(SecondNearest([GOODCUTOFF]),STATE_PANIC)
+    CheckStatLT(SecondNearest([GOODCUTOFF]),100,RESISTSLASHING)
+    See(SecondNearest([GOODCUTOFF]))
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    !CheckStatGT([GOODCUTOFF],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no Improved Mantle or higher
+    !StateCheck([GOODCUTOFF],STATE_PANIC)
+    CheckStatLT([GOODCUTOFF],100,RESISTSLASHING)
+    See([GOODCUTOFF])
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    OR(2)
+      HasItemEquiped("RR#EFSAL",[0.0.ELEMENTAL.ELEMENTAL_FIRE]) // Fire Salamander
+      HasItemEquiped("RR#ENSAL",[0.0.ELEMENTAL.ELEMENTAL_FIRE]) // Salamander Noble
+    See([0.0.ELEMENTAL.ELEMENTAL_FIRE])
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+	Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
+    Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !AreaType(OUTDOOR)
+    !Range(NearestEnemyOf(Myself),30)
+    Range(NearestDoor,15) // if the nearest door is in visual range. note: this seems to auto-skip locked doors
+    OpenState(NearestDoor,FALSE)
+THEN
+    RESPONSE #100
+        MoveToObject(NearestDoor)
+        OpenDoor(NearestDoor)
+END
+
+IF
+    Exists(LastSeenBy(Myself)) // safety check
+    !StateCheck(LastSeenBy(Myself),STATE_REALLY_DEAD)
+    !StateCheck(LastSeenBy(Myself),STATE_INVISIBLE)
+    Allegiance(LastSeenBy(Myself),GOODCUTOFF) // safety check
+THEN
+    RESPONSE #100
+        AttackReevaluate(LastSeenBy(Myself),15)
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Move","LOCALS") // help -> move timer
+    Help([EVILCUTOFF.0.ELEMENTAL]) // note: Frost Salamanders respond to hearing help cries but don't activelly call for help, as per PnP
+    InMyArea(LastHelp(Myself))
+    !StateCheck(LastHelp(Myself),STATE_REALLY_DEAD)
+THEN
+    RESPONSE #100
+        SetGlobalTimer("RR#Move","LOCALS",6)
+        MoveToObject(LastHelp(Myself))
+END
+
+IF
+    !GlobalTimerNotExpired("RR#Move","LOCALS")
+THEN
+    RESPONSE #100
+        RandomWalkContinuous()
+END

@@ -235,3 +235,108 @@ BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
 
+
+// Standardize Nereid soundsets
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+               ~shoal~                                                             // Shoal the Nereid (BGT)
+              ~_shoal~                                                             // Shoal the Nereid (Tutu)
+            ~rr#enere~                                                             // aTweaks' Nereid
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY                                              // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                     // Null soundset (code borrowed from Nythrun with thanks)
+      WRITE_LONG s1 ~-1~
+  END
+  SAY BATTLE_CRY1 #5195 SAY BATTLE_CRY2 #5194 SAY ATTACK1 #6033 SAY DAMAGE #6035 SAY DYING #6036 SAY SELECT_COMMON1 #5193 SAY SELECT_COMMON2 #5197 SAY SELECT_COMMON3 #5194  SAY SELECT_ACTION1 #5197
+  PATCH_IF (("%SOURCE_RES%" STRING_EQUAL_CASE ~SHOAL~) OR ("%SOURCE_RES%" STRING_EQUAL_CASE ~_SHOAL~)) BEGIN  // additional sounds for Shoal
+    SAY INITIAL_MEETING #4829 SAY DAMAGE #12526 SAY DYING #12527 SAY SELECT_COMMON4 #4830
+  END
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Restore Frost Salamander soundsets (the creatures appear to be silent in the original game)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~salgrice~                                                             // Frost Salamander (Abazigal's Lair)
+            ~icsalcol~                                                             // Ice Salamander (Planar Sphere)
+            ~telicesa~                                                             // Ice Salamander (unused?)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY                                              // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                     // Null soundset (code borrowed from Nythrun with thanks)
+      WRITE_LONG s1 ~-1~
+  END
+  SAY BATTLE_CRY1 #55438 SAY BATTLE_CRY2 #55437 SAY ATTACK1 #55440 SAY ATTACK2 #55439 SAY DAMAGE #55441 SAY DYING #55442 SAY SELECT_COMMON1 #55437 SAY SELECT_ACTION1 #55438
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Give Water Elementals their Icewind Dale soundset
+
+COPY    ~atweaks/wav/rr#ewa01.wav~ ~override~                                      // IWD Water Elemental Select Common 1 and Battle Cry 1
+COPY    ~atweaks/wav/rr#ewa02.wav~ ~override~                                      // IWD Water Elemental Battle Cry 2
+COPY    ~atweaks/wav/rr#ewa03.wav~ ~override~                                      // IWD Water Elemental Attack 1
+COPY    ~atweaks/wav/rr#ewa04.wav~ ~override~                                      // IWD Water Elemental Attack 2
+COPY    ~atweaks/wav/rr#ewa05.wav~ ~override~                                      // IWD Water Elemental Damage
+COPY    ~atweaks/wav/rr#ewa06.wav~ ~override~                                      // IWD Water Elemental Dying
+COPY    ~atweaks/wav/rr#ewa07.wav~ ~override~                                      // IWD Water Elemental Action Acknowledgement 1
+
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~elemhydr~                                                             // Olhydra
+            ~elwatg01~                                                             // Greater Water Elemental
+            ~rr#ewwei~                                                             // aTweaks' Water Weird
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY                                              // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                     // Null soundset (code borrowed from Nythrun with thanks)
+      WRITE_LONG s1 ~-1~
+  END
+  SAY SELECT_COMMON1 @471 SAY BATTLE_CRY1 @471 SAY BATTLE_CRY2 @472 SAY ATTACK1 @473 SAY ATTACK2 @474 SAY DAMAGE @475 SAY DYING @476 SAY SELECT_ACTION1 @477
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Give Ice Paraelementals and Ice Golems a proper soundset
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~elemcryo~                                                             // Cryonax
+            ~finsol03~                                                             // Cryonax in ToB
+            ~golice01~                                                             // Ice Golem
+            ~gorgoli~                                                              // Ice Golem (Watcher's Keep)
+            ~rr#eicer~                                                             // aTweaks' Ice Paraelemental
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
+COPY_EXISTING ~%file%.cre~ ~override~
+LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY                                              // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+ INT_VAR do_message = 1
+END
+// =============================================================================== // the actual work starts from here
+  FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                     // Null soundset (code borrowed from Nythrun with thanks)
+      WRITE_LONG s1 ~-1~
+  END
+  SAY SELECT_COMMON1 @481 SAY BATTLE_CRY1 @481 SAY BATTLE_CRY2 @482 SAY ATTACK1 @483 SAY ATTACK2 @484 SAY DAMAGE @487 SAY HURT @488 SAY DYING @489 SAY SELECT_ACTION1 @482
+// =============================================================================== // the actual work ends here
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block

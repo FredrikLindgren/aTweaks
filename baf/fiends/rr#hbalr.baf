@@ -1406,6 +1406,7 @@ IF
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
         CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
@@ -1431,6 +1432,7 @@ IF
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
         CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
@@ -1456,6 +1458,7 @@ IF
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
         CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
@@ -1481,6 +1484,7 @@ IF
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
         CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
@@ -1506,6 +1510,7 @@ IF
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
         CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
@@ -1531,6 +1536,7 @@ IF
 	!General(LastSeenBy(Myself),UNDEAD)
         !Race(LastSeenBy(Myself),SLIME)
 	!Race(LastSeenBy(Myself),DEMONIC)
+    !Race(LastSeenBy(Myself),ELEMENTAL)
 	CheckStatLT(LastSeenBy(Myself),75,RESISTMAGIC)
         CheckStatGT(LastSeenBy(Myself),-4,SAVEVSSPELL)
 	!Name("RR#SHM",LastSeenBy(Myself)) // RR's Shambling Mounds
@@ -2465,6 +2471,19 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
                 ForceSpellRES("RR#TELWE",LastSeenBy(Myself)) // Teleport Without Error
 		SetInterrupt(TRUE)
+END
+
+IF
+	Global("RR#NOPND","GLOBAL",0) // opening doors is allowed
+    Allegiance(Myself,EVILCUTOFF) // humanoids and some intelligent monsters can open unlocked doors
+    !AreaType(OUTDOOR)
+    !Range(NearestEnemyOf(Myself),30)
+    Range(NearestDoor,15) // if the nearest door is in visual range. note: this seems to auto-skip locked doors
+    OpenState(NearestDoor,FALSE)
+THEN
+    RESPONSE #100
+        MoveToObject(NearestDoor)
+        OpenDoor(NearestDoor)
 END
 
 IF

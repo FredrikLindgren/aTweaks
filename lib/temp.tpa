@@ -1,0 +1,46 @@
+//deletes all instances of ~item_to_delete~ at current creature
+		DEFINE_PATCH_MACRO ~DELETE_CRE_ITEM~ BEGIN
+      LAUNCH_PATCH_FUNCTION ~FJ_CRE_VALIDITY~ RET valid = valid END
+		  PATCH_IF (valid) BEGIN
+		    READ_LONG 0x2bc ___#itm_off
+		    READ_LONG 0x2c0 ___#itm_num
+		    READ_LONG 0x2b8 ___#islot_off
+		    SET ___#delta = 0
+		    FOR (___#cur_itm = 0; ___#cur_itm < ___#itm_num; ___#cur_itm = (___#cur_itm + 1)) BEGIN
+		    READ_ASCII (___#itm_off + (___#cur_itm * 0x14)) ~item~
+		      PATCH_IF (~%item%~ STRING_MATCHES_REGEXP ~%item_to_delete%~ = 0) THEN BEGIN
+		
+		        DELETE_BYTES (___#itm_off + (___#cur_itm * 0x14)) 0x14
+		        SET ___#itm_num = ___#itm_num - 1
+		        //SET ___#delta = ___#delta + 1
+		
+		        //correct offsets
+		        PATCH_FOR_EACH ___#offset IN 0x2a0 0x2a8 0x2b0 0x2b8 0x2bc BEGIN
+		          READ_LONG ___#offset ___#current_off
+		          PATCH_IF ___#current_off > ___#itm_off BEGIN
+		            WRITE_LONG ___#offset (___#current_off - 0x14)
+		          END
+		        END
+		
+		        FOR (___#cur_slot = 0; ___#cur_slot < 37; ___#cur_slot = ___#cur_slot + 1) BEGIN
+		          READ_LONG 0x2b8 ___#islot_off
+		          READ_SHORT  (___#islot_off + ___#cur_slot * 2) ___#itm_index
+		          PATCH_IF (___#itm_index = ___#cur_itm) BEGIN //if slot with deleted item
+		            WRITE_SHORT  (___#islot_off + ___#cur_slot * 2) 0xffff //nullify reference
+		          END
+		          PATCH_IF ((___#itm_index > ___#cur_itm) AND NOT (___#itm_index = 0xffff)) BEGIN //if next slot and not empty
+		            WRITE_SHORT  (___#islot_off + ___#cur_slot * 2) (___#itm_index - 1) //shift items back
+		          END
+		        END
+		
+		        SET ___#cur_itm = ___#cur_itm - 1 //step back to not miss an item
+		      END
+		    END
+		    //correcting number
+		    WRITE_LONG  0x02c0 ___#itm_num
+		    //no offsets to correct
+		
+		  END
+		END
+
+
