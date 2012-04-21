@@ -1107,12 +1107,13 @@ END
 
 IF
     Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT([EVILCUTOFF.0.0.CLERIC_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck([EVILCUTOFF.0.0.CLERIC_ALL],STATE_PANIC)
-    CheckStatLT([EVILCUTOFF.0.0.CLERIC_ALL],100,RESISTCRUSHING)
-    CheckStatLT([EVILCUTOFF.0.0.CLERIC_ALL],1,STONESKINS)
-    !StateCheck([EVILCUTOFF.0.0.CLERIC_ALL],STATE_MIRRORIMAGE)
-    See([EVILCUTOFF.0.0.CLERIC_ALL]) // try to prioritize spellcasters when attacking/teleporting
+    !CheckStatGT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),STATE_PANIC)
+    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),100,RESISTCRUSHING)
+    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),1,STONESKINS)
+    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
+    Range(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),10) // only engage if the target is fairly close
+    See(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL])) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
     RESPONSE #100
@@ -1126,6 +1127,7 @@ IF
     CheckStatLT(SecondNearest([EVILCUTOFF.0.0.CLERIC_ALL]),100,RESISTCRUSHING)
     CheckStatLT(SecondNearest([EVILCUTOFF.0.0.CLERIC_ALL]),1,STONESKINS)
     !StateCheck(SecondNearest([EVILCUTOFF.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
+    Range(SecondNearest([EVILCUTOFF.0.0.CLERIC_ALL]),10) // only engage if the target is fairly close
     See(SecondNearest([EVILCUTOFF.0.0.CLERIC_ALL])) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
@@ -1135,40 +1137,13 @@ END
 
 IF
     Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),STATE_PANIC)
-    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),100,RESISTCRUSHING)
-    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),1,STONESKINS)
-    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
-    See(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL])) // try to prioritize spellcasters when attacking/teleporting
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
-
-IF
-    Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT([EVILCUTOFF.0.0.DRUID_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck([EVILCUTOFF.0.0.DRUID_ALL],STATE_PANIC)
-    CheckStatLT([EVILCUTOFF.0.0.DRUID_ALL],100,RESISTCRUSHING)
-    CheckStatLT([EVILCUTOFF.0.0.DRUID_ALL],1,STONESKINS)
-    !StateCheck([EVILCUTOFF.0.0.DRUID_ALL],STATE_MIRRORIMAGE)
-    See([EVILCUTOFF.0.0.DRUID_ALL]) // try to prioritize spellcasters when attacking/teleporting
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
-
-IF
-    Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),STATE_PANIC)
-    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),100,RESISTCRUSHING)
-    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),1,STONESKINS)
-    !StateCheck(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
-    See(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL])) // try to prioritize spellcasters when attacking/teleporting
+    !CheckStatGT([EVILCUTOFF.0.0.CLERIC_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck([EVILCUTOFF.0.0.CLERIC_ALL],STATE_PANIC)
+    CheckStatLT([EVILCUTOFF.0.0.CLERIC_ALL],100,RESISTCRUSHING)
+    CheckStatLT([EVILCUTOFF.0.0.CLERIC_ALL],1,STONESKINS)
+    !StateCheck([EVILCUTOFF.0.0.CLERIC_ALL],STATE_MIRRORIMAGE)
+    Range([EVILCUTOFF.0.0.CLERIC_ALL],10) // only engage if the target is fairly close
+    See([EVILCUTOFF.0.0.CLERIC_ALL]) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
     RESPONSE #100
@@ -1182,6 +1157,7 @@ IF
     CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.DRUID_ALL]),100,RESISTCRUSHING)
     CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.DRUID_ALL]),1,STONESKINS)
     !StateCheck(ThirdNearest([EVILCUTOFF.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
+    Range(ThirdNearest([EVILCUTOFF.0.0.DRUID_ALL]),10) // only engage if the target is fairly close
     See(ThirdNearest([EVILCUTOFF.0.0.DRUID_ALL])) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
@@ -1191,12 +1167,13 @@ END
 
 IF
     Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT([EVILCUTOFF.0.0.MAGE_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck([EVILCUTOFF.0.0.MAGE_ALL],STATE_PANIC)
-    CheckStatLT([EVILCUTOFF.0.0.MAGE_ALL],100,RESISTCRUSHING)
-    CheckStatLT([EVILCUTOFF.0.0.MAGE_ALL],1,STONESKINS)
-    !StateCheck([EVILCUTOFF.0.0.MAGE_ALL],STATE_MIRRORIMAGE)
-    See([EVILCUTOFF.0.0.MAGE_ALL]) // try to prioritize spellcasters when attacking/teleporting
+    !CheckStatGT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),STATE_PANIC)
+    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),100,RESISTCRUSHING)
+    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),1,STONESKINS)
+    !StateCheck(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
+    Range(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),10) // only engage if the target is fairly close
+    See(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL])) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
     RESPONSE #100
@@ -1205,12 +1182,13 @@ END
 
 IF
     Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),STATE_PANIC)
-    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),100,RESISTCRUSHING)
-    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),1,STONESKINS)
-    !StateCheck(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
-    See(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL])) // try to prioritize spellcasters when attacking/teleporting
+    !CheckStatGT([EVILCUTOFF.0.0.DRUID_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck([EVILCUTOFF.0.0.DRUID_ALL],STATE_PANIC)
+    CheckStatLT([EVILCUTOFF.0.0.DRUID_ALL],100,RESISTCRUSHING)
+    CheckStatLT([EVILCUTOFF.0.0.DRUID_ALL],1,STONESKINS)
+    !StateCheck([EVILCUTOFF.0.0.DRUID_ALL],STATE_MIRRORIMAGE)
+    Range([EVILCUTOFF.0.0.DRUID_ALL],10) // only engage if the target is fairly close
+    See([EVILCUTOFF.0.0.DRUID_ALL]) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
     RESPONSE #100
@@ -1224,7 +1202,38 @@ IF
     CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),100,RESISTCRUSHING)
     CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),1,STONESKINS)
     !StateCheck(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
+    Range(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),10) // only engage if the target is fairly close
     See(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL])) // try to prioritize spellcasters when attacking/teleporting
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF)
+    !CheckStatGT(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),STATE_PANIC)
+    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),100,RESISTCRUSHING)
+    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),1,STONESKINS)
+    !StateCheck(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
+    Range(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL]),10) // only engage if the target is fairly close
+    See(SecondNearest([EVILCUTOFF.0.0.MAGE_ALL])) // try to prioritize spellcasters when attacking/teleporting
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF)
+    !CheckStatGT([EVILCUTOFF.0.0.MAGE_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck([EVILCUTOFF.0.0.MAGE_ALL],STATE_PANIC)
+    CheckStatLT([EVILCUTOFF.0.0.MAGE_ALL],100,RESISTCRUSHING)
+    CheckStatLT([EVILCUTOFF.0.0.MAGE_ALL],1,STONESKINS)
+    !StateCheck([EVILCUTOFF.0.0.MAGE_ALL],STATE_MIRRORIMAGE)
+    Range([EVILCUTOFF.0.0.MAGE_ALL],10) // only engage if the target is fairly close
+    See([EVILCUTOFF.0.0.MAGE_ALL]) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
     RESPONSE #100

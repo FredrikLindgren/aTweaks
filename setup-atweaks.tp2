@@ -1174,7 +1174,6 @@ REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                       
 // It also flags these abilities as non-magical which prevents Wild Magic and Dead Magic zones from affecting them
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-              ~spwi406~                                                            // Minor Globe of Invulnrability
               ~spcl611~                                                            // Druid Shapeshift Brown Bear
               ~spcl612~                                                            // Druid Shapeshift Wolf
               ~spcl613~                                                            // Druid Shapeshift Black Bear
@@ -1204,6 +1203,35 @@ END                                                                             
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Add the non-dispellable flag to druidic shapechange weapons if TobEx is detected
+// This will prevent the natural weapons of the shapechange forms (i.e. claws and such) from being removed by Dispel Magic and Dead Magic Zones
+ACTION_IF FILE_EXISTS_IN_GAME ~tobex_ini/tobexcore.ini~ BEGIN                      // if TobEx is installed
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+               ~brbrp~                                                             // Brown Bear shape attack
+               ~brblp~                                                             // Black Bear shape attack
+               ~wolfm~                                                             // Wolf shape attack
+             ~plyspid~                                                             // Sword Spider shape attack
+            ~plywyvrn~                                                             // Baby Wyvern shape attack
+             ~plysala~                                                             // Fire Salamander shape attack
+              ~drufir~                                                             // Fire Elemental shape attack
+              ~druear~                                                             // Earth Elemental shape attack
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN                                   // if the designated file with an ITM extension exists
+COPY_EXISTING ~%file%.itm~ ~override~
+  PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
+// =============================================================================== // the actual work starts from here
+    READ_BYTE 0x1b "flags"
+    PATCH_IF (("%flags%" BAND "0b00000001") = "0b00000000") BEGIN                  // if bit 24 isn't set
+      WRITE_BYTE "0x1b" ("%flags%" BOR "0b00000001")                               // set bit 24
+    END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends second ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+END                                                                                // ends first ACTION_IF FILE_EXISTS_IN_GAME block
 
 
 

@@ -1088,6 +1088,46 @@ IF
     !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
     !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
     !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
+    Allegiance(Myself,GOODCUTOFF)
+    OR(8)
+      See([EVILCUTOFF.0.UMBERHULK])
+      See([EVILCUTOFF.0.VAMPIRE])
+      See([EVILCUTOFF.0.0.BARD_ALL])
+      See([EVILCUTOFF.0.0.CLERIC_ALL])
+      See([EVILCUTOFF.0.0.DRUID_ALL])
+      See([EVILCUTOFF.0.0.MAGE_ALL])
+      See([EVILCUTOFF.0.BEHOLDER])
+      See([EVILCUTOFF.0.DRAGON]) // high priority targets
+    !StateCheck(LastSeenBy(Myself),STATE_HARMLESS)
+    !StateCheck(LastSeenBy(Myself),STATE_BLIND)
+    CheckStatLT(LastSeenBy(Myself),50,RESISTMAGIC)
+    CheckStat(LastSeenBy(Myself),0,MINORGLOBE)
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        SetGlobalTimer("rr#sfog","LOCALS",12) // use Solid Fog once per 2 rounds
+        ForceSpellRES("rr#echsf",LastSeenBy(Myself)) // Solid Fog
+        RemoveSpellRES("rr#echsf") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#sfog","LOCALS")
+    HaveSpellRES("rr#echsf") // Solid Fog
+    !CheckStat([GOODCUTOFF],0,179) // Wind Wall is active
+    !CheckStat(SecondNearest([GOODCUTOFF]),0,179)
+    !CheckStat(ThirdNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FourthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(FifthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SixthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(SeventhNearest([GOODCUTOFF]),0,179)
+    !CheckStat(EighthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(NinthNearest([GOODCUTOFF]),0,179)
+    !CheckStat(TenthNearest([GOODCUTOFF]),0,179)
     See(NearestEnemyOf(Myself))
     !Race(LastSeenBy(Myself),LICH)
     !Race(LastSeenBy(Myself),RAKSHASA)
@@ -2008,12 +2048,12 @@ END
 
 IF
     Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT([EVILCUTOFF.0.0.CLERIC_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck([EVILCUTOFF.0.0.CLERIC_ALL],STATE_PANIC)
-    CheckStatLT([EVILCUTOFF.0.0.CLERIC_ALL],100,RESISTCRUSHING)
-    CheckStatLT([EVILCUTOFF.0.0.CLERIC_ALL],1,STONESKINS)
-    !StateCheck([EVILCUTOFF.0.0.CLERIC_ALL],STATE_MIRRORIMAGE)
-    See([EVILCUTOFF.0.0.CLERIC_ALL]) // try to prioritize spellcasters when attacking/teleporting
+    !CheckStatGT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),STATE_PANIC)
+    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),100,RESISTCRUSHING)
+    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),1,STONESKINS)
+    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
+    See(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL])) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
     RESPONSE #100
@@ -2036,40 +2076,12 @@ END
 
 IF
     Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),STATE_PANIC)
-    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),100,RESISTCRUSHING)
-    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),1,STONESKINS)
-    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL]),STATE_MIRRORIMAGE)
-    See(ThirdNearest([EVILCUTOFF.0.0.CLERIC_ALL])) // try to prioritize spellcasters when attacking/teleporting
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
-
-IF
-    Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT([EVILCUTOFF.0.0.DRUID_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck([EVILCUTOFF.0.0.DRUID_ALL],STATE_PANIC)
-    CheckStatLT([EVILCUTOFF.0.0.DRUID_ALL],100,RESISTCRUSHING)
-    CheckStatLT([EVILCUTOFF.0.0.DRUID_ALL],1,STONESKINS)
-    !StateCheck([EVILCUTOFF.0.0.DRUID_ALL],STATE_MIRRORIMAGE)
-    See([EVILCUTOFF.0.0.DRUID_ALL]) // try to prioritize spellcasters when attacking/teleporting
-    False()
-THEN
-    RESPONSE #100
-        NoAction()
-END
-
-IF
-    Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),STATE_PANIC)
-    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),100,RESISTCRUSHING)
-    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),1,STONESKINS)
-    !StateCheck(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
-    See(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL])) // try to prioritize spellcasters when attacking/teleporting
+    !CheckStatGT([EVILCUTOFF.0.0.CLERIC_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck([EVILCUTOFF.0.0.CLERIC_ALL],STATE_PANIC)
+    CheckStatLT([EVILCUTOFF.0.0.CLERIC_ALL],100,RESISTCRUSHING)
+    CheckStatLT([EVILCUTOFF.0.0.CLERIC_ALL],1,STONESKINS)
+    !StateCheck([EVILCUTOFF.0.0.CLERIC_ALL],STATE_MIRRORIMAGE)
+    See([EVILCUTOFF.0.0.CLERIC_ALL]) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
     RESPONSE #100
@@ -2092,12 +2104,40 @@ END
 
 IF
     Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT([EVILCUTOFF.0.0.MAGE_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck([EVILCUTOFF.0.0.MAGE_ALL],STATE_PANIC)
-    CheckStatLT([EVILCUTOFF.0.0.MAGE_ALL],100,RESISTCRUSHING)
-    CheckStatLT([EVILCUTOFF.0.0.MAGE_ALL],1,STONESKINS)
-    !StateCheck([EVILCUTOFF.0.0.MAGE_ALL],STATE_MIRRORIMAGE)
-    See([EVILCUTOFF.0.0.MAGE_ALL]) // try to prioritize spellcasters when attacking/teleporting
+    !CheckStatGT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),STATE_PANIC)
+    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),100,RESISTCRUSHING)
+    CheckStatLT(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),1,STONESKINS)
+    !StateCheck(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL]),STATE_MIRRORIMAGE)
+    See(SecondNearest([EVILCUTOFF.0.0.DRUID_ALL])) // try to prioritize spellcasters when attacking/teleporting
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF)
+    !CheckStatGT([EVILCUTOFF.0.0.DRUID_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck([EVILCUTOFF.0.0.DRUID_ALL],STATE_PANIC)
+    CheckStatLT([EVILCUTOFF.0.0.DRUID_ALL],100,RESISTCRUSHING)
+    CheckStatLT([EVILCUTOFF.0.0.DRUID_ALL],1,STONESKINS)
+    !StateCheck([EVILCUTOFF.0.0.DRUID_ALL],STATE_MIRRORIMAGE)
+    See([EVILCUTOFF.0.0.DRUID_ALL]) // try to prioritize spellcasters when attacking/teleporting
+    False()
+THEN
+    RESPONSE #100
+        NoAction()
+END
+
+IF
+    Allegiance(Myself,GOODCUTOFF)
+    !CheckStatGT(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),STATE_PANIC)
+    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),100,RESISTCRUSHING)
+    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),1,STONESKINS)
+    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
+    See(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL])) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
     RESPONSE #100
@@ -2120,18 +2160,17 @@ END
 
 IF
     Allegiance(Myself,GOODCUTOFF)
-    !CheckStatGT(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
-    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),STATE_PANIC)
-    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),100,RESISTCRUSHING)
-    CheckStatLT(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),1,STONESKINS)
-    !StateCheck(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL]),STATE_MIRRORIMAGE)
-    See(ThirdNearest([EVILCUTOFF.0.0.MAGE_ALL])) // try to prioritize spellcasters when attacking/teleporting
+    !CheckStatGT([EVILCUTOFF.0.0.MAGE_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // no PfMW
+    !StateCheck([EVILCUTOFF.0.0.MAGE_ALL],STATE_PANIC)
+    CheckStatLT([EVILCUTOFF.0.0.MAGE_ALL],100,RESISTCRUSHING)
+    CheckStatLT([EVILCUTOFF.0.0.MAGE_ALL],1,STONESKINS)
+    !StateCheck([EVILCUTOFF.0.0.MAGE_ALL],STATE_MIRRORIMAGE)
+    See([EVILCUTOFF.0.0.MAGE_ALL]) // try to prioritize spellcasters when attacking/teleporting
     False()
 THEN
     RESPONSE #100
         NoAction()
 END
-
 IF
     Allegiance(Myself,EVILCUTOFF)
     !StateCheck(WorstAC([PC]),STATE_PANIC)
