@@ -3789,18 +3789,12 @@ END
 // Slightly tweak Water Elemetal spawns in Abazigal's lair
 
 COPY_EXISTING ~ptelew01.bcs~ ~override~
-DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~ICRMPARI~ ~rr#envlp~ // use aTweaks visual effect
-  REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreatureImpassable~ ~CreateCreature~ // spawn the creatures in a passable area
-  REPLACE_TEXTUALLY EXACT_MATCH ~ELWATG01~ ~rr#ewate~ // Replace Greater with Elder Water Elementals
-COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
-
-COPY_EXISTING ~ptelew02.bcs~ ~override~
+              ~ptelew02.bcs~ ~override~
               ~ptelew03.bcs~ ~override~
 DECOMPILE_BCS_TO_BAF
   REPLACE_TEXTUALLY EXACT_MATCH ~ICRMPARI~ ~rr#envlp~ // use aTweaks visual effect
   REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreatureImpassable~ ~CreateCreature~ // spawn the creatures in a passable area
+  REPLACE_TEXTUALLY EXACT_MATCH ~ELWATG01~ ~rr#ewate~ // Replace Greater with Elder Water Elementals
 COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
 
@@ -3872,6 +3866,21 @@ COPY_EXISTING ~ar6105.are~ ~override~                                           
     READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
     PATCH_IF ("%cre_file%" STRING_EQUAL_CASE "ELEARG01") BEGIN
       WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~rr#eeare~ #8
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Replace the Lesser Earth Elementals at the enterance of Abazigal's lair with Greater Water Elementals
+
+COPY_EXISTING ~ar6001.are~ ~override~                                              // enterance to Abazigal's lair (pool room)
+  READ_LONG  0x54 "actor_off"
+  READ_SHORT 0x58 "actor_num"
+  WHILE ("%actor_num%" > 0) BEGIN
+    SET "actor_num" = ("%actor_num%" - 1)
+    READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
+    PATCH_IF ("%cre_file%" STRING_EQUAL_CASE "ELEARL01") BEGIN
+      WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~ELWATG01~ #8
     END
   END
 BUT_ONLY_IF_IT_CHANGES
