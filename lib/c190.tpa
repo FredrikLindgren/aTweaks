@@ -3574,13 +3574,15 @@ COPY_EXISTING ~splesfir.eff~  ~override~                                        
 
 // Air Elementals
 COPY_EXISTING ~splesair.eff~  ~override~                                           // Conjure Lesser Air Elemental (8 HD)
-               ~spair1.eff~   ~override~                                           // Conjure Air Elemental (12 HD, mage version)
-               ~spair2.eff~   ~override~                                           // Conjure Air Elemental (16 HD, mage version)
-               ~spair3.eff~   ~override~                                           // Conjure Air Elemental (24 HD, mage version)
+                ~spair1.eff~  ~override~                                           // Conjure Air Elemental (12 HD, mage version)
+                ~spair2.eff~  ~override~                                           // Conjure Air Elemental (16 HD, mage version)
+                ~spair3.eff~  ~override~                                           // Conjure Air Elemental (24 HD, mage version)
                 ~staf16.eff~  ~override~                                           // Conjure Lesser Air Elemental (8 HD, Staff of Air version)
               ~swaaire1.eff~  ~override~                                           // Elemental Summoning (16 HD, priest HLA version)
               ~swaaire2.eff~  ~override~                                           // Elemental Summoning (24 HD, priest HLA version)
                ~sumchan.eff~  ~override~                                           // Summon Chan (priest HLA version)
+                ~spserv.eff~  ~override~                                           // Aerial Servant
+               ~spstalk.eff~  ~override~                                           // Invisible Stalker
   WRITE_ASCII 0x70 ~SPPORTAL~ #8                                                   // resref2: SPPORTAL (VVC to display)
   WRITE_LONG  0x18 "0"                                                             // power: 0 (in case the spell is cast directly on a Rakshasa or something)
 BUT_ONLY_IF_IT_CHANGES
@@ -3596,6 +3598,31 @@ COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
 
 
+// Add Conjure Lesser Elemental scrolls to BGT/Tutu and some BG2 stores
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+               ~jayes~                                                             // Jayes' store (the halfling who appears during night time at Waukeen's Promenade)
+             ~sto0703~                                                             // Sorcerous Sundries (BGT version)
+            ~_sto0703~                                                             // Sorcerous Sundries (Tutu version)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.sto~ BEGIN                                   // if the designated file with a STO extension exists
+COPY_EXISTING ~%file%.sto~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x9b) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+// =============================================================================== // the actual work starts from here
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL7C~) BEGIN              // if the store doesn't already have the specified item
+  ADD_STORE_ITEM ~SCRL7C~   AFTER  ~%TUTU_VAR%SCRL5P~ #1 #0 #0 ~IDENTIFIED~ #2     // Adds 2x Conjure Lesser Earth Elemental scroll
+END
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL7B~) BEGIN              // if the store doesn't already have the specified item
+  ADD_STORE_ITEM ~SCRL7B~   BEFORE  ~SCRL7C~ #1 #0 #0 ~IDENTIFIED~ #2              // Adds 2x Conjure Lesser Air Elemental scroll
+END
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL6X~) BEGIN              // if the store doesn't already have the specified item
+  ADD_STORE_ITEM ~SCRL6X~   BEFORE  ~SCRL7B~ #1 #0 #0 ~IDENTIFIED~ #2              // Adds 2x Conjure Lesser Air Elemental scroll
+END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
 
 
 
@@ -4103,6 +4130,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY sr_effs BEGIN
      ELAIRSU1,    2     =>   spair1                                                // Conjure Air Elemental (12 HD, arcane version)
      ELAIRSU2,    2     =>   spair2                                                // Conjure Greater Air Elemental (16 HD, arcane version)
      ELAIRSU3,    2     =>   spair3                                                // Conjure Elder Air Elemental (20 HD, arcane version)
+       SERVSU,    0     =>   spserv                                                // Aerial Servant
+       STALKE,    0     =>   spstalk                                               // Invisible Stalker
      ELEARSUW,    2     =>   splesear                                              // Conjure Lesser Earth Elemental (8 HD, arcane version)
      ELEARSU2,    2     =>   speart1                                               // Conjure Earth Elemental (12 HD, arcane version)
      ELEARSU3,    2     =>   speart2                                               // Conjure Greater Earth Elemental (16 HD, arcane version)
