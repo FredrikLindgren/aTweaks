@@ -221,11 +221,22 @@ THEN
 END
 
 IF
+    Global("rr#walk","LOCALS",1) // if RandomWalk() is active
+	!Range(NearestEnemyOf(Myself),8) // and no enemies are nearby
+THEN
+    RESPONSE #100
+        SetGlobal("rr#walk","LOCALS",0)
+        ClearActions(Myself) // clear actions so that ActionListEmpty() can return true again
+END
+
+IF
 	ActionListEmpty()
-        Range(NearestEnemyOf(Myself),8) // Don't use spells with a long casting time in melee
+	Range(NearestEnemyOf(Myself),8) // Dryads and Hamadryads avoid melee combat
+    Global("rr#walk","LOCALS",0)
 THEN
 	RESPONSE #100
-		RunAwayFromNoInterrupt(NearestEnemyOf(Myself),30) // note: RandomWalk() seems to clash with ActionListEmpty, hence RunAwayFrom
+        SetGlobal("rr#walk","LOCALS",1)
+        RandomWalkContinuous() // Note: using this instead of RunAwayFrom() since the latter can unintentionally make creatures travel between areas
 END
 
 IF
@@ -1467,7 +1478,7 @@ IF
 	ActionListEmpty()
 	!GlobalTimerNotExpired("RR#Cast","LOCALS")
 	HaveSpell(CLERIC_BLESS)
-	Range(NearestEnemyOf(Myself),20)
+	Range(NearestEnemyOf(Myself),30)
         Allegiance(Myself,GOODCUTOFF)
 	See([GOODCUTOFF])
 	!StateCheck(LastSeenBy(Myself),STATE_BLESS)
@@ -1575,12 +1586,4 @@ THEN
 		SetGlobalTimer("RR#Cast","LOCALS",6)
 		Spell(LastSeenBy(Myself),CLERIC_BLESS)
 		SetInterrupt(TRUE)
-END
-
-IF
-	ActionListEmpty()
-        Range(NearestEnemyOf(Myself),10) // Nymphs, Dryads and Hamadryads avoid melee combat
-THEN
-	RESPONSE #100
-		RunAwayFrom(NearestEnemyOf(Myself),30) // note: RandomWalk() seems to clash with ActionListEmpty, hence RunAwayFrom
 END
