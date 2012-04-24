@@ -20,6 +20,22 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#renew" = "1" END  
 COPY ~atweaks/spl/rr#niinv.spl~ ~override~                                         // Natural Invisibility
   SAY NAME1 @2100 SAY NAME2 @2100
 
+COPY ~atweaks/spl/elementals/rr#emcbt.spl~ ~override~                              // New Mental Combat spell (used for arcane spellcasters when summoning elementals)
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
+      READ_LONG  ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "param1"
+        PATCH_IF (("%opcode%" = 139) AND ("%param1%" = 54333)) BEGIN // display string
+          SAY ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) @2131  // Locked in mental combat
+        END
+    END
+  END
+
 COPY ~atweaks/spl/rr#uchrm.spl~ ~override~                                         // Remove Enchantment Spell School (uncharm)
 
 COPY ~atweaks/spl/elementals/rr#track.spl~ ~override~                              // Tracking
@@ -474,12 +490,14 @@ COPY ~atweaks/itm/elementals/rr#esunn.itm~ ~override~                           
 COPY ~atweaks/itm/elementals/rr#ezaam.itm~ ~override~                              // Zaaman Rul attack
 
 
-// Special Spell Revisions compatibility block (needs to go before aTweaks' creature modifications)
-// SR removes the mental combat script from elementals summoned by wizards. aTweaks adds it back. Also, these elementals need to start out Neutral
+// Special Spell Revisions compatibility block. Needs to go way up here so that the spell is backed up before aTweaks alters it
 
 ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
-
 COPY_EXISTING ~sppr702.spl~  ~override/rr#srbk1.spl~                               // Backup SR's Summon Shambling Mound
+END                                                                                // ends Spell Revisions compatibility block
+
+
+// Ensure that the mental combat script is assigned to all elementals summoned by arcane spellcasters. Also, these elementals need to start out as NEUTRAL
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
             ~elairsu1~                                                             // Air Elemental (mage summon)
@@ -501,13 +519,14 @@ ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                
 COPY_EXISTING ~%file%.cre~ ~override~
 LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
 // =============================================================================== // the actual work starts from here
-WRITE_ASCII 0x248 ~WIZELSU2~ #8                                                    // assign override AI script
+WRITE_ASCII 0x248 ~rr#ewizs~ #8                                                    // assign override AI script
 WRITE_BYTE  0x270 128                                                              // set initial allegiance to NEUTRAL
+ADD_CRE_ITEM ~RIDRING~ #0 #0 #0 ~UNDROPPABLE~ ~RRING~                              // selection circle removal ring
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
-END                                                                                // ends Spell Revisions compatibility block
+
 
 
 
@@ -2988,6 +3007,7 @@ COMPILE ~atweaks/baf/elementals/rr#eyanc.baf~                                   
 COMPILE ~atweaks/baf/elementals/rr#echan.baf~                                      // Chan AI script
 COMPILE ~atweaks/baf/elementals/rr#esunn.baf~                                      // Sunnis AI script
 COMPILE ~atweaks/baf/elementals/rr#ezaam.baf~                                      // Zaaman Rul AI script
+COMPILE ~atweaks/baf/elementals/rr#ewizs.baf~                                      // Mental Combat AI script (for elementals summoned by arcane spellcasters)
 
 
 
@@ -3192,36 +3212,6 @@ END                                                                             
 
 // Revised Elemental summoning spells
 
-// Prevent talking to elementals summoned by arcane casters during the Mental Combat phase as it might break their script
-
-COPY_EXISTING ~spin906.spl~ ~override~ // Initial elemental enchantment immunity
-  READ_LONG  0x64 "abil_off" ELSE 0
-  READ_SHORT 0x68 "abil_num" ELSE 0
-  READ_LONG  0x6a "fx_off"   ELSE 0
-  SET "delta" = 0
-  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN
-    READ_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
-    READ_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
-    SET "abil_fx_idx" = ("%abil_fx_idx%" + "%delta%")
-    WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
-    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
-     READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
-      PATCH_IF ("%opcode%" = 101) BEGIN // clone Protection from Opcode effect
-        READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30)
-        SET "index2"= "%abil_fx_num%" // kills loop
-        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
-          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
-          WRITE_SHORT           ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "287"            // opcode #287 (Selection circle removal)
-          WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "0"              // param1: 0
-          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "0"              // param2: 0
-        SET "delta" = "%delta%" + 1
-        WRITE_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%" + 1)
-      END
-    END
-  END
-BUT_ONLY_IF_IT_CHANGES
-
-
 // Fix Bioware's mixup with Conjure (Lesser) Air Elemental EFFs
 
 COPY_EXISTING ~splesair.eff~  ~override~                                           // Conjure Lesser Air Elemental (8 HD)
@@ -3301,9 +3291,6 @@ WRITE_LONG 0x50 "%rr#var_1%"                                                    
 LPF prep_itm_spl INT_VAR f_Type = 1 END
 LPF configure_spell_header INT_VAR f_Target = 4 f_Range = 15 f_CastTime = 9 STR_VAR f_Icon = EVAL ~%SOURCE_RES%B~ END
 LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 114 STR_VAR resource = EVAL ~%rr#var_0%~ END  // Use EFF file
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target = 1 parameter2 = 1 duration = 18 STR_VAR resource = SPELEMND END            // Play 3D Effect
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 1 parameter2 = 131 duration = 18 END                                      // Display Special Effect Icon
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 165 target = 1 duration = 18 END                                                       // Pause Target
   READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
   READ_LONG  0x6a "fx_off"
@@ -3354,9 +3341,6 @@ LPF configure_spell_header INT_VAR f_Target = 4 f_Range = 35 f_CastTime = 9 STR_
 LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 100  probability2 = 0   STR_VAR resource = EVAL ~%rr#var_0%~ END  // Regular elemental
 LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 95  probability2 = 61  STR_VAR resource = EVAL ~%rr#var_1%~ END  // Greater elemental
 LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 100 probability2 = 96  STR_VAR resource = EVAL ~%rr#var_2%~ END  // Elder elemental
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target = 1 parameter2 = 1 duration = 18 STR_VAR resource = SPELEMND END            // Play 3D Effect
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 1 parameter2 = 131 duration = 18 END                                      // Display Special Effect Icon
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 165 target = 1 duration = 18 END                                                       // Pause Target
   READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
   READ_LONG  0x6a "fx_off"
@@ -3589,6 +3573,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 
 // Revised summoned elemental scripts (note: summoner targeting is now handled via the main script, so it needs to be removed from here)
+// These scripts are no longer used by aTweaks, but patch them just in case
 
 COPY_EXISTING ~wizelsu2.bcs~ ~override~
               ~wizelsum.bcs~ ~override~
@@ -4168,12 +4153,14 @@ THEN
         SetInterrupt(FALSE)
 		SetGlobal("Elementalcontrol","LOCALS",3)
         Ally()
+        DestroyItem("RIDRING") // selection circle removal ring
         SetInterrupt(TRUE)
 END
 >>>>>>>>
 
 EXTEND_TOP ~wizelsum.bcs~  ~atweaks/inlined/baf/elementals/wizelsu.baf~
 EXTEND_TOP ~wizelsu2.bcs~  ~atweaks/inlined/baf/elementals/wizelsu.baf~
+EXTEND_TOP ~rr#ewizs.bcs~  ~atweaks/inlined/baf/elementals/wizelsu.baf~
 
 
 //==================================================================================
