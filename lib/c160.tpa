@@ -1,9 +1,9 @@
 
 INCLUDE "atweaks/lib/dsandstuff.tpa"
+INCLUDE "atweaks/lib/undead.tpa"
 
 LAF ret_from_eval STR_VAR f_Entry = fl#Disease RET DiseaseSecType = f_Value END
 LAF ret_from_eval STR_VAR f_Entry = fl#Fear RET FearSecType = f_Value END
-
 LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Value END
 
 
@@ -101,7 +101,7 @@ BEGIN
             timing = 9
             paramater2 = 1 END
         LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END                   //Invisibility detection by script
-        LPF DELETE_CRE_ITEM STR_VAR item_to_delete = "sw2h02\|sw2hdeat\|_?sw2h05" END
+        LPF DELETE_CRE_ITEM STR_VAR item_to_delete = "sw2h02\|sw2hdeat\|_?sw2h05\|ringdemn" END
         LPF RR#MDCRE
           INT_VAR
             newxpv = 10000
@@ -167,22 +167,107 @@ BEGIN
               script08 = bpdemon
           END
         END
+        LPF add_skeletal_traits END
       END
     BUT_ONLY
   END
 END
 
-COPY_EXISTING misc56.itm "override/fl#brsw.itm"                                    //Broken sword
+COPY_EXISTING misc56.itm "override/fl#brsw.itm" //Broken sword
   SAY 0x8 @1031
   SAY 0xc @1031
   SAY 0x50 @1032
   SAY 0x54 @1032
 
-COPY ~atweaks/spl/undead/fldkaura.spl~ override                                           // Death Knight Fear Aura
-     "atweaks/itm/undead/fl#dksw3.itm" override                                           //Two-handed sword +4
-     "atweaks/itm/undead/fl#dksw4.itm" override                                           //Bastard sword +2, +1 APR
-     "atweaks/itm/undead/fl#dksw5.itm" override                                           //Bastard sword +2, of dancing
-     "atweaks/itm/undead/fl#dksw6.itm" override                                           //Bastard sword +2, of life stealing
+COPY ~atweaks/spl/undead/fldkaura.spl~ override //Death Knight Fear Aura
+     "atweaks/itm/undead/fl#dksw3.itm" override //Two-handed sword +4
+
+COPY_EXISTING sw1h02.itm "override/fl#dksw4.itm" //Bastard sword +2, +1 APR
+              sw1h02.itm "override/fl#dksw5.itm" //Bastard sword +2, of dancing
+              sw1h02.itm "override/fl#dksw6.itm" //Bastard sword +2, of life stealing
+  WRITE_LONG 0x60 2 //enchantment
+  LPF configure_header
+    INT_VAR
+      f_ToHit = 2
+      f_Damage = 2
+  END
+  PATCH_MATCH "%DEST_RES%"
+  WITH
+    fl#dksw4 BEGIN
+      LPF ADD_ITEM_EQEFFECT
+        INT_VAR
+          opcode = 1 //APR mod
+          target = 1
+          parameter1 = 1
+          timing = 2
+      END
+    END
+    fl#dksw5 BEGIN
+      LPF fill_headers
+        INT_VAR
+          f_FillLimit = 2
+      END
+      LPF configure_header
+        INT_VAR
+          f_Header = 1
+          f_Type = 3
+          f_Identify = 1
+          f_Slot = 3
+          f_Target = 5
+          f_Speed = 0
+          f_Drained = 3
+          f_Flags = BIT11
+      END
+      LPF ADD_ITEM_EFFECT
+        INT_VAR
+          type = 3
+          opcode = 112 //Remove item
+          target = 1
+          timing = 1
+        STR_VAR
+          resource = fl#dksw5
+      END
+      LPF ADD_ITEM_EFFECT
+        INT_VAR
+          type = 3
+          opcode = 122 //Create item
+          target = 1
+          timing = 4
+          duration = 24
+        STR_VAR
+          resource = fl#dksw5
+      END
+      LPF ADD_ITEM_EFFECT
+        INT_VAR
+          type = 3
+          opcode = 67 //Summon creature
+          target = 1
+          duration = 24
+        STR_VAR
+          resource = fl#dksw5
+      END
+      LPF ADD_ITEM_EFFECT
+        INT_VAR
+          type = 3
+          opcode = 215 //Play visual
+          target = 1
+          timing = 1
+        STR_VAR
+          resource = spcrtwpn
+      END
+    END
+    fl#dksw6 BEGIN
+      LPF ADD_ITEM_EFFECT
+        INT_VAR
+          type = 1
+          opcode = 216 //Level drain
+          target = 2
+          parameter1 = 1
+          timing = 1
+      END
+    END
+    DEFAULT
+  END
 
 COPY "atweaks/cre/undead/fl#dksw5.cre" override                                           //Dancing sword
   SAY 0x8 @1030
@@ -893,11 +978,13 @@ BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
         REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring                                //Standard undead immunities
         REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring                               //+1 or better only
-        LPF ADD_CRE_EFFECT INT_VAR
-                          opcode = 297                                             //Immunity to Turn Undead
-                          target = 1
-                          timing = 9
-                          paramater2 = 1 END
+        LPF ADD_CRE_EFFECT
+          INT_VAR
+            opcode = 297                                             //Immunity to Turn Undead
+            target = 1
+            timing = 9
+            paramater2 = 1
+        END
         LPF RR#MDCRE
           INT_VAR
             newxpv = 4000
@@ -957,6 +1044,7 @@ BEGIN
             script07 = dw#range
             script98 = _wtarsgt
         END
+        LPF add_skeletal_traits END
       END
     BUT_ONLY
   END
