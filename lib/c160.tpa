@@ -754,6 +754,8 @@ COPY "atweaks/spl/undead/fl#mum.spl" override
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 2 parameter2 = 9 timing = 4 duration = i*7200 END
   END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*7200 END
+  //protection from cure wounds
+  //add a display string before death kicks in, so it does not come out of the blue
   
 //Spells and items that cure and protect against disease and fear are patched at the end
 
@@ -890,6 +892,9 @@ COPY "atweaks/spl/undead/fl#mum.spl" "override/fl#gmum.spl"
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 6 timing = 4 duration = i*300 END
   END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*300 END
+  //Add spell-casting failure
+  //protection from cure wounds
+  //add a display string before death kicks in, so it does not come out of the blue
   
 OUTER_SET $f_AddSecType(fl#gmum.spl) = DiseaseSecType
 
@@ -898,7 +903,7 @@ COPY "atweaks/spl/undead/fl#mumfa.spl" "override/fl#gmumf.spl"
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64 + 0x28*i + 0x26 fl#sight
   END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 timing = 1 parameter1 = 1 parameter2 = 1 STR_VAR resource = fl#gmumn END //cast fl#mumfn
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 timing = 1 parameter1 = 1 parameter2 = 1 STR_VAR resource = fl#gmumn END //cast fl#gmumn
   //LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter1 = 1 parameter2 = 4 STR_VAR resource = fl#gmumh END //Use fl#mumfh.eff for humans
 
 /*
