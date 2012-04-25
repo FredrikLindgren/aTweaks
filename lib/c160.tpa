@@ -10,7 +10,8 @@ LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Value END
 //Banshee
 
 ACTION_FOR_EACH file IN
-                banshe01
+                banshe01 //ToB Banshee
+                firmon01 //Unused critter from Firkraag's
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
@@ -64,7 +65,7 @@ BEGIN
   END
 END
 
-COPY "atweaks/spl/undead/fl#banwa.spl" override                                           //Banshee's wail
+COPY "atweaks/spl/undead/fl#banwa.spl" override //Banshee's wail
   FOR(i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64+i*0x28+0x26 fl#sight
   END
@@ -72,16 +73,15 @@ COPY "atweaks/spl/undead/fl#banwa.spl" override                                 
 
 
 // Death Knights
-
 ACTION_FOR_EACH file IN
-               deathk                                                              //Death Knight from Durlag's Tower
-               _deathk                                                             //Tutu
-               deathkni                                                            //Plain Death Knight used in ToB
-               deck615                                                             //DoMT hitman
-               uddeath                                                             //Undeadark Death Knights
-               uddeath2                                                            //Underdark Death Knight leader
-               gooddeat                                                            //Durlag's Tower DK mirror fiend
-               _ooddeat                                                            //Tutu
+               deathk //Death Knight from Durlag's Tower
+               _deathk
+               deathkni //Plain Death Knight used in ToB
+               deck615 //DoMT hitman
+               uddeath //Undeadark Death Knights
+               uddeath2 //Underdark Death Knight leader
+               gooddeat //Durlag's Tower DK mirror fiend
+               _ooddeat
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
@@ -89,18 +89,18 @@ BEGIN
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
         PATCH_IF "%file%" STRING_MATCHES_REGEXP "_?g?ooddeat$" BEGIN
-          SAY 0x8 @1020                                                            //Death Knight
+          SAY 0x8 @1020 //Death Knight
           SAY 0xc @1020
         END
-        REPLACE_CRE_ITEM helmnoan #0 #0 #0 none helmet                             //Helmet
-        REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring                                //Standard undead immunities
+        REPLACE_CRE_ITEM helmnoan #0 #0 #0 none helmet //Helmet
+        REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities
         LPF ADD_CRE_EFFECT
 	  INT_VAR
             opcode = 297 //Immunity to Turn Undead                                            
             target = 1 
             timing = 9
             paramater2 = 1 END
-        LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END                   //Invisibility detection by script
+        LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END //Invisibility detection by script
         LPF DELETE_CRE_ITEM STR_VAR item_to_delete = "sw2h02\|sw2hdeat\|_?sw2h05\|ringdemn" END
         LPF RR#MDCRE
           INT_VAR
@@ -138,6 +138,8 @@ BEGIN
             newrace = 115 //Skeleton
             newclass = 17 //F_M_C
             newalign = 51
+
+            enforce = 1
           STR_VAR
             enfc01 = deathk
             enfc02 = _deathk
@@ -269,7 +271,7 @@ COPY_EXISTING sw1h02.itm "override/fl#dksw4.itm" //Bastard sword +2, +1 APR
     DEFAULT
   END
 
-COPY "atweaks/cre/undead/fl#dksw5.cre" override                                           //Dancing sword
+COPY "atweaks/cre/undead/fl#dksw5.cre" override //Dancing sword
   SAY 0x8 @1030
   SAY 0xc @1030
   WRITE_ASCII 0x248 fl#dksw5 #8
@@ -372,30 +374,30 @@ END
 
 
 //Ghasts
-
 ACTION_FOR_EACH file IN
-		ghast                                                                //BG1 standard Ghast
-		ghastd                                                               //Durlag's Tower Ghast Trap Ghast
+		ghast //BG1 standard Ghast
+		ghastd //Durlag's Tower Ghast Trap Ghast
 		_ghast
 		_ghastd
-		ghasts                                                               //Tiax' summoned ghast
+		ghasts //Tiax' summoned ghast
 		_ghasts
-		ghast01                                                              //BG2 standard Ghast
-		nevm3                                                                //Nev's undead trap Ghast
+		ghast01 //BG2 standard Ghast
+		nevm3 //Nev's undead trap Ghast
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM fl#ghast #0 #0 #0 none weapon1 EQUIP
+        REPLACE_CRE_ITEM fl#ghas1 #0 #0 #0 none weapon1 EQUIP
+        REPLACE_CRE_ITEM fl#ghas2 #0 #0 #0 none shield
         LPF RR#MDCRE
           INT_VAR
             newxpv = 650
             newhp = 32 //4d8
             newac = 4
             newth = 17
-            newapr = 3
+            newapr = 2 //2 APR with main hand, plus teeth in the off hand
             newsvd = 9
             newsvw = 11
             newsvp = 10
@@ -422,6 +424,8 @@ BEGIN
             newmor = 14
             newclass = 118
             newalign = 51
+
+            enforce = 1
           STR_VAR
         END
         LPF RR#MDCSC
@@ -442,34 +446,57 @@ BEGIN
   END
 END
 
-COPY "atweaks/itm/undead/fl#ghast.itm" override
+COPY //"atweaks/itm/undead/fl#ghast.itm" override
      "atweaks/spl/undead/fl#ghaau.spl" override
 
+COPY_EXISTING s1-4.itm "override/fl#ghas1.itm"
+              s1-8.itm "override/fl#ghas2.itm"
+  DEFINE_ARRAY ghast_opcode BEGIN 175 141 141 50 174 174 END
+  DEFINE_ARRAY ghast_p1 BEGIN 0 0 0 0x455700 0 0 END
+  DEFINE_ARRAY ghast_p2 BEGIN 2 1 33 0x190000 0 0 END
+  DEFINE_ARRAY ghast_timing BEGIN 0 1 1 0 1 4 END
+  DEFINE_ARRAY ghast_duration BEGIN 42 0 0 2 0 42 END
+  DEFINE_ARRAY ghast_resref BEGIN "" "" "" "" eff_p11 eff_e05 END
+  PHP_EACH ghast_opcode AS int => opcode BEGIN
+    LPF ADD_ITEM_EFFECT
+      INT_VAR
+        type = 1
+        opcode
+        target = 2
+        parameter1 = $ghast_p1("%int%")
+        parameter2 = $ghast_p2("%int%")
+        timing = $ghast_timing("%int%")
+        duration = $ghast_duration("%int%")
+        savingthrow = BIT2 //Paralysation
+      STR_VAR
+        resource = EVAL $ghast_resref("%int%")
+    END
+  END
 
 
-//Ghouls and Lacedons
-
+// Ghouls and Lacedons
 ACTION_FOR_EACH file IN
-               ghoul                                                               //BG1 Ghoul
-               korax                                                               //Korax the Ghoul
-               _ghoul                                                              //Tutu
-               _korax                                                              //Tutu
-               lacedo01                                                            //Lacedon
-               sahlace                                                             //Lacedon
+               ghoul //BG1 Ghoul
+               korax //Korax the Ghoul
+               _ghoul
+               _korax
+               lacedo01 //Lacedon
+               sahlace //Lacedon
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM fl#ghoul #0 #0 #0 none weapon1 EQUIP
+        REPLACE_CRE_ITEM fl#ghou1 #0 #0 #0 none weapon1 EQUIP
+        REPLACE_CRE_ITEM fl#ghou2 #0 #0 #0 none shield
         LPF RR#MDCRE
           INT_VAR
             newxpv = 175
             newhp = 16 //2d8
             newac = 6
             newth = 19
-            newapr = 3
+            newapr = 2 //2 with main, plus one chomp with the off hand
             newsvd = 12
             newsvw = 14
             newsvp = 13
@@ -495,6 +522,8 @@ BEGIN
             newchr = 7
             newmor = 12
             newalign = 51 //CE
+
+            enforce = 1
           STR_VAR
             enfc01 = ghoul
             enfc02 = _ghoul
@@ -517,7 +546,8 @@ BEGIN
   END
 END
 
-COPY "atweaks/itm/undead/fl#ghoul.itm" override
+COPY_EXISTING s1-3.itm "override/fl#ghou1.itm"
+              s1-6.itm "override/fl#ghou2.itm"
   LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 177 target = 2 duration = 1 parameter1 = 2 parameter2 = 4 STR_VAR resource = fl#ghoul END //Protection from fl#ghoul.spl for elves
   LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 146 target = 2 timing = 1 parameter1 = 1 parameter2 = 1 STR_VAR resource = fl#ghoul END //Cast fl#ghoul.spl
 
@@ -531,21 +561,22 @@ COPY "atweaks/spl/undead/fl#ghoul.spl" override
 
 
 
-//Ghoul lords
-
+// Ghoul lords
 ACTION_FOR_EACH file IN
                 ghogr01
                 gholor01
                 riftcr01
                 ghoullor
                 _houllor
+                //lacedo02 //Sahuagin Greater Lacedon; add exception to the name change
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM fl#glord #0 #0 #0 none weapon1 EQUIP
+        REPLACE_CRE_ITEM fl#glor1 #0 #0 #0 none weapon1 EQUIP
+        REPLACE_CRE_ITEM fl#glor2 #0 #0 #0 none shield
         REMOVE_CRE_ITEM mage06 _mage06
         SAY 0x8 @1033
         SAY 0xc @1033
@@ -555,7 +586,7 @@ BEGIN
             newhp = 48 //6d8
             newac = 4
             newth = 15
-            newapr = 3
+            newapr = 2 //2 with main, plus one with off-hand
             newsvd = 9
             newsvw = 11
             newsvp = 10
@@ -582,6 +613,8 @@ BEGIN
             newchr =  9
             newmor = 14
             newalign = 51
+
+            enforce = 1
           STR_VAR
             enfc01 = ghogr01
             enfc02 = gholor01
@@ -605,8 +638,60 @@ BEGIN
   END
 END
 
-COPY "atweaks/itm/undead/fl#glord.itm" override
-  LPF ADD_ITEM_EFFECT INT_VAR opcode = 146 target = 2 parameter1 = 1 parameter2 = 1 timing = 1 savingthrow = 4 type = 1 STR_VAR resource = fl#glor2 END
+COPY_EXISTING s1-6.itm "override/fl#glor1.itm"
+              s1-10.itm "override/fl#glor2.itm"
+  PATCH_IF "%DEST_RES%" STRING_EQUAL_CASE fl#glor1 BEGIN
+    LPF ADD_ITEM_EQEFFECT
+      INT_VAR
+        opcode = 120 //weapon immunity
+        target = 1
+        parameter2 = 2 //non-magical
+        timing = 2
+    END
+    LPF ADD_ITEM_EQEFFECT
+      INT_VAR
+        opcode = 126 //movement bonus
+        target = 1
+        parameter1 = 2 //double
+        parameter2 = 2
+        timing = 2
+    END
+  END
+  DEFINE_ARRAY glor_opcode BEGIN 175 141 141 50 174 174 END
+  DEFINE_ARRAY glor_p1 BEGIN 0 0 0 0x455700 0 0 END
+  DEFINE_ARRAY glor_p2 BEGIN 2 1 33 0x190000 0 0 END
+  DEFINE_ARRAY glor_timing BEGIN 0 1 1 0 1 4 END
+  DEFINE_ARRAY glor_duration BEGIN 54 0 0 2 0 54 END
+  DEFINE_ARRAY glor_resref BEGIN "" "" "" "" eff_p11 eff_e05 END
+  PHP_EACH glor_opcode AS int => opcode BEGIN
+    LPF ADD_ITEM_EFFECT
+      INT_VAR
+        type = 1
+        opcode
+        target = 2
+        parameter1 = $glor_p1("%int%")
+        parameter2 = $glor_p2("%int%")
+        timing = $glor_timing("%int%")
+        duration = $glor_duration("%int%")
+        savingthrow = BIT2 //Paralysation
+      STR_VAR
+        resource = EVAL $glor_resref("%int%")
+    END
+  END
+  PATCH_IF "%DEST_RES%" STRING_EQUAL_CASE fl#glor2 BEGIN
+    LPF ADD_ITEM_EFFECT
+      INT_VAR
+        type = 1
+        opcode = 146 //Cast spell
+        target = 2
+        parameter1 = 1
+        parameter2 = 1
+        timing = 1
+        savingthrow = BIT2
+      STR_VAR
+        resource = fl#glor2
+    END
+  END
 
 COPY "atweaks/spl/base.spl" "override/fl#glor2.spl"
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#glor2 END
@@ -633,8 +718,9 @@ COPY "atweaks/spl/undead/fl#glord.spl" override
 
 OUTER_SET $f_AddSecType(fl#glord.spl) = FearSecType
 
-//Mummies
 
+
+// Mummies
 ACTION_FOR_EACH file IN
 		mummy
 		mummy01
@@ -676,6 +762,8 @@ BEGIN
             newchr = 7
             newmor = 15
             newalign = 19 //LE
+
+            enforce = 1
           STR_VAR
             enfc01 = mummy
             enfc02 = mummy01
@@ -764,7 +852,6 @@ OUTER_SET $f_AddSecType(fl#mum.spl) = DiseaseSecType
 
 
 // Greater Mummies
-
 ACTION_FOR_EACH file IN
 		mumgre01
 		riftcr03
@@ -847,6 +934,8 @@ BEGIN
             newmor = 18
             newalign = 51 //CE
             newclass = 3 //cleric
+
+            enforce = 1
           STR_VAR
             enfc01 = mumgre01
             enfc02 = riftcr03
@@ -950,8 +1039,7 @@ OUTER_SET $f_AddSecType(fl#gmumn.spl) = FearSecType
 
 
 
-//Skeleton Warriors
-
+// Skeleton Warriors
 ACTION_FOR_EACH file IN
                ar18skel
                ceskel01
@@ -1063,7 +1151,6 @@ COPY "atweaks/spl/undead/fl#skelw.spl" override
 
 
 // Scripts
-
 ACTION_IF BG1 AND !BGT BEGIN
   OUTER_SPRINT DurlagArea fw0516
   OUTER_SPRINT TutuJournal
