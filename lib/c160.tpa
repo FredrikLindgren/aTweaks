@@ -18,6 +18,10 @@ BEGIN
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_CRE_ITEM b1-8m2 #0 #0 #0 none weapon1 EQUIP
+        REPLACE_CRE_ITEM immune1 #0 #0 #0 none lring
+        REPLACE_CRE_ITEM ring95 #0 #0 #0 none rring
+        REMOVE_CRE_ITEM immchs
         LPF RR#MDCRE
           INT_VAR
             newxpv = 4000
@@ -93,13 +97,14 @@ BEGIN
           SAY 0xc @1020
         END
         REPLACE_CRE_ITEM helmnoan #0 #0 #0 none helmet //Helmet
-        REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
         LPF ADD_CRE_EFFECT
 	  INT_VAR
             opcode = 297 //Immunity to Turn Undead                                            
             target = 1 
             timing = 9
-            paramater2 = 1 END
+            paramater2 = 1
+        END
         LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END //Invisibility detection by script
         LPF DELETE_CRE_ITEM STR_VAR item_to_delete = "sw2h02\|sw2hdeat\|_?sw2h05\|ringdemn" END
         LPF RR#MDCRE
@@ -271,10 +276,11 @@ COPY_EXISTING sw1h02.itm "override/fl#dksw4.itm" //Bastard sword +2, +1 APR
     DEFAULT
   END
 
-COPY "atweaks/cre/undead/fl#dksw5.cre" override //Dancing sword
+COPY_EXISTING sword02.cre "override/fl#dksw5.cre" //Dancing sword
   SAY 0x8 @1030
   SAY 0xc @1030
-  WRITE_ASCII 0x248 fl#dksw5 #8
+  REPLACE_CRE_ITEM fl#dksw5 #0 #0 #0 unstealable&undroppable weapon1 EQUIP
+  WRITE_ASCII SCRIPT_OVERRIDE fl#dksw5 #8
  
 OUTER_SPRINT $dksw(1) sw1h42
 OUTER_SPRINT $dksw(2) sw2h20
@@ -451,6 +457,7 @@ COPY //"atweaks/itm/undead/fl#ghast.itm" override
 
 COPY_EXISTING s1-4.itm "override/fl#ghas1.itm"
               s1-8.itm "override/fl#ghas2.itm"
+  WRITE_LONG 0x60 1 //enchantment
   DEFINE_ARRAY ghast_opcode BEGIN 175 141 141 50 174 174 END
   DEFINE_ARRAY ghast_p1 BEGIN 0 0 0 0x455700 0 0 END
   DEFINE_ARRAY ghast_p2 BEGIN 2 1 33 0x190000 0 0 END
@@ -568,7 +575,7 @@ ACTION_FOR_EACH file IN
                 riftcr01
                 ghoullor
                 _houllor
-                //lacedo02 //Sahuagin Greater Lacedon; add exception to the name change
+                lacedo02 //Sahuagin Greater Lacedon
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
@@ -578,8 +585,10 @@ BEGIN
         REPLACE_CRE_ITEM fl#glor1 #0 #0 #0 none weapon1 EQUIP
         REPLACE_CRE_ITEM fl#glor2 #0 #0 #0 none shield
         REMOVE_CRE_ITEM mage06 _mage06
-        SAY 0x8 @1033
-        SAY 0xc @1033
+        PATCH_IF "%SOURCE_RES%" STRING_COMPARE_CASE lacedo02 BEGIN
+          SAY 0x8 @1033
+          SAY 0xc @1033
+        END
         LPF RR#MDCRE
           INT_VAR
             newxpv = 3000
@@ -640,6 +649,7 @@ END
 
 COPY_EXISTING s1-6.itm "override/fl#glor1.itm"
               s1-10.itm "override/fl#glor2.itm"
+  WRITE_LONG 0x60 1 //enchantment
   PATCH_IF "%DEST_RES%" STRING_EQUAL_CASE fl#glor1 BEGIN
     LPF ADD_ITEM_EQEFFECT
       INT_VAR
@@ -687,7 +697,7 @@ COPY_EXISTING s1-6.itm "override/fl#glor1.itm"
         parameter1 = 1
         parameter2 = 1
         timing = 1
-        savingthrow = BIT2
+        savingthrow = BIT2 //Poison
       STR_VAR
         resource = fl#glor2
     END
@@ -696,9 +706,9 @@ COPY_EXISTING s1-6.itm "override/fl#glor1.itm"
 COPY "atweaks/spl/base.spl" "override/fl#glor2.spl"
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#glor2 END
   FOR (i=1;i<30;++i) BEGIN
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target = 2 parameter1 = 5 parameter2 = 4194304 timing = 4 duration = i*300 END
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 6 timing = 4 duration = i*300 END
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 9 timing = 4 duration = i*300 END
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 12 target = 2 parameter1 = 5 parameter2 = 4194304 timing = 4 duration = i*300 END //5 points of damage
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 6 timing = 4 duration = i*300 END //1 point of con
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 9 timing = 4 duration = i*300 END //1 point of cha
   END
 
 OUTER_SET $f_AddSecType(fl#glor2.spl) = DiseaseSecType
@@ -781,6 +791,7 @@ BEGIN
 END
 
 COPY "atweaks/itm/undead/fl#mum.itm" override
+  WRITE_LONG 0x60 2 //enchantment
   //LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 272 target = 1 timing = 2 parameter1 = 6 parameter2 = 3 STR_VAR resource = fl#mumfa END
   //LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 232 target = 1 timing = 2 parameter1 = 0 parameter2 = 1 STR_VAR resource = fl#mumfa END //cast spell on self every round
 
@@ -837,13 +848,14 @@ COPY "atweaks/spl/undead/fl#mum.spl" override
       SAY i + 0x4 @1029
     END
   END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#mum END
+  //Already on the spl: display string: disease, immunity to cure spells, portrait icon, colour pulse
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#mum END //Non-cumulativity
   FOR (i=1;i<6;++i) BEGIN
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 2 parameter2 = 9 timing = 4 duration = i*7200 END
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 2 parameter2 = 9 timing = 4 duration = i*7200 END //2 points of chr
   END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*7200 END
-  //protection from cure wounds
-  //add a display string before death kicks in, so it does not come out of the blue
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*7200 END //death, disintegration-style
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1035) timing = 4 duration = 5*7200 END //display a waring a day before insta-death
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1036) timing = 4 duration = 6*7200 - 1 END //display flavour text right before insta-death
   
 //Spells and items that cure and protect against disease and fear are patched at the end
 
@@ -952,6 +964,7 @@ BEGIN
 END
 
 COPY "atweaks/itm/undead/fl#mum.itm" "override/fl#gmum.itm"
+  WRITE_LONG 0x60 4 //enchantment
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_BYTE LONG_AT 0x64 + 0x38*i + 0x16 6
     WRITE_BYTE LONG_AT 0x64 + 0x38*i + 0x18 3 //3d6
@@ -973,17 +986,20 @@ COPY "atweaks/spl/undead/fl#mum.spl" "override/fl#gmum.spl"
       SAY i + 0x4 @1029
     END
   END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#gmum END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#mum END
+  //Already on the spl: display string: disease, immunity to cure spells, portrait icon, colour pulse
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#gmum END //non-cumulativity
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#mum END //immunity from regular mummy rot
   FOR (i=1;i<6;++i) BEGIN
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 2 parameter2 = 9 timing = 4 duration = i*300 END
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 4 timing = 4 duration = i*300 END
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 6 timing = 4 duration = i*300 END
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 2 parameter2 = 9 timing = 4 duration = i*300 END //2 points of chr
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 4 timing = 4 duration = i*300 END //1 point of str
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 6 timing = 4 duration = i*300 END //1 point of con
   END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*300 END
-  //Add spell-casting failure
-  //protection from cure wounds
-  //add a display string before death kicks in, so it does not come out of the blue
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*300 END //death, disintigration-style
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1035) timing = 4 duration = 5*300 END //display a waring a day before insta-death
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1036) timing = 4 duration = 6*300 - 1 END //display flavour text right before insta-death
+  PATCH_FOR_EACH parameter2 IN 0 1 BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 145 target = 2 parameter2 duration = 6*300 END //disable spellcasting
+  END
   
 OUTER_SET $f_AddSecType(fl#gmum.spl) = DiseaseSecType
 
@@ -1069,11 +1085,12 @@ BEGIN
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring                                //Standard undead immunities
-        REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring                               //+1 or better only
+        REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities, plus red colouring, sans charm immunity
+        REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring //+1 or better only
+        REPLACE_CRE_ITEM immchs #0 #0 #0 none amulet //charm and sleep immunity
         LPF ADD_CRE_EFFECT
           INT_VAR
-            opcode = 297                                             //Immunity to Turn Undead
+            opcode = 297 //Immunity to Turn Undead
             target = 1
             timing = 9
             paramater2 = 1
