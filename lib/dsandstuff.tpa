@@ -256,3 +256,21 @@ BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_PHP_EACH
 END                                                                                // ends safety check
+
+//Tag celestials, for detectability (mirrors code in SCSII)
+ACTION_FOR_EACH celestial IN 
+		devagood
+		devaevil
+		plangood
+		planevil
+		ca#dastr
+		ca#dmond
+		ca#dmova
+		ca#plan
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%celestial%.cre" BEGIN
+    COPY_EXISTING "%celestial%.cre" override
+      WRITE_BYTE 0x274 182 //Specific
+    BUT_ONLY
+  END 
+END

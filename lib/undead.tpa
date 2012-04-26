@@ -15,11 +15,23 @@ END
 
 
 //Wall of Ice
-COPY ~atweaks/bam/rr#icew.bam~ ~override~                                          // Wall of Ice BAM
-COPY ~atweaks/spl/rr#icew.spl~ ~override~                                          // Wall of Ice
-  SAY NAME1 @1024 SAY NAME2 @1024
-  READ_LONG  0x64 ab_off
-  READ_SHORT 0x68 ab_num
-  FOR(i=0; i<ab_num; i+=1) BEGIN
-    WRITE_SHORT (ab_off+i*0x28+0x26) %rr#icew%                                     // use new projectile
-  END
+ACTION_IF !FILE_EXISTS_IN_GAME rr#icew.spl BEGIN
+  COPY ~atweaks/bam/rr#icew.bam~ ~override~                                          // Wall of Ice BAM
+  COPY ~atweaks/spl/rr#icew.spl~ ~override~                                          // Wall of Ice
+    SAY NAME1 @1024 SAY NAME2 @1024
+    READ_LONG  0x64 ab_off
+    READ_SHORT 0x68 ab_num
+    FOR(i=0; i<ab_num; i+=1) BEGIN
+      WRITE_SHORT (ab_off+i*0x28+0x26) %rr#icew%                                     // use new projectile
+    END
+END
+
+//Symbol, Pain
+ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.spl BEGIN
+  COPY ~aTweaks/SPL/RR#SPAIN.SPL~ ~override~                                         // Symbol Pain
+    READ_LONG  0x64 ab_off
+    READ_SHORT 0x68 ab_num
+    FOR(i=0; i<ab_num; i+=1) BEGIN
+      WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                    // use new projectile (party friendly)
+    END
+END

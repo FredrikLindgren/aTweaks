@@ -73,7 +73,31 @@ COPY "atweaks/spl/undead/fl#banwa.spl" override //Banshee's wail
   FOR(i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64+i*0x28+0x26 fl#sight
   END
-  
+
+COPY "atweaks/spl/base.spl" "override/fl#banfa.spl" //Fear aura
+  WRITE_BYTE 0x27 11 //disabling
+  READ_LONG 0x64 ao
+  FOR(i=0;i<SHORT_AT 0x68;++i) BEGIN
+    WRITE_BYTE  ao+i*0x28+0xc 4 //any point
+    WRITE_SHORT ao+i*0x28+0x26 fl#sight
+  END
+  DEFINE_ARRAY banfa_opcode BEGIN 24 139 142 END
+  DEFINE_ARRAY banfa_p1 BEGIN 0 14007 0 END
+  DEFINE_ARRAY banfa_p2 BEGIN 0 0 36 END
+  DEFINE_ARRAY banfa_timing BEGIN 0 1 0 END
+  DEFINE_ARRAY banfa_duration BEGIN 60 0 60 END
+  PHP_EACH banfa_opcode AS int => opcode BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+        opcode
+        target = 2
+        parameter1 = $banfa_p1("%int%")
+        parameter2 = $banfa_p2("%int%")
+        timing = $banfa_timing("%int%")
+        duration = $banfa_duration("%int%")
+        savingthrow = BIT0 //spell
+    END
+  END
 
 
 // Death Knights
@@ -279,7 +303,7 @@ COPY_EXISTING sw1h02.itm "override/fl#dksw4.itm" //Bastard sword +2, +1 APR
 COPY_EXISTING sword02.cre "override/fl#dksw5.cre" //Dancing sword
   SAY 0x8 @1030
   SAY 0xc @1030
-  REPLACE_CRE_ITEM fl#dksw5 #0 #0 #0 unstealable&undroppable weapon1 EQUIP
+  REPLACE_CRE_ITEM fl#dksw5 #0 #0 #0 "unstealable&undroppable" weapon1 EQUIP
   WRITE_ASCII SCRIPT_OVERRIDE fl#dksw5 #8
  
 OUTER_SPRINT $dksw(1) sw1h42
@@ -713,16 +737,37 @@ COPY "atweaks/spl/base.spl" "override/fl#glor2.spl"
 
 OUTER_SET $f_AddSecType(fl#glor2.spl) = DiseaseSecType
 
-COPY "atweaks/eff/undead/fl#glord.eff" override
-     
 COPY "atweaks/spl/undead/fl#glord.spl" override
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64 + 0x28*i + 0x26 fl#sight
   END
-  FOR (i=LONG_AT 0x6a;i<SOURCE_SIZE;i+=0x30) BEGIN
-    READ_SHORT i type
-    PATCH_IF type = 139 BEGIN
-      SAY i + 0x4 @1034
+  LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = "-1" END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter1 = 1 parameter2 = 8 STR_VAR resource = fl#glord.eff END //Use EFF on good people
+
+COPY "atweaks/eff/base.eff" "override/fl#glord.eff"
+  WRITE_LONG  0x10 146 //cast spell
+  WRITE_LONG  0x14 2
+  WRITE_ASCII 0x30 fl#glor3
+
+COPY "atweaks/spl/base.spl" "override/fl#glor3.spl"
+  glor3_strref = RESOLVE_STR_REF(@1034)
+  DEFINE_ARRAY glor3_opcode BEGIN 278 139 142 206 END
+  DEFINE_ARRAY glor3_p1 BEGIN "-4" glor3_strref 0 0 END
+  DEFINE_ARRAY glor3_p2 BEGIN 0 0 7 0 END
+  DEFINE_ARRAY glor3_timing BEGIN 0 1 0 0 END
+  DEFINE_ARRAY glor3_duration BEGIN 6 0 6 6 END
+  DEFINE_ARRAY glor3_resref BEGIN "" "" "" fl#glor3 END
+  PHP_EACH glor3_opcode AS int => opcode BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+        opcode
+        target = 2
+        parameter1 = $glor3_p1("%int%")
+        parameter2 = $glor3_p2("%int%")
+        timing = $glor3_timing("%int%")
+        duration = $glor3_duration("%int%")
+      STR_VAR
+        resource = $glor3_resref("%int%")
     END
   END
 
