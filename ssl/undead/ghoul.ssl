@@ -21,7 +21,7 @@ IF TRIGGER
   TargetBlock(PCSquishy)
   TargetBlock(EnemiesInOrder)
   !Race(scstarget,ELF)
-  TriggerBlock(PierceRes|Disabled|Enemy|ProEvil)
+  TriggerBlock(SlashRes|Disabled|Enemy|ProEvil)
   !HPPercentGT(scstarget,25)
   Range(scstarget,10)
 THEN DO
@@ -32,7 +32,7 @@ IF TRIGGER
   TargetBlock(PCSquishy)
   TargetBlock(EnemiesInOrder)
   !Race(scstarget,ELF)
-  TriggerBlock(PierceRes|Disabled|Enemy|ProEvil)
+  TriggerBlock(SlashRes|Disabled|Enemy|ProEvil)
   Range(scstarget,10)
 THEN DO
   Action(Attack)
@@ -41,21 +41,21 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   !Race(scstarget,ELF)
-  TriggerBlock(PierceRes|Disabled|Enemy|ProEvil)
+  TriggerBlock(SlashRes|Disabled|Enemy|ProEvil)
 THEN DO
   Action(Attack)
 END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(PierceRes|Disabled|Enemy|ProEvil)
+  TriggerBlock(SlashRes|Disabled|Enemy|ProEvil)
 THEN DO
   Action(Attack)
 END
 
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(PierceRes|Enemy|ProEvil)
+  TriggerBlock(SlashRes|Enemy|ProEvil)
 THEN DO
   Action(Attack)
 END
@@ -95,4 +95,11 @@ IF TRIGGER
   !CheckStatGT(LastAttackerOf(Myself),0,PROTECTION_FROM_EVIL)
 THEN DO
   Action(Attack)
+END
+
+//If everyone is under PfE, stalk the juicy-looking ones
+IF TRIGGER
+  TargetBlock(PCSquishy)
+THEN DO
+    Action(MoveIfEmpty)
 END
