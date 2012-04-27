@@ -19,7 +19,10 @@ my @undead = (
     "skelwa_melee.ssl:fl#sklwm.baf",
     "skelwa_ranged.ssl:fl#sklwr.baf",
     "gooddeat.ssl:gooddeat.baf",
-    "killgood.ssl:killgood.baf"
+    "killgood.ssl:killgood.baf",
+    "zombie.ssl:fl#zomb.baf",
+    "zombie-juju.ssl:fl#zomju.baf",
+    "zombie-sea.ssl:fl#zomse.baf"
     );
 
 my @beholders = (

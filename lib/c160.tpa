@@ -122,13 +122,7 @@ BEGIN
         END
         REPLACE_CRE_ITEM helmnoan #0 #0 #0 none helmet //Helmet
         REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
-        LPF ADD_CRE_EFFECT
-	  INT_VAR
-            opcode = 297 //Immunity to Turn Undead                                            
-            target = 1 
-            timing = 9
-            paramater2 = 1
-        END
+        LPM unturnable
         LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END //Invisibility detection by script
         LPF DELETE_CRE_ITEM STR_VAR item_to_delete = "sw2h02\|sw2hdeat\|_?sw2h05\|ringdemn" END
         LPF RR#MDCRE
@@ -169,15 +163,6 @@ BEGIN
             newalign = 51
 
             enforce = 1
-          STR_VAR
-            enfc01 = deathk
-            enfc02 = _deathk
-            enfc03 = deathkni
-            enfc04 = deck615
-            enfc05 = uddeath
-            enfc06 = uddeath2
-            enfc07 = gooddeat
-            enfc08 = _ooddeat
         END
         PATCH_IF "%file%" STRING_MATCHES_REGEXP "_?g?ooddeat$" BEGIN
           PATCH_IF "%file%" STRING_MATCHES_REGEXP "_?deathk$" = 0 BEGIN
@@ -469,7 +454,7 @@ BEGIN
             newcon = 9
             newint = 12
             newwis = 9
-            newchr = 7
+            newchr = 9
             newmor = 14
             newclass = 118
             newalign = 51
@@ -489,6 +474,8 @@ BEGIN
             script07 = _ghastd
             script08 = _movep1
             script09 = dw#melee
+            skipfile02 = ghasts
+            skipfile03 = _ghasts
         END
       END
     BUT_ONLY
@@ -569,16 +556,11 @@ BEGIN
             newcon = 9
             newint = 7
             newwis = 7
-            newchr = 7
+            newchr = 9
             newmor = 12
             newalign = 51 //CE
 
             enforce = 1
-          STR_VAR
-            enfc01 = ghoul
-            enfc02 = _ghoul
-            enfc03 = lacedo01
-            enfc04 = sahlace
         END
         LPF RR#MDCSC
           STR_VAR
@@ -667,12 +649,6 @@ BEGIN
             newalign = 51
 
             enforce = 1
-          STR_VAR
-            enfc01 = ghogr01
-            enfc02 = gholor01
-            enfc03 = riftcr01
-            enfc04 = ghoullor
-            enfc05 = _houllor
         END
         LPF RR#MDCSC
           STR_VAR
@@ -838,9 +814,6 @@ BEGIN
             newalign = 19 //LE
 
             enforce = 1
-          STR_VAR
-            enfc01 = mummy
-            enfc02 = mummy01
         END
         LPF RR#MDCSC
           STR_VAR
@@ -1012,9 +985,6 @@ BEGIN
             newclass = 3 //cleric
 
             enforce = 1
-          STR_VAR
-            enfc01 = mumgre01
-            enfc02 = riftcr03
         END
         LPF RR#MDCSC
           STR_VAR
@@ -1064,6 +1034,7 @@ COPY "atweaks/spl/undead/fl#mum.spl" "override/fl#gmum.spl"
   PATCH_FOR_EACH parameter2 IN 0 1 BEGIN
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 145 target = 2 parameter2 duration = 6*300 END //disable spellcasting
   END
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 2 parameter2 = 83 duration = 6*300 END //portrait: spell failure
   
 OUTER_SET $f_AddSecType(fl#gmum.spl) = DiseaseSecType
 
@@ -1152,13 +1123,7 @@ BEGIN
         REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities, plus red colouring, sans charm immunity
         REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring //+1 or better only
         REPLACE_CRE_ITEM immchs #0 #0 #0 none amulet //charm and sleep immunity
-        LPF ADD_CRE_EFFECT
-          INT_VAR
-            opcode = 297 //Immunity to Turn Undead
-            target = 1
-            timing = 9
-            paramater2 = 1
-        END
+        LPM unturnable
         LPF RR#MDCRE
           INT_VAR
             newxpv = 4000
@@ -1198,8 +1163,8 @@ BEGIN
             
             enforce = 1
           STR_VAR
-            skipfile01 = hgskl04
-            skipfile02 = grtomb01
+            notenf01 = hgskl04
+            notenf02 = grtomb01
         END
         PATCH_IF "%file%" STRING_EQUAL_CASE skelwa03 OR "%file%" STRING_EQUAL_CASE _kelwa03 OR "%file%" STRING_EQUAL_CASE bgskel03 BEGIN
           SPRINT script fl#sklwr
@@ -1217,6 +1182,7 @@ BEGIN
             script06 = wdasight
             script07 = dw#range
             script98 = _wtarsgt
+            skipfile02 = skelwasu
         END
         LPF add_skeletal_traits END
       END
@@ -1228,6 +1194,301 @@ COPY "atweaks/spl/undead/fl#skelw.spl" override
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64 + 0x28*i + 0x26 fl#sight
   END
+
+
+
+// Zombie
+ACTION_FOR_EACH file IN
+                bhghoul3 //undead village
+                bhghoul5 //undead village
+                kelzomb //Keldorn's
+                nevm5 //Nev's
+                rzomb01 //Ranger stronghold mission
+                zombie01 //Unused, but no accounting for mods
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM fl#zomb #0 #0 #0 none weapon1
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 65
+            newhp = 16 //2d8
+            newac = 8
+            newth = 19
+            newapr = 1
+            newsvd = 14
+            newsvw = 16
+            newsvp = 15
+            newsvb = 17
+            newsvs = 17
+            newlvl1 = 2
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 0
+            newfr = 0
+            newcr = 100
+            newer = 0
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 9
+            newstrx = 0
+            newint = 9
+            newwis = 9
+            newdex = 9
+            newcon = 9
+            newchr = 9
+            newmor = 20
+            newalign = 34 //Neutral
+            newclass = 198 //Zombie
+            newgen = 4 //undead
+            newrace = 148 //Zombie
+            
+            enforce = 1
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#zomb
+            script01 = wtasight
+            skipfile02 = kelzomb
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+COPY_EXISTING b1-8.itm "override/fl#zomb.itm"
+  FOR (i = 0; i < SHORT_AT 0x68; ++i) BEGIN
+    WRITE_BYTE LONG_AT 0x64 + 0x38*i + 0x12 10 //speed
+  END
+
+
+
+// Zombie, Ju-ju
+ACTION_FOR_EACH file IN
+                zombju01
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring
+        REPLACE_CRE_ITEM fl#zomju #0 #0 #0 none weapon1
+        LPM illusion_immunity
+        LPF ADD_CRE_EFFECT
+          INT_VAR
+            opcode = 83 //protection from projectile
+            target = 1
+            parameter2 = 0x24 //Magic Missile
+            timing = 9
+        END
+        //LPM seeinvisible
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 975
+            newhp = 36 //3d8+12
+            newac = 6
+            newth = 15
+            newapr = 1
+            newsvd = 11
+            newsvw = 13
+            newsvp = 12
+            newsvb = 13
+            newsvs = 14
+            newlvl1 = 9
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 0
+            newfr = 50
+            newcr = 100
+            newer = 100
+            newar = 0
+            newrs = 0
+            newrc = 50
+            newrp = 50
+            newrm = 50
+            newstr = 9
+            newstrx = 0
+            newint = 7
+            newwis = 9
+            newdex = 16
+            newcon = 9
+            newchr = 9
+            newmor = 20
+            newalign = 35 //NE
+            newclass = 198 //Zombie
+            newgen = 4 //undead
+            newrace = 148 //Zombie
+            
+            enforce = 1
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#zomju
+            script01 = wtasight
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+COPY_EXISTING b3-12.itm "override/fl#zomju.itm"
+  WRITE_LONG 0x60 1 //enchantment
+
+
+
+// Zombie, Sea
+ACTION_FOR_EACH file IN
+                sahzomb
+                zombse01
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM fl#zomse #0 #0 #0 none weapon1
+        LPM illusion_immunity
+        LPM unturnable
+        //LPM seeinvisible
+        ADD_MEMORIZED_SPELL sppr102 #0 priest //Command
+        ADD_MEMORIZED_SPELL sppr113 #0 priest //Doom
+        ADD_MEMORIZED_SPELL sppr208 #1 priest //Hold Person
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 420
+            newhp = 40 //5d8
+            newac = 6
+            newth = 15
+            newapr = 1
+            newsvd = 11
+            newsvw = 13
+            newsvp = 12
+            newsvb = 13
+            newsvs = 14
+            newlvl1 = 5
+            newlvl2 = 3
+            newlvl3 = 0
+            newmr = 0
+            newfr = 50
+            newcr = "-100"
+            newer = "-100"
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 18
+            newstrx = 0
+            newint = 7
+            newwis = 9
+            newdex = 9
+            newcon = 9
+            newchr = 9
+            newmor = 20
+            newalign = 0x33 //NE
+            newclass = 8 //F/C
+            newgen = 4 //undead
+            newrace = 148 //Zombie
+            
+            enforce = 1
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#zomse
+            script01 = wtasight
+            script02 = sahamb01
+            script03 = wdasight
+        END
+      END
+    BUT_ONLY
+  END
+END
+
+COPY "atweaks/spl/base.spl" "override/fl#zomse.spl" //Aura
+  READ_LONG 0x64 ao
+  FOR (i = 0; i < SHORT_AT 0x68; ++i) BEGIN
+    WRITE_BYTE  ao + 0x28*i + 0xc 4 //any point
+    WRITE_SHORT ao + 0x28*i + 0x26 fl#sight
+  END
+  DEFINE_ARRAY zomse_opcode BEGIN 278 0 142 139 END
+  DEFINE_ARRAY zomse_p1 BEGIN "-1" "-1" 0 17398 END
+  DEFINE_ARRAY zomse_p2 BEGIN 0 0 126 0 END
+  PHP_EACH zomse_opcode AS int => opcode BEGIN 
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+        opcode
+        target = 2
+        parameter1 = $zomse_p1("%int%")
+        parameter2 = $zomse_p2("%int%")
+        timing = opcode = 139 ? 1 : 0
+        duration = opcode = 139 ? 0 : 30
+        savingthrow = BIT2 //poison
+    END
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 206 //non-cumulativity
+      target = 2
+      duration = 30
+      savingthrow = BIT2
+    STR_VAR
+      resource = fl#zomse
+  END
+
+COPY_EXISTING b1-10.itm "override/fl#zomse.itm" //Sorry, but the zombie animation does not support weapons, so fists it is
+  WRITE_LONG 0x60 1 //enchantment
+  LPF ADD_ITEM_EFFECT
+    INT_VAR
+      type = 1
+
+      opcode = 146 //cast spell
+      target = 2
+      parameter1 = 1
+      parameter2 = 1
+      timing = 1
+      probability1 = 10
+    STR_VAR
+      resource = fl#zomsd
+  END
+
+COPY "atweaks/spl/base.spl" "override/fl#zomsd.spl"
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 78
+      target = 2
+      parameter1 = 1
+      parameter2 = 4 //strength
+      timing = 4
+      duration = 8*300
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 78
+      target = 2
+      parameter1 = 1
+      parameter2 = 6 //constitution
+      timing = 4
+      duration = 8*300
+  END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 142 //portrait icon
+      target = 2
+      parameter2 = 7 //nauseated
+      timing = 1
+  END
+
+OUTER_SET $f_AddSecType(fl#zomsd.spl) = DiseaseSecType
 
 
 
@@ -1286,6 +1547,9 @@ COMPILE ~atweaks/baf/undead/fl#death.baf~
         "atweaks/baf/undead/fl#sklwr.baf"
         "atweaks/baf/undead/fl#bansh.baf"
 	"atweaks/baf/undead/fl#gmum.baf"
+        "atweaks/baf/undead/fl#zomb.baf"
+        "atweaks/baf/undead/fl#zomju.baf"
+        "atweaks/baf/undead/fl#zomse.baf"
 
 
 
