@@ -206,44 +206,6 @@ ForceSpellRES("RR#TELWE",LastAttackerOf(Myself))
 END
 
 IF
-!GlobalTimerNotExpired("RR#Help","LOCALS")
-See(NearestEnemyOf(Myself))
-THEN
-RESPONSE #100
-SetGlobalTimer("RR#Help","LOCALS",12)
-GlobalShout(5827)
-Continue()
-END
-
-IF
-!GlobalTimerNotExpired("flCast","LOCALS")
-Allegiance(Myself,GOODCUTOFF)
-!Range(NearestEnemyOf(Myself),20)
-Heard([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5827)
-InMyArea(LastHeardBy(Myself))
-!Range(LastHeardBy(Myself),12)
-!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
-THEN
-RESPONSE #100
-SetGlobalTimer("flCast","LOCALS",6)
-ForceSpellRES("RR#TELWE",LastHeardBy(Myself))
-END
-
-IF
-!GlobalTimerNotExpired("flCast","LOCALS")
-Allegiance(Myself,EVILCUTOFF)
-!Range(NearestEnemyOf(Myself),20)
-Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5827)
-InMyArea(LastHeardBy(Myself))
-!Range(LastHeardBy(Myself),12)
-!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
-THEN
-RESPONSE #100
-SetGlobalTimer("flCast","LOCALS",6)
-ForceSpellRES("RR#TELWE",LastHeardBy(Myself))
-END
-
-IF
 !GlobalTimerNotExpired("flCast","LOCALS")
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
@@ -6900,6 +6862,19 @@ ActionListEmpty()
 THEN
 RESPONSE #100
 AttackOneRound(LastSeenBy(Myself))
+END
+
+IF
+Global("RR#NOPND","GLOBAL",0)
+Allegiance(Myself,EVILCUTOFF)
+!AreaType(OUTDOOR)
+!Range(NearestEnemyOf(Myself),30)
+Range(NearestDoor,15)
+OpenState(NearestDoor,FALSE)
+THEN
+RESPONSE #100
+MoveToObject(NearestDoor)
+OpenDoor(NearestDoor)
 END
 
 IF
