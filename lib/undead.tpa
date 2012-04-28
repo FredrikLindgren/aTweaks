@@ -74,3 +74,71 @@ ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.spl BEGIN
       WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                    // use new projectile (party friendly)
     END
 END
+
+
+
+//Sensible Encounters
+
+//Replace the Vampyre with a Spectre, because Vampyres are not undead and Spectres are underrepresented
+COPY_EXISTING nevmtrap.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~"nevm4"~ ~"spectr01"~
+  END
+BUT_ONLY
+IF nevm4
+
+//Replace Shadow Fiend with a Wraith, because Shadow Fiends are not undead
+COPY_EXISTING ar1401.bcs override
+              ar5013.bcs override
+              spwndead.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~"sdshadfi"~ ~"fl#sdwra"~
+    REPLACE_TEXTUALLY ~"shadfi01"~ ~"wraith01"~
+  END
+BUT_ONLY
+
+COPY_EXISTING ar1404.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~"shadfi01"~ ~"fl#stwra"~
+  END
+BUT_ONLY
+IF shadfi01
+
+//Replace Shadow Fiends with mummies, for triple-mummy goodness
+COPY_EXISTING ar0813.are override
+  READ_LONG  0x54 ao
+  FOR (i = 0; i < SHORT_AT 0x58; ++i) BEGIN
+    READ_ASCII ao + 0x110 * i + 0x80 resref
+    PATCH_IF "%resref%" STRING_EQUAL_CASE shadfi01 BEGIN
+      WRITE_ASCII ao + 0x110 * i        Mummy #32
+      WRITE_LONG  ao + 0x110 * i + 0x30 57472 //IC_MUMMY
+      WRITE_ASCII ao + 0x110 * i + 0x80 mummy01 #8
+    END
+  END
+BUT_ONLY
+IF shadfi01
+
+//Replace Shadow Fiends with Wraiths
+COPY_EXISTING ar1202.are override
+  READ_LONG 0xc0 reo
+  FOR (i = 0; i < 10; ++i) BEGIN
+    READ_ASCII reo + 0x48 + 0x8 * i resref
+    PATCH_IF "%resref%" STRING_EQUAL_CASE shadfi01 BEGIN
+      WRITE_ASCII reo + 0x48 + 0x8 * i wraith01 #8
+    END
+  END
+BUT_ONLY
+IF shadfi01
+
+//Replace Shadow Fiends with Wraiths
+COPY_EXISTING ar1404.are override
+  READ_LONG  0x54 ao
+  FOR (i = 0; i < SHORT_AT 0x58; ++i) BEGIN
+    READ_ASCII ao + 0x110 * i + 0x80 resref
+    PATCH_IF "%resref%" STRING_EQUAL_CASE shadfi01 BEGIN
+      WRITE_ASCII ao + 0x110 * i        Wraith #32
+      WRITE_ASCII ao + 0x110 * i + 0x80 fl#stwra #8
+    END
+  END
+BUT_ONLY
+IF shadfi01
