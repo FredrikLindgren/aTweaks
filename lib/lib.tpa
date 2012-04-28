@@ -92,8 +92,6 @@ END
 //FAILs if the source file is too small or doesn't have an ITM or SPL file extension
 DEFINE_PATCH_FUNCTION prep_itm_spl INT_VAR f_Type = 1 BEGIN
   PATCH_IF SOURCE_SIZE > 0x71 AND ("%SOURCE_EXT%" STRING_EQUAL_CASE itm OR "%SOURCE_EXT%" STRING_EQUAL_CASE spl) BEGIN
-    TO_UPPER SOURCE_EXT //lower-case crashes the game :D
-    WRITE_ASCIIE 0x00 "%SOURCE_EXT% " #4
     al = "%SOURCE_EXT%" STRING_EQUAL_CASE spl ? 0x28 : 0x38
     READ_LONG  0x64 ao
     READ_SHORT 0x68 na

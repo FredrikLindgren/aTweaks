@@ -6,6 +6,15 @@ INCLUDE "atweaks/lib/dsandstuff.tpa"
 
 // New spells
 
+ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.spl BEGIN
+  COPY ~aTweaks/SPL/RR#SPAIN.SPL~ ~override~                                         // Symbol Pain
+    READ_LONG  0x64 ab_off
+    READ_SHORT 0x68 ab_num
+    FOR(i=0; i<ab_num; i+=1) BEGIN
+      WRITE_SHORT (ab_off+i*0x28+0x26) %RR#SPAIN%                                    // use new projectile (party friendly)
+    END
+END
+
 COPY ~aTweaks/SPL/RR#DLDRN.SPL~ ~override~                                         // Drain Life (Alu-Fiend)
   SAY NAME1 @709 SAY NAME2 @709
 COPY ~aTweaks/SPL/RR#CURSE.SPL~ ~override~                                         // Curse (Marilith)
