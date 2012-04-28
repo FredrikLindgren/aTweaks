@@ -25,7 +25,7 @@ BEGIN
         LPF RR#MDCRE
           INT_VAR
             newxpv = 4000
-            newhp = 56
+            newhp = 56 //7d8
             newac = 0
             newth = 13
             newapr = 1
@@ -64,6 +64,8 @@ BEGIN
             script01 = banshe01
             script02 = wtasight
         END
+        LPF cold_spell_immunities END
+        LPF electrical_spell_immunities END
       END
     BUT_ONLY
   END
@@ -567,7 +569,6 @@ BEGIN
             newscript = fl#ghoul
             script01 = wdasight
             script02 = _dasight
-            script03 = sahamb01
             script04 = _tasight
             script05 = wtasight
             skipfile01 = korax
@@ -794,7 +795,7 @@ BEGIN
             newsvb = 12
             newsvs = 13
             newmr = 0
-            newlvl1 = 6
+            newlvl1 = 7
             newfr = "-33"
             newcr = 100
             newer = 0
@@ -822,6 +823,7 @@ BEGIN
             script02 = dw#melee
             //skipscript01 = dw#melee //do not assign a script if SCSII is installed
         END
+        LPF cold_spell_immunities END
       END
     BUT_ONLY
   END
@@ -992,6 +994,7 @@ BEGIN
             script01 = wtasight
             script02 = "mummy01`"
         END
+        LPF cold_spell_immunities END
       END
     BUT_ONLY
   END
@@ -1090,6 +1093,182 @@ OUTER_SET $f_AddSecType(fl#gmumn.spl) = FearSecType
 
 
 
+// Shadow
+ACTION_FOR_EACH file IN
+                kshadow  //circus
+                rngsha01 //in shadow temple
+                rngsha04 //Shadow Jailer
+                sdshadow //Spawned by area script in shadow temple
+                sewsha03 //Saradush sewers
+                shadow01 //regular
+                shadowsu //summoned shadow (shadow altar)
+                uhcreat  //with the kids in umar cave
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+    PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring //+1 or better only
+        REPLACE_CRE_ITEM fl#shad #0 #0 #0 none weapon1
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 420
+            newhp = 27 //3d8+3
+            newac = 7
+            newth = 17
+            newapr = 1
+            newsvd = 13
+            newsvw = 15
+            newsvp = 14
+            newsvb = 16
+            newsvs = 16
+            newlvl1 = 4
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 0
+            newfr = 0
+            newcr = 100
+            newer = 0
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 13
+            newstrx = 0
+            newint = 7
+            newwis = 7
+            newdex = 10
+            newcon = 9
+            newchr = 9
+            newalign = 0x33 //CE
+            newclass = 170 //Shadow
+            newgen = 4 //undead
+            newrace = 132 //Shadow
+            
+            enforce = 1
+          STR_VAR
+            notenf01 = rngsha04
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#midmc
+            script01 = wtasight
+        END
+        LPF cold_spell_immunities END
+      END
+    BUT_ONLY
+  END
+END
+
+COPY_EXISTING b1-10.itm "override/fl#shad.itm"
+  WRITE_LONG 0x60 1 //enchantment
+  LPF configure_header
+    INT_VAR
+      f_TargetType = 1
+      f_NumDice = 2
+      f_DieSize = 5
+  END
+  LPF ADD_ITEM_EFFECT
+    INT_VAR
+      type = 1
+
+      opcode = 44 //strengh bonus
+      target = 2
+      parameter1 = "-1"
+      duration = 5*60
+  END
+  LPF ADD_ITEM_EFFECT
+    INT_VAR
+      type = 1
+
+      opcode = 142 //portrait icon
+      target = 2
+      parameter2 = 91 //damaged ability score
+      duration = 5*60
+  END
+
+
+
+// Skeleton
+ACTION_FOR_EACH file IN
+                ghastsu //Animate Dead
+                gpskel1 //Underdark adventuring party
+                rskel01 //Ranger plot
+                rskel03 //Ranger plot
+                skelar01 //with Vongoethe
+                skelar02 //aslo Vongoethe
+                skelet01 //regular
+                ttskel   //tutorial
+                uddoor07 //drow party by the UD exit
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities, plus red colouring, sans charm immunity
+        REPLACE_CRE_ITEM immchs #0 #0 #0 none amulet //charm and sleep immunity
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 65
+            newhp = 8 //1d8
+            newac = 7
+            newth = 19
+            newapr = 1
+            newsvd = 14
+            newsvw = 16
+            newsvp = 15
+            newsvb = 17
+            newsvs = 17
+            newlvl1 = 1
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 0
+            newfr = 0
+            newcr = 100
+            newer = 0
+            newar = 0
+            newrs = 50
+            newrc = 0
+            newrp = 50
+            newrm = 50
+            newstr = 9
+            newstrx = 0
+            newint = 3
+            newwis = 9
+            newdex = 9
+            newcon = 9
+            newchr = 9
+            newalign = 0x22 //Neutral
+            newclass = 134 //Skeleton
+            newgen = 4 //undead
+            newrace = 115 //Skeleton
+          STR_VAR
+            enfc01 = skelet01
+        END
+        PATCH_IF "%file%" STRING_EQUAL_CASE skelar01 OR "%file%" STRING_EQUAL_CASE skelar02 BEGIN
+          SPRINT script fl#lowr
+        END ELSE BEGIN
+          SPRINT script fl#lowm
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = EVAL "%script%"
+            script02 = wtasight
+            script03 = wtarsgt
+            skipfile02 = ghastsu
+        END
+        LPF add_skeletal_traits END
+      END
+    BUT_ONLY
+  END
+END
+
+
+
 // Skeleton Warriors
 ACTION_FOR_EACH file IN
                ar18skel
@@ -1136,7 +1315,7 @@ BEGIN
             newsvp = 8
             newsvb = 8
             newsvs = 10
-            newlvl1 = 9
+            newlvl1 = 12
             newlvl2 = 0
             newlvl3 = 0
             newmr = 90
@@ -1197,6 +1376,256 @@ COPY "atweaks/spl/undead/fl#skelw.spl" override
 
 
 
+// Spectre
+ACTION_FOR_EACH file IN
+                spectr01 //regular (also ranger stronghold mission)
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring
+        REPLACE_CRE_ITEM fl#spect #0 #0 #0 none weapon1
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 3000
+            newhp = 59 //7d8+3
+            newac = 2
+            newth = 13
+            newapr = 1
+            newsvd = 7
+            newsvw = 9
+            newsvp = 8
+            newsvb = 9
+            newsvs = 8
+            newlvl1 = 8
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 0
+            newfr = 0
+            newcr = 100
+            newer = 0
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 13
+            newstrx = 0
+            newint = 14
+            newwis = 11
+            newdex = 10
+            newcon = 9
+            newchr = 10
+            newalign = 0x13 //LE
+            newgen = 4 //undead
+            
+            enforce = 1
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#higmc
+            script01 = wtasight
+        END
+        LPF hover_immunities END
+        LPF cold_spell_immunities END
+      END
+    BUT_ONLY
+  END
+END
+
+COPY_EXISTING b1-8.itm "override/fl#spect.itm"
+  WRITE_LONG 0x60 2 //enchantment
+  DEFINE_ARRAY wigh_opcode BEGIN 216 139 141 END //drain 2 levels
+  DEFINE_ARRAY wigh_p1 BEGIN 2 40968 0 END
+  DEFINE_ARRAY wigh_p2 BEGIN 0 0 1 END
+  PHP_EACH wigh_opcode AS int => opcode BEGIN
+    LPF ADD_ITEM_EFFECT
+      INT_VAR
+        type = 1
+
+        opcode
+        target = 2
+        parameter1 = $wigh_p1("%int%")
+        parameter2 = $wigh_p2("%int%")
+        timing = 1
+     END
+   END
+
+
+
+// Wight
+ACTION_FOR_EACH file IN
+                nevm1 //Nev's
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring
+        REPLACE_CRE_ITEM fl#wigh #0 #0 #0 none weapon1
+        WRITE_SHORT 0x28 30464 //animation: ghoul
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 1400
+            newhp = 35 //4d8+3
+            newac = 5
+            newth = 15
+            newapr = 1
+            newsvd = 12
+            newsvw = 14
+            newsvp = 13
+            newsvb = 15
+            newsvs = 13
+            newlvl1 = 5
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 0
+            newfr = 0
+            newcr = 100
+            newer = 0
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 16
+            newstrx = 0
+            newint = 10
+            newwis = 9
+            newdex = 9
+            newcon = 9
+            newchr = 9
+            newalign = 0x13 //LE
+            newgen = 4 //undead
+            
+            enforce = 1
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#midmc
+            script01 = wdasight
+        END
+        LPF cold_spell_immunities END
+      END
+    BUT_ONLY
+  END
+END
+
+COPY_EXISTING b1-4.itm "override/fl#wigh.itm"
+  WRITE_LONG 0x60 1 //enchantment
+  DEFINE_ARRAY wigh_opcode BEGIN 216 139 141 END //drain 1 level
+  DEFINE_ARRAY wigh_p1 BEGIN 1 41495 0 END
+  DEFINE_ARRAY wigh_p2 BEGIN 0 0 1 END
+  PHP_EACH wigh_opcode AS int => opcode BEGIN
+    LPF ADD_ITEM_EFFECT
+      INT_VAR
+        type = 1
+
+        opcode
+        target = 2
+        parameter1 = $wigh_p1("%int%")
+        parameter2 = $wigh_p2("%int%")
+        timing = 1
+     END
+   END
+
+
+
+// Wraith
+ACTION_FOR_EACH file IN
+                chwraith //Neb's child wraiths
+                //telslav //Demon Wraith's slaves; not undead, apparently
+                wraith01 //regular
+                firwra01 //Greater Wraith at Firkraag's
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_CRE_ITEM immune1 #0 #0 #0 none lring
+        PATCH_IF !"%SOURCE_RES%" STRING_EQUAL_CASE chwraith BEGIN
+          REPLACE_CRE_ITEM ring95 #0 #0 #0 none rring //Standard undead immunities
+        END
+        PATCH_IF !"%SOURCE_RES%" STRING_EQUAL_CASE telslav BEGIN
+          REPLACE_CRE_ITEM fl#wrai #0 #0 #0 none weapon1
+        END
+        LPF RR#MDCRE
+          INT_VAR
+            newxpv = 2000
+            newhp = 43 //5d8+3
+            newac = 4
+            newth = 15
+            newapr = 1
+            newsvd = 10
+            newsvw = 12
+            newsvp = 11
+            newsvb = 12
+            newsvs = 13
+            newlvl1 = 6
+            newlvl2 = 0
+            newlvl3 = 0
+            newmr = 0
+            newfr = 0
+            newcr = 100
+            newer = 0
+            newar = 0
+            newrs = 0
+            newrc = 0
+            newrp = 0
+            newrm = 0
+            newstr = 13
+            newstrx = 0
+            newint = 12
+            newwis = 11
+            newdex = 10
+            newcon = 9
+            newchr = 10
+            newalign = 0x13 //LE
+            newgen = 4 //undead
+            
+            enforce = 1
+          STR_VAR
+            notenf01 = chwraith
+            notenf02 = telslav
+            notenf03 = firwra01
+        END
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#higmc
+            script01 = wtasight
+        END
+        LPF hover_immunities END
+        LPF cold_spell_immunities END
+      END
+    BUT_ONLY
+  END
+END
+
+COPY_EXISTING b1-6.itm "override/fl#wrai.itm"
+  WRITE_LONG 0x60 1 //enchantment
+  DEFINE_ARRAY wigh_opcode BEGIN 216 139 141 END //drain 1 level
+  DEFINE_ARRAY wigh_p1 BEGIN 1 41495 0 END
+  DEFINE_ARRAY wigh_p2 BEGIN 0 0 1 END
+  PHP_EACH wigh_opcode AS int => opcode BEGIN
+    LPF ADD_ITEM_EFFECT
+      INT_VAR
+        type = 1
+
+        opcode
+        target = 2
+        parameter1 = $wigh_p1("%int%")
+        parameter2 = $wigh_p2("%int%")
+        timing = 1
+     END
+   END
+
+
 // Zombie
 ACTION_FOR_EACH file IN
                 bhghoul3 //undead village
@@ -1239,7 +1668,7 @@ BEGIN
             newrm = 0
             newstr = 9
             newstrx = 0
-            newint = 9
+            newint = 3
             newwis = 9
             newdex = 9
             newcon = 9
@@ -1254,10 +1683,11 @@ BEGIN
         END
         LPF RR#MDCSC
           STR_VAR
-            newscript = fl#zomb
+            newscript = fl#lowm
             script01 = wtasight
             skipfile02 = kelzomb
         END
+        LPF cold_spell_immunities END
       END
     BUT_ONLY
   END
@@ -1279,6 +1709,8 @@ BEGIN
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        SAY NAME1 @1037
+        SAY NAME2 @1037
         REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
         REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring
         REPLACE_CRE_ITEM fl#zomju #0 #0 #0 none weapon1
@@ -1332,9 +1764,11 @@ BEGIN
         END
         LPF RR#MDCSC
           STR_VAR
-            newscript = fl#zomju
+            newscript = fl#midmc
             script01 = wtasight
         END
+        LPF cold_spell_immunities END
+        LPF electrical_spell_immunities END
       END
     BUT_ONLY
   END
@@ -1406,7 +1840,6 @@ BEGIN
           STR_VAR
             newscript = fl#zomse
             script01 = wtasight
-            script02 = sahamb01
             script03 = wdasight
         END
       END
@@ -1487,8 +1920,24 @@ COPY "atweaks/spl/base.spl" "override/fl#zomsd.spl"
       parameter2 = 7 //nauseated
       timing = 1
   END
+  LPF ADD_SPELL_EFFECT
+    INT_VAR
+      opcode = 139
+      target = 2
+      parameter1 = 39752 //stricken by a foul disease
+      timing = 1
+  END
 
 OUTER_SET $f_AddSecType(fl#zomsd.spl) = DiseaseSecType
+
+
+
+//Replace the stupid run-away-and-or-attack script with one that is just responsible for running away
+COPY_EXISTING sahlace.cre override
+              sahskel.cre override
+              sahzomb.cre override
+  REPLACE_TEXTUALLY sahamb01 fl#saham (8)
+BUT_ONLY
 
 
 
@@ -1547,9 +1996,12 @@ COMPILE ~atweaks/baf/undead/fl#death.baf~
         "atweaks/baf/undead/fl#sklwr.baf"
         "atweaks/baf/undead/fl#bansh.baf"
 	"atweaks/baf/undead/fl#gmum.baf"
-        "atweaks/baf/undead/fl#zomb.baf"
-        "atweaks/baf/undead/fl#zomju.baf"
+        "atweaks/baf/undead/fl#lowm.baf"
         "atweaks/baf/undead/fl#zomse.baf"
+        "atweaks/baf/undead/fl#lowr.baf"
+        "atweaks/baf/undead/fl#midmc.baf"
+        "atweaks/baf/undead/fl#higmc.baf"
+        "atweaks/baf/undead/fl#saham.baf"
 
 
 

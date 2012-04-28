@@ -1,4 +1,6 @@
 
+INCLUDE "atweaks/lib/lib.tpa"
+
 DEFINE_PATCH_FUNCTION add_skeletal_traits BEGIN
   READ_ASCII 0 sig (4)  
   PATCH_IF "%sig%" STRING_EQUAL_CASE "CRE " AND SOURCE_SIZE > 0x2d3 BEGIN
@@ -7,6 +9,7 @@ DEFINE_PATCH_FUNCTION add_skeletal_traits BEGIN
     WRITE_BYTE 0x60 50  //Slashing
     WRITE_BYTE 0x62 50  //Piercinc
     WRITE_BYTE 0x63 50  //Missile
+    LPF cold_spell_immunities END
   END ELSE BEGIN
     PATCH_FAIL ~Incorrect file type or below minimum size~
   END
