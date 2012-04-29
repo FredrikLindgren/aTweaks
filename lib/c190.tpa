@@ -3905,6 +3905,53 @@ COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
 
 
+// Give Vithal a better chance of surviving against aTweaks' portal guardians by adding defensive sequencers and slightly changing his offensive spell repertoire
+
+COPY_EXISTING ~dwvith.bcs~ ~override~
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~See([0.0.0.0.10])~ ~See([0.0.0.0.10]) !GlobalTimerNotExpired("RR#Cast","LOCALS")~
+COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
+
+<<<<<<<<atweaks/inlined/baf/elementals/dwvith.baf
+IF
+    See([0.0.0.0.10]) // elemental portal guardians
+    Global("RR#Seq","LOCALS",0) // Spell Sequencer
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !StateCheck(Myself,STATE_SILENCED)
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Seq","LOCALS",1)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        FaceObject([0.0.0.0.10]) // elemental portal guardians
+        SetSequence(SEQ_CAST) // Displays the proper casting animation (for cosmetic purposes)
+        DisplayStringHead(Myself,25951) // Spell Sequencer
+        ReallyForceSpell(Myself,WIZARD_PROTECTION_FROM_FIRE)
+        ReallyForceSpell(Myself,WIZARD_MIRROR_IMAGE)
+        ReallyForceSpell(Myself,WIZARD_STONE_SKIN)
+END
+
+IF
+    See([0.0.0.0.10]) // elemental portal guardians
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    Global("RR#MSeq","LOCALS",0) // Minor Sequencer
+	!StateCheck(Myself,STATE_MIRRORIMAGE)
+    !StateCheck(Myself,STATE_SILENCED)
+THEN
+    RESPONSE #100
+        SetGlobal("RR#MSeq","LOCALS",1)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        FaceObject([0.0.0.0.10]) // elemental portal guardians
+        SetSequence(SEQ_CAST) // Displays the proper casting animation (for cosmetic purposes)
+        DisplayStringHead(Myself,5013) // Minor Sequencer
+        ReallyForceSpell(Myself,WIZARD_BLUR)
+        ReallyForceSpell(Myself,WIZARD_MIRROR_IMAGE)
+END
+>>>>>>>>
+
+EXTEND_TOP ~dwvith.bcs~  ~atweaks/inlined/baf/elementals/dwvith.baf~            // extend Vithal's AI script
+
+
 // Add an Ice Paraelemental to the Ice Island's dungeon in BG1
 
 <<<<<<<<atweaks/inlined/baf/elementals/bg1009.baf
@@ -4166,8 +4213,10 @@ THEN
 	RESPONSE #100
         SetInterrupt(FALSE)
 		SetGlobal("Elementalcontrol","LOCALS",3)
+        SetGlobal("RR#Active","LOCALS",1)
         Ally()
         DestroyItem("RIDRING") // selection circle removal ring
+        ChangeAIScript("",OVERRIDE) // clear the slot previously used by this script
         SetInterrupt(TRUE)
 END
 >>>>>>>>

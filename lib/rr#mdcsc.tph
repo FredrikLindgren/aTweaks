@@ -40,6 +40,8 @@ STR_VAR                                                                         
 "skipfile03" = "RR#NOSKIP"                                                        // skip script patching for a designated file
 "skipfile04" = "RR#NOSKIP"                                                        // skip script patching for a designated file
 "skipfile05" = "RR#NOSKIP"                                                        // skip script patching for a designated file
+"skipfile06" = "RR#NOSKIP"                                                        // skip script patching for a designated file
+
 
 
 
@@ -57,7 +59,7 @@ PATCH_IF (("%gender%" = "9") AND ("%SOURCE_RES%" STRING_EQUAL_CASE "%skipfile01%
   WRITE_BYTE  0x275 "1"                                                            // set gender to Male 
 END
 
-PATCH_FOR_EACH ~skipfile~ IN ~%skipfile01%~ ~%skipfile02%~ ~%skipfile03%~ ~%skipfile04%~ ~%skipfile05%~ BEGIN
+PATCH_FOR_EACH ~skipfile~ IN ~%skipfile01%~ ~%skipfile02%~ ~%skipfile03%~ ~%skipfile04%~ ~%skipfile05%~ ~%skipfile06%~ BEGIN
   PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE EVALUATE_BUFFER ~%skipfile%~) BEGIN   // if file is supposed to be skipped
     SET "scrdone" = "1"                                                            // mark new script as assigned
     SET "scrskip" = "1"                                                            // mark script patching to be skipped
