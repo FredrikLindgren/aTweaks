@@ -1,4 +1,12 @@
 IF
+    HasItem("RR#DINV",Myself) // invisibility item which prevents enemies from targeting not-yet-gated creatures
+THEN
+    RESPONSE #100
+        DestroyItem("RR#DINV")
+        Continue()
+END
+
+IF
 	OR(2)
 	  StateCheck(Myself,STATE_IMMOBILE) // using this instead of STATE_DISABLED because the latter includes STATE_CHARMED
 	  StateCheck(Myself,STATE_REALLY_DEAD) // prevents contingencies and other ReallyForceSpell() stuff from popping up on dead creatures

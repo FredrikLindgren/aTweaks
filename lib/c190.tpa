@@ -453,7 +453,7 @@ BEGIN                                                                           
 END                                                                                // ends PATCH_FOR_EACH
 BUT_ONLY_IF_IT_CHANGES
 
-
+COPY ~atweaks/itm/rr#dinv.itm~  ~override~                                         // item which makes creatures untargetable until the gating animation finishes
 COPY ~atweaks/itm/elementals/rr#easer.itm~ ~override~                              // Aerial Servant attack
 COPY ~atweaks/itm/elementals/rr#efsal.itm~ ~override~                              // Fire Salamander spear attack
 COPY ~atweaks/itm/elementals/rr#efsa2.itm~ ~override~                              // Fire Salamander tail attack
@@ -521,7 +521,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 WRITE_ASCII 0x248 ~rr#ewizs~ #8                                                    // assign override AI script
 WRITE_BYTE  0x270 128                                                              // set initial allegiance to NEUTRAL
-ADD_CRE_ITEM ~RIDRING~ #0 #0 #0 ~UNDROPPABLE~ ~RRING~                              // selection circle removal ring
+ADD_CRE_ITEM ~RIDRING~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~RRING~                  // selection circle removal ring
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1016,6 +1016,7 @@ REMOVE_KNOWN_SPELLS                                                             
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EWWEI~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "9"                                                                   // new movement rate
@@ -1070,6 +1071,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
             ~ELARIL01~                                                             // Lesser Air Elemental (8 HD, Bioware's typo?)
             ~GORAIR01~                                                             // Lesser Air Elemental (8 HD, Watcher's Keep)
             ~SUMELAIR~                                                             // Lesser Air Elemental (8 HD, summoned, Staff of Air)
+            ~DW#PRELA~                                                             // SCS - Prat's Lesser Air Elementals
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -2051,6 +2053,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "5"                                                                   // new movement rate
@@ -2108,6 +2111,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "5"                                                                   // new movement rate
@@ -2166,6 +2170,7 @@ REMOVE_KNOWN_SPELLS                                                             
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
 REMOVE_CRE_ITEM ~WALLPASS~                                                         // remove wallpass item
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EWATG~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
@@ -2234,6 +2239,7 @@ REMOVE_KNOWN_SPELLS                                                             
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
@@ -2292,6 +2298,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "5"                                                                   // new movement rate
@@ -3236,6 +3243,8 @@ BUT_ONLY_IF_IT_CHANGES
 
 
 // Summoned elementals should not leave corpses behind after they are slain
+// Also, they should not be targetable while the summoning animation plays
+// Lastly, the player should have the option to dismiss (unsummon) a summoned creature at will
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
             ~elairsu1~                                                             // Air Elemental (mage summon)
@@ -3283,6 +3292,8 @@ COPY_EXISTING ~%file%.cre~ ~override~
       READ_BYTE 0x10 "flags"                                                       // read flags again to account for the previous change
       WRITE_BYTE "0x10" ("%flags%" BAND "0b11111011")                              // unset bit 2 (disable Permanent Corpse flag)
     END
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
+ADD_MEMORIZED_SPELL ~rr#usumn~ #0 ~innate~ ( 1 )                                   // adds 1x Unsummon
 // =============================================================================== // the actual work ends here
 END                                                                                // ends file size check
 BUT_ONLY_IF_IT_CHANGES
