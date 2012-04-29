@@ -1,58 +1,4 @@
 
-INCLUDE "atweaks/lib/lib.tpa"
-
-DEFINE_PATCH_FUNCTION add_skeletal_traits BEGIN
-  READ_ASCII 0 sig (4)  
-  PATCH_IF "%sig%" STRING_EQUAL_CASE "CRE " AND SOURCE_SIZE > 0x2d3 BEGIN
-    WRITE_BYTE 0x5a 100 //Cold
-    WRITE_BYTE 0x5f 100 //Magic cold
-    WRITE_BYTE 0x60 50  //Slashing
-    WRITE_BYTE 0x62 50  //Piercinc
-    WRITE_BYTE 0x63 50  //Missile
-    LPF cold_spell_immunities END
-  END ELSE BEGIN
-    PATCH_FAIL ~Incorrect file type or below minimum size~
-  END
-END
-
-DEFINE_PATCH_MACRO unturnable BEGIN
-  LPF ADD_CRE_EFFECT
-    INT_VAR
-       opcode = 297 //Immunity to Turn Undead
-       target = 1
-       timing = 9
-       paramater2 = 1
-  END
-END
-
-DEFINE_PATCH_MACRO seeinvisible BEGIN
-  LPF ADD_CRE_EFFECT
-    INT_VAR
-      opcode = 193
-      target = 1
-      parameter2 = 1
-      timing = 9
-  END
-END
-
-DEFINE_PATCH_MACRO illusion_immunity BEGIN
-  LPF ADD_CRE_EFFECT
-    INT_VAR
-      opcode = 291 //disable visual effect
-      target = 1
-      parameter2 = 1
-      timing = 9
-  END
-  LPF ADD_CRE_EFFECT
-    INT_VAR
-      opcode = 204 //immunity to school
-      target = 1
-      parameter2 = 5 //illusion
-      timing = 9
-  END
-END
-
-
 //Wall of Ice
 ACTION_IF !FILE_EXISTS_IN_GAME rr#icew.spl BEGIN
   COPY ~atweaks/bam/rr#icew.bam~ ~override~                                          // Wall of Ice BAM
@@ -104,6 +50,13 @@ COPY_EXISTING ar1404.bcs override
 BUT_ONLY
 IF shadfi01
 
+COPY_EXISTING cut247a.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~"sewsha01"~ ~"fl#swr01"~
+    REPLACE_TEXTUALLY ~"sewsha02"~ ~"fl#swr02"~
+  END
+BUT_ONLY
+
 //Replace Shadow Fiends with mummies, for triple-mummy goodness
 COPY_EXISTING ar0813.are override
   READ_LONG  0x54 ao
@@ -142,3 +95,26 @@ COPY_EXISTING ar1404.are override
   END
 BUT_ONLY
 IF shadfi01
+
+//Ungroup Shadow Fiends from undead random encounters; PATCHING 2DA TABLES, ALWAYS A DELIGHT
+COPY_EXISTING spawngrp.2da override
+  COUNT_2DA_COLS num_col
+  READ_2DA_ENTRIES_NOW rspawngrp num_col - 1 //Because this row has one column less
+  FOR (i = 0; i < num_col - 1; ++i) BEGIN
+    READ_2DA_ENTRY_FORMER rspawngrp 0 i e
+    PATCH_IF "%e%" STRING_EQUAL_CASE rdundea2 OR
+             "%e%" STRING_EQUAL_CASE rdshad
+    BEGIN
+      FOR (j = 1; j < rspawngrp; ++j) BEGIN
+        READ_2DA_ENTRY_FORMER rspawngrp j i + 1 f //Because that row has one column less
+        PATCH_IF "%f%" STRING_EQUAL_CASE shadfi01 BEGIN
+          SET_2DA_ENTRY_LATER sspawngrp j i + 1 wraith01
+        END
+      END
+    END
+    SET_2DA_ENTRIES_NOW sspawngrp num_col - 1
+    PRETTY_PRINT_2DA
+  END
+BUT_ONLY
+
+//mummies and ghasts are not so great either; mummies shouldn't really be out and about in that way either
