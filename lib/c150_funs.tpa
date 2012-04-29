@@ -1565,3 +1565,49 @@ DEFINE_PATCH_FUNCTION make_arcanaloth BEGIN
     ADD_MEMORIZED_SPELL spwi615 #5 wizard      //Chain Lightning
   END
 END
+
+DEFINE_PATCH_FUNCTION make_shadow_fiend BEGIN
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                                    // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+  PATCH_IF valid BEGIN
+    // =============================================================================== // the actual work starts from here
+    LAUNCH_PATCH_FUNCTION fire_spell_immunities END
+    LAUNCH_PATCH_FUNCTION cold_spell_immunities END
+    LPF electrical_spell_immunities END
+    REPLACE_CRE_ITEM fl#shaf1 #0 #0 #0 none weapon1 EQUIP
+    REPLACE_CRE_ITEM fl#shaf2 #0 #0 #0 none shield
+    REMOVE_CRE_ITEM immune1 ring95
+    LAUNCH_PATCH_FUNCTION RR#MDCRE
+      INT_VAR
+        newxp        = 2000
+        newhp        = 59
+        newac        = 5
+        newth        = 12
+        newapr       = 2
+        newsvd       = 13
+        newsvw       = 15
+        newsvp       = 14
+        newsvb       = 16
+        newsvs       = 16
+        newlvl1      = 17
+        newmr        = 0
+        newfr        = 100
+        newcr        = 100
+        newer        = 100
+        newar        = 0
+        newrs        = 0
+        newrc        = 0
+        newrp        = 0
+        newrm        = 0
+        newstr       = 13
+        newdex       = 10
+        newcon       = 9
+        newint       = 12 
+        newwis       = 11
+        newchr       = 19
+        newmor       = 16
+        newalign     = 0x33 //CE
+        
+        enforce      = 1
+    END
+  END
+END

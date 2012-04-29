@@ -488,6 +488,62 @@ COPY "atweaks/cre/fiendbase.cre" "override/fl#sarca.cre"
   LPF make_arcanaloth END
 
 
+
+
+///////////////
+// Nonaligned
+///////////////
+
+//Shadow Fiend
+ACTION_FOR_EACH file IN
+                shadfi01 //regular
+                sdshadfi //summoned in shadow temple
+                sewsha01 //Saradush sewers
+                sewsha02 //ditto
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      LPF make_shadow_fiend END
+      LPF RR#MDCSC
+        STR_VAR
+          newscript = fl#shafi
+          script01 = wtasight
+      END
+      LPF extraplanar_traits END
+      LPM dual_wield
+    BUT_ONLY
+  END
+END
+
+//Devil Shade (Shadow Fiend on steroids)
+ACTION_FOR_EACH file IN
+                hgwra02 //Master Wraith's pal
+                hgwra03 //ditto
+                shadfi02 //regular
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      LPF fire_spell_immunities END
+      LPF cold_spell_immunities END
+      LPF electrical_spell_immunities END
+      LPF RR#MDCRE
+        INT_VAR
+          newlvl1 = 20
+          newer = 100
+      END
+      LPF RR#MDCSC
+        STR_VAR
+          newscript = fl#shaf2
+          script01 = shadfi02
+          script02 = wtasight
+      END
+      LPF extraplanar_traits END
+    BUT_ONLY
+  END
+END
+
+
+
 //Create scripts and creatures outside the ACTION_IF in case SCSII is installed after 
 COMPILE ~atweaks/baf/fiends/fl#nabsu.baf~
         ~atweaks/baf/fiends/fl#corsu.baf~
@@ -631,6 +687,8 @@ COMPILE ~aTweaks/BAF/fiends/RR#HGELU.BAF~                                       
 COMPILE ~aTweaks/BAF/fiends/RR#HPITF.BAF~                                                 // Hostile Pit Fiend AI script
 COMPILE ~aTweaks/BAF/fiends/RR#KARAS.BAF~                                                 // Ka'rashur's reinforcement summoning script
 COMPILE ~aTweaks/BAF/fiends/RR#TAHAZ.BAF~                                                 // Tahazzar's reinforcement summoning script
+COMPILE "atweaks/baf/fiends/fl#shafi.baf" //Shadow Fiend
+        "atweaks/baf/fiends/fl#shaf2.baf" //Devil Shade
 
 EXTEND_TOP ~KARASH.BCS~ ~aTweaks/BAF/fiends/KARASH.BAF~                                   // make Ka'rashur use aTweaks' Pit Fiend script once he goes hostile
 EXTEND_TOP ~TAHAZZ.BCS~ ~aTweaks/BAF/fiends/TAHAZZ.BAF~                                   // make Tahazzar use aTweaks' Balor script once he goes hostile
@@ -669,6 +727,13 @@ DECOMPILE_BCS_TO_BAF
 COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
 
+//Add another Shadow Fiend to the playhouse encounter, because the new Shadow Fiends are weak-sauce compared to Bioware's creative take on them
+COPY_EXISTING ar0510.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPSTRENH",\[915\.463\])\)~ ~\1 CreateVisualEffect("SPSTRENH",[893.482])~
+    REPLACE_TEXTUALLY ~\(CreateCreature("SHADFI01",\[915\.463\],0)\)~ ~\1 CreateCreature("SHADFI01",[893.482],0)~
+  END
+BUT_ONLY
 
 // The Pit Fiend summoned through the portal in the maze below Spellhold should not be attacked before the gating animation is complete
 
