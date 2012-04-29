@@ -40,7 +40,9 @@ my @fiends = (
     "fl#adead.ssl:fl#adead.baf",
     "fl#sarca.ssl:fl#sarca.baf",
     "fl#snyca.ssl:fl#snyca.baf",
-    "fl#sultr.ssl:fl#sultr.baf"
+    "fl#sultr.ssl:fl#sultr.baf",
+    "fl#shafi.ssl:fl#shafi.baf",
+    "fl#shafi.ssl DevilShade=True:fl#shaf2.baf"
     );
 
 sub process_files {

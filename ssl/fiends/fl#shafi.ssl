@@ -1,0 +1,51 @@
+
+INCLUDE FILE(include/definitions.ssl)
+INCLUDE FILE(fiends/definitions.ssl)
+
+BEGIN LOOP(ThereAreExtraActions||True)
+  BEGIN LOOP(ExtraActions||SetGlobal("flFear","LOCALS",0) SetGlobal("MoreShadows","LOCALS",0) SetGlobal("CuredSelf","LOCALS",0))
+    INCLUDE FILE(include/baseinitial.ssl)
+  END LOOP
+END LOOP
+
+IF TRIGGER
+  TargetBlock(PCsPreferringStrong)
+  TriggerBlock(Enemy|Disabled|Fear|SINec|MinorGlobe|MR50)
+  GlobalLT("flFear","LOCALS",1)
+THEN DO
+    Combine()
+    IncrementGlobal("flFear","LOCALS",1)
+    Action(ForceSpellRES,"fl#shafi"|100|100)
+END
+
+IF TRIGGER
+  RequireBlock(DevilShade)
+  HPPercentLT(Myself,50)
+  Global("MoreShadows","LOCALS",0)
+THEN DO
+    CreateVisualEffectObject("ICMAGICH",Myself)
+    CreateCreatureObject("shadfi01",Myself,0,0,0) // Shadow Fiend
+    CreateCreatureObject("shadfi01",Myself,0,0,0) // Shadow Fiend
+    SetGlobal("MoreShadows","LOCALS",1)
+    Continue()
+END
+
+IF TRIGGER
+  RequireBlock(DevilShade)
+  HPPercentLT(Myself,30)
+  Global("CuredSelf","LOCALS",0)
+THEN DO
+    ForceSpell(Myself,CLERIC_CURE_CRITICAL_WOUNDS)
+    SetGlobal("CuredSelf","LOCALS",1)
+    Continue()
+END
+
+BEGIN LOOP(DamageRes||CrushRes)
+  BEGIN LOOP(AttackType||Attack)
+    INCLUDE FILE(general/melee_high.ssl)
+  END LOOP
+END LOOP
+
+INCLUDE FILE(include/open_door.ssl)
+
+INCLUDE FILE(include/baseend.ssl)
