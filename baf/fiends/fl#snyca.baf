@@ -131,6 +131,44 @@ SetInterrupt(TRUE)
 END
 
 IF
+!GlobalTimerNotExpired("RR#Help","LOCALS")
+See(NearestEnemyOf(Myself))
+THEN
+RESPONSE #100
+SetGlobalTimer("RR#Help","LOCALS",12)
+GlobalShout(5827)
+Continue()
+END
+
+IF
+!GlobalTimerNotExpired("RR#Cast","LOCALS")
+Allegiance(Myself,GOODCUTOFF)
+!Range(NearestEnemyOf(Myself),20)
+Heard([GOODCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5827)
+InMyArea(LastHeardBy(Myself))
+!Range(LastHeardBy(Myself),12)
+!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
+THEN
+RESPONSE #100
+SetGlobalTimer("RR#Cast","LOCALS",6)
+ForceSpellRES("RR#TELWE",LastHeardBy(Myself))
+END
+
+IF
+!GlobalTimerNotExpired("RR#Cast","LOCALS")
+Allegiance(Myself,EVILCUTOFF)
+!Range(NearestEnemyOf(Myself),20)
+Heard([EVILCUTOFF.0.DEMONIC.0.0.0.MASK_CHAOTIC],5827)
+InMyArea(LastHeardBy(Myself))
+!Range(LastHeardBy(Myself),12)
+!StateCheck(LastHeardBy(Myself),STATE_REALLY_DEAD)
+THEN
+RESPONSE #100
+SetGlobalTimer("RR#Cast","LOCALS",6)
+ForceSpellRES("RR#TELWE",LastHeardBy(Myself))
+END
+
+IF
 See(LastAttackerOf(Myself))
 !GlobalTimerNotExpired("flCast","LOCALS")
 Exists(LastAttackerOf(Myself))
