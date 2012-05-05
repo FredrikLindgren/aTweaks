@@ -260,6 +260,20 @@ END
 
 //20-dice Fireball once per day
 IF TRIGGER
+  IgnoreBlock(IsDurlagKnight)
+  TargetBlock(PlayersReverse)
+  TriggerBlock(FireRes0|MR0|SIEvo|MinorGlobe|Enemy|CanCastMage) //Most of the time, the potential for friendly fire is a bit too big to risk it, unless the target is really juicy
+  DifficultyGT(EASY) //Only on Core or higher
+  CheckStatGT(Myself,49,RESISTMAGIC)
+  !HasItem("clck26",scstarget)
+  GlobalLT("flFireball","LOCALS",1)
+THEN DO
+    IncrementGlobal("flFireball","LOCALS",1)
+    Action(SpellNoDec,DEATHKNIGHT_FIREBALL|100|100)
+END
+
+IF TRIGGER
+  RequireBlock(IsDurlagKnight)
   TargetBlock(PlayersReverse)
   TriggerBlock(FireRes50|MR50|SIEvo|MinorGlobe|Enemy|CanCastMage)
   DifficultyGT(EASY) //Only on Core or higher

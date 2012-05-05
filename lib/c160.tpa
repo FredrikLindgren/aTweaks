@@ -64,6 +64,8 @@ BEGIN
             script01 = banshe01
             script02 = wtasight
             script03 = dw#melee
+            script04 = bpwtsigt
+            script05 = bpwdasgt
         END
         LPF cold_spell_immunities END
         LPF electrical_spell_immunities END
@@ -127,7 +129,7 @@ BEGIN
         REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
         LPF unturnable END
         LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END //Invisibility detection by script
-        LPF DELETE_CRE_ITEM STR_VAR item_to_delete = "sw2h02\|sw2hdeat\|_?sw2h05\|ringdemn" END
+        LPF DELETE_CRE_ITEM STR_VAR item_to_delete = "sw2h02\|sw2hdeat\|_?sw2h05\|ringdemn\|_?shld06" END
         LPF RR#MDCRE
           INT_VAR
             newxpv = 10000
@@ -182,9 +184,9 @@ BEGIN
               script04 = _tasight
               script05 = uddeath
               script06 = dw#melee
-              //script06 = bpwtsigt
-              //script07 = bpmag18a
-              //script08 = bpdemon
+              script06 = bpwtsigt
+              script07 = bpmag18a
+              script08 = bpdemon
           END
         END
         LPF add_skeletal_traits END
@@ -423,6 +425,8 @@ ACTION_FOR_EACH file IN
 		_ghasts
 		ghast01 //BG2 standard Ghast
 		nevm3 //Nev's undead trap Ghast
+                bgghast //Aec'Letec't death ray, BGT
+                rr#ghast //Nabussu death ray, aTweaks
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
@@ -481,6 +485,7 @@ BEGIN
             script07 = _ghastd
             script08 = _movep1
             script09 = dw#melee
+            script10 = bpwtsigt
             skipfile02 = ghasts
             skipfile03 = _ghasts
         END
@@ -578,6 +583,8 @@ BEGIN
             script04 = _tasight
             script05 = wtasight
             script06 = dw#melee
+            script07 = bpwtsigt
+            script08 = bpwdasgt
         END
       END
     BUT_ONLY
@@ -668,6 +675,8 @@ BEGIN
             script06 = wdasight
             script07 = riftcr01
             script08 = dw#melee
+            script09 = bpwtsigt
+            script10 = bpwdasgt
         END
       END
     BUT_ONLY
@@ -828,6 +837,7 @@ BEGIN
             newscript = fl#mum
             script01 = wtasight
             script02 = dw#melee
+            script03 = bpwtsigt
         END
         LPF cold_spell_immunities END
       END
@@ -1000,6 +1010,7 @@ BEGIN
             script01 = wtasight
             script02 = "mummy01`"
             script03 = dw#melee
+            script04 = bpwtsigt
         END
         LPF cold_spell_immunities END
       END
@@ -1110,6 +1121,8 @@ ACTION_FOR_EACH file IN
                 shadow01 //regular
                 shadowsu //summoned shadow (shadow altar)
                 uhcreat  //with the kids in umar cave
+                lshadfi  //From BP, apparently
+                lshadow  //likewise
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
@@ -1164,6 +1177,10 @@ BEGIN
             newscript = fl#midmc
             script01 = wtasight
             script02 = dw#melee
+            script03 = bpshadow
+            script04 = bpwtsigt
+            script05 = bpwdasgt
+            script06 = bpmag14m //maybe we should not strip this for the shadow jailer
         END
         LPF cold_spell_immunities END
       END
@@ -1226,8 +1243,8 @@ ACTION_FOR_EACH file IN
                 _kelet_c
                 skelfire //shoots fire
                 _kelfire
-                skelpetr
-                _kelpetr
+                //skelpetr //The tourist attraction in Durlag's Tower
+                //_kelpetr
                 skelaci  //acid
                 _skelaci
                 skeldis  //dispelling
@@ -1240,6 +1257,7 @@ ACTION_FOR_EACH file IN
                 _skelets
                 skelice  //ice
                 _skelice
+                bpskelar //BP
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
@@ -1286,7 +1304,8 @@ BEGIN
           STR_VAR
             enfc01 = skelet01
         END
-        PATCH_IF "%file%" STRING_MATCHES_REGEXP "skelar0[12]\|s?_?kel\(fire\|aci\|ice\|dis\)\|_?skelet[bs]" = 0 BEGIN
+        LPF promote_script STR_VAR script = skeletb END
+        PATCH_IF "%file%" STRING_MATCHES_REGEXP "skelar0[12]\|s?_?kel\(fire\|aci\|ice\|dis\)\|_?skelet[bs]\|bpskelar" = 0 BEGIN
           SPRINT script fl#lowr
         END ELSE BEGIN
           SPRINT script fl#lowm
@@ -1300,6 +1319,9 @@ BEGIN
             script05 = _wtarsgt
             script06 = dw#melee
             script07 = dw#range
+            script08 = bpwtsigt
+            script09 = bpwtrsgt
+            script10 = bpwdrsgt
             skipfile02 = ghastsu
         END
         LPF add_skeletal_traits END
@@ -1401,7 +1423,11 @@ BEGIN
             script05 = dw#melee
             script06 = wdasight
             script07 = dw#range
-            script98 = _wtarsgt
+            script08 = _wtarsgt
+            script09 = bpwtsigt
+            script10 = bpwtrsgt
+            script11 = bpwdasgt
+            script12 = bpwtasgt
             skipfile02 = skelwasu
         END
         LPF add_skeletal_traits END
@@ -1470,6 +1496,8 @@ BEGIN
             newscript = fl#higmc
             script01 = wtasight
             script02 = dw#melee
+            script03 = bpmag14m
+            script04 = bpwtsigt
         END
         LPF hover_immunities END
         LPF cold_spell_immunities END
@@ -1552,6 +1580,7 @@ BEGIN
             newscript = fl#midmc
             script01 = wdasight
             script02 = dw#melee
+            script03 = bpwtsigt
         END
         LPF cold_spell_immunities END
       END
@@ -1643,6 +1672,9 @@ BEGIN
             newscript = fl#higmc
             script01 = wtasight
             script02 = dw#melee
+            script03 = bpmag14m
+            script04 = bpwtsigt
+            script05 = bpwdasgt
         END
         LPF hover_immunities END
         LPF cold_spell_immunities END
@@ -1728,9 +1760,9 @@ ACTION_FOR_EACH file IN
                 _ombie_e
                 zombie
                 _zombie
-                zombieb
+                zombieb //Bassilus
                 _zombieb
-                zombiew
+                zombiew //zombie farm
                 _zombiew
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
@@ -1779,11 +1811,13 @@ BEGIN
             
             enforce = 1
         END
+        LPF promote_script STR_VAR script = "_?zombie[bw]" END
         LPF RR#MDCSC
           STR_VAR
             newscript = fl#lowm
             script01 = wtasight
             script02 = dw#melee
+            script03 = bpwtsigt
             skipfile02 = kelzomb
         END
         LPF cold_spell_immunities END
@@ -1865,6 +1899,7 @@ BEGIN
             newscript = fl#midmc
             script01 = wtasight
             script02 = dw#melee
+            script03 = bpwtsigt
         END
         LPF cold_spell_immunities END
         LPF electrical_spell_immunities END
@@ -1940,6 +1975,8 @@ BEGIN
             script01 = wtasight
             script03 = wdasight
             script04 = dw#melee
+            script05 = bpwtsigt
+            script06 = bpwdasgt
         END
       END
     BUT_ONLY

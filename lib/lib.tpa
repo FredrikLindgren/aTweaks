@@ -2547,3 +2547,24 @@ DEFINE_PATCH_FUNCTION set_enchantment INT_VAR enchantment = 1 BEGIN
     END
   END
 END
+
+DEFINE_PATCH_FUNCTION promote_script STR_VAR script = "^$" kill = "^$" BEGIN
+  READ_ASCII 0 sig (3)
+  PATCH_IF "%sig%" STRING_EQUAL_CASE CRE AND SOURCE_SIZE > 0x2d3 BEGIN
+    FOR (o = 0x248; o < 0x270; o += 0x8) BEGIN
+      READ_ASCII o s1
+      PATCH_IF "%s1%" STRING_MATCHES_REGEXP "%script%" = 0 BEGIN
+        FOR (p = 0x248; p < 0x270 AND p < o; p += 0x8) BEGIN
+          READ_ASCII p s2
+          PATCH_IF "%s2%" STRING_EQUAL "" OR "%s2%" STRING_EQUAL_CASE none OR "%s2%" STRING_MATCHES_REGEXP "%kill%" = 0 BEGIN
+            WRITE_ASCII  o "" #8
+            WRITE_ASCIIE p "%s1%" #8
+            p = SOURCE_SIZE
+            o = SOURCE_SIZE
+          END
+        END
+        o = p >= o ? SOURCE_SIZE : o
+      END
+    END
+  END ELSE PATCH_FAIL "promote_script: incorrect signature or below minimum file size (%SOURCE_FILE%)"
+END
