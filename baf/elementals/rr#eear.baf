@@ -1,4 +1,12 @@
 IF
+    HasItem("RR#DINV",Myself) // invisibility item which prevents enemies from targeting not-yet-gated creatures
+THEN
+    RESPONSE #100
+        DestroyItem("RR#DINV")
+        Continue()
+END
+
+IF
     Global("RR#Active","LOCALS",0)
     !Allegiance(Myself,GOODCUTOFF)
     OR(6)
@@ -109,6 +117,7 @@ IF
       CheckStatGT([GOODCUTOFF],4,LEVEL3)
    !Class([GOODCUTOFF],ELEMENTAL_AIR) // unaffected by Earthquake
    !Class([GOODCUTOFF],ELEMENTAL_EARTH) // unaffected by Earthquake
+   !Race([GOODCUTOFF],BEHOLDER) // unaffected by Earthquake
 THEN
     RESPONSE #100
         SetInterrupt(FALSE)
@@ -132,6 +141,7 @@ IF
       CheckStatGT([GOODCUTOFF],4,LEVEL3)
    !Class([GOODCUTOFF],ELEMENTAL_AIR) // unaffected by Earthquake
    !Class([GOODCUTOFF],ELEMENTAL_EARTH) // unaffected by Earthquake
+   !Race([GOODCUTOFF],BEHOLDER) // unaffected by Earthquake
 THEN
     RESPONSE #70
         SetGlobalTimer("rr#equa","LOCALS",12) // Earthquake timer
@@ -155,6 +165,7 @@ IF
       CheckStatGT([GOODCUTOFF],4,LEVEL3)
    !Class([GOODCUTOFF],ELEMENTAL_AIR) // unaffected by Earthquake
    !Class([GOODCUTOFF],ELEMENTAL_EARTH) // unaffected by Earthquake
+   !Race([GOODCUTOFF],BEHOLDER) // unaffected by Earthquake
 THEN
     RESPONSE #85
         SetGlobalTimer("rr#equa","LOCALS",12) // Earthquake timer
@@ -228,6 +239,7 @@ IF
       CheckStatGT([EVILCUTOFF],4,LEVEL3)
    !Class([EVILCUTOFF],ELEMENTAL_AIR) // unaffected by Earthquake
    !Class([EVILCUTOFF],ELEMENTAL_EARTH) // unaffected by Earthquake
+   !Race([EVILCUTOFF],BEHOLDER) // unaffected by Earthquake
 THEN
     RESPONSE #100
         SetInterrupt(FALSE)
@@ -252,6 +264,7 @@ IF
       CheckStatGT([EVILCUTOFF],4,LEVEL3)
    !Class([EVILCUTOFF],ELEMENTAL_AIR) // unaffected by Earthquake
    !Class([EVILCUTOFF],ELEMENTAL_EARTH) // unaffected by Earthquake
+   !Race([EVILCUTOFF],BEHOLDER) // unaffected by Earthquake
 THEN
     RESPONSE #70
         SetGlobalTimer("rr#equa","LOCALS",12) // Earthquake timer
@@ -276,10 +289,89 @@ IF
       CheckStatGT([EVILCUTOFF],4,LEVEL3)
    !Class([EVILCUTOFF],ELEMENTAL_AIR) // unaffected by Earthquake
    !Class([EVILCUTOFF],ELEMENTAL_EARTH) // unaffected by Earthquake
+   !Race([EVILCUTOFF],BEHOLDER) // unaffected by Earthquake
 THEN
     RESPONSE #85
         SetGlobalTimer("rr#equa","LOCALS",12) // Earthquake timer
     RESPONSE #15
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#equa",Myself) // Earthquake
+        RemoveSpellRES("rr#equa") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#equa","LOCALS") // Earthquake timer
+    HaveSpellRES("rr#equa") // Earthquake
+    CheckStatGT([EVILCUTOFF],13,LEVEL) // use Earthquake against single opponents if they are high level
+    Range([EVILCUTOFF],12)
+   !Class([EVILCUTOFF],ELEMENTAL_AIR) // unaffected by Earthquake
+   !Class([EVILCUTOFF],ELEMENTAL_EARTH) // unaffected by Earthquake
+   !Race([EVILCUTOFF],BEHOLDER) // unaffected by Earthquake
+    See([EVILCUTOFF])
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatGT(LastSeenBy(Myself),-6,SAVEVSSPELL)
+    !CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+    !CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#equa",Myself) // Earthquake
+        RemoveSpellRES("rr#equa") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#equa","LOCALS") // Earthquake timer
+    HaveSpellRES("rr#equa") // Earthquake
+    CheckStatGT(SecondNearest([EVILCUTOFF]),15,LEVEL) // use Earthquake against single opponents if they are high level
+    See(SecondNearest([EVILCUTOFF]))
+    Range(LastSeenBy(Myself),12)
+    !Class(LastSeenBy(Myself),ELEMENTAL_AIR) // unaffected by Earthquake
+    !Class(LastSeenBy(Myself),ELEMENTAL_EARTH) // unaffected by Earthquake
+    !Race(LastSeenBy(Myself),BEHOLDER) // unaffected by Earthquake
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatGT(LastSeenBy(Myself),-6,SAVEVSSPELL)
+    !CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+    !CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        ForceSpellRES("rr#equa",Myself) // Earthquake
+        RemoveSpellRES("rr#equa") // remove one instance of the spell upon casting
+        SetInterrupt(TRUE)
+END
+
+IF
+    ActionListEmpty()
+    Allegiance(Myself,GOODCUTOFF)
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !GlobalTimerNotExpired("rr#equa","LOCALS") // Earthquake timer
+    HaveSpellRES("rr#equa") // Earthquake
+    CheckStatGT(ThirdNearest([EVILCUTOFF]),15,LEVEL) // use Earthquake against single opponents if they are high level
+    See(ThirdNearest([EVILCUTOFF]))
+    Range(LastSeenBy(Myself),12)
+    !Class(LastSeenBy(Myself),ELEMENTAL_AIR) // unaffected by Earthquake
+    !Class(LastSeenBy(Myself),ELEMENTAL_EARTH) // unaffected by Earthquake
+    !Race(LastSeenBy(Myself),BEHOLDER) // unaffected by Earthquake
+    !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+    CheckStatGT(LastSeenBy(Myself),-6,SAVEVSSPELL)
+    !CheckStatGT(LastSeenBy(Myself),0,CLERIC_CHAOTIC_COMMANDS)
+    !CheckStat(LastSeenBy(Myself),1,SCRIPTINGSTATE4) // Barbarian Rage, Berserker Enrage
+    !CheckStat(LastSeenBy(Myself),8,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Alteration
+THEN
+    RESPONSE #100
         SetInterrupt(FALSE)
         SetGlobalTimer("RR#Cast","LOCALS",6)
         ForceSpellRES("rr#equa",Myself) // Earthquake

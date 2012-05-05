@@ -1,0 +1,69 @@
+IF
+    HasItem("RR#DINV",Myself) // invisibility item which prevents enemies from targeting not-yet-gated creatures
+THEN
+    RESPONSE #100
+        DestroyItem("RR#DINV")
+        Continue()
+END
+
+IF
+    Allegiance(LastSummonerOf(Myself),ENEMY)
+    !Allegiance(Myself,ENEMY)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        SetGlobal("Elementalcontrol","LOCALS",1)
+        Enemy()
+        DestroyItem("RIDRING") // selection circle removal ring
+        ChangeAIScript("",OVERRIDE) // clear the slot previously used by this script
+        SetInterrupt(TRUE)
+END
+
+IF
+    Global("RR#NOEMC","GLOBAL",0) // mental combat is allowed
+    Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
+    Global("Elementalcontrol","LOCALS",0)
+THEN
+    RESPONSE #15
+        SetInterrupt(FALSE)
+        FaceObject(LastSummonerOf(Myself))
+        ActionOverride(LastSummonerOf(Myself),SetSequence(SEQ_CAST)) // Displays the casting animation (for cosmetic purposes)
+        ReallyForceSpellRES("RR#EMCBT",LastSummonerOf(Myself)) // Mental Combat spell, also applies temporary enchantment immunity and summoning circle removal to the elemental
+        Wait(17)
+        PlaySound("EFF_M72D")
+        Enemy()
+        SetGlobal("Elementalcontrol","LOCALS",2)
+        DisplayString(Myself,10381) // Berserk
+        DestroyItem("RIDRING") // selection circle removal ring
+        ChangeAIScript("",OVERRIDE) // clear the slot previously used by this script
+        SetInterrupt(TRUE)
+    RESPONSE #85
+        SetInterrupt(FALSE)
+        FaceObject(LastSummonerOf(Myself))
+        ActionOverride(LastSummonerOf(Myself),SetSequence(SEQ_CAST)) // Displays the casting animation (for cosmetic purposes)
+        ReallyForceSpellRES("RR#EMCBT",LastSummonerOf(Myself)) // Mental Combat spell, also applies temporary enchantment immunity and summoning circle removal to the elemental
+        Wait(17)
+        PlaySound("EFF_M72C")
+        Ally()
+        SetGlobal("Elementalcontrol","LOCALS",1)
+        SetGlobal("RR#Active","LOCALS",1)
+        DisplayString(Myself,61418) // Controlled
+        DestroyItem("RIDRING") // selection circle removal ring
+        ChangeAIScript("",OVERRIDE) // clear the slot previously used by this script
+        SetInterrupt(TRUE)
+END
+
+IF
+    Global("RR#NOEMC","GLOBAL",1) // mental combat is disabled
+    Global("Elementalcontrol","LOCALS",0)
+    Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
+THEN
+    RESPONSE #100
+        SetInterrupt(FALSE)
+        Ally()
+        SetGlobal("Elementalcontrol","LOCALS",1)
+        SetGlobal("RR#Active","LOCALS",1)
+        DestroyItem("RIDRING") // selection circle removal ring
+        ChangeAIScript("",OVERRIDE) // clear the slot previously used by this script
+        SetInterrupt(TRUE)
+END
