@@ -305,6 +305,130 @@ BEGIN
   END
 END
 
+//Called from integrate_sectypes
+DEFINE_PATCH_FUNCTION integrate_sectypes_inner BEGIN
+  READ_LONG  0x64 ao
+  READ_SHORT 0x68 na
+  READ_LONG  0x6a eo
+  READ_SHORT 0x6e ei1
+  READ_SHORT 0x70 gne
+
+  PATCH_IF "%SOURCE_EXT%" STRING_EQUAL_CASE itm BEGIN      
+    FOR (i=0;i<gne;++i) BEGIN
+      READ_SHORT eo + 0x30*(ei1 + i)       type ELSE 999
+      READ_LONG  eo + 0x30*(ei1 + i) + 0x8 p2   ELSE 999
+
+      //This works as long as we always insert the new effects in front of the ones that trigger the insertion of a new effect
+      PATCH_IF type = 206 BEGIN
+        READ_ASCII eo + 0x30 * (ei1 + i) + 0x14 rr ELSE nil
+        TO_LOWER rr
+        SET $onequip_immunity("%rr%") = 1
+      END
+
+      //On-equip immunity
+      PATCH_IF type = 101 AND VARIABLE_IS_SET $f_ImmunitySecType("%p2%") BEGIN
+        PHP_EACH f_AddSecType AS file => SecTypeToAdd BEGIN
+          PATCH_IF "%file%" STRING_MATCHES_REGEXP ".*\.spl$" = 0 AND SecTypeToAdd = $f_ImmunitySecType("%p2%") BEGIN
+            INNER_PATCH "%file%" BEGIN
+              READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
+            END
+            TO_LOWER spell
+            PATCH_IF !VARIABLE_IS_SET $onequip_immunity("%spell%") BEGIN
+              INSERT_BYTES   eo + 0x30 * (ei1 + i)        0x30
+                WRITE_SHORT  eo + 0x30 * (ei1 + i)        206 //protection from spell
+                WRITE_BYTE   eo + 0x30 * (ei1 + i) + 0x2  1
+                WRITE_BYTE   eo + 0x30 * (ei1 + i) + 0xc  2
+                WRITE_BYTE   eo + 0x30 * (ei1 + i) + 0x12 100
+                WRITE_ASCIIE eo + 0x30 * (ei1 + i) + 0x14 "%spell%" #8
+              ++i
+              ++gne
+            END
+          END
+        END
+      END
+    END
+  END
+
+  WRITE_SHORT 0x70 gne
+  ei = gne = 0 ? 0 : ei1 + gne //Some mod files have illegal values for ei1, but the engine disregards the illegal value because gne is 0; we do the same 
+  ne = 0
+  al = "%SOURCE_EXT%" STRING_EQUAL_CASE itm ? 0x38 : 0x28
+
+  //Check for effects to remove e.g. fear or disease and effects that grant immunity to e.g. fear or disease
+  FOR (i=0;i<na AND ao + na*al < SOURCE_SIZE;++i) BEGIN
+    ei += ne
+    WRITE_SHORT ao + al*i + 0x20 ei
+    READ_SHORT  ao + al*i + 0x1e ne
+    FOR (j=0;j<ne;++j) BEGIN
+      READ_SHORT eo + 0x30*(ei + j)        type   ELSE 999
+      READ_BYTE  eo + 0x30*(ei + j) + 0x2  target ELSE 0
+      READ_BYTE  eo + 0x30*(ei + j) + 0x3  power  ELSE 0
+      READ_LONG  eo + 0x30*(ei + j) + 0x4  p1     ELSE 999
+      READ_LONG  eo + 0x30*(ei + j) + 0x8  p2     ELSE 999
+      READ_BYTE  eo + 0x30*(ei + j) + 0xc  timing ELSE 0
+      READ_BYTE  eo + 0x30*(ei + j) + 0xd  dr     ELSE 0
+      READ_LONG  eo + 0x30*(ei + j) + 0xe  time   ELSE 0
+
+      //This works as long as we always insert the new effects in front of the ones that trigger the insertion of the new effect
+      PATCH_IF type = 221 BEGIN
+        SET $extended_sectype_immunity("%i%" "%p2%") = 1
+      END
+      PATCH_IF type = 206 BEGIN
+        READ_ASCII eo + 0x30 * (ei + j) + 0x14 rr ELSE nil
+        TO_LOWER rr
+        SET $extended_spell_immunity("%i%" "%rr%") = 1
+      END
+
+
+
+      PATCH_IF VARIABLE_IS_SET $f_RemoveSecType("%type%") BEGIN
+        check = $f_RemoveSecType("%type%")
+        PATCH_IF !VARIABLE_IS_SET $extended_sectype_immunity("%i%" "%check%") BEGIN
+          INSERT_BYTES  eo + 0x30*(ei + j)        0x30
+            WRITE_SHORT eo + 0x30*(ei + j)        221 //remove sec type
+            WRITE_BYTE  eo + 0x30*(ei + j) + 0x2  target
+            WRITE_BYTE  eo + 0x30*(ei + j) + 0x3  power
+            WRITE_LONG  eo + 0x30*(ei + j) + 0x4  9
+            WRITE_LONG  eo + 0x30*(ei + j) + 0x8  $f_RemoveSecType("%type%")
+            WRITE_BYTE  eo + 0x30*(ei + j) + 0xc  1
+            WRITE_BYTE  eo + 0x30*(ei + j) + 0x12 100
+          ++ne
+          ++j
+        END
+      END
+
+
+
+      PATCH_IF type = 101 AND VARIABLE_IS_SET $f_ImmunitySecType("%p2%") BEGIN
+        PHP_EACH f_AddSecType AS file => SecTypeToAdd BEGIN
+          PATCH_IF "%file%" STRING_MATCHES_REGEXP ".+\.spl$" = 0 AND SecTypeToAdd = $f_ImmunitySecType("%p2%") BEGIN
+            INNER_PATCH "%file%" BEGIN
+              READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
+            END
+            TO_LOWER spell
+            PATCH_IF !VARIABLE_IS_SET $extended_spell_immunity("%i%" "%spell%") BEGIN
+              INSERT_BYTES   eo + 0x30*(ei + j)        0x30
+                WRITE_SHORT  eo + 0x30*(ei + j)        206 //protection from spell
+                WRITE_BYTE   eo + 0x30*(ei + j) + 0x2  target
+                WRITE_BYTE   eo + 0x30*(ei + j) + 0x3  power
+                WRITE_BYTE   eo + 0x30*(ei + j) + 0xc  timing
+                WRITE_BYTE   eo + 0x30*(ei + j) + 0xd  dr
+                WRITE_LONG   eo + 0x30*(ei + j) + 0xe  time
+                WRITE_BYTE   eo + 0x30*(ei + j) + 0x12 100
+                WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 "%spell%" #8
+              ++ne
+              ++j
+            END
+          END
+        END
+      END
+
+
+
+    END
+    WRITE_SHORT ao + al*i + 0x1e ne
+  END
+END
 
 //Add the SecTypes to items and spells that should grant immunity or be able to remove them
 //Needs the three arrays:
@@ -318,129 +442,10 @@ END
 DEFINE_ACTION_FUNCTION integrate_sectypes BEGIN
   COPY_EXISTING_REGEXP GLOB ~.+\.\(spl\|itm\)$~ override
     PATCH_IF SOURCE_SIZE > 0x71 BEGIN
-      READ_LONG  0x64 ao
-      READ_SHORT 0x68 na
-      READ_LONG  0x6a eo
-      READ_SHORT 0x6e ei1
-      READ_SHORT 0x70 gne
-
-      PATCH_IF "%SOURCE_EXT%" STRING_EQUAL_CASE itm BEGIN      
-        FOR (i=0;i<gne;++i) BEGIN
-          READ_SHORT eo + 0x30*(ei1 + i)       type ELSE 999
-          READ_LONG  eo + 0x30*(ei1 + i) + 0x8 p2   ELSE 999
-          
-          //This works as long as we always insert the new effects in front of the ones that trigger the insertion of a new effect
-          PATCH_IF type = 206 BEGIN
-            READ_ASCII eo + 0x30 * (ei1 + i) + 0x14 rr ELSE nil
-            TO_LOWER rr
-            SET $onequip_immunity("%SOURCE_FILE%" "%rr%") = 1
-          END
-
-          //On-equip immunity
-          PATCH_IF type = 101 AND VARIABLE_IS_SET $f_ImmunitySecType("%p2%") BEGIN
-            PHP_EACH f_AddSecType AS file => SecTypeToAdd BEGIN
-              PATCH_IF "%file%" STRING_MATCHES_REGEXP ".*\.spl$" = 0 AND SecTypeToAdd = $f_ImmunitySecType("%p2%") BEGIN
-                INNER_PATCH "%file%" BEGIN
-                  READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
-                END
-                TO_LOWER file
-                PATCH_IF !VARIABLE_IS_SET $onequip_immunity("%SOURCE_FILE%" "%spell%") BEGIN
-                  INSERT_BYTES   eo + 0x30 * (ei1 + i)        0x30
-                    WRITE_SHORT  eo + 0x30 * (ei1 + i)        206 //protection from spell
-                    WRITE_BYTE   eo + 0x30 * (ei1 + i) + 0x2  1
-                    WRITE_BYTE   eo + 0x30 * (ei1 + i) + 0xc  2
-                    WRITE_BYTE   eo + 0x30 * (ei1 + i) + 0x12 100
-                    WRITE_ASCIIE eo + 0x30 * (ei1 + i) + 0x14 "%spell%" #8
-                  ++i
-                  ++gne
-                END
-              END
-            END
-          END
-        END
-      END
-
-      WRITE_SHORT 0x70 gne
-      ei = gne = 0 ? 0 : ei1 + gne //Some mod files have illegal values for ei1, but the engine disregards the illegal value because gne is 0; we do the same 
-      ne = 0
-      al = "%SOURCE_EXT%" STRING_EQUAL_CASE itm ? 0x38 : 0x28
-
-      //Check for effects to remove e.g. fear or disease and effects that grant immunity to e.g. fear or disease
-      FOR (i=0;i<na AND ao + na*al < SOURCE_SIZE;++i) BEGIN
-        ei += ne
-        WRITE_SHORT ao + al*i + 0x20 ei
-        READ_SHORT  ao + al*i + 0x1e ne
-        FOR (j=0;j<ne;++j) BEGIN
-          READ_SHORT eo + 0x30*(ei + j)        type   ELSE 999
-          READ_BYTE  eo + 0x30*(ei + j) + 0x2  target ELSE 0
-          READ_BYTE  eo + 0x30*(ei + j) + 0x3  power  ELSE 0
-          READ_LONG  eo + 0x30*(ei + j) + 0x4  p1     ELSE 999
-          READ_LONG  eo + 0x30*(ei + j) + 0x8  p2     ELSE 999
-          READ_BYTE  eo + 0x30*(ei + j) + 0xc  timing ELSE 0
-          READ_BYTE  eo + 0x30*(ei + j) + 0xd  dr     ELSE 0
-          READ_LONG  eo + 0x30*(ei + j) + 0xe  time   ELSE 0
-
-          //This works as long as we always insert the new effects in front of the ones that trigger the insertion of the new effect
-          PATCH_IF type = 221 BEGIN
-            SET $extended_sectype_immunity("%SOURCE_FILE%" "%i%" "%p2%") = 1
-          END
-          PATCH_IF type = 206 BEGIN
-            READ_ASCII eo + 0x30 * (ei + j) + 0x14 rr ELSE nil
-            TO_LOWER rr
-            SET $extended_spell_immunity("%SOURCE_FILE%" "%i%" "%rr%") = 1
-          END
-          
-
-
-          PATCH_IF VARIABLE_IS_SET $f_RemoveSecType("%type%") BEGIN
-            check = $f_RemoveSecType("%type%")
-            PATCH_IF !VARIABLE_IS_SET $extended_sectype_immunity("%SOURCE_FILE%" "%i%" "%check%") BEGIN
-              INSERT_BYTES  eo + 0x30*(ei + j)        0x30
-                WRITE_SHORT eo + 0x30*(ei + j)        221 //remove sec type
-                WRITE_BYTE  eo + 0x30*(ei + j) + 0x2  target
-                WRITE_BYTE  eo + 0x30*(ei + j) + 0x3  power
-                WRITE_LONG  eo + 0x30*(ei + j) + 0x4  9
-                WRITE_LONG  eo + 0x30*(ei + j) + 0x8  $f_RemoveSecType("%type%")
-                WRITE_BYTE  eo + 0x30*(ei + j) + 0xc  1
-                WRITE_BYTE  eo + 0x30*(ei + j) + 0x12 100
-              ++ne
-              ++j
-            END
-          END
-
-
-
-          PATCH_IF type = 101 AND VARIABLE_IS_SET $f_ImmunitySecType("%p2%") BEGIN
-            PHP_EACH f_AddSecType AS file => SecTypeToAdd BEGIN
-              PATCH_IF "%file%" STRING_MATCHES_REGEXP ".+\.spl$" = 0 AND SecTypeToAdd = $f_ImmunitySecType("%p2%") BEGIN
-                INNER_PATCH "%file%" BEGIN
-                  READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
-                END
-                PATCH_IF !VARIABLE_IS_SET $extended_spell_immunity("%SOURCE_FILE%" "%i%" "%spell%") BEGIN
-                  INSERT_BYTES   eo + 0x30*(ei + j)        0x30
-                    WRITE_SHORT  eo + 0x30*(ei + j)        206 //protection from spell
-                    WRITE_BYTE   eo + 0x30*(ei + j) + 0x2  target
-                    WRITE_BYTE   eo + 0x30*(ei + j) + 0x3  power
-                    WRITE_BYTE   eo + 0x30*(ei + j) + 0xc  timing
-                    WRITE_BYTE   eo + 0x30*(ei + j) + 0xd  dr
-                    WRITE_LONG   eo + 0x30*(ei + j) + 0xe  time
-                    WRITE_BYTE   eo + 0x30*(ei + j) + 0x12 100
-                    WRITE_ASCIIE eo + 0x30*(ei + j) + 0x14 "%spell%" #8
-                  ++ne
-                  ++j
-                END
-              END
-            END
-          END
-
-
-
-        END
-        WRITE_SHORT ao + al*i + 0x1e ne
-      END
+      LPF integrate_sectypes_inner END
     END
   BUT_ONLY 
-END      
+END 
       
 DEFINE_PATCH_MACRO update_fiend_xp BEGIN
   WRITE_LONG 0x14 THIS > newxpv ? THIS : newxpv
