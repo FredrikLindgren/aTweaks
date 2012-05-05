@@ -1,4 +1,12 @@
 IF
+    HasItem("RR#DINV",Myself) // invisibility item which prevents enemies from targeting not-yet-gated creatures
+THEN
+    RESPONSE #100
+        DestroyItem("RR#DINV")
+        Continue()
+END
+
+IF
 	Global("rr#trees","LOCALS",0) // area type check (0 - inappropriate area, 1 - contains trees, 2 - check done) 
 	HaveSpellRES("rr#ddoor") // Dimension Door
 	AreaType(OUTDOOR)
@@ -1487,9 +1495,20 @@ THEN
 END
 
 IF
+    Global("rr#walk","LOCALS",1) // if RandomWalk() is active
+	!Range(NearestEnemyOf(Myself),8) // and no enemies are nearby
+THEN
+    RESPONSE #100
+        SetGlobal("rr#walk","LOCALS",0)
+        ClearActions(Myself) // clear actions so that ActionListEmpty() can return true again
+END
+
+IF
 	ActionListEmpty()
-        Range(NearestEnemyOf(Myself),10) // Dryads and Hamadryads avoid melee combat
+	Range(NearestEnemyOf(Myself),8) // Dryads and Hamadryads avoid melee combat
+    Global("rr#walk","LOCALS",0)
 THEN
 	RESPONSE #100
-		RunAwayFrom(NearestEnemyOf(Myself),30) // note: RandomWalk() seems to clash with ActionListEmpty, hence RunAwayFrom
+        SetGlobal("rr#walk","LOCALS",1)
+        RandomWalkContinuous() // Note: using this instead of RunAwayFrom() since the latter can unintentionally make creatures travel between areas
 END

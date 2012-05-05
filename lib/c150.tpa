@@ -13,6 +13,8 @@ ACTION_FOR_EACH ~file~ IN                                                       
              ~GORBAT4~                                                             // Imp
                ~IMP01~                                                             // Imp
              ~TELIMP1~                                                             // Imp
+             ~RUMAR03~                                                             // Imp (Ranger stronghold quest)
+            ~MEKIMP01~                                                             // Imp (Mekrath's stolen mirror quest)
 BEGIN                                                                              // execute the following
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
     COPY_EXISTING ~%file%.cre~ ~override~
@@ -194,6 +196,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
               ~DEMOSUM4~                                                           // Cambion
                ~TELCAM1~                                                           // Cambion
                ~GORCAMB~                                                           // Aesgareth (Watcher's Keep Cambion)
+               ~PWARDEN~                                                           // Warden (Planar Prison Cambion)
 BEGIN                                                                              // execute the following
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
     COPY_EXISTING ~%file%.cre~ ~override~
@@ -455,7 +458,7 @@ LAUNCH_PATCH_FUNCTION poison_spell_immunities END                               
     END
   END
   SAY NAME1 @670 SAY NAME2 @670
-  WRITE_BYTE  0x10 BIT2                                                            //flags: permanent corpse   
+  WRITE_LONG 0x10 0                                                                // clear flags
   WRITE_LONG  0x14 "19000"                                                         // XP value
   WRITE_ASCII 0x248 ~RR#HGELU~ #8                                                  // override AI script
   WRITE_BYTE  0x270 "255"                                                          // set initial allegiance to ENEMY
@@ -783,6 +786,13 @@ COPY_EXISTING demnabsu.cre "override/demnabsu.cre"
 
 // Spell changes
 
+COPY_EXISTING ~spcaco.eff~ ~override~                                              // Summon Cacofiend effect file
+             ~spfiend.eff~ ~override~                                              // Summon Fiend effect file
+              ~spgate.eff~ ~override~                                              // Gate effect file
+  WRITE_LONG  0x18 "0"                                                             // power: 0 (in case the spell is cast directly on a Rakshasa or something)
+BUT_ONLY_IF_IT_CHANGES
+
+
 COPY_EXISTING ~SPWI707.SPL~  ~override~                                            // Cacofiend
 SAY NAME1 #17320 SAY NAME2 #17320  SAY DESC @751 SAY UNIDENTIFIED_DESC @751        // retain old name but set new description
   WRITE_SHORT 0x1e BIT8                                                            //Exclude diviners
@@ -803,6 +813,7 @@ SAY NAME1 #17320 SAY NAME2 #17320  SAY DESC @751 SAY UNIDENTIFIED_DESC @751     
      READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
      READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "resref"
       PATCH_IF (("%opcode%" = "177") AND ("%resref%" STRING_EQUAL_CASE ~SPCACO~)) BEGIN  // effect #177: Use EFF File
+        WRITE_BYTE            ("%fx_off%" + 0x03 + ("%abil_fx_idx%" * 0x30)) "0"                // power: 0
         WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "48"               // param1: 48 (MASK_CHAOTIC)
         WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"                // param2: 8 (ALIGN.IDS)
         WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "120"              // duration: 120 (20 rounds)
@@ -848,6 +859,7 @@ SAY NAME1 #17360 SAY NAME2 #17360  SAY DESC @752 SAY UNIDENTIFIED_DESC @752     
      READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
      READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "resref"
       PATCH_IF (("%opcode%" = "177") AND ("%resref%" STRING_EQUAL_CASE ~SPFIEND~)) BEGIN  // effect #177: Use EFF File
+        WRITE_BYTE            ("%fx_off%" + 0x03 + ("%abil_fx_idx%" * 0x30)) "0"                // power: 0
         WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "48"               // param1: 48 (MASK_CHAOTIC)
         WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"                // param2: 8 (ALIGN.IDS)
         WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "198"              // duration: 198 (33 rounds)
@@ -903,6 +915,7 @@ COPY_EXISTING ~SPWI905.SPL~  ~override~                                         
      READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
      READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "resref"
       PATCH_IF (("%opcode%" = "177") AND ("%resref%" STRING_EQUAL_CASE ~SPGATE~)) BEGIN  // effect #177: Use EFF File
+        WRITE_BYTE            ("%fx_off%" + 0x03 + ("%abil_fx_idx%" * 0x30)) "0"                // power: 0
         WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "16"               // param1: 16 (MASK_LAWFUL)
         WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"                // param2: 8 (ALIGN.IDS)
         WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "396"              // duration: 396 (66 rounds)
@@ -1012,6 +1025,36 @@ REPLACE ~RR#9000~ @9000                                                         
 REPLACE ~RR#9001~ @9001                                                            // Death Gaze tip
 REPLACE ~RR#9002~ @9002                                                            // Fiend gating tip
 REPLACE ~RR#9004~ @9004                                                            // Extraplanar healing immunity tip
+BUT_ONLY_IF_IT_CHANGES
+
+
+// More sensible encounters
+
+// Replace the Abishai and the Demon Knight near Diaytha with a Glabrezu and a Balor
+
+COPY_EXISTING ~ar6105.are~ ~override~                                              // Ogremoch's lair in Sendai's enclave
+  READ_LONG  0x54 "actor_off"
+  READ_SHORT 0x58 "actor_num"
+  WHILE ("%actor_num%" > 0) BEGIN
+    SET "actor_num" = ("%actor_num%" - 1)
+    READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
+    PATCH_IF ("%cre_file%" STRING_EQUAL_CASE "DEMABI01") BEGIN
+      WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~DEMGLA01~ #8
+    END
+    PATCH_IF ("%cre_file%" STRING_EQUAL_CASE "DEATHKNI") BEGIN
+      WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~DEMBAL01~ #8
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Mellisan should not summon Bone Fiends during the final battle in order to avoid Blood War issues
+
+COPY_EXISTING ~meliss01.bcs~ ~override~
+              ~meliss02.bcs~ ~override~
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~MELSUM02~ ~MELSUM01~
+COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
 
 

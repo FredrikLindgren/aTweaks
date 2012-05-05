@@ -10,6 +10,7 @@ INT_VAR                                                                         
 "racempty" = "0"
 "genempty" = "0"
 "defempty" = "0"
+"scrskip"  = "0"
 
 
 STR_VAR                                                                           // initialize strings
@@ -39,6 +40,9 @@ STR_VAR                                                                         
 "skipfile03" = "RR#NOSKIP"                                                        // skip script patching for a designated file
 "skipfile04" = "RR#NOSKIP"                                                        // skip script patching for a designated file
 "skipfile05" = "RR#NOSKIP"                                                        // skip script patching for a designated file
+"skipfile06" = "RR#NOSKIP"                                                        // skip script patching for a designated file
+
+
 
 
 BEGIN                                                                              // Start FUNCTION
@@ -55,13 +59,14 @@ PATCH_IF (("%gender%" = "9") AND ("%SOURCE_RES%" STRING_EQUAL_CASE "%skipfile01%
   WRITE_BYTE  0x275 "1"                                                            // set gender to Male 
 END
 
-PATCH_FOR_EACH ~skipfile~ IN ~%skipfile01%~ ~%skipfile02%~ ~%skipfile03%~ ~%skipfile04%~ ~%skipfile05%~ BEGIN
+PATCH_FOR_EACH ~skipfile~ IN ~%skipfile01%~ ~%skipfile02%~ ~%skipfile03%~ ~%skipfile04%~ ~%skipfile05%~ ~%skipfile06%~ BEGIN
   PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE EVALUATE_BUFFER ~%skipfile%~) BEGIN   // if file is supposed to be skipped
     SET "scrdone" = "1"                                                            // mark new script as assigned
+    SET "scrskip" = "1"                                                            // mark script patching to be skipped
   END
 END
 
-PATCH_FOR_EACH ~ainul~ IN ~%script01%~ ~%script02%~ ~%script03%~ ~%script04%~ ~%script05%~ ~%script06%~ ~%script07%~ ~%script08%~ ~%script09%~ ~%script10%~ ~%script11%~ ~%script12%~ ~%script13%~ ~%script14%~ ~%script15%~ ~%script16%~ BEGIN
+PATCH_FOR_EACH ~ainul~ IN ~%script01%~ ~%script02%~ ~%script03%~ ~%script04%~ ~%script05%~ ~%script06%~ ~%script07%~ ~%script08%~ ~%script09%~ ~%script10%~ ~%script11%~ ~%script12%~ ~%script13%~ ~%script14%~ ~%script15%~ ~%script16%~ ~%script17%~ ~%script18%~ ~%script19%~ ~%script20%~ BEGIN
   PATCH_IF ("%aiovr%" STRING_EQUAL_CASE "%ainul%") OR "%aiovr%" STRING_EQUAL "" OR "%aiovr%" STRING_EQUAL_CASE none BEGIN             
     SPRINT "aiovr" ""                                                          // null matching override script
     SET "ovrempty" = "1"                                                           // mark override script slot as empty
@@ -106,11 +111,13 @@ PATCH_IF ("defempty" = "1") AND ("scrdone" = 0) BEGIN
   SET "scrdone" = "1"
 END
 
+PATCH_IF ("scrskip" = "0") BEGIN                                                   // if script patching shouldn't be skipped
 WRITE_EVALUATED_ASCII 0x248 "%aiovr%" #8                                           // new override script
 WRITE_EVALUATED_ASCII 0x250 "%aicls%" #8                                           // new class script
 WRITE_EVALUATED_ASCII 0x258 "%airac%" #8                                           // new race script
 WRITE_EVALUATED_ASCII 0x260 "%aigen%" #8                                           // new general script
 WRITE_EVALUATED_ASCII 0x268 "%aidef%" #8                                           // new default script
+END
 
 
 END                                                                                // End FUNCTION
