@@ -8,7 +8,7 @@
 
 BACKUP ~atweaks/backup~
 AUTHOR "Wisp, shsforums.net"                                                       // Author and e-mail address
-VERSION ~v3.81~                                                                    // Mod version
+VERSION ~v3.82~                                                                    // Mod version
 ALWAYS                                                                             // Always do this block
   INCLUDE ~aTweaks/LIB/RR#AGLEF.TPH~                                               // Include my custom "Add Global Effect" function
   INCLUDE ~aTweaks/LIB/RR#SP2IN.TPH~                                               // Include my custom "Spell to Innate" function
@@ -39,7 +39,7 @@ ASK_EVERY_COMPONENT                                                             
 
 LANGUAGE ~English~ ~ENGLISH~ ~aTweaks/TRA/ENGLISH/aTweaks.tra~
 LANGUAGE ~Francais (by the d'Oghmatiques)~ ~FRENCH~ ~aTweaks/TRA/ENGLISH/aTweaks.tra~ ~aTweaks/TRA/FRENCH/aTweaks.tra~
-LANGUAGE ~Espanol (by Immortality)~ ~SPANISH~ ~aTweaks/TRA/ENGLISH/aTweaks.tra~ ~aTweaks/TRA/SPANISH/aTweaks.tra~
+LANGUAGE ~Espanol (by Immortality, William Imm and Lisandro)~ ~SPANISH~ ~aTweaks/TRA/ENGLISH/aTweaks.tra~ ~aTweaks/TRA/SPANISH/aTweaks.tra~
 LANGUAGE ~Deutsch (by Cronox and Leomar)~ ~GERMAN~ ~aTweaks/TRA/ENGLISH/aTweaks.tra~ ~aTweaks/TRA/GERMAN/aTweaks.tra~
 LANGUAGE ~Italian (by Andrea C. and ilot)~ ~ITALIAN~ ~aTweaks/TRA/ENGLISH/aTweaks.tra~ ~aTweaks/TRA/ITALIAN/aTweaks.tra~
 LANGUAGE ~Russian (by the Aerie.ru team and the Arcanecoast.ru team)~ ~RUSSIAN~ ~aTweaks/TRA/ENGLISH/aTweaks.tra~ ~aTweaks/TRA/RUSSIAN/aTweaks.tra~
@@ -681,6 +681,8 @@ GROUP @1 // PnP Tweaks
 REQUIRE_PREDICATE ENGINE_IS ~tob~ @90                                              // ToB engine required
 REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~rr#fdrya.bcs~ @1908                         // PnP Fey creatures required
 
+COPY ~atweaks/itm/rr#dinv.itm~  ~override~                                         // item which makes creatures untargetable until the gating animation finishes
+
 COPY    ~atweaks/spl/fey/sppr410.spl~   ~override~                                 // Call Woodland Beings spell
 SAY DESC @1895 SAY UNIDENTIFIED_DESC @1895
 
@@ -691,6 +693,8 @@ COPY   ~atweaks/eff/fey/rr#snymp.eff~   ~override~                              
 COPY_EXISTING ~dry01.cre~    ~override/rr#sdrya.cre~                               // Summoned Dryad
               ~hamasu.cre~   ~override/rr#shama.cre~                               // Summoned Hamadryad
              ~nymphsu.cre~   ~override/rr#snymp.cre~                               // Summoned Nymph
+  ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~               // item which makes creatures invisible and untargetable while they gate in
+  ADD_MEMORIZED_SPELL ~rr#usumn~ #0 ~innate~ ( 1 )                                 // adds 1x Unsummon
   WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
   WRITE_ASCIIE 0x248 "%DEST_RES%" #8                                               // Override script
   WRITE_ASCII  0x250 ~~ #8                                                         // disable class AI script
@@ -699,6 +703,7 @@ COPY_EXISTING ~dry01.cre~    ~override/rr#sdrya.cre~                            
   WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
   WRITE_BYTE   0x270 128                                                           // set intial allegiance to Neutral
   WRITE_BYTE   0x275 2                                                             // set gender to Female (treated as gated creatures)
+  WRITE_LONG   0x001c 0                                                            // set gold carried to 0
   WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32                                              // death variable
   WRITE_ASCII  0x2cc ~~ #8                                                         // dialogue file
   READ_LONG 0x2bc io
@@ -1156,7 +1161,6 @@ REQUIRE_PREDICATE ENGINE_IS ~bg2 tob~ @92                                       
 // It also flags these abilities as non-magical which prevents Wild Magic and Dead Magic zones from affecting them
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-              ~spwi406~                                                            // Minor Globe of Invulnrability
               ~spcl611~                                                            // Druid Shapeshift Brown Bear
               ~spcl612~                                                            // Druid Shapeshift Wolf
               ~spcl613~                                                            // Druid Shapeshift Black Bear
@@ -1186,6 +1190,35 @@ END                                                                             
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Add the non-dispellable flag to druidic shapechange weapons if TobEx is detected
+// This will prevent the natural weapons of the shapechange forms (i.e. claws and such) from being removed by Dispel Magic and Dead Magic Zones
+ACTION_IF FILE_EXISTS_IN_GAME ~tobex_ini/tobexcore.ini~ BEGIN                      // if TobEx is installed
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+               ~brbrp~                                                             // Brown Bear shape attack
+               ~brblp~                                                             // Black Bear shape attack
+               ~wolfm~                                                             // Wolf shape attack
+             ~plyspid~                                                             // Sword Spider shape attack
+            ~plywyvrn~                                                             // Baby Wyvern shape attack
+             ~plysala~                                                             // Fire Salamander shape attack
+              ~drufir~                                                             // Fire Elemental shape attack
+              ~druear~                                                             // Earth Elemental shape attack
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN                                   // if the designated file with an ITM extension exists
+COPY_EXISTING ~%file%.itm~ ~override~
+  PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
+// =============================================================================== // the actual work starts from here
+    READ_BYTE 0x1b "flags"
+    PATCH_IF (("%flags%" BAND "0b00000001") = "0b00000000") BEGIN                  // if bit 24 isn't set
+      WRITE_BYTE "0x1b" ("%flags%" BOR "0b00000001")                               // set bit 24
+    END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends second ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+END                                                                                // ends first ACTION_IF FILE_EXISTS_IN_GAME block
 
 
 

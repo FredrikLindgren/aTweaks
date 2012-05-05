@@ -20,6 +20,22 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" "rr#renew" = "1" END  
 COPY ~atweaks/spl/rr#niinv.spl~ ~override~                                         // Natural Invisibility
   SAY NAME1 @2100 SAY NAME2 @2100
 
+COPY ~atweaks/spl/elementals/rr#emcbt.spl~ ~override~                              // New Mental Combat spell (used for arcane spellcasters when summoning elementals)
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  READ_LONG  0x6a "fx_off"
+  FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+    READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+    READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
+      READ_LONG  ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "param1"
+        PATCH_IF (("%opcode%" = 139) AND ("%param1%" = 54333)) BEGIN // display string
+          SAY ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) @2131  // Locked in mental combat
+        END
+    END
+  END
+
 COPY ~atweaks/spl/rr#uchrm.spl~ ~override~                                         // Remove Enchantment Spell School (uncharm)
 
 COPY ~atweaks/spl/elementals/rr#track.spl~ ~override~                              // Tracking
@@ -416,9 +432,28 @@ LAUNCH_PATCH_FUNCTION ~insect_spell_immunities~ END                             
 LAUNCH_PATCH_FUNCTION ~hold_immunity~ END                                          // add hold immunity
 LAUNCH_PATCH_FUNCTION ~stun_immunity~ END                                          // add stun immunity
 LAUNCH_PATCH_FUNCTION ~sleep_immunity~ END                                         // add sleep immunity
+PATCH_FOR_EACH ~spell~ IN                                                          // creatures without flesh shouldn't be affected by the Flesh to Stone spell
+             ~SPWI604~                                                             // Flesh to Stone (wizard version)
+             ~SPIN984~                                                             // Flesh to Stone (Beholder ray)
+            ~RR#WI604~                                                             // Flesh to Stone (aTweaks)
+BEGIN                                                                              // execute the following
+  LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                        // Starts FUNCTION call
+  INT_VAR                                                                          // initialize variables
+    "opcode" = "206"                                                               // effect: #206 (Protection from Spell)
+    "target" = "1"                                                                 // target: 1 (self)
+    "timing" = "2"                                                                 // timing mode: 2 (while equipped)
+    "parameter1" = "4742"                                                          // param1: string (Spell Ineffective)
+    "duration" = "0"                                                               // duration: 0
+    "sectype" = "0"                                                                // secondary type: none
+    "probability1" = "100"                                                         // probability1: 100%
+  STR_VAR                                                                          // initialize strings
+    "resource"  = EVALUATE_BUFFER "%spell%"                                        // resref: the current spell
+    "effsource" = ""                                                               // effsource: none
+  END                                                                              // ends LAUNCH_PATCH_FUNCTION
+END                                                                                // ends PATCH_FOR_EACH
 BUT_ONLY_IF_IT_CHANGES
 
-
+COPY ~atweaks/itm/rr#dinv.itm~  ~override~                                         // item which makes creatures untargetable until the gating animation finishes
 COPY ~atweaks/itm/elementals/rr#easer.itm~ ~override~                              // Aerial Servant attack
 COPY ~atweaks/itm/elementals/rr#efsal.itm~ ~override~                              // Fire Salamander spear attack
 COPY ~atweaks/itm/elementals/rr#efsa2.itm~ ~override~                              // Fire Salamander tail attack
@@ -455,35 +490,43 @@ COPY ~atweaks/itm/elementals/rr#esunn.itm~ ~override~                           
 COPY ~atweaks/itm/elementals/rr#ezaam.itm~ ~override~                              // Zaaman Rul attack
 
 
-// Special Spell Revisions compatibility block (needs to go before aTweaks' creature modifications)
-// SR removes the mental combat script from elementals summoned by wizards. aTweaks adds it back
+// Special Spell Revisions compatibility block. Needs to go way up here so that the spell is backed up before aTweaks alters it
 
 ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
-
 COPY_EXISTING ~sppr702.spl~  ~override/rr#srbk1.spl~                               // Backup SR's Summon Shambling Mound
+END                                                                                // ends Spell Revisions compatibility block
+
+
+// Ensure that the mental combat script is assigned to all elementals summoned by arcane spellcasters. Also, these elementals need to start out as NEUTRAL
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-            ~ELAIRSU1~                                                             // Air Elemental (mage summon)
-            ~ELAIRSU2~                                                             // Air Elemental (mage summon)
-            ~ELAIRSU3~                                                             // Air Elemental (mage summon)
-            ~ELEARSU1~                                                             // Earth Elemental (mage summon)
-            ~ELEARSU2~                                                             // Earth Elemental (mage summon)
-            ~ELEARSU3~                                                             // Earth Elemental (mage summon)
-            ~ELFIRSU1~                                                             // Fire Elemental (mage summon)
-            ~ELFIRSU2~                                                             // Fire Elemental (mage summon)
-            ~ELFIRSU3~                                                             // Fire Elemental (mage summon)
-            ~ELFIRSUW~                                                             // Fire Elemental (mage summon)
+            ~elairsu1~                                                             // Air Elemental (mage summon)
+            ~elairsu2~                                                             // Air Elemental (mage summon)
+            ~elairsu3~                                                             // Air Elemental (mage summon)
+            ~elairsuw~                                                             // Lesser Air Elemental (mage summon)
+            ~elearsu1~                                                             // Earth Elemental (mage summon)
+            ~elearsu2~                                                             // Earth Elemental (mage summon)
+            ~elearsu3~                                                             // Earth Elemental (mage summon)
+            ~elearsu4~                                                             // Earth Elemental (mage summon)
+            ~elearsuw~                                                             // Lesser Earth Elemental (mage summon)
+            ~elfirsu1~                                                             // Fire Elemental (mage summon)
+            ~elfirsu2~                                                             // Fire Elemental (mage summon)
+            ~elfirsu3~                                                             // Fire Elemental (mage summon)
+            ~elfirsu4~                                                             // Fire Elemental (mage summon)
+            ~elfirsuw~                                                             // Lesser Fire Elemental (mage summon)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
 LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
 // =============================================================================== // the actual work starts from here
-WRITE_ASCII 0x248 ~WIZELSU2~ #8                                                    // assign override AI script
+WRITE_ASCII 0x248 ~rr#ewizs~ #8                                                    // assign override AI script
+WRITE_BYTE  0x270 128                                                              // set initial allegiance to NEUTRAL
+ADD_CRE_ITEM ~RIDRING~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~RRING~                  // selection circle removal ring
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
-END                                                                                // ends Spell Revisions compatibility block
+
 
 
 
@@ -973,6 +1016,7 @@ REMOVE_KNOWN_SPELLS                                                             
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EWWEI~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "9"                                                                   // new movement rate
@@ -1023,10 +1067,11 @@ END                                                                             
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
             ~ELAIRL01~                                                             // Lesser Air Elemental (8 HD)
-            ~ELAIRSU1~                                                             // Lesser Air Elemental (8 HD, summoned, wizard version)
+            ~ELAIRSUW~                                                             // Lesser Air Elemental (8 HD, summoned, wizard version)
             ~ELARIL01~                                                             // Lesser Air Elemental (8 HD, Bioware's typo?)
             ~GORAIR01~                                                             // Lesser Air Elemental (8 HD, Watcher's Keep)
             ~SUMELAIR~                                                             // Lesser Air Elemental (8 HD, summoned, Staff of Air)
+            ~DW#PRELA~                                                             // SCS - Prat's Lesser Air Elementals
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -1100,7 +1145,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
             ~_IRASPEC~                                                             // Air Aspect (Tutu)
             ~AIRASPEC~                                                             // Air Aspect (BGT)
              ~ELAIR01~                                                             // Air Elemental (12 HD)
-            ~ELAIRSUW~                                                             // Lesser Air Elemental (12 HD, summoned, wizard version)
+            ~ELAIRSU1~                                                             // Air Elemental (12 HD, summoned, wizard version)
                ~MDAIR~                                                             // Air Elemental (12 HD, unused?)
               ~MDAIR2~                                                             // Air Elemental (12 HD, unused?)
             ~PAIREL01~                                                             // Air Elemental (12 HD, unused?)
@@ -1110,6 +1155,9 @@ COPY_EXISTING ~%file%.cre~ ~override~
 LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
 // =============================================================================== // the actual work starts from here
 WRITE_SHORT 0x28 "29472"                                                           // use the proper avatar (ELEMENTAL_AIR)
+PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~ELAIRSU1~) BEGIN                       // special case, this particular Air Elemental needs to be renamed
+  SAY NAME1 #2831 SAY NAME2 #2832                                                  // Air Elemental
+END                                                                                // ends ELAIRSU1 specific block
 PATCH_IF (("%SOURCE_RES%" STRING_EQUAL_CASE ~AIRASPEC~) OR ("%SOURCE_RES%" STRING_EQUAL_CASE ~_IRASPEC~)) BEGIN // special case, Air Aspect
   REMOVE_CRE_ITEM ~%TUTU_VAR%MISC52~                                               // Wyvern Head
   REMOVE_CRE_ITEM ~%TUTU_VAR%WYVERN1~                                              // Wyvern Attack 1
@@ -1370,6 +1418,7 @@ COPY_EXISTING ~%file%.cre~ ~override~
 LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                   // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
 // =============================================================================== // the actual work starts from here
 SAY NAME1 #2850 SAY NAME2 #2851                                                    // Lesser Earth Elemental
+WRITE_SHORT 0x28 "29441"                                                           // use the proper avatar (ELEMENTAL_EARTH_SMALL)
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
@@ -1422,6 +1471,8 @@ STR_VAR                                                                         
 "script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1495,6 +1546,8 @@ STR_VAR                                                                         
 "skipfile01" = "SHEARTH"                                                           // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1575,6 +1628,8 @@ STR_VAR                                                                         
 "script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -1656,6 +1711,8 @@ STR_VAR                                                                         
 "skipfile01" = "DRUEAR01"                                                          // skip script patching for a designated file
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -2000,6 +2057,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "5"                                                                   // new movement rate
@@ -2057,6 +2115,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "5"                                                                   // new movement rate
@@ -2115,6 +2174,7 @@ REMOVE_KNOWN_SPELLS                                                             
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
 REMOVE_CRE_ITEM ~WALLPASS~                                                         // remove wallpass item
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EWATG~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
@@ -2183,6 +2243,7 @@ REMOVE_KNOWN_SPELLS                                                             
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
@@ -2241,6 +2302,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "5"                                                                   // new movement rate
@@ -2520,6 +2582,8 @@ END                                                                             
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "16" END      // remove spurious haste opcode
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
 LAUNCH_PATCH_FUNCTION clear_bg1_profs END                                          // Clear BG1 proficiencies
 // =============================================================================== // the actual work ends here
@@ -2850,6 +2914,8 @@ END                                                                             
 LAUNCH_PATCH_FUNCTION ~DELETE_CRE_EFFECT~ INT_VAR opcode_to_delete = "101" END     // remove spurious opcode protections
 LAUNCH_PATCH_FUNCTION clear_bg1_profs END                                          // Clear BG1 proficiencies
 LAUNCH_PATCH_FUNCTION earth_affinity END                                           // apply earth affinity traits
+LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
+LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
 LAUNCH_PATCH_FUNCTION petrification_immunity END                                   // petrification immunity
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
@@ -2964,6 +3030,7 @@ COMPILE ~atweaks/baf/elementals/rr#eyanc.baf~                                   
 COMPILE ~atweaks/baf/elementals/rr#echan.baf~                                      // Chan AI script
 COMPILE ~atweaks/baf/elementals/rr#esunn.baf~                                      // Sunnis AI script
 COMPILE ~atweaks/baf/elementals/rr#ezaam.baf~                                      // Zaaman Rul AI script
+COMPILE ~atweaks/baf/elementals/rr#ewizs.baf~                                      // Mental Combat AI script (for elementals summoned by arcane spellcasters)
 
 
 
@@ -2986,6 +3053,28 @@ LAUNCH_PATCH_FUNCTION ~disease_immunity~ END                                    
 LAUNCH_PATCH_FUNCTION ~poison_immunity~ END                                        // add poison immunity
 LAUNCH_PATCH_FUNCTION ~poison_spell_immunities~ END                                // add immunity to poison-based spells
 LAUNCH_PATCH_FUNCTION ~insect_spell_immunities~ END                                // add immunity to insect spells
+LAUNCH_PATCH_FUNCTION ~hold_immunity~ END                                          // add hold immunity
+LAUNCH_PATCH_FUNCTION ~stun_immunity~ END                                          // add stun immunity
+LAUNCH_PATCH_FUNCTION ~sleep_immunity~ END                                         // add sleep immunity
+PATCH_FOR_EACH ~spell~ IN                                                          // creatures without flesh shouldn't be affected by the Flesh to Stone spell
+             ~SPWI604~                                                             // Flesh to Stone (wizard version)
+             ~SPIN984~                                                             // Flesh to Stone (Beholder ray)
+            ~RR#WI604~                                                             // Flesh to Stone (aTweaks)
+BEGIN                                                                              // execute the following
+  LAUNCH_PATCH_FUNCTION ~ADD_ITEM_EQEFFECT~                                        // Starts FUNCTION call
+  INT_VAR                                                                          // initialize variables
+    "opcode" = "206"                                                               // effect: #206 (Protection from Spell)
+    "target" = "1"                                                                 // target: 1 (self)
+    "timing" = "2"                                                                 // timing mode: 2 (while equipped)
+    "parameter1" = "4742"                                                          // param1: string (Spell Ineffective)
+    "duration" = "0"                                                               // duration: 0
+    "sectype" = "0"                                                                // secondary type: none
+    "probability1" = "100"                                                         // probability1: 100%
+  STR_VAR                                                                          // initialize strings
+    "resource"  = EVALUATE_BUFFER "%spell%"                                        // resref: the current spell
+    "effsource" = ""                                                               // effsource: none
+  END                                                                              // ends LAUNCH_PATCH_FUNCTION
+END                                                                                // ends PATCH_FOR_EACH
 
 COPY_EXISTING ~rr#eshfe.itm~ ~override~                                            // Druid Fire Elemental transformation attack
               ~rr#eshfr.itm~ ~override~                                            // Shapechange Fire Elemental attack
@@ -3146,6 +3235,76 @@ END                                                                             
 
 // Revised Elemental summoning spells
 
+// Fix Bioware's mixup with Conjure (Lesser) Air Elemental EFFs
+
+COPY_EXISTING ~splesair.eff~  ~override~                                           // Conjure Lesser Air Elemental (8 HD)
+  WRITE_ASCII 0x30 "ELAIRSUW" #8                                                   // resref (creature to be summoned)
+BUT_ONLY_IF_IT_CHANGES
+
+COPY_EXISTING ~spair1.eff~  ~override~                                             // Conjure Air Elemental (12 HD, mage version)
+  WRITE_ASCII 0x30 "ELAIRSU1" #8                                                   // resref (creature to be summoned)
+BUT_ONLY_IF_IT_CHANGES
+
+
+
+// Summoned elementals should not leave corpses behind after they are slain
+// Also, they should not be targetable while the summoning animation plays
+// Lastly, the player should have the option to dismiss (unsummon) a summoned creature at will
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+            ~elairsu1~                                                             // Air Elemental (mage summon)
+            ~elairsu2~                                                             // Air Elemental (mage summon)
+            ~elairsu3~                                                             // Air Elemental (mage summon)
+            ~swaair01~                                                             // Air Elemental (priest summon)
+            ~swaair02~                                                             // Air Elemental (priest summon)
+            ~elairsuw~                                                             // Lesser Air Elemental (mage summon)
+            ~sumelair~                                                             // Lesser Air Elemental (staff summon)
+            ~elearsu1~                                                             // Earth Elemental (mage summon)
+            ~elearsu2~                                                             // Earth Elemental (mage summon)
+            ~elearsu3~                                                             // Earth Elemental (mage summon)
+            ~elearsu4~                                                             // Earth Elemental (mage summon)
+             ~elearpr~                                                             // Earth Elemental (priest summon)
+            ~elearpr2~                                                             // Earth Elemental (priest summon)
+            ~elearpr3~                                                             // Earth Elemental (priest summon)
+            ~swaear01~                                                             // Earth Elemental (priest summon)
+            ~swaear02~                                                             // Earth Elemental (priest summon)
+            ~elearsuw~                                                             // Lesser Earth Elemental (mage summon)
+            ~sumelear~                                                             // Lesser Earth Elemental (staff summon)
+            ~elfirsu1~                                                             // Fire Elemental (mage summon)
+            ~elfirsu2~                                                             // Fire Elemental (mage summon)
+            ~elfirsu3~                                                             // Fire Elemental (mage summon)
+            ~elfirsu4~                                                             // Fire Elemental (mage summon)
+             ~elfirpr~                                                             // Fire Elemental (priest summon)
+            ~elfirpr2~                                                             // Fire Elemental (priest summon)
+            ~elfirpr3~                                                             // Fire Elemental (priest summon)
+            ~swafir01~                                                             // Fire Elemental (priest summon)
+            ~swafir02~                                                             // Fire Elemental (priest summon)
+            ~elfirsuw~                                                             // Lesser Fire Elemental (mage summon)
+            ~sumelfir~                                                             // Lesser Fire Elemental (staff summon)
+            ~elemchan~                                                             // Chan
+            ~elemsunn~                                                             // Sunnis
+            ~elemzaam~                                                             // Zaaman Rul
+              ~servsu~                                                             // Aerial Servant
+              ~stalke~                                                             // Invisible Stalker
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the designated file with an ITM extension exists
+COPY_EXISTING ~%file%.cre~ ~override~
+  PATCH_IF (SOURCE_SIZE > 0x2d3) THEN BEGIN                                        // protects against invalid files
+// =============================================================================== // the actual work starts from here
+    READ_BYTE 0x10 "flags"                                                         // read initial flags
+    PATCH_IF (("%flags%" BAND "0b00000010") = "0b00000000") BEGIN                  // if bit 1 isn't set 
+      WRITE_BYTE "0x10" ("%flags%" BOR "0b00000010")                               // set bit 1 (enable No Corpse flag)
+      READ_BYTE 0x10 "flags"                                                       // read flags again to account for the previous change
+      WRITE_BYTE "0x10" ("%flags%" BAND "0b11111011")                              // unset bit 2 (disable Permanent Corpse flag)
+    END
+ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
+ADD_MEMORIZED_SPELL ~rr#usumn~ #0 ~innate~ ( 1 )                                   // adds 1x Unsummon
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends second ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
 
 // Conjure Lesser X Elemental (arcane version)
 
@@ -3162,9 +3321,6 @@ WRITE_LONG 0x50 "%rr#var_1%"                                                    
 LPF prep_itm_spl INT_VAR f_Type = 1 END
 LPF configure_spell_header INT_VAR f_Target = 4 f_Range = 15 f_CastTime = 9 STR_VAR f_Icon = EVAL ~%SOURCE_RES%B~ END
 LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 114 STR_VAR resource = EVAL ~%rr#var_0%~ END  // Use EFF file
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target = 1 parameter2 = 1 duration = 18 STR_VAR resource = SPELEMND END            // Play 3D Effect
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 1 parameter2 = 131 duration = 18 END                                      // Display Special Effect Icon
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 165 target = 1 duration = 18 END                                                       // Pause Target
   READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
   READ_LONG  0x6a "fx_off"
@@ -3215,9 +3371,6 @@ LPF configure_spell_header INT_VAR f_Target = 4 f_Range = 35 f_CastTime = 9 STR_
 LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 100  probability2 = 0   STR_VAR resource = EVAL ~%rr#var_0%~ END  // Regular elemental
 LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 95  probability2 = 61  STR_VAR resource = EVAL ~%rr#var_1%~ END  // Greater elemental
 LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 1 parameter2 = 2 duration = 660 probability1 = 100 probability2 = 96  STR_VAR resource = EVAL ~%rr#var_2%~ END  // Elder elemental
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 215 target = 1 parameter2 = 1 duration = 18 STR_VAR resource = SPELEMND END            // Play 3D Effect
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 1 parameter2 = 131 duration = 18 END                                      // Display Special Effect Icon
-LPF ADD_SPELL_EFFECT INT_VAR opcode = 165 target = 1 duration = 18 END                                                       // Pause Target
   READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
   READ_LONG  0x6a "fx_off"
@@ -3414,6 +3567,7 @@ COPY_EXISTING ~splesear.eff~  ~override~                                        
               ~swaeare2.eff~  ~override~                                           // Elemental Summoning (24 HD, priest HLA version)
                ~sumsunn.eff~  ~override~                                           // Summon Sunnis (priest HLA version)
   WRITE_ASCII 0x70 ~RR#CEART~ #8                                                   // resref2: RR#CEART (VVC to display)
+  WRITE_LONG  0x18 "0"                                                             // power: 0 (in case the spell is cast directly on a Rakshasa or something)
 
 
 // Fire Elementals
@@ -3429,9 +3583,27 @@ COPY_EXISTING ~splesfir.eff~  ~override~                                        
               ~swafire2.eff~  ~override~                                           // Elemental Summoning (24 HD, priest HLA version)
                ~sumzaam.eff~  ~override~                                           // Summon Zaaman Rul (priest HLA version)
   WRITE_ASCII 0x70 ~RR#CFIRE~ #8                                                   // resref2: RR#CFIRE (VVC to display)
+  WRITE_LONG  0x18 "0"                                                             // power: 0 (in case the spell is cast directly on a Rakshasa or something)
+
+
+// Air Elementals
+COPY_EXISTING ~splesair.eff~  ~override~                                           // Conjure Lesser Air Elemental (8 HD)
+                ~spair1.eff~  ~override~                                           // Conjure Air Elemental (12 HD, mage version)
+                ~spair2.eff~  ~override~                                           // Conjure Air Elemental (16 HD, mage version)
+                ~spair3.eff~  ~override~                                           // Conjure Air Elemental (24 HD, mage version)
+                ~staf16.eff~  ~override~                                           // Conjure Lesser Air Elemental (8 HD, Staff of Air version)
+              ~swaaire1.eff~  ~override~                                           // Elemental Summoning (16 HD, priest HLA version)
+              ~swaaire2.eff~  ~override~                                           // Elemental Summoning (24 HD, priest HLA version)
+               ~sumchan.eff~  ~override~                                           // Summon Chan (priest HLA version)
+                ~spserv.eff~  ~override~                                           // Aerial Servant
+               ~spstalk.eff~  ~override~                                           // Invisible Stalker
+  WRITE_ASCII 0x70 ~SPPORTAL~ #8                                                   // resref2: SPPORTAL (VVC to display)
+  WRITE_LONG  0x18 "0"                                                             // power: 0 (in case the spell is cast directly on a Rakshasa or something)
+BUT_ONLY_IF_IT_CHANGES
 
 
 // Revised summoned elemental scripts (note: summoner targeting is now handled via the main script, so it needs to be removed from here)
+// These scripts are no longer used by aTweaks, but patch them just in case
 
 COPY_EXISTING ~wizelsu2.bcs~ ~override~
               ~wizelsum.bcs~ ~override~
@@ -3441,6 +3613,39 @@ COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
 
 
+// Add Conjure Lesser Elemental scrolls to BGT/Tutu and some BG2 stores
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+               ~jayes~                                                             // Jayes' store (the halfling who appears during night time at Waukeen's Promenade)
+             ~sto0703~                                                             // Sorcerous Sundries (BGT version)
+            ~_sto0703~                                                             // Sorcerous Sundries (Tutu version)
+BEGIN                                                                              // execute the following
+ACTION_IF FILE_EXISTS_IN_GAME ~%file%.sto~ BEGIN                                   // if the designated file with a STO extension exists
+COPY_EXISTING ~%file%.sto~ ~override~
+PATCH_IF (%SOURCE_SIZE% > 0x9b) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+// =============================================================================== // the actual work starts from here
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL7C~) BEGIN              // if the store doesn't already have the specified item
+  ADD_STORE_ITEM ~SCRL7C~   AFTER  ~%TUTU_VAR%SCRL5P~ #1 #0 #0 ~IDENTIFIED~ #2     // Adds 2x Conjure Lesser Earth Elemental scroll
+END
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL7B~) BEGIN              // if the store doesn't already have the specified item
+  ADD_STORE_ITEM ~SCRL7B~   BEFORE  ~SCRL7C~ #1 #0 #0 ~IDENTIFIED~ #2              // Adds 2x Conjure Lesser Air Elemental scroll
+END
+PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL6X~) BEGIN              // if the store doesn't already have the specified item
+  ADD_STORE_ITEM ~SCRL6X~   BEFORE  ~SCRL7B~ #1 #0 #0 ~IDENTIFIED~ #2              // Adds 2x Conjure Lesser Air Elemental scroll
+END
+// =============================================================================== // the actual work ends here
+END                                                                                // ends file size check
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_FOR_EACH block
+
+
+// Make a custom Air Elemental to be summoned by Chan and Yan-C-Bin
+
+COPY_EXISTING ~elairsu1.cre~ ~override/rr#eairr.cre~                               // Air Elemental
+  REMOVE_CRE_ITEM ~RIDRING~                                                        // selection circle removal ring
+  WRITE_ASCII_LIST 0x248 ~rr#eair~ ~~ ~~ ~~ ~~                                     // assign new override script, null other scripts
+  WRITE_ASCII 0x280 ~rr#eairr~ #32                                                 // assign new death variable
 
 
 
@@ -3724,6 +3929,53 @@ COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
 
 
+// Give Vithal a better chance of surviving against aTweaks' portal guardians by adding defensive sequencers and slightly changing his offensive spell repertoire
+
+COPY_EXISTING ~dwvith.bcs~ ~override~
+DECOMPILE_BCS_TO_BAF
+  REPLACE_TEXTUALLY EXACT_MATCH ~See([0.0.0.0.10])~ ~See([0.0.0.0.10]) !GlobalTimerNotExpired("RR#Cast","LOCALS")~
+COMPILE_BAF_TO_BCS
+BUT_ONLY_IF_IT_CHANGES
+
+<<<<<<<<atweaks/inlined/baf/elementals/dwvith.baf
+IF
+    See([0.0.0.0.10]) // elemental portal guardians
+    Global("RR#Seq","LOCALS",0) // Spell Sequencer
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    !StateCheck(Myself,STATE_SILENCED)
+THEN
+    RESPONSE #100
+        SetGlobal("RR#Seq","LOCALS",1)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        FaceObject([0.0.0.0.10]) // elemental portal guardians
+        SetSequence(SEQ_CAST) // Displays the proper casting animation (for cosmetic purposes)
+        DisplayStringHead(Myself,25951) // Spell Sequencer
+        ReallyForceSpell(Myself,WIZARD_PROTECTION_FROM_FIRE)
+        ReallyForceSpell(Myself,WIZARD_MIRROR_IMAGE)
+        ReallyForceSpell(Myself,WIZARD_STONE_SKIN)
+END
+
+IF
+    See([0.0.0.0.10]) // elemental portal guardians
+    !GlobalTimerNotExpired("RR#Cast","LOCALS")
+    Global("RR#MSeq","LOCALS",0) // Minor Sequencer
+	!StateCheck(Myself,STATE_MIRRORIMAGE)
+    !StateCheck(Myself,STATE_SILENCED)
+THEN
+    RESPONSE #100
+        SetGlobal("RR#MSeq","LOCALS",1)
+        SetGlobalTimer("RR#Cast","LOCALS",6)
+        FaceObject([0.0.0.0.10]) // elemental portal guardians
+        SetSequence(SEQ_CAST) // Displays the proper casting animation (for cosmetic purposes)
+        DisplayStringHead(Myself,5013) // Minor Sequencer
+        ReallyForceSpell(Myself,WIZARD_BLUR)
+        ReallyForceSpell(Myself,WIZARD_MIRROR_IMAGE)
+END
+>>>>>>>>
+
+EXTEND_TOP ~dwvith.bcs~  ~atweaks/inlined/baf/elementals/dwvith.baf~            // extend Vithal's AI script
+
+
 // Add an Ice Paraelemental to the Ice Island's dungeon in BG1
 
 <<<<<<<<atweaks/inlined/baf/elementals/bg1009.baf
@@ -3748,18 +4000,12 @@ END
 // Slightly tweak Water Elemetal spawns in Abazigal's lair
 
 COPY_EXISTING ~ptelew01.bcs~ ~override~
-DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~ICRMPARI~ ~rr#envlp~ // use aTweaks visual effect
-  REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreatureImpassable~ ~CreateCreature~ // spawn the creatures in a passable area
-  REPLACE_TEXTUALLY EXACT_MATCH ~ELWATG01~ ~rr#ewate~ // Replace Greater with Elder Water Elementals
-COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
-
-COPY_EXISTING ~ptelew02.bcs~ ~override~
+              ~ptelew02.bcs~ ~override~
               ~ptelew03.bcs~ ~override~
 DECOMPILE_BCS_TO_BAF
   REPLACE_TEXTUALLY EXACT_MATCH ~ICRMPARI~ ~rr#envlp~ // use aTweaks visual effect
   REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreatureImpassable~ ~CreateCreature~ // spawn the creatures in a passable area
+  REPLACE_TEXTUALLY EXACT_MATCH ~ELWATG01~ ~rr#ewate~ // Replace Greater with Elder Water Elementals
 COMPILE_BAF_TO_BCS
 BUT_ONLY_IF_IT_CHANGES
 
@@ -3793,7 +4039,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 // Replace the Burning Men near Imix with Elder Fire Elementals
 
-COPY_EXISTING ~ar5204.are~ ~override~                                              // Ogremoch's lair in Sendai's enclave
+COPY_EXISTING ~ar5204.are~ ~override~                                              // Yaga-Shura's lair
   READ_LONG  0x54 "actor_off"
   READ_SHORT 0x58 "actor_num"
   WHILE ("%actor_num%" > 0) BEGIN
@@ -3831,6 +4077,21 @@ COPY_EXISTING ~ar6105.are~ ~override~                                           
     READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
     PATCH_IF ("%cre_file%" STRING_EQUAL_CASE "ELEARG01") BEGIN
       WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~rr#eeare~ #8
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Replace the Lesser Earth Elementals at the enterance of Abazigal's lair with Greater Water Elementals
+
+COPY_EXISTING ~ar6001.are~ ~override~                                              // enterance to Abazigal's lair (pool room)
+  READ_LONG  0x54 "actor_off"
+  READ_SHORT 0x58 "actor_num"
+  WHILE ("%actor_num%" > 0) BEGIN
+    SET "actor_num" = ("%actor_num%" - 1)
+    READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
+    PATCH_IF ("%cre_file%" STRING_EQUAL_CASE "ELEARL01") BEGIN
+      WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~ELWATG01~ #8
     END
   END
 BUT_ONLY_IF_IT_CHANGES
@@ -3901,34 +4162,92 @@ COPY ~atweaks/spl/elementals/sr_cmpt/sppr732.spl~ ~override~                    
 SAY UNIDENTIFIED_DESC @2208 SAY DESC @2208
 
 
+// Ensure that all summoned elementals are properly named, i.e. undo SR's changes
+ACTION_DEFINE_ASSOCIATIVE_ARRAY sr_names BEGIN
+//   rr#var0     rr#file
+//    name       file
+     2845  =>   elairsuw                                                           // Lesser Air Elemental (8 HD, arcane version)
+     2831  =>   elairsu1                                                           // Air Elemental (12 HD, arcane version)
+     2848  =>   elairsu2                                                           // Greater Air Elemental (16 HD, arcane version)
+     2850  =>   elearsuw                                                           // Lesser Earth Elemental (8 HD, arcane version)
+     2867  =>   elearsu2                                                           // Earth Elemental (12 HD, arcane version)
+     2853  =>   elearsu3                                                           // Greater Earth Elemental (16 HD, arcane version)
+     2867  =>   elearpr                                                            // Earth Elemental (12 HD, divine version)
+     2853  =>   elearpr2                                                           // Greater Earth Elemental (16 HD, divine version)
+     2878  =>   elfirsuw                                                           // Lesser Fire Elemental (8 HD, arcane version)
+     2873  =>   elfirsu2                                                           // Fire Elemental (12 HD, arcane version)
+     2876  =>   elfirsu3                                                           // Greater Fire Elemental (16 HD, arcane version)
+     2873  =>   elfirpr                                                            // Fire Elemental (12 HD, divine version)
+     2876  =>   elfirpr2                                                           // Greater Fire Elemental (16 HD, divine version)
+END                                                                                // ends ACTION_DEFINE_ASSOCIATIVE_ARRAY
+ACTION_PHP_EACH sr_names AS rr#var => rr#file BEGIN
+ACTION_IF FILE_EXISTS_IN_GAME ~%rr#file%.cre~ BEGIN                                // if the designated file with a EFF extension exists
+COPY_EXISTING ~%rr#file%.cre~  ~override~
+  WRITE_LONG 0x08 "%rr#var_0%"                                                     // Name1
+  WRITE_LONG 0x0c "%rr#var_0%"                                                     // Name2
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_PHP_EACH
+
+
+// Ensure that the elemental summoning EFFs actually summon the intended creatures
+// Also, make the arcane versions of the summons initially neutral, as in the unmodded game
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY sr_effs BEGIN
+//   rr#var0    rr#var1      rr#file
+//   resref1    param2         file
+     ELAIRSUW,    2     =>   splesair                                              // Conjure Lesser Air Elemental (8 HD, arcane version)
+     ELAIRSU1,    2     =>   spair1                                                // Conjure Air Elemental (12 HD, arcane version)
+     ELAIRSU2,    2     =>   spair2                                                // Conjure Greater Air Elemental (16 HD, arcane version)
+     ELAIRSU3,    2     =>   spair3                                                // Conjure Elder Air Elemental (20 HD, arcane version)
+       SERVSU,    0     =>   spserv                                                // Aerial Servant
+       STALKE,    0     =>   spstalk                                               // Invisible Stalker
+     ELEARSUW,    2     =>   splesear                                              // Conjure Lesser Earth Elemental (8 HD, arcane version)
+     ELEARSU2,    2     =>   speart1                                               // Conjure Earth Elemental (12 HD, arcane version)
+     ELEARSU3,    2     =>   speart2                                               // Conjure Greater Earth Elemental (16 HD, arcane version)
+     ELEARSU4,    2     =>   speart3                                               // Conjure Elder Earth Elemental (20 HD, arcane version)
+     ELEARPR,     0     =>   speart1p                                              // Conjure Earth Elemental (12 HD, divine version)
+     ELEARPR2,    0     =>   speart2p                                              // Conjure Greater Earth Elemental (16 HD, divine version)
+     ELEARPR3,    0     =>   speart3p                                              // Conjure Elder Earth Elemental (20 HD, divine version)
+     ELFIRSUW,    2     =>   splesfir                                              // Conjure Lesser Fire Elemental (8 HD, arcane version)
+     ELFIRSU2,    2     =>   spfir1                                                // Conjure Fire Elemental (12 HD, arcane version)
+     ELFIRSU3,    2     =>   spfir2                                                // Conjure Greater Fire Elemental (16 HD, arcane version)
+     ELFIRSU4,    2     =>   spfir3                                                // Conjure Elder Fire Elemental (20 HD, arcane version)
+     ELFIRPR,     0     =>   spfir1p                                               // Conjure Fire Elemental (12 HD, divine version)
+     ELFIRPR2,    0     =>   spfir2p                                               // Conjure Greater Fire Elemental (16 HD, divine version)
+     ELFIRPR3,    0     =>   spfir3p                                               // Conjure Elder Fire Elemental (20 HD, divine version)
+END                                                                                // ends ACTION_DEFINE_ASSOCIATIVE_ARRAY
+ACTION_PHP_EACH sr_effs AS rr#var => rr#file BEGIN
+ACTION_IF FILE_EXISTS_IN_GAME ~%rr#file%.eff~ BEGIN                                // if the designated file with a EFF extension exists
+COPY_EXISTING ~%rr#file%.eff~  ~override~
+  WRITE_ASCIIE 0x30 "%rr#var_0%" #8                                                // resref (creature to be summoned) 
+  WRITE_LONG   0x20 EVAL "%rr#var_1%"                                              // param2: control
+BUT_ONLY_IF_IT_CHANGES
+END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
+END                                                                                // ends ACTION_PHP_EACH
+
 // Make sure that elementals are friendly when summoned by druids
 
 <<<<<<<<atweaks/inlined/baf/elementals/wizelsu.baf
 IF
 	Global("Elementalcontrol","LOCALS",0)
     Class(LastSummonerOf(Myself),DRUID_ALL)
+	Allegiance(LastSummonerOf(Myself),GOODCUTOFF)
 THEN
 	RESPONSE #100
+        SetInterrupt(FALSE)
 		SetGlobal("Elementalcontrol","LOCALS",3)
+        SetGlobal("RR#Active","LOCALS",1)
+        Ally()
+        DestroyItem("RIDRING") // selection circle removal ring
+        ChangeAIScript("",OVERRIDE) // clear the slot previously used by this script
+        SetInterrupt(TRUE)
 END
 >>>>>>>>
 
 EXTEND_TOP ~wizelsum.bcs~  ~atweaks/inlined/baf/elementals/wizelsu.baf~
 EXTEND_TOP ~wizelsu2.bcs~  ~atweaks/inlined/baf/elementals/wizelsu.baf~
-
-
-// Restore original graphics to Air Elemental summoning spells
-
-COPY_EXISTING ~splesair.eff~  ~override~                                           // Conjure Lesser Air Elemental (8 HD)
-               ~spair1.eff~   ~override~                                           // Conjure Air Elemental (12 HD, mage version)
-               ~spair2.eff~   ~override~                                           // Conjure Air Elemental (16 HD, mage version)
-               ~spair3.eff~   ~override~                                           // Conjure Air Elemental (24 HD, mage version)
-                ~staf16.eff~  ~override~                                           // Conjure Lesser Air Elemental (8 HD, Staff of Air version)
-              ~swaaire1.eff~  ~override~                                           // Elemental Summoning (16 HD, priest HLA version)
-              ~swaaire2.eff~  ~override~                                           // Elemental Summoning (24 HD, priest HLA version)
-               ~sumchan.eff~  ~override~                                           // Summon Chan (priest HLA version)
-  WRITE_ASCII 0x70 ~SPPORTAL~ #8                                                   // resref2: RR#CEART (VVC to display)
-BUT_ONLY_IF_IT_CHANGES
+EXTEND_TOP ~rr#ewizs.bcs~  ~atweaks/inlined/baf/elementals/wizelsu.baf~
 
 
 //==================================================================================

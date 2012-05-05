@@ -1986,7 +1986,7 @@ PATCH_IF valid BEGIN
   STR_VAR                                                                          // initialize string variables
   "effsource" = ""                                                                 // effsource: none
   END                                                                              // ends FUNCTION call
-PATCH_FOR_EACH ~rr#color~ IN ~9~ ~50~ BEGIN                                        // grant immunity to the color glow/pulse effects (they disrupt aTweaks' re-coloring)
+PATCH_FOR_EACH ~rr#color~ IN  ~50~ BEGIN                                           // grant immunity to the color glow/pulse effects (they disrupt aTweaks' re-coloring)
 LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call
   INT_VAR                                                                          // initialize variables
   "opcode" = "101"                                                                 // effect: #101 (Protection from Opcode)
@@ -2036,7 +2036,7 @@ PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~DVDEATHK~) BEGIN         
   STR_VAR                                                                          // initialize string variables
   "effsource" = ""                                                                 // effsource: none
   END                                                                              // ends FUNCTION call
-PATCH_FOR_EACH ~rr#color~ IN ~9~ ~50~ BEGIN                                        // grant immunity to the color glow/pulse effects (they disrupt aTweaks' re-coloring)
+PATCH_FOR_EACH ~rr#color~ IN ~50~ BEGIN                                            // grant immunity to the color glow/pulse effects (they disrupt aTweaks' re-coloring)
 LAUNCH_PATCH_FUNCTION ~ADD_CRE_EFFECT~                                             // Starts FUNCTION call
   INT_VAR                                                                          // initialize variables
   "opcode" = "101"                                                                 // effect: #101 (Protection from Opcode)
@@ -2903,14 +2903,15 @@ END                                                                             
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
              ~ELAIR01~                                                             // Air Elemental (12 HD)
             ~ELAIRL01~                                                             // Lesser Air Elemental (8 HD)
-            ~ELAIRSU1~                                                             // Lesser Air Elemental (8 HD, summoned, wizard version)
-            ~ELAIRSUW~                                                             // Air Elemental (12 HD, summoned, wizard version)
+            ~ELAIRSU1~                                                             // Air Elemental (summoned, wizard version)
+            ~ELAIRSUW~                                                             // Air Elemental (summoned, wizard version)
             ~ELARIL01~                                                             // Lesser Air Elemental (8 HD, Bioware's typo?)
             ~GORAIR01~                                                             // Lesser Air Elemental (8 HD, Watcher's Keep)
                ~MDAIR~                                                             // Air Elemental (12 HD, unused?)
               ~MDAIR2~                                                             // Air Elemental (12 HD, unused?)
             ~PAIREL01~                                                             // Air Elemental (12 HD, unused?)
             ~SUMELAIR~                                                             // Lesser Air Elemental (8 HD, summoned, Staff of Air)
+            ~rr#eairr~                                                             // Air Elemental (12 HD, summoned, summoned by Chan and Yan-C-Bin in aTweaks)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
