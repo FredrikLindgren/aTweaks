@@ -1,0 +1,17 @@
+INCLUDE FILE(include/definitions.ssl)
+
+INCLUDE FILE(include/summoned_top.ssl)
+
+IF
+  StateCheck(Myself,STATE_CHARMED)
+  See(NearestEnemyOf(Myself))
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    EquipMostDamagingMelee()
+    AttackOneRound(LastSeenBy(Myself))
+END
+
+DEFAULT TRIGGER(ActionListEmpty())
+
+INCLUDE FILE(general/melee_mindless.ssl)

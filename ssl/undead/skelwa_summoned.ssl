@@ -1,0 +1,28 @@
+INCLUDE FILE(include/definitions.ssl)
+
+INCLUDE FILE(include/summoned_top.ssl)
+
+IF
+  !StateCheck(Myself,STATE_REALLY_DEAD)
+  !GlobalTimerNotExpired("flAura","LOCALS")
+  Detect(NearestEnemyOf(Myself))
+THEN
+  RESPONSE #100
+    ForceSpellRES("fl#skelw",Myself)
+    SetGlobalTimer("flAura","LOCALS",6)
+    Continue()
+END
+
+IF
+  StateCheck(Myself,STATE_CHARMED)
+  See(NearestEnemyOf(Myself))
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    EquipMostDamagingMelee()
+    AttackOneRound(LastSeenBy(Myself))
+END
+
+BEGIN LOOP(DamageRes||SlashRes)
+  INCLUDE FILE (general/summon_high.ssl)
+END LOOP

@@ -1,0 +1,20 @@
+IF
+    HasItem("RR#DINV",Myself) // invisibility item which prevents enemies from targeting not-yet-gated creatures
+THEN
+    RESPONSE #100
+        DestroyItem("RR#DINV")
+        Continue()
+END
+
+IF
+  Allegiance(LastSummonerOf(Myself),ENEMY)
+  OR(2)
+    !StateCheck(LastSummonerOf(Myself),STATE_CHARMED)
+    !Allegiance(Myself,GOODCUTOFF)
+THEN
+  RESPONSE #100
+    SetInterrupt(FALSE)
+    Enemy()
+    ChangeAIScript("",OVERRIDE) //In case of hostile summons, fall back on the regular script
+    SetInterrupt(TRUE)
+END

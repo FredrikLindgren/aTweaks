@@ -421,11 +421,11 @@ ACTION_FOR_EACH file IN
 		ghastd //Durlag's Tower Ghast Trap Ghast
 		_ghast
 		_ghastd
-		ghasts //Tiax' summoned ghast
-		_ghasts
+		//ghasts //Tiax' summoned ghast; do separately
+		//_ghasts
 		ghast01 //BG2 standard Ghast
 		nevm3 //Nev's undead trap Ghast
-                bgghast //Aec'Letec't death ray, BGT
+                bgghast //Aec'Letec's death ray, BGT
                 rr#ghast //Nabussu death ray, aTweaks
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
@@ -1221,7 +1221,7 @@ END ELSE OUTER_SPRINT fluddoor uddoor07
 
 // Skeleton
 ACTION_FOR_EACH file IN
-                ghastsu //Animate Dead
+                //ghastsu //Animate Dead; do separately
                 gpskel1 //Underdark adventuring party
                 rskel01 //Ranger plot
                 rskel03 //Ranger plot
@@ -1348,7 +1348,6 @@ ACTION_FOR_EACH file IN
                skelwa01
                skelwa02
                skelwa03
-               skelwasu
                suundead
                _skelwa
                _kelwa02
@@ -1435,6 +1434,21 @@ BEGIN
     BUT_ONLY
   END
 END
+
+/*
+ACTION_FOR_EACH file IN
+                skelwasu
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities, plus red colouring, sans charm immunity
+        REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring //+1 or better only
+        REPLACE_CRE_ITEM immchs #0 #0 #0 none amulet //charm and sleep immunity
+        LPF unturnable END
+*/
 
 COPY "atweaks/spl/undead/fl#skelw.spl" override
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN

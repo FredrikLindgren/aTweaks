@@ -2553,6 +2553,8 @@ DEFINE_PATCH_FUNCTION set_enchantment INT_VAR enchantment = 1 BEGIN
   END
 END
 
+//Will increase the priority of a single script matching the regexp script to the first empty script slot.
+//Script slots with scripts matching the regexp kill will be treated as empty.
 DEFINE_PATCH_FUNCTION promote_script STR_VAR script = "^$" kill = "^$" BEGIN
   READ_ASCII 0 sig (3)
   PATCH_IF "%sig%" STRING_EQUAL_CASE CRE AND SOURCE_SIZE > 0x2d3 BEGIN
@@ -2568,7 +2570,6 @@ DEFINE_PATCH_FUNCTION promote_script STR_VAR script = "^$" kill = "^$" BEGIN
             o = SOURCE_SIZE
           END
         END
-        o = p >= o ? SOURCE_SIZE : o
       END
     END
   END ELSE PATCH_FAIL "promote_script: incorrect signature or below minimum file size (%SOURCE_FILE%)"

@@ -1,0 +1,118 @@
+DEFAULT TRIGGER=(ActionListEmpty())
+
+//Go after the wounded and weak
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled)
+  OR(4)
+    Class(scstarget,MAGE)
+    Class(scstarget,MAGE_THIEF)
+    Class(scstarget,CLERIC_MAGE)
+    !HPPercentGT(scstarget,25)
+  Range(scstarget,5)
+THEN DO
+    Action(Attack|100|50)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|NotSummoned)
+  OR(4)
+    Class(scstarget,MAGE)
+    Class(scstarget,MAGE_THIEF)
+    Class(scstarget,CLERIC_MAGE)
+    !HPPercentGT(scstarget,25)
+  !TargetUnreachable(scstarget)
+THEN DO
+    Action(Move|100|100)
+END
+
+//Go after the slightly less weak and wounded
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled)
+  OR(4)
+    Class(scstarget,MAGE)
+    Class(scstarget,MAGE_THIEF)
+    Class(scstarget,CLERIC_MAGE)
+    !HPPercentGT(scstarget,50)
+  Range(scstarget,5)
+THEN DO
+    Action(Attack|100|50)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|NotSummoned)
+  OR(4)
+    Class(scstarget,MAGE)
+    Class(scstarget,MAGE_THIEF)
+    Class(scstarget,CLERIC_MAGE)
+    !HPPercentGT(scstarget,50)
+  !TargetUnreachable(scstarget)
+THEN DO
+    Action(Move|100|100)
+END
+
+//Lay into any nearby, suitable enemies
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled)
+THEN DO
+    Action(Attack|100|100)
+END
+
+//Walk to anyone unprotected
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled)
+THEN DO
+    Action(Move|100|100)
+END
+
+//Start igoring Mirror Images first
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|Disabled)
+THEN DO
+    Action(Attack|100|100)
+END
+
+//Then Stoneskin
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Disabled)
+THEN DO
+    Action(Attack|100|100)
+END
+
+//Be less discrimitating about DR
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes75|Disabled)
+THEN DO
+    Action(Attack|100|50)
+END
+
+//Be even less discriminating about DR
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageResFull|Disabled)
+THEN DO
+    Action(Attack|100|100)
+END
+
+//Start go after the less able
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageResFull)
+THEN DO
+    Action(Attack)
+END
+
+//Just look busy
+IF TRIGGER
+  Target(NearestEnemyOf(Myself))
+THEN DO
+    Action(Attack)
+END

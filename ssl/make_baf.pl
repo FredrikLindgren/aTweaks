@@ -24,7 +24,9 @@ my @undead = (
     "fl#lowm.ssl:fl#lowm.baf",
     "fl#lowr.ssl:fl#lowr.baf",
     "fl#midmc.ssl:fl#midmc.baf",
-    "fl#higmc.ssl:fl#higmc.baf"
+    "fl#higmc.ssl:fl#higmc.baf",
+    "skelwa_summoned.ssl:fl#skwsu.baf",
+    "skeleton_summoned.ssl:fl#sklsu.baf"
     );
 
 my @beholders = (
