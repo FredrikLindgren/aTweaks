@@ -2574,3 +2574,12 @@ DEFINE_PATCH_FUNCTION promote_script STR_VAR script = "^$" kill = "^$" BEGIN
     END
   END ELSE PATCH_FAIL "promote_script: incorrect signature or below minimum file size (%SOURCE_FILE%)"
 END
+
+DEFINE_PATCH_FUNCTION make_summon BEGIN
+  READ_ASCII 0 sig (3)
+  PATCH_IF "%sig%" STRING_EQUAL CRE AND SOURCE_SIZE > 0x2d3 BEGIN
+    WRITE_BYTE 0x10 (THIS BOR BIT1) BAND 0xfb                     //Set 'No corpse' and unset 'Permanent Corpse'
+    ADD_CRE_ITEM rr#dinv #0 #0 #0 "undroppable&unstealable" boots //item for keeping summons from being killed before the summoning is done
+    ADD_MEMORIZED_SPELL rr#usumn #0 innate (1)                    //'Unsummon' spell
+  END
+END

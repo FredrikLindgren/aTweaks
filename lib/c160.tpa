@@ -1,13 +1,14 @@
 
 INCLUDE "atweaks/lib/dsandstuff.tpa"
 INCLUDE "atweaks/lib/undead.tpa"
+INCLUDE "atweaks/lib/c160_defs.tpa"
 
 LAF ret_from_eval STR_VAR f_Entry = fl#Disease RET DiseaseSecType = f_Value END
 LAF ret_from_eval STR_VAR f_Entry = fl#Fear RET FearSecType = f_Value END
 LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Value END
 
 
-//Banshee
+// Banshee
 
 ACTION_FOR_EACH file IN
                 banshe01 //ToB Banshee
@@ -105,7 +106,7 @@ COPY "atweaks/spl/base.spl" "override/fl#banfa.spl" //Fear aura
   END
 
 
-// Death Knights
+// Death Knight
 ACTION_FOR_EACH file IN
                deathk //Death Knight from Durlag's Tower
                _deathk
@@ -415,14 +416,14 @@ END
 
 
 
-//Ghasts
+//Ghast
 ACTION_FOR_EACH file IN
 		ghast //BG1 standard Ghast
 		ghastd //Durlag's Tower Ghast Trap Ghast
 		_ghast
 		_ghastd
-		//ghasts //Tiax' summoned ghast; do separately
-		//_ghasts
+		ghasts //Tiax' summoned ghast
+		_ghasts
 		ghast01 //BG2 standard Ghast
 		nevm3 //Nev's undead trap Ghast
                 bgghast //Aec'Letec's death ray, BGT
@@ -430,68 +431,25 @@ ACTION_FOR_EACH file IN
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
-      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
-      PATCH_IF valid BEGIN
-        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM fl#ghas1 #0 #0 #0 none weapon1 EQUIP
-        REPLACE_CRE_ITEM fl#ghas2 #0 #0 #0 none shield
-        LPF RR#MDCRE
-          INT_VAR
-            newxpv = 650
-            newhp = 32 //4d8
-            newac = 4
-            newth = 17
-            newapr = 2 //2 APR with main hand, plus teeth in the off hand
-            newsvd = 9
-            newsvw = 11
-            newsvp = 10
-            newsvb = 12
-            newsvs = 12
-            newlvl1 = 4
-            newlvl2 = 0
-            newlvl3 = 0
-            newmr = 0
-            newfr = 0
-            newcr = 0
-            newer = 0
-            newar = 0
-            newrs = 0
-            newrc = 0
-            newrp = 0
-            newrm = 0
-            newstr = 18
-            newdex = 9
-            newcon = 9
-            newint = 12
-            newwis = 9
-            newchr = 9
-            newmor = 14
-            newclass = 118
-            newalign = 51
-            rr#ptwf = 1
-
-            enforce = 1
-          STR_VAR
-        END
-        LPF RR#MDCSC
-          STR_VAR
-            newscript = fl#ghast
-            script01 = ghast
-            script02 = wtasight
-            script03 = ghastd
-            script04 = movep1
-            script05 = _ghast
-            script06 = _tasight
-            script07 = _ghastd
-            script08 = _movep1
-            script09 = dw#melee
-            script10 = bpwtsigt
-            skipfile02 = ghasts
-            skipfile03 = _ghasts
-        END
+      LPF make_ghast END
+      LPF RR#MDCSC
+        STR_VAR
+          newscript = fl#ghast
+          script01 = ghast
+          script02 = wtasight
+          script03 = ghastd
+          script04 = movep1
+          script05 = _ghast
+          script06 = _tasight
+          script07 = _ghastd
+          script08 = _movep1
+          script09 = dw#melee
+          script10 = bpwtsigt
+          skipfile02 = ghasts
+          skipfile03 = _ghasts
       END
-    BUT_ONLY
-  END
+    END
+  BUT_ONLY
 END
 
 COPY //"atweaks/itm/undead/fl#ghast.itm" override
@@ -523,7 +481,7 @@ COPY_EXISTING s1-4.itm "override/fl#ghas1.itm"
   END
 
 
-// Ghouls and Lacedons
+// Ghoul and Lacedon
 ACTION_FOR_EACH file IN
                ghoul //BG1 Ghoul
                korax //Korax the Ghoul
@@ -606,7 +564,7 @@ COPY "atweaks/spl/undead/fl#ghoul.spl" override
 
 
 
-// Ghoul lords
+// Ghoul Lord
 ACTION_FOR_EACH file IN
                 ghogr01
                 gholor01
@@ -787,7 +745,7 @@ OUTER_SET $f_AddSecType(fl#glord.spl) = FearSecType
 
 
 
-// Mummies
+// Mummy
 ACTION_FOR_EACH file IN
 		mummy
 		mummy01
@@ -918,7 +876,7 @@ OUTER_SET $f_AddSecType(fl#mum.spl) = DiseaseSecType
 
 
 
-// Greater Mummies
+// Greater Mummy
 ACTION_FOR_EACH file IN
 		mumgre01
 		riftcr03
@@ -1215,18 +1173,17 @@ COPY_EXISTING b1-10.itm "override/fl#shad.itm"
       duration = 5*60
   END
 
+
+
 ACTION_IF FILE_EXISTS_IN_GAME dw#drow.mrk BEGIN
   OUTER_SPRINT fluddoor ""
 END ELSE OUTER_SPRINT fluddoor uddoor07
 
-// Skeleton
+// Skeleton, melee
 ACTION_FOR_EACH file IN
-                //ghastsu //Animate Dead; do separately
                 gpskel1 //Underdark adventuring party
                 rskel01 //Ranger plot
                 rskel03 //Ranger plot
-                skelar01 //with Vongoethe
-                skelar02 //aslo Vongoethe
                 skelet01 //regular
                 ttskel   //tutorial
                 "%fluddoor%" //drow party by the UD exit; Golem if SCSII's Improved Drow is installed (vide supra)
@@ -1241,90 +1198,83 @@ ACTION_FOR_EACH file IN
                 _kelet_b
                 skelet_c
                 _kelet_c
-                skelfire //shoots fire
-                _kelfire
                 //skelpetr //The tourist attraction in Durlag's Tower
                 //_kelpetr
+                skelet
+                _skelet
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      LPF make_skeleton END
+      LPF RR#MDCSC
+        STR_VAR
+          newscript = fl#lowm
+          script02 = wtasight
+          script04 = _tasight
+          script06 = dw#melee
+          script08 = bpwtsigt
+          script09 = bpwtrsgt
+          script10 = bpwdrsgt
+      END
+    END
+  BUT_ONLY
+END
+
+// Skeleton, ranged
+ACTION_FOR_EACH file IN
+                skelar01 //with Vongoethe
+                skelar02 //aslo Vongoethe
+                skelfire //shoots fire
+                _kelfire
                 skelaci  //acid
                 _skelaci
                 skeldis  //dispelling
                 _skeldis
-                skelet
-                _skelet
+                skelice  //ice
+                _skelice
+                bpskelar //BP
                 skeletb  //bassilus
                 _skeletb
                 skelets  //throwing daggers
                 _skelets
-                skelice  //ice
-                _skelice
-                bpskelar //BP
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
-      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
-      PATCH_IF valid BEGIN
-        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities, plus red colouring, sans charm immunity
-        REPLACE_CRE_ITEM immchs #0 #0 #0 none amulet //charm and sleep immunity
-        LPF RR#MDCRE
-          INT_VAR
-            newxpv = 65
-            newhp = 8 //1d8
-            newac = 7
-            newth = 19
-            newapr = 1
-            newsvd = 14
-            newsvw = 16
-            newsvp = 15
-            newsvb = 17
-            newsvs = 17
-            newlvl1 = 1
-            newlvl2 = 0
-            newlvl3 = 0
-            newmr = 0
-            newfr = 0
-            newcr = 100
-            newer = 0
-            newar = 0
-            newrs = 50
-            newrc = 0
-            newrp = 50
-            newrm = 50
-            newstr = 9
-            newstrx = 0
-            newint = 3
-            newwis = 9
-            newdex = 9
-            newcon = 9
-            newchr = 9
-            newalign = 0x22 //Neutral
-            newclass = 134 //Skeleton
-            newgen = 4 //undead
-            newrace = 115 //Skeleton
-          STR_VAR
-            enfc01 = skelet01
-        END
-        LPF promote_script STR_VAR script = skeletb END
-        PATCH_IF "%file%" STRING_MATCHES_REGEXP "skelar0[12]\|s?_?kel\(fire\|aci\|ice\|dis\)\|_?skelet[bs]\|bpskelar" = 0 BEGIN
-          SPRINT script fl#lowr
-        END ELSE BEGIN
-          SPRINT script fl#lowm
-        END
-        LPF RR#MDCSC
-          STR_VAR
-            newscript = EVAL "%script%"
-            script02 = wtasight
-            script03 = wtarsgt
-            script04 = _tasight
-            script05 = _wtarsgt
-            script06 = dw#melee
-            script07 = dw#range
-            script08 = bpwtsigt
-            script09 = bpwtrsgt
-            script10 = bpwdrsgt
-            skipfile02 = ghastsu
-        END
-        LPF add_skeletal_traits END
+      LPF make_skeleton END
+      LPF promote_script STR_VAR script = skeletb END
+      LPF RR#MDCSC
+        STR_VAR
+          newscript = fl#lowr
+          script02 = wtasight
+          script03 = wtarsgt
+          script04 = _tasight
+          script05 = _wtarsgt
+          script06 = dw#melee
+          script07 = dw#range
+          script08 = bpwtsigt
+          script09 = bpwtrsgt
+          script10 = bpwdrsgt
+      END
+    BUT_ONLY
+  END
+END
+
+// Skeleton, summoned
+ACTION_FOR_EACH file IN
+                ghastsu //Animate Dead
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      LPF make_skeleton INT_VAR newxpv = 0 END
+      LPF make_summon END
+      WRITE_ASCII 0x248 fl#sklsu #8                                 //Player-friendly summoned-skeleton script; kills itself if summoner is an enemy
+      LPF RR#MDCSC
+        STR_VAR
+          newscript = fl#lowm
+          script01 = bornwait
+          script02 = wtasight
+          script03 = dw#melee
+          script04 = bpwtsigt
       END
     BUT_ONLY
   END
@@ -1332,7 +1282,7 @@ END
 
 
 
-// Skeleton Warriors
+// Skeleton Warrior, melee
 ACTION_FOR_EACH file IN
                ar18skel
                ceskel01
@@ -1347,108 +1297,83 @@ ACTION_FOR_EACH file IN
                skelwa
                skelwa01
                skelwa02
-               skelwa03
                suundead
                _skelwa
                _kelwa02
-               _kelwa03
-               bgskel03
                bgskel02
                bgskelwa
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
-      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
-      PATCH_IF valid BEGIN
-        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities, plus red colouring, sans charm immunity
-        REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring //+1 or better only
-        REPLACE_CRE_ITEM immchs #0 #0 #0 none amulet //charm and sleep immunity
-        LPF unturnable END
-        LPF RR#MDCRE
-          INT_VAR
-            newxpv = 4000
-            newhp = 80 //9d8+8
-            newac = 2
-            newth = 8
-            newapr = 1
-            newsvd = 7
-            newsvw = 9
-            newsvp = 8
-            newsvb = 8
-            newsvs = 10
-            newlvl1 = 12
-            newlvl2 = 0
-            newlvl3 = 0
-            newmr = 90
-            newfr = 0
-            newcr = 100
-            newer = 0
-            newar = 0
-            newrs = 50
-            newrc = 0
-            newrp = 50
-            newrm = 50
-            newstr = 18
-            newstrx = 50
-            newint = 16
-            newwis = 9
-            newdex = 16
-            newcon = 14
-            newchr = 9
-            newmor = 15
-            newalign = 35 //NE
-            newclass = 135 //Skeleton Warrior (for ID)
-            newgen = 4 //undead
-            newrace = 115 //Skeleton
-            
-            enforce = 1
-          STR_VAR
-            notenf01 = hgskl04
-            notenf02 = grtomb01
-        END
-        PATCH_IF "%file%" STRING_EQUAL_CASE skelwa03 OR "%file%" STRING_EQUAL_CASE _kelwa03 OR "%file%" STRING_EQUAL_CASE bgskel03 BEGIN
-          SPRINT script fl#sklwr
-        END ELSE BEGIN
-          SPRINT script fl#sklwm
-        END
-        LPF RR#MDCSC
-          STR_VAR
-            newscript = EVAL "%script%"
-            script01 = gpskel1
-            script02 = wtasight
-            script03 = _tasight
-            script04 = wtarsgt
-            script05 = dw#melee
-            script06 = wdasight
-            script07 = dw#range
-            script08 = _wtarsgt
-            script09 = bpwtsigt
-            script10 = bpwtrsgt
-            script11 = bpwdasgt
-            script12 = bpwtasgt
-            skipfile02 = skelwasu
-        END
-        LPF add_skeletal_traits END
+      LPF make_skeleton_warrior END   
+      LPF RR#MDCSC
+        STR_VAR
+          newscript = fl#sklwm
+          script01 = gpskel1
+          script02 = wtasight
+          script03 = _tasight
+          script04 = wtarsgt
+          script05 = dw#melee
+          script06 = wdasight
+          script07 = dw#range
+          script08 = _wtarsgt
+          script09 = bpwtsigt
+          script10 = bpwtrsgt
+          script11 = bpwdasgt
+          script12 = bpwtasgt
       END
     BUT_ONLY
   END
 END
 
-/*
+// Skeleton Warrior, ranged
+ACTION_FOR_EACH file IN
+               skelwa03
+               _kelwa03
+               bgskel03
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      LPF make_skeleton_warrior END
+      LPF RR#MDCSC
+        STR_VAR
+          newscript = fl#sklwr
+          script01 = gpskel1
+          script02 = wtasight
+          script03 = _tasight
+          script04 = wtarsgt
+          script05 = dw#melee
+          script06 = wdasight
+          script07 = dw#range
+          script08 = _wtarsgt
+          script09 = bpwtsigt
+          script10 = bpwtrsgt
+          script11 = bpwdasgt
+          script12 = bpwtasgt
+      END
+    BUT_ONLY
+  END
+END
+
+// Skeleton Warrior, summoned
 ACTION_FOR_EACH file IN
                 skelwasu
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
-      PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
-      PATCH_IF valid BEGIN
-        PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities, plus red colouring, sans charm immunity
-        REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring //+1 or better only
-        REPLACE_CRE_ITEM immchs #0 #0 #0 none amulet //charm and sleep immunity
-        LPF unturnable END
-*/
+      LPF make_skeleton_warrior INT_VAR newxpv = 0 END
+      ADD_CRE_ITEM rr#dinv #0 #0 #0 "unstealable&undroppable" boots //Temporary invincibility item
+      WRITE_ASCII 0x248 fl#skwsu #8                                 //Player-friendly summoned-skeleton-warrior script; self-destructs if summoner is enemy
+      LPF RR#MDCSC
+        STR_VAR
+          newscript = fl#sklwm
+          script01 = wtasight
+          script02 = dw#melee
+          script03 = bpwtsigt
+      END
+    BUT_ONLY
+  END
+END
 
 COPY "atweaks/spl/undead/fl#skelw.spl" override
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
@@ -2152,6 +2077,8 @@ COMPILE ~atweaks/baf/undead/fl#death.baf~
         "atweaks/baf/undead/fl#midmc.baf"
         "atweaks/baf/undead/fl#higmc.baf"
         "atweaks/baf/undead/fl#saham.baf"
+        "atweaks/baf/undead/fl#skwsu.baf"
+        "atweaks/baf/undead/fl#sklsu.baf"
 
 
 

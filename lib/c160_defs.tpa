@@ -1,0 +1,159 @@
+
+INCLUDE "atweaks/lib/lib.tpa"
+
+DEFINE_PATCH_FUNCTION make_ghast
+  INT_VAR
+    newxpv = 650
+BEGIN
+  PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+  PATCH_IF valid BEGIN
+    PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+    REPLACE_CRE_ITEM fl#ghas1 #0 #0 #0 none weapon1 EQUIP
+    REPLACE_CRE_ITEM fl#ghas2 #0 #0 #0 none shield
+    LPF RR#MDCRE
+      INT_VAR
+        newxpv
+        newhp = 32 //4d8
+        newac = 4
+        newth = 17
+        newapr = 2 //2 APR with main hand, plus teeth in the off hand
+        newsvd = 9
+        newsvw = 11
+        newsvp = 10
+        newsvb = 12
+        newsvs = 12
+        newlvl1 = 4
+        newlvl2 = 0
+        newlvl3 = 0
+        newmr = 0
+        newfr = 0
+        newcr = 0
+        newer = 0
+        newar = 0
+        newrs = 0
+        newrc = 0
+        newrp = 0
+        newrm = 0
+        newstr = 18
+        newdex = 9
+        newcon = 9
+        newint = 12
+        newwis = 9
+        newchr = 9
+        newmor = 14
+        newclass = 118
+        newalign = 51
+        rr#ptwf = 1
+
+        enforce = 1
+    END
+  END
+END
+
+DEFINE_PATCH_FUNCTION make_skeleton
+  INT_VAR
+    newxpv = 65
+BEGIN
+  PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+  PATCH_IF valid BEGIN
+    PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+    REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities, plus red colouring, sans charm immunity
+    REPLACE_CRE_ITEM immchs #0 #0 #0 none amulet //charm and sleep immunity
+    LPF RR#MDCRE
+      INT_VAR
+        newxpv
+        newhp = 8 //1d8
+        newac = 7
+        newth = 19
+        newapr = 1
+        newsvd = 14
+        newsvw = 16
+        newsvp = 15
+        newsvb = 17
+        newsvs = 17
+        newlvl1 = 1
+        newlvl2 = 0
+        newlvl3 = 0
+        newmr = 0
+        newfr = 0
+        newcr = 100
+        newer = 0
+        newar = 0
+        newrs = 50
+        newrc = 0
+        newrp = 50
+        newrm = 50
+        newstr = 9
+        newstrx = 0
+        newint = 3
+        newwis = 9
+        newdex = 9
+        newcon = 9
+        newchr = 9
+        newalign = 0x22 //Neutral
+        newclass = 134 //Skeleton
+        newgen = 4 //undead
+        newrace = 115 //Skeleton
+    END
+    LPF add_skeletal_traits END
+  END
+END
+
+DEFINE_PATCH_FUNCTION make_skeleton_warrior
+  INT_VAR
+    newxpv = 4000
+BEGIN
+  PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
+  PATCH_IF valid BEGIN
+    PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+    REPLACE_CRE_ITEM ring99 #0 #0 #0 none lring //Standard undead immunities, plus red colouring, sans charm immunity
+    REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring //+1 or better only
+    REPLACE_CRE_ITEM immchs #0 #0 #0 none amulet //charm and sleep immunity
+    LPF unturnable END
+    LPF RR#MDCRE
+      INT_VAR
+        newxpv
+        newhp = 80 //9d8+8
+        newac = 2
+        newth = 8
+        newapr = 1
+        newsvd = 7
+        newsvw = 9
+        newsvp = 8
+        newsvb = 8
+        newsvs = 10
+        newlvl1 = 12
+        newlvl2 = 0
+        newlvl3 = 0
+        newmr = 90
+        newfr = 0
+        newcr = 100
+        newer = 0
+        newar = 0
+        newrs = 50
+        newrc = 0
+        newrp = 50
+        newrm = 50
+        newstr = 18
+        newstrx = 50
+        newint = 16
+        newwis = 9
+        newdex = 16
+        newcon = 14
+        newchr = 9
+        newmor = 15
+        newalign = 35 //NE
+        newclass = 135 //Skeleton Warrior (for ID)
+        newgen = 4 //undead
+        newrace = 115 //Skeleton
+
+        enforce = 1
+      STR_VAR
+        notenf01 = hgskl04
+        notenf02 = grtomb01
+        notenf03 = ar18skel
+        notenf04 = ceskel01
+    END
+    LPF add_skeletal_traits END
+  END
+END
