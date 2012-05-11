@@ -77,7 +77,8 @@ STR_VAR                                                                         
 "notenf08" = "RR#XENFD"                                                            // non-enforced creature 8
 "notenf09" = "RR#XENFD"                                                            // non-enforced creature 9
 "notenf10" = "RR#XENFD"                                                            // non-enforced creature 10
-
+enf_regexp = "^$"                                                                  // Enforce stats for all matching SOURCE_RES
+notenf_regexp = "^$"                                                               // Do not enforce stats for any matching SOURCE_RES
 
 
 BEGIN                                                                              // Start FUNCTION
@@ -130,11 +131,17 @@ PATCH_FOR_EACH ~enfcre~ IN ~%enfc01%~ ~%enfc02%~ ~%enfc03%~ ~%enfc04%~ ~%enfc05%
     SET "enforce" = "1"                                                           // mark creature as enforced (will always use specified values, even if the existing ones are better)
   END
 END
+PATCH_IF "%SOURCE_RES%" STRING_MATCHES_REGEXP "%enf_regexp%" = 0 BEGIN
+  enforce = 1
+END
 
 PATCH_FOR_EACH ~notenf~ IN ~%notenf01%~ ~%notenf02%~ ~%notenf03%~ ~%notenf04%~ ~%notenf05%~ ~%notenf06%~ ~%notenf07%~ ~%notenf08%~ ~%notenf09%~ ~%notenf10%~ BEGIN // checks for enforced creatures
   PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE "%notenf%") BEGIN             
     SET "enforce" = "0"                                                           // mark creature as non-enforced
   END
+END
+PATCH_IF "%SOURCE_RES%" STRING_MATCHES_REGEXP "%notenf_regexp%" = 0 BEGIN
+  enforce = 0
 END
 
 PATCH_IF ("%oldxpv%" < "%newxpv%") OR (("%enforce%" = "1") AND ("%newxpv%" != "0")) BEGIN
