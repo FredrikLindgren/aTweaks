@@ -53,6 +53,8 @@ END
 DEFINE_PATCH_FUNCTION make_skeleton
   INT_VAR
     newxpv = 65
+  STR_VAR
+    enf_regexp = "^$"
 BEGIN
   PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
   PATCH_IF valid BEGIN
@@ -94,6 +96,8 @@ BEGIN
         newclass = 134 //Skeleton
         newgen = 4 //undead
         newrace = 115 //Skeleton
+      STR_VAR
+        enf_regexp
     END
     LPF add_skeletal_traits END
   END
@@ -102,6 +106,10 @@ END
 DEFINE_PATCH_FUNCTION make_skeleton_warrior
   INT_VAR
     newxpv = 4000
+    enforce = 1
+  STR_VAR
+    enf_regexp = "^$"
+    notenf_regexp = "^$"
 BEGIN
   PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
   PATCH_IF valid BEGIN
@@ -147,12 +155,10 @@ BEGIN
         newgen = 4 //undead
         newrace = 115 //Skeleton
 
-        enforce = 1
+        enforce
       STR_VAR
-        notenf01 = hgskl04
-        notenf02 = grtomb01
-        notenf03 = ar18skel
-        notenf04 = ceskel01
+        enf_regexp
+        notenf_regexp
     END
     LPF add_skeletal_traits END
   END

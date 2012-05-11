@@ -448,8 +448,8 @@ BEGIN
           skipfile02 = ghasts
           skipfile03 = _ghasts
       END
-    END
-  BUT_ONLY
+    BUT_ONLY
+  END
 END
 
 COPY //"atweaks/itm/undead/fl#ghast.itm" override
@@ -1205,7 +1205,10 @@ ACTION_FOR_EACH file IN
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
-      LPF make_skeleton END
+      LPF make_skeleton
+        STR_VAR
+          enf_regexp = "skelet01\|rskel0[13]\|_?iskelet\|skelet03\|[s_]kelet_[abc]\|_?skelet"
+      END
       LPF RR#MDCSC
         STR_VAR
           newscript = fl#lowm
@@ -1216,8 +1219,8 @@ BEGIN
           script09 = bpwtrsgt
           script10 = bpwdrsgt
       END
-    END
-  BUT_ONLY
+    BUT_ONLY
+  END
 END
 
 // Skeleton, ranged
@@ -1241,7 +1244,9 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
       LPF make_skeleton END
-      LPF promote_script STR_VAR script = skeletb END
+      PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE skeletb BEGIN
+        LPF promote_script STR_VAR script = skeletb END
+      END
       LPF RR#MDCSC
         STR_VAR
           newscript = fl#lowr
@@ -1305,7 +1310,13 @@ ACTION_FOR_EACH file IN
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
-      LPF make_skeleton_warrior END   
+      LPF make_skeleton_warrior
+        STR_VAR
+          notenf_regexp = "hgskl04\|grtomb01\|ar18skel\|ceskel01"
+      END
+      PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE grskel01 BEGIN
+        LPF promote_script STR_VAR script = initdlg END
+      END
       LPF RR#MDCSC
         STR_VAR
           newscript = fl#sklwm
@@ -1750,7 +1761,9 @@ BEGIN
             
             enforce = 1
         END
-        LPF promote_script STR_VAR script = "_?zombie[bw]" END
+        PATCH_IF "%SOURCE_RES%" STRING_MATCHES_REGEXP "_?zombie[bw]" = 0 BEGIN
+          LPF promote_script STR_VAR script = "_?zombie[bw]" END
+        END
         LPF RR#MDCSC
           STR_VAR
             newscript = fl#lowm
