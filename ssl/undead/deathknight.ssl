@@ -17,13 +17,14 @@ BEGIN_ACTION_DEFINITION
       SpellNoDec(scstarget,scsargument1)
 END
 
-IF
+IF TRIGGER
   RequireBlock(IsDurlagKnight)
-  Die()
-THEN
-  RESPONSE #100
-%TutuJournal%
+  False()
+  Global("flPlaceholder4Journal","LOCALS",0)
+THEN DO
+    Continue()
 END
+
 //IF
 //  Die()
 //THEN
@@ -122,7 +123,6 @@ END
 IF
   !StateCheck(Myself,STATE_REALLY_DEAD)
   !GlobalTimerNotExpired("flFearAura","LOCALS")
-  Range(NearestEnemyOf(Myself),14)
 THEN
   RESPONSE #100
     SetGlobalTimer("flFearAura","LOCALS",18)

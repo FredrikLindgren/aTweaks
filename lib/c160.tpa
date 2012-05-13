@@ -9,7 +9,6 @@ LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Value END
 
 
 // Banshee
-
 ACTION_FOR_EACH file IN
                 banshe01 //ToB Banshee
                 firmon01 //Unused critter from Firkraag's
@@ -81,6 +80,7 @@ COPY "atweaks/spl/undead/fl#banwa.spl" override //Banshee's wail
   END
 
 COPY "atweaks/spl/base.spl" "override/fl#banfa.spl" //Fear aura
+  WRITE_ASCII 0x10 "" #8 //no casting sound
   WRITE_BYTE 0x27 11 //disabling
   READ_LONG 0x64 ao
   FOR(i=0;i<SHORT_AT 0x68;++i) BEGIN
@@ -130,6 +130,7 @@ BEGIN
         REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
         LPF unturnable END
         LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END //Invisibility detection by script
+        LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 0 END //AC bonus
         LPF DELETE_CRE_ITEM STR_VAR item_to_delete = "sw2h02\|sw2hdeat\|_?sw2h05\|ringdemn\|_?shld06" END
         LPF RR#MDCRE
           INT_VAR
@@ -192,6 +193,18 @@ BEGIN
         END
         LPF add_skeletal_traits END
       END
+    BUT_ONLY
+  END
+END
+
+ACTION_FOR_EACH file IN
+                deathk1
+                _deathk1
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      SAY NAME1 @1020
+      SAY NAME2 @1020
     BUT_ONLY
   END
 END
@@ -288,6 +301,22 @@ COPY_EXISTING sw1h02.itm "override/fl#dksw4.itm" //Bastard sword +2, +1 APR
           opcode = 216 //Level drain
           target = 2
           parameter1 = 1
+          timing = 1
+      END
+      LPF ADD_ITEM_EFFECT
+        INT_VAR
+          type = 1
+          opcode = 139 //display string
+          target = 2
+          parameter1 = 41495 //one level drained
+          timing = 1
+      END
+      LPF ADD_ITEM_EFFECT
+        INT_VAR
+          type = 1
+          opcode = 141 //lighting effect
+          target = 2
+          parameter2 = 1 //necromancy, earth
           timing = 1
       END
     END
@@ -452,8 +481,8 @@ BEGIN
   END
 END
 
-COPY //"atweaks/itm/undead/fl#ghast.itm" override
-     "atweaks/spl/undead/fl#ghaau.spl" override
+COPY "atweaks/spl/undead/fl#ghaau.spl" override
+  WRITE_ASCII 0x10 "" #8 //no casting sound
 
 COPY_EXISTING s1-4.itm "override/fl#ghas1.itm"
               s1-8.itm "override/fl#ghas2.itm"
@@ -578,6 +607,9 @@ BEGIN
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
+        REPLACE_TEXTUALLY "immune[0-9]+" "" (8)
+        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring
+        REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring
         REPLACE_CRE_ITEM fl#glor1 #0 #0 #0 none weapon1 EQUIP
         REPLACE_CRE_ITEM fl#glor2 #0 #0 #0 none shield
         REMOVE_CRE_ITEM mage06 _mage06
@@ -636,6 +668,14 @@ BEGIN
             script09 = bpwtsigt
             script10 = bpwdasgt
         END
+        LPF ADD_CRE_EFFECT
+          INT_VAR
+            opcode = 176 //movement bonus
+            target = 1
+            parameter1 = 200 //double speed
+            parameter2 = 2
+            timing = 9
+        END
       END
     BUT_ONLY
   END
@@ -644,23 +684,6 @@ END
 COPY_EXISTING s1-6.itm "override/fl#glor1.itm"
               s1-10.itm "override/fl#glor2.itm"
   LPF set_enchantment END
-  PATCH_IF "%DEST_RES%" STRING_EQUAL_CASE fl#glor1 BEGIN
-    LPF ADD_ITEM_EQEFFECT
-      INT_VAR
-        opcode = 120 //weapon immunity
-        target = 1
-        parameter2 = 2 //non-magical
-        timing = 2
-    END
-    LPF ADD_ITEM_EQEFFECT
-      INT_VAR
-        opcode = 126 //movement bonus
-        target = 1
-        parameter1 = 2 //double
-        parameter2 = 2
-        timing = 2
-    END
-  END
   DEFINE_ARRAY glor_opcode BEGIN 175 141 141 50 174 174 END
   DEFINE_ARRAY glor_p1 BEGIN 0 0 0 0x455700 0 0 END
   DEFINE_ARRAY glor_p2 BEGIN 2 1 33 0x190000 0 0 END
@@ -708,6 +731,7 @@ COPY "atweaks/spl/base.spl" "override/fl#glor2.spl"
 OUTER_SET $f_AddSecType(fl#glor2.spl) = DiseaseSecType
 
 COPY "atweaks/spl/undead/fl#glord.spl" override
+  WRITE_ASCII 0x10 "" #8 //no casting sound
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64 + 0x28*i + 0x26 fl#sight
   END
@@ -803,27 +827,28 @@ BEGIN
   END
 END
 
-COPY "atweaks/itm/undead/fl#mum.itm" override
+COPY_EXISTING b1-12.itm "override/fl#mum.itm"
   LPF set_enchantment INT_VAR enchantment = 2 END
-  //LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 272 target = 1 timing = 2 parameter1 = 6 parameter2 = 3 STR_VAR resource = fl#mumfa END
-  //LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 232 target = 1 timing = 2 parameter1 = 0 parameter2 = 1 STR_VAR resource = fl#mumfa END //cast spell on self every round
-
-  /*
-COPY "atweaks/eff/base.eff" "override/fl#mumfa.eff"
-  WRITE_LONG 0x10 146 //cast spell
-  WRITE_LONG 0x14 2
-  WRITE_LONG 0x1c 1
-  WRITE_LONG 0x20 1
-  WRITE_LONG 0x28 1
-  WRITE_ASCII 0x30 fl#mumfa #8*/
+  LPF ADD_ITEM_EFFECT
+    INT_VAR
+      type = 1
+      opcode = 146
+      target = 2
+      parameter1 = 1
+      parameter2 = 1
+      timing = 1
+    STR_VAR
+      resource = fl#mum
+  END
 
 COPY "atweaks/spl/undead/fl#mumfa.spl" override
+  WRITE_SHORT 0x22 0 //no casting animation
+  WRITE_SHORT 0x27 0 //no school
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64 + 0x28*i + 0x26 fl#sight
   END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 timing = 1 parameter1 = 1 parameter2 = 1 STR_VAR resource = fl#mumfn END //cast fl#mumfn
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter1 = 1 parameter2 = 4 STR_VAR resource = fl#mumfh END //Use fl#mumfh.eff for humans
-  //LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 1 timing = 1 parameter1 = 388 END
 
 COPY "atweaks/eff/base.eff" "override/fl#mumfh.eff"
   WRITE_LONG 0x10 146 //cast spell
@@ -841,13 +866,13 @@ COPY "atweaks/eff/base.eff" "override/fl#mumfn.eff"
   
 COPY "atweaks/spl/undead/fl#mumfh.spl" override
      "atweaks/spl/undead/fl#mumfn.spl" override
-  FOR (i=LONG_AT 0x64;i<SOURCE_SIZE;i+=0x30) BEGIN
+  FOR (i=LONG_AT 0x6a;i<SOURCE_SIZE;i+=0x30) BEGIN
     READ_SHORT i type
     PATCH_IF type = 139 BEGIN
       SAY i + 0x4 @1026
     END
   END
-  
+
 OUTER_SET $f_AddSecType(fl#mumfh.spl) = FearSecType
 OUTER_SET $f_AddSecType(fl#mumfn.spl) = FearSecType
 
@@ -976,7 +1001,7 @@ BEGIN
   END
 END
 
-COPY "atweaks/itm/undead/fl#mum.itm" "override/fl#gmum.itm"
+COPY_EXISTING fl#mum.itm "override/fl#gmum.itm"
   LPF set_enchantment INT_VAR enchantment = 4 END
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_BYTE LONG_AT 0x64 + 0x38*i + 0x16 6
@@ -1019,51 +1044,24 @@ OUTER_SET $f_AddSecType(fl#gmum.spl) = DiseaseSecType
 
 //Fear aura
 COPY "atweaks/spl/undead/fl#mumfa.spl" "override/fl#gmumf.spl"
+  WRITE_SHORT 0x22 0 //no casting animation
+  WRITE_SHORT 0x27 0 //no school
   FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
     WRITE_SHORT LONG_AT 0x64 + 0x28*i + 0x26 fl#sight
   END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 146 target = 2 timing = 1 parameter1 = 1 parameter2 = 1 STR_VAR resource = fl#gmumn END //cast fl#gmumn
-  //LPF ADD_SPELL_EFFECT INT_VAR opcode = 177 target = 2 parameter1 = 1 parameter2 = 4 STR_VAR resource = fl#gmumh END //Use fl#mumfh.eff for humans
-
-/*
-COPY "atweaks/eff/base.eff" "override/fl#gmumh.eff"
-  WRITE_LONG 0x10 146 //cast spell
-  WRITE_LONG 0x14 2
-  WRITE_LONG 0x1c 1
-  WRITE_LONG 0x20 1
-  WRITE_LONG 0x28 1
-  WRITE_ASCII 0x30 fl#gmumh #8
-  */
-/*
-COPY "atweaks/eff/base.eff" "override/fl#gmumn.eff"
-  WRITE_LONG 0x10 206 //Protection from fl#mumfn.spl for Humans, fl#mumfn.eff used by fl#mumfn.spl
-  WRITE_LONG 0x14 2
-  WRITE_LONG 0x28 1
-  WRITE_ASCII 0x30 fl#gmumn #8*/
   
-COPY //"atweaks/spl/undead/fl#mumfh.spl" "override/fl#gmumh.spl"
-     "atweaks/spl/undead/fl#mumfn.spl" "override/fl#gmumn.spl"
-  READ_LONG  0x64 ao
-  READ_SHORT 0x68 na
-  READ_LONG  0x6a eo
-  ne = 0
-  ei = 0
-  FOR(i=0;i<na;++i) BEGIN
-    ei += ne
-    READ_SHORT  ao + 0x28*i + 0x1e ne
-    WRITE_SHORT ao + 0x28*i + 0x20 ei
-    FOR (j=0;j<ne;++j) BEGIN
-      READ_SHORT eo + 0x30*(ei + j) type
-      PATCH_IF type = 177 BEGIN
-        DELETE_BYTES eo + 0x30*(ei + j) 0x30
-        --ne
-        --j
-      END
-      WRITE_LONG eo + 0x30*(ei + j) + 0xe  THIS * 2 //Double duration for the fearsome greater mummies
-      WRITE_LONG eo + 0x30*(ei + j) + 0x28 THIS - 3 //And save penalty
+COPY "atweaks/spl/undead/fl#mumfn.spl" "override/fl#gmumn.spl"
+  FOR (i=LONG_AT 0x6a;i<SOURCE_SIZE;i+=0x30) BEGIN
+    READ_SHORT i type
+    PATCH_IF type = 139 BEGIN
+      SAY i + 0x4 @1026
     END
-    WRITE_SHORT ao + 0x28*i + 0x1e ne
+    WRITE_LONG i + 0xe  THIS > 2 ? THIS * 2 : THIS //Double duration
+    WRITE_LONG i + 0x28 THIS - 3                   //And a save penalty
   END
+  LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = 177 END
+
 
 OUTER_SET $f_AddSecType(fl#gmumn.spl) = FearSecType
 
@@ -1194,10 +1192,6 @@ ACTION_FOR_EACH file IN
                 _kelet03
                 skelet_a
                 _kelet_a
-                skelet_b
-                _kelet_b
-                skelet_c
-                _kelet_c
                 //skelpetr //The tourist attraction in Durlag's Tower
                 //_kelpetr
                 skelet
@@ -1240,6 +1234,10 @@ ACTION_FOR_EACH file IN
                 _skeletb
                 skelets  //throwing daggers
                 _skelets
+                skelet_b
+                _kelet_b
+                skelet_c
+                _kelet_c
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
@@ -1259,6 +1257,8 @@ BEGIN
           script08 = bpwtsigt
           script09 = bpwtrsgt
           script10 = bpwdrsgt
+          script11 = wdarsgt
+          script12 = _wdarsgt
       END
     BUT_ONLY
   END
@@ -1314,7 +1314,7 @@ BEGIN
         STR_VAR
           notenf_regexp = "hgskl04\|grtomb01\|ar18skel\|ceskel01"
       END
-      PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE grskel01 BEGIN
+      PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE grskel1 BEGIN
         LPF promote_script STR_VAR script = initdlg END
       END
       LPF RR#MDCSC
@@ -2032,33 +2032,39 @@ BUT_ONLY
 // Scripts
 ACTION_IF BG1 AND !BGT BEGIN
   OUTER_SPRINT DurlagArea fw0516
-  OUTER_SPRINT TutuJournal
-  "
-    EraseJournalEntry(84201)
-    EraseJournalEntry(84195)
-    EraseJournalEntry(83499)
-    EraseJournalEntry(83502)
-    EraseJournalEntry(83506)
-    EraseJournalEntry(83508)
-    EraseJournalEntry(83510)
-    EraseJournalEntry(83512)
-    EraseJournalEntry(83522)
-    EraseJournalEntry(83710)
-    EraseJournalEntry(83561)
-    EraseJournalEntry(83738)
-    EraseJournalEntry(83894)
-    EraseJournalEntry(83899)
-    EraseJournalEntry(83905)
-    EraseJournalEntry(83989)
-    EraseJournalEntry(83993)
-    EraseJournalEntry(83995)
-"
+<<<<<<<< ...atweaks/fl-inlined/bg1kn_new.baf
+  IF
+    Die()
+  THEN
+    RESPONSE #100
+      EraseJournalEntry(84201)
+      EraseJournalEntry(84195)
+      EraseJournalEntry(83499)
+      EraseJournalEntry(83502)
+      EraseJournalEntry(83506)
+      EraseJournalEntry(83508)
+      EraseJournalEntry(83510)
+      EraseJournalEntry(83512)
+      EraseJournalEntry(83522)
+      EraseJournalEntry(83710)
+      EraseJournalEntry(83561)
+      EraseJournalEntry(83738)
+      EraseJournalEntry(83894)
+      EraseJournalEntry(83899)
+      EraseJournalEntry(83905)
+      EraseJournalEntry(83989)
+      EraseJournalEntry(83993)
+      EraseJournalEntry(83995)
+  END
+>>>>>>>>
   OUTER_SPRINT Skelwa _skelwa
   OUTER_SPRINT GGhoul _houllor
   OUTER_SPRINT SkeletC _kelet_c
   OUTER_SPRINT killgood _illgood
   OUTER_SPRINT gooddeat _ooddeat
 END ELSE ACTION_IF BGT BEGIN
+<<<<<<<< ...atweaks/fl-inlined/bg1kn_new.baf
+>>>>>>>>
   OUTER_SPRINT DurlagArea ard016
   OUTER_SPRINT TutuJournal ""
   OUTER_SPRINT Skelwa bgskelwa
@@ -2069,10 +2075,23 @@ END ELSE ACTION_IF BGT BEGIN
 END
 
 ACTION_IF BG1 BEGIN
+<<<<<<<< ...atweaks/fl-inlined/bg1kn_old.baf
+IF
+  False()
+  Global("flPlaceholder4Journal","LOCALS",0)
+THEN
+  RESPONSE #100
+    Continue()
+END
+>>>>>>>>
   COPY - "atweaks/baf/undead/killgood.baf" "...atweaks/fl-inlined/%killgood%.baf"
          "atweaks/baf/undead/gooddeat.baf" "...atweaks/fl-inlined/%gooddeat%.baf"
   COMPILE ~atweaks/baf/undead/fl#bg1kn.baf~ "...atweaks/fl-inlined/%killgood%.baf" "...atweaks/fl-inlined/%gooddeat%.baf" EVAL
-END 
+  COPY_EXISTING fl#bg1kn.bcs override
+                killgood.bcs override
+    REPLACE_BCS_BLOCK "...atweaks/fl-inlined/bg1kn_old.baf" "...atweaks/fl-inlined/bg1kn_new.baf"
+  BUT_ONLY
+END
 
 COMPILE ~atweaks/baf/undead/fl#death.baf~
         ~atweaks/baf/undead/fl#mum.baf~
