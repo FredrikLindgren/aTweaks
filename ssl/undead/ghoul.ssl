@@ -2,13 +2,16 @@ INCLUDE FILE(include/definitions.ssl)
 
 INCLUDE FILE(include/baseinitial.ssl)
 
+//Non-standard melee scripting because they do not care about stoneskin and MI, and because I don't feel like taking ProEvil apart and feeding it to DEFAULT TRIGGER; also not much randomness because they are dumb
+
+//Weak and wounded, not elves; only target the very wounded because they is dumb
 IF TRIGGER
   TargetBlock(PCSquishy)
   TargetBlock(EnemiesInOrder)
   !Race(scstarget,ELF)
   TriggerBlock(WeaponImmunity|SlashRes|Disabled|Enemy|ProEvil)
   !HPPercentGT(scstarget,25)
-  Range(scstarget,10)
+  Range(scstarget,5)
 THEN DO
   Action(Attack)
 END
@@ -18,7 +21,37 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   !Race(scstarget,ELF)
   TriggerBlock(WeaponImmunity|SlashRes|Disabled|Enemy|ProEvil)
-  Range(scstarget,10)
+  !HPPercentGT(scstarget,25)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty)
+END
+
+//Attack in general, favouring the soft
+IF TRIGGER
+  TargetBlock(PCSquishy)
+  !Race(scstarget,ELF)
+  TriggerBlock(WeaponImmunity|SlashRes|Disabled|Enemy|ProEvil)
+  Range(scstarget,5)
+THEN DO
+  Action(Attack)
+END
+
+IF TRIGGER
+  TargetBlock(PCSquishy)
+  !Race(scstarget,ELF)
+  TriggerBlock(WeaponImmunity|SlashRes|Disabled|Enemy|ProEvil)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty)
+END
+
+//Attack in general
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  !Race(scstarget,ELF)
+  TriggerBlock(WeaponImmunity|SlashRes|Disabled|Enemy|ProEvil)
+  Range(scstarget,5)
 THEN DO
   Action(Attack)
 END
@@ -27,6 +60,16 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   !Race(scstarget,ELF)
   TriggerBlock(WeaponImmunity|SlashRes|Disabled|Enemy|ProEvil)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty)
+END
+
+//Stop being so nice to elves
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|SlashRes|Disabled|Enemy|ProEvil)
+  Range(scstarget,5)
 THEN DO
   Action(Attack)
 END
@@ -34,59 +77,49 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|SlashRes|Disabled|Enemy|ProEvil)
+  //!TargetUnreachable(scstarget)
 THEN DO
-  Action(Attack)
+  Action(MoveIfEmpty)
 END
 
+//Start going after the disabled
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|SlashRes|Enemy|ProEvil)
+  ActionListEmpty()
 THEN DO
   Action(Attack)
 END
 
 INCLUDE FILE(include/open_door.ssl)
   
-//Pursue
-BEGIN LOOP (loopvar||1;2;3;4;5;6)
-IF
-  !See([GOODCUTOFF])
-  !Detect(Playerloopvar)
-  GlobalTimerNotExpired("flChasePlayerloopvar","LOCALS")
-THEN
-  RESPONSE #100
-    MoveToObject(Playerloopvar)
-END
-END LOOP
+INCLUDE FILE(include/pursue.ssl)
 
 //Just keep busy
 IF TRIGGER
   ActionListEmpty()
   Target(NearestEnemyOf(Myself))
   TriggerBlock(Enemy|ProEvil)
+  ActionListEmpty()
 THEN DO
   Action(Attack)
 END
 
-IF TRIGGER
-  Target(NearestEnemyOf(Myself))
-  TriggerBlock(ProEvil)
-THEN DO
-  Action(Attack)
-END
-
+//Counter-attack, even if we are not ENEMY
 IF TRIGGER
   !Allegiance(Myself,ENEMY)
   AttackedBy([ANYONE],DEFAULT)
   Target(LastAttackerOf(Myself))
   TriggerBlock(ProEvil)
+  ActionListEmpty()
 THEN DO
   Action(Attack)
 END
 
-//If everyone is under PfE, stalk the juicy-looking ones
+//If everyone is under PfE, stalk the juicy-looking ones, or anyone who happens to be nearby
 IF TRIGGER
   TargetBlock(PCSquishy)
+  TargetBlock(EnemiesInOrder)
 THEN DO
     Action(MoveIfEmpty)
 END

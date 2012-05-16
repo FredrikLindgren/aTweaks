@@ -24,12 +24,36 @@ END
 
 INCLUDE FILE(include/baseinitial.ssl)
 
+//Non-standard melee scripting because these guys do not particularly care about stoneskins or mirror images
+
+//Weak and wounded
 IF TRIGGER
   TargetBlock(PCsPreferringWeak)
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|Enemy|SlashRes|WeaponImmunity)
   !HPPercentGT(scstarget,25)
-  Range(scstarget,10)
+  Range(scstarget,5)
+THEN DO
+  Action(Attack|100|50)
+END
+
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|SlashRes|WeaponImmunity)
+  !HPPercentGT(scstarget,25)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty|100|50)
+END
+
+//Less weak and wounded
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|SlashRes|WeaponImmunity)
+  !HPPercentGT(scstarget,50)
+  Range(scstarget,5)
 THEN DO
   Action(Attack|100|50)
 END
@@ -39,16 +63,39 @@ IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|Enemy|SlashRes|WeaponImmunity)
   !HPPercentGT(scstarget,50)
-  Range(scstarget,10)
+  //!TargetUnreachable(scstarget)
 THEN DO
-  Action(Attack|100|50)
+  Action(MoveIfEmpty|100|50)
+END
+
+//Attack wounded beefy types (and wounded enemies in general)
+IF TRIGGER 
+  TargetBlock(PCArchers)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|SlashRes|WeaponImmunity)
+  !HPPercentGT(scstarget,50)
+  Range(scstarget,5)
+THEN DO
+  Action(Attack|100|100)
 END
 
 IF TRIGGER 
-  ConditionalTargetBlock(PCArchers;Range(scstarget,5))
+  TargetBlock(PCArchers)
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|Enemy|SlashRes|WeaponImmunity)
   !HPPercentGT(scstarget,50)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty|100|100)
+END
+
+//Attack enemies in general, favouring archers/beefy types and casters, also go easier on the DR
+IF TRIGGER
+  TargetBlock(PCArchers)
+  TargetBlock(PCCasters)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|SlashRes75|WeaponImmunity)
+  Range(scstarget,5)
 THEN DO
   Action(Attack|100|100)
 END
@@ -56,35 +103,18 @@ END
 IF TRIGGER
   TargetBlock(PCArchers)
   TargetBlock(PCCasters)
-  TriggerBlock(Disabled|Enemy|SlashRes|WeaponImmunity)
-  !HPPercentGT(scstarget,50)
-  !TargetUnreachable(scstarget)
-THEN DO
-  Action(MoveIfEmpty|100|100)
-END
-
-IF TRIGGER
-  ConditionalTargetBlock(PCArchers;Range(scstarget,5))
-  ConditionalTargetBlock(PCCasters;Range(scstarget,5))
-  TriggerBlock(Disabled|Enemy|SlashRes|WeaponImmunity)
-THEN DO
-  Action(Attack|100|100)
-END
-
-IF TRIGGER
-  TargetBlock(PCArchers)
-  TargetBlock(PCCasters)
-  TriggerBlock(Disabled|Enemy|SlashRes|WeaponImmunity)
-  !TargetUnreachable(scstarget)
-THEN DO
-  Action(MoveIfEmpty|100|100)
-END
-
-IF TRIGGER
-  ConditionalTargetBlock(PCArchers;Range(scstarget,5))
-  ConditionalTargetBlock(PCCasters;Range(scstarget,5))
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|Enemy|SlashRes75|WeaponImmunity)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty|100|100)
+END
+
+//Attack the first, best
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|Enemy|SlashRes75|WeaponImmunity)
+  Range(scstarget,5)
 THEN DO
   Action(Attack|100|100)
 END
@@ -92,27 +122,25 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|Enemy|SlashRes75|WeaponImmunity)
+  //!TargetUnreachable(scstarget)
 THEN DO
-  Action(Attack|100|100)
+  Action(MoveIfEmpty|100|100)
 END
 
+//Do not particularly care about DR at all
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|Enemy|SlashResFull|WeaponImmunity)
+  ActionListEmpty()
 THEN DO
   Action(Attack|100|100)
 END
 
+//Go after the disabled
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Enemy|SlashResFull|WeaponImmunity)
-THEN DO
-  Action(Attack|100|100)
-END
-
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(Enemy|WeaponImmunity)
+  ActionListEmpty()
 THEN DO
   Action(Attack|100|100)
 END

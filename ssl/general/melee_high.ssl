@@ -9,10 +9,19 @@ THEN DO
   Action(AttackType|100|50)
 END
 
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|Enemy)
+  !HPPercentGT(scstarget,25)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty|100|100)
+END
+
 //Go after the slightly less wounded but equally weak
 IF TRIGGER
   TargetBlock(PCsPreferringWeak)
-  //TargetBlock(EnemiesInOrder)
+  TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|Enemy)
   !HPPercentGT(scstarget,50)
   Range(scstarget,5)
@@ -20,13 +29,11 @@ THEN DO
   Action(AttackType|100|50)
 END
 
-//Look for wounded and weak and walk to them
 IF TRIGGER
   TargetBlock(PCsPreferringWeak)
-  //TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|Enemy)
   !HPPercentGT(scstarget,50)
-  !TargetUnreachable(scstarget)
+  //!TargetUnreachable(scstarget)
 THEN DO
   Action(MoveIfEmpty|100|100)
 END
@@ -40,20 +47,27 @@ THEN DO
   Action(AttackType|100|50)
 END
 
-//Lay into nearby enemies
+IF TRIGGER
+  TargetBlock(PCsPreferringWeak)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|Enemy)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty|100|100)
+END
+
+//Lay into enemies in general
 IF TRIGGER
   TargetBlock(PCsInOrder)
   TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|Enemy)
+  Range(scstarget,5)
 THEN DO
   Action(AttackType|100|100)
 END
 
-//Look for anyone unprotected and walk to them
 IF TRIGGER
-  TargetBlock(PCsPreferringWeak)
-  //TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|Disabled|DamageRes|Stoneskin|MirrorImage|Enemy)
-  !TargetUnreachable(scstarget)
+  TargetBlock(PCsInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|Enemy)
+  //!TargetUnreachable(scstarget)
 THEN DO
   Action(MoveIfEmpty|100|100)
 END
@@ -62,22 +76,41 @@ END
 IF TRIGGER
   TargetBlock(PCsInOrder)
   TriggerBlock(WeaponImmunity|Disabled|DamageRes|Stoneskin|Enemy)
+  Range(scstarget,5)
 THEN DO
   Action(AttackType|100|50)
+END
+
+IF TRIGGER
+  TargetBlock(PCsInOrder)
+  TriggerBlock(WeaponImmunity|Disabled|DamageRes|Stoneskin|Enemy)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty|100|50)
 END
 
 //Then Stoneskins
 IF TRIGGER
   TargetBlock(PCsInOrder)
   TriggerBlock(WeaponImmunity|Disabled|DamageRes|Enemy)
+  Range(scstarget,5)
 THEN DO
   Action(AttackType|100|50)
+END
+
+IF TRIGGER
+  TargetBlock(PCsInOrder)
+  TriggerBlock(WeaponImmunity|Disabled|DamageRes|Enemy)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty|100|50)
 END
 
 //Stop ignoring those with !GT75% damage resistance
 IF TRIGGER
   TargetBlock(PCsInOrder)
   TriggerBlock(WeaponImmunity|Disabled|DamageRes75|Enemy)
+  ActionListEmpty()
 THEN DO
   Action(AttackType|100|100)
 END
@@ -86,6 +119,7 @@ END
 IF TRIGGER
   TargetBlock(PCsInOrder)
   TriggerBlock(WeaponImmunity|Disabled|DamageResFull|Enemy)
+  ActionListEmpty()
 THEN DO
   Action(AttackType|100|100)
 END
@@ -94,6 +128,7 @@ END
 IF TRIGGER
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|Disabled|DamageResFull|Enemy)
+  ActionListEmpty()
 THEN DO
   Action(AttackType|100|100)
 END
@@ -103,6 +138,7 @@ IF TRIGGER
   ConditionalTargetBlock(PCsPreferringWeak;Range(scstarget,5))
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|DamageResFull|Enemy)
+  ActionListEmpty()
 THEN DO
   Action(AttackType|100|100)
 END

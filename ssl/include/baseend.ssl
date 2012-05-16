@@ -2,20 +2,18 @@
 INCLUDE FILE(include/pursue.ssl)
 
 //Just keep busy
-IF
+IF TRIGGER
   ActionListEmpty()
-  See(NearestEnemyOf(Myself))
-THEN
-  RESPONSE #100
-  AttackOneRound(LastSeenBy(Myself))
+  Target(NearestEnemyOf(Myself))
+THEN DO
+    Action(Attack)
 END
 
-IF
+IF TRIGGER
   ActionListEmpty()
   !Allegiance(Myself,ENEMY)
   AttackedBy([ANYONE],DEFAULT)
-  See(LastAttackerOf(Myself))
-THEN
-  RESPONSE #100
-  AttackOneRound(LastAttackerOf(Myself))
+  Target(LastAttackerOf(Myself))
+THEN DO
+    Action(Attack)
 END

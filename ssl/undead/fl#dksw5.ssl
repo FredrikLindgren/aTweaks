@@ -20,16 +20,15 @@ BEGIN LOOP(AttackType||Attack)
 END LOOP
 END LOOP
 
-IF
-  See(NearestEnemyOf(Myself))
-THEN
-  RESPONSE #100
-    AttackOneRound(LastSeenBy(Myself))
+IF TRIGGER
+  Target(NearestEnemyOf(Myself))
+THEN DO
+    Action(Attack)
 END
 
 IF
   ActionListEmpty()
-  !Range(LastSummonerOf(Myself),5)
+  !Range(LastSummonerOf(Myself),15)
 THEN
   RESPONSE #100
     MoveToObject(LastSummonerOf(Myself))

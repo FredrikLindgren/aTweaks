@@ -247,7 +247,7 @@ IF TRIGGER
     CheckStatGT(scstarget,0,WIZARD_RESIST_FEAR)
     CheckStatGT(scstarget,0,CLERIC_CHAOTIC_COMMANDS)
     CheckStatGT(scstarget,49,RESISTFIRE)
-    CheckStatGT(scstarget,0,SCRIPTINGSTATE2) //Death Ward, I presume
+    CheckStatGT(scstarget,0,SCRIPTINGSTATE2) //Death Ward
     StateCheck(scstarget,STATE_HASTED)
   GlobalLT("flDispel","LOCALS",2)
   BEGIN LOOP(sslvar||1;2;3;4;5;6)
@@ -353,18 +353,11 @@ IF
   Global("flUsedSword","LOCALS",0)
 THEN
   RESPONSE #100
-    UseItem("fl#dksw5",Myself)
+    SetInterrupt(FALSE)
+    DisplayStringHead(Myself,@1039)
+    ReallyForceSpellRES("fl#dksw5",Myself)
     SetGlobal("flUsedSword","LOCALS",1)
-END
-
-IF
-  Global("flUsedSword","LOCALS",1)
-  HasItem("fl#dksw5",Myself)
-  !HasItemEquiped("fl#dksw5",Myself)
-THEN
-  RESPONSE #100
-    ReallyForceSpellRES("fl#dkeds",Myself)
-    Continue()
+    SetInterrupt(TRUE)
 END
 
 IF TRIGGER

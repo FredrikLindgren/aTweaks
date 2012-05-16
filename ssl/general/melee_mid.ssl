@@ -1,23 +1,55 @@
 
-IF TRIGGER
-  TargetBlock(EnemiesInOrder)
-  TriggerBlock(DamageResFull|WeaponImmunity|Enemy)
-  StateCheck(scstarget,STATE_DISABLED)
-  Range(scstarget,25)
-THEN DO
-    Action(Attack|200|50)
-END
+//I don't remember why I put this here, but targeting disabled this far up does not sound like fun
+//IF TRIGGER
+//  TargetBlock(EnemiesInOrder)
+//  TriggerBlock(DamageResFull|WeaponImmunity|Enemy)
+//  StateCheck(scstarget,STATE_DISABLED)
+//  Range(scstarget,25)
+//THEN DO
+//    Action(Attack|200|50)
+//END
 
+//Target the weak and wounded
 IF TRIGGER
   TargetBlock(PCSquishy)
   TargetBlock(EnemiesInOrder)
-  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|Disabled|Enemy)
-  Range(scstarget,5)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|Enemy)
   HPPercentLT(scstarget,25)
+  Range(scstarget,5)
 THEN DO
   Action(Attack|100|100)
 END
 
+IF TRIGGER
+  TargetBlock(PCSquishy)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|Enemy)
+  HPPercentLT(scstarget,25)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty|100|100)
+END
+
+//Start attacking in general
+IF TRIGGER
+  TargetBlock(PCSquishy)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|Enemy)
+  Range(scstarget,5)
+THEN DO
+  Action(Attack|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(PCSquishy)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|MirrorImage|Disabled|Enemy)
+  //!TargetUnreachable(scstarget)
+THEN DO
+  Action(MoveIfEmpty|100|100)
+END
+
+//Start ignoring Mirror Images
 IF TRIGGER
   TargetBlock(PCSquishy)
   TargetBlock(EnemiesInOrder)
@@ -28,41 +60,50 @@ THEN DO
 END
 
 IF TRIGGER
-  ConditionalTargetBlock(PCSquishy;Range(scstarget,5))
+  TargetBlock(PCSquishy)
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|DamageRes|Stoneskin|Disabled|Enemy)
+  //!TargetUnreachable(scstarget)
 THEN DO
-  Action(Attack|100|100)
+  Action(MoveIfEmpty|100|100)
 END
 
+//Be less strict about DR
 IF TRIGGER
   ConditionalTargetBlock(PCSquishy;Range(scstarget,5))
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|DamageRes75|Stoneskin|Disabled|Enemy)
+  ActionListEmpty()
 THEN DO
   Action(Attack|100|100)
 END
 
+//Start ignoring Stoneskins
 IF TRIGGER
   ConditionalTargetBlock(PCSquishy;Range(scstarget,5))
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|DamageRes75|Disabled|Enemy)
+  ActionListEmpty()
 THEN DO
   Action(Attack|100|100)
 END
 
+//Be even less strict about DR
 IF TRIGGER
   ConditionalTargetBlock(PCSquishy;Range(scstarget,5))
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|DamageResFull|Disabled|Enemy)
+  ActionListEmpty()
 THEN DO
   Action(Attack|100|100)
 END
 
+//Go after the disabled
 IF TRIGGER
   ConditionalTargetBlock(PCSquishy;Range(scstarget,5))
   TargetBlock(EnemiesInOrder)
   TriggerBlock(WeaponImmunity|DamageResFull|Enemy)
+  ActionListEmpty()
 THEN DO
   Action(Attack|100|100)
 END
