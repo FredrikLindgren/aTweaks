@@ -988,21 +988,22 @@ COPY "atweaks/spl/undead/fl#mum.spl" "override/fl#gmum.spl"
       SAY i + 0x4 @1029
     END
   END
+  interval = 1200 //Four hours
   //Already on the spl: display string: disease, immunity to cure spells, portrait icon, colour pulse
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#gmum END //non-cumulativity
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#mum END //immunity from regular mummy rot
   FOR (i=1;i<6;++i) BEGIN
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 2 parameter2 = 9 timing = 4 duration = i*300 END //2 points of chr
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 4 timing = 4 duration = i*300 END //1 point of str
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 6 timing = 4 duration = i*300 END //1 point of con
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 2 parameter2 = 9 timing = 4 duration = i*interval END //2 points of chr
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 4 timing = 4 duration = i*interval END //1 point of str
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 6 timing = 4 duration = i*interval END //1 point of con
   END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*300 END //death, disintigration-style
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1035) timing = 4 duration = 5*300 END //display a waring a day before insta-death
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1036) timing = 4 duration = 6*300 - 1 END //display flavour text right before insta-death
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*interval END //death, disintigration-style
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1035) timing = 4 duration = 5*interval END //display a waring a time unit before insta-death
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1036) timing = 4 duration = 6*interval - 1 END //display flavour text right before insta-death
   PATCH_FOR_EACH parameter2 IN 0 1 BEGIN
-    LPF ADD_SPELL_EFFECT INT_VAR opcode = 145 target = 2 parameter2 duration = 6*300 END //disable spellcasting
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 145 target = 2 parameter2 duration = 6*interval END //disable spellcasting
   END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 2 parameter2 = 83 duration = 6*300 END //portrait: spell failure
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 2 parameter2 = 83 duration = 6*interval END //portrait: spell failure
   
 OUTER_SET $f_AddSecType(fl#gmum.spl) = DiseaseSecType
 
