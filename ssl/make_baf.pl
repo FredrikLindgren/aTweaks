@@ -50,6 +50,7 @@ sub process_files {
     my $to_dir = $_[1];
     my $from_dir = $_[2];
     File::Path::make_path($to_dir);
+    File::Path::make_path($from_dir . "/ssl_out"); #perl on win does not automatically create it and instead errors out
     foreach (@files) {
 	my @collection = split(":");
 	my $arg = $from_dir . $collection[0];

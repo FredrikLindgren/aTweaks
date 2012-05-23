@@ -15,13 +15,13 @@ ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DS.RR~ THEN BEGIN                         
  OUTER_SPRINT ~marker~ ~dw#fixasc.mrk~                                             // DavidW's fix for Ascension's DS scripts
  OUTER_SPRINT ~oldfiles~ ~aTweaks/LIB/DS/oldfiles_asc.2da~
  OUTER_SPRINT ~oldswapfile~ ~aTweaks/LIB/DS/oldds_swap.2da~
- LAUNCH_ACTION_MACRO ~fix_old_DS_scripts~ 
+ LAUNCH_ACTION_MACRO ~fix_old_DS_scripts~
  OUTER_SPRINT ~marker~ ~dw#fixkelsey.mrk~                                          // DavidW's fix for Kelsey's DS scripts
  OUTER_SPRINT ~oldfiles~ ~aTweaks/LIB/DS/oldfiles_kelsey.2da~
  OUTER_SPRINT ~oldswapfile~ ~aTweaks/LIB/DS/oldds_swap.2da~
  LAUNCH_ACTION_MACRO ~fix_old_DS_scripts~
  APPEND stats.ids "109 CLERIC_HALLOW" UNLESS CLERIC_HALLOW                         //Ensure that CLERIC_HALLOW is in there
- 
+
  INCLUDE "atweaks/lib/DS/label_weapons.tph"                                        //Lifted from SCSII
  OUTER_SET ~weapon_enchantment_stat~=109
  OUTER_SET ~weapon_enchantment_type~=233
@@ -33,7 +33,7 @@ END
 
 ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#EVAL.2DA~ THEN BEGIN                         // only copy the evaluation file once
   COPY ~aTweaks/LIB/RR#EVAL.2DA~ ~override~
-END                                       
+END
 
 ACTION_IF !FILE_EXISTS_IN_GAME rr#trat.cre BEGIN
   COPY ~atweaks/cre/rr#trat.cre~ ~override~                                         // Targeting Rat (script aid)
@@ -79,7 +79,7 @@ ACTION_IF !FILE_EXISTS_IN_GAME fl#cnenp.pro BEGIN
   APPEND RR#EVAL.2da "fl#cnenp %fl#cnenp%"
 END
 ACTION_IF !FILE_EXISTS_IN_GAME fl#sight.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/fl#sight.pro~                                        //Like INAREANP, but extends roughly as far as you can see 
+  ADD_PROJECTILE ~atweaks/pro/fl#sight.pro~                                        //Like INAREANP, but extends roughly as far as you can see
   APPEND RR#EVAL.2da "fl#sight %fl#sight%"
 END
 ACTION_IF !FILE_EXISTS_IN_GAME rr#pyrot.pro BEGIN
@@ -173,7 +173,7 @@ APPEND ~STATE.IDS~ ~0x60400010 STATE_ILLUSIONS~ UNLESS ~0x60400010 STATE_ILLUSIO
 APPEND ~STATE.IDS~ ~0x80040004 STATE_RANGED_TARGET~ UNLESS ~0x80040004 STATE_RANGED_TARGET~    // includes Blind, Confused, Panic
 APPEND ~STATE.IDS~ ~0x00000029 STATE_IMMOBILE~ UNLESS ~0x00000029 STATE_IMMOBILE~              // includes Helpless, Stunned, Sleeping
 APPEND ~STATE.IDS~ ~0x00400010 STATE_NOT_TARGETABLE~ UNLESS ~0x00400010 STATE_NOT_TARGETABLE~  // includes Improved Invisibility and plain Invisibility
-APPEND ~STATE.IDS~ ~0x8010202D STATE_DISABLED~ UNLESS ~0x8010202D STATE_DISABLED~              // includes Helpless, Stunned, Panic, Sleeping, Charmed, Feebleminded, Confused 
+APPEND ~STATE.IDS~ ~0x8010202D STATE_DISABLED~ UNLESS ~0x8010202D STATE_DISABLED~              // includes Helpless, Stunned, Panic, Sleeping, Charmed, Feebleminded, Confused
 
 
 // TRIGGER.IDS additions (mirrors G3 BG2 Fixpack code)
@@ -196,6 +196,12 @@ APPEND ~TRIGGER.IDS~ ~0x40D5 ActuallyInCombat()~
 
 APPEND ~ACTION.IDS~ ~147 RemoveSpellRES(S:Spell*)~
              UNLESS ~147 RemoveSpellRES(S:Spell\*)~
+
+
+// SPELL.IDS additions (mirrors G3 BG2 Fixpack code)
+
+APPEND ~spell.ids~ ~1718 CLERIC_SYMBOL_STUN~      UNLESS ~^1718 CLERIC_SYMBOL_STUN~
+APPEND ~spell.ids~ ~1719 CLERIC_SYMBOL_DEATH~     UNLESS ~^1719 CLERIC_SYMBOL_DEATH~
 
 
 // Fix a mistargeted opcode in the Death Ward spell which prevents Detectable Spells from noticing it correctly (mirrors G3 BG2 Fixpack code)
@@ -240,9 +246,9 @@ COPY_EXISTING ~%rr#itm%.itm~ ~override~
 PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                           // protects against invalid files
 // =============================================================================== // the actual work starts from here
 LAUNCH_PATCH_FUNCTION ~ITEM_EFFECT_TO_SPELL~
-  INT_VAR 
+  INT_VAR
     "type" = "99"                                                                  // transfer all headers
-  STR_VAR 
+  STR_VAR
     ~new_itm_spl~ = EVALUATE_BUFFER ~%rr#spl%.spl~                                 // spell file
 END                                                                                // ends LAUNCH_PATCH_FUNCTION
 LAUNCH_PATCH_FUNCTION ~DELETE_ITEM_EFFECT~ INT_VAR "opcode_to_delete" = "-1" END   // delete all effects from the item's extended header
@@ -268,7 +274,7 @@ END                                                                             
 END                                                                                // ends safety check
 
 //Tag celestials, for detectability (mirrors code in SCSII)
-ACTION_FOR_EACH celestial IN 
+ACTION_FOR_EACH celestial IN
 		devagood
 		devaevil
 		plangood
@@ -282,5 +288,5 @@ BEGIN
     COPY_EXISTING "%celestial%.cre" override
       WRITE_BYTE 0x274 182 //Specific
     BUT_ONLY
-  END 
+  END
 END
