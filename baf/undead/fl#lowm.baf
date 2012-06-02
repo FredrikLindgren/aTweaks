@@ -1,0 +1,369 @@
+IF
+!Detect(NearestEnemyOf(Myself))
+Global("flRest","LOCALS",1)
+!GlobalTimerNotExpired("flRestTimer","LOCALS")
+THEN
+RESPONSE #100
+SetGlobal("flRest","LOCALS",0)
+ApplySpell(Myself,RESTORE_FULL_HEALTH)
+Rest()
+END
+
+IF
+!GlobalTimerNotExpired("flRestTimer","LOCALS")
+Detect(NearestEnemyOf(Myself))
+Global("flRest","LOCALS",0)
+THEN
+RESPONSE #100
+SetGlobalTimer("flRestTimer","LOCALS",2400)
+SetGlobal("flRest","LOCALS",1)
+Continue()
+END
+
+IF
+Global("flActive","LOCALS",0)
+HitBy([GOODCUTOFF],0)
+!Allegiance(Myself,GOODCUTOFF)
+THEN
+RESPONSE #100
+SetGlobal("flActive","LOCALS",1)
+Enemy()
+Continue()
+END
+
+IF
+Global("flActive","LOCALS",0)
+Allegiance(Myself,EVILCUTOFF)
+See([GOODCUTOFF])
+THEN
+RESPONSE #100
+SetGlobal("flActive","LOCALS",1)
+Continue()
+END
+
+IF
+OR(13)
+HitBy([GOODCUTOFF],0)
+AttackedBy([GOODCUTOFF.0.0.0.0.SUMMONED],DEFAULT)
+AttackedBy([PC],DEFAULT)
+AttackedBy([FAMILIAR],DEFAULT)
+AttackedBy([ALLY],DEFAULT)
+AttackedBy([CONTROLLED],DEFAULT)
+AttackedBy([CHARMED],DEFAULT)
+SpellCastOnMe([GOODCUTOFF.0.0.0.0.SUMMONED],0)
+SpellCastOnMe([PC],0)
+SpellCastOnMe([FAMILIAR],0)
+SpellCastOnMe([ALLY],0)
+SpellCastOnMe([CONTROLLED],0)
+SpellCastOnMe([CHARMED],0)
+!GlobalTimerNotExpired("whatthe","LOCALS")
+!See([GOODCUTOFF])
+THEN
+RESPONSE #100
+Enemy()
+SetGlobalTimer("whatthe","LOCALS",12)
+Continue()
+END
+
+IF
+!See([GOODCUTOFF])
+GlobalTimerNotExpired("whatthe","LOCALS")
+THEN
+RESPONSE #100
+RandomWalkContinuous()
+END
+
+IF
+See([GOODCUTOFF])
+GlobalTimerNotExpired("whatthe","LOCALS")
+THEN
+RESPONSE #100
+ClearActions(Myself)
+SetGlobalTimer("whatthe","LOCALS",0)
+END
+
+IF
+Global("flActive","LOCALS",0)
+!Detect(NearestEnemyOf(Myself))
+THEN
+RESPONSE #100
+NoAction()
+END
+
+IF
+StateCheck(Myself,STATE_PANIC)
+THEN
+RESPONSE #100
+RandomWalkContinuous()
+END
+
+IF
+StateCheck(Myself,STATE_CHARMED)
+See(NearestEnemyOf(Myself))
+ActionListEmpty()
+!Range(LastSeenBy(Myself),5)
+THEN
+RESPONSE #100
+EquipRanged()
+Attack(LastSeenBy(Myself))
+END
+
+IF
+StateCheck(Myself,STATE_CHARMED)
+See(NearestEnemyOf(Myself))
+ActionListEmpty()
+Range(LastSeenBy(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+Attack(LastSeenBy(Myself))
+END
+
+IF
+See(Player1)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer1","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer1","LOCALS",6)
+Continue()
+END
+
+IF
+See(Player2)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer2","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer2","LOCALS",6)
+Continue()
+END
+
+IF
+See(Player3)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer3","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer3","LOCALS",6)
+Continue()
+END
+
+IF
+See(Player4)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer4","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer4","LOCALS",6)
+Continue()
+END
+
+IF
+See(Player5)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer5","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer5","LOCALS",6)
+Continue()
+END
+
+IF
+See(Player6)
+Allegiance(Myself,EVILCUTOFF)
+!GlobalTimerNotExpired("flChasePlayer6","LOCALS")
+THEN
+RESPONSE #100
+SetGlobalTimer("flChasePlayer6","LOCALS",6)
+Continue()
+END
+
+IF
+See(NearestEnemyOf(Myself))
+Range(NearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(NearestEnemyOf(Myself),30)
+END
+
+IF
+See(SecondNearestEnemyOf(Myself))
+Range(SecondNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(SecondNearestEnemyOf(Myself),30)
+END
+
+IF
+See(ThirdNearestEnemyOf(Myself))
+Range(ThirdNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(ThirdNearestEnemyOf(Myself),30)
+END
+
+IF
+See(FourthNearestEnemyOf(Myself))
+Range(FourthNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(FourthNearestEnemyOf(Myself),30)
+END
+
+IF
+See(FifthNearestEnemyOf(Myself))
+Range(FifthNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(FifthNearestEnemyOf(Myself),30)
+END
+
+IF
+See(SixthNearestEnemyOf(Myself))
+Range(SixthNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(SixthNearestEnemyOf(Myself),30)
+END
+
+IF
+ActionListEmpty()
+See(NearestEnemyOf(Myself))
+
+THEN
+RESPONSE #100
+MoveToObject(NearestEnemyOf(Myself))
+END
+
+IF
+ActionListEmpty()
+See(SecondNearestEnemyOf(Myself))
+
+THEN
+RESPONSE #100
+MoveToObject(SecondNearestEnemyOf(Myself))
+END
+
+IF
+ActionListEmpty()
+See(ThirdNearestEnemyOf(Myself))
+
+THEN
+RESPONSE #100
+MoveToObject(ThirdNearestEnemyOf(Myself))
+END
+
+IF
+ActionListEmpty()
+See(FourthNearestEnemyOf(Myself))
+
+THEN
+RESPONSE #100
+MoveToObject(FourthNearestEnemyOf(Myself))
+END
+
+IF
+ActionListEmpty()
+See(FifthNearestEnemyOf(Myself))
+
+THEN
+RESPONSE #100
+MoveToObject(FifthNearestEnemyOf(Myself))
+END
+
+IF
+ActionListEmpty()
+See(SixthNearestEnemyOf(Myself))
+
+THEN
+RESPONSE #100
+MoveToObject(SixthNearestEnemyOf(Myself))
+END
+
+IF
+!See([GOODCUTOFF])
+!Detect(Player1)
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer1","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player1)
+END
+
+IF
+!See([GOODCUTOFF])
+!Detect(Player2)
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer2","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player2)
+END
+
+IF
+!See([GOODCUTOFF])
+!Detect(Player3)
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer3","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player3)
+END
+
+IF
+!See([GOODCUTOFF])
+!Detect(Player4)
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer4","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player4)
+END
+
+IF
+!See([GOODCUTOFF])
+!Detect(Player5)
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer5","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player5)
+END
+
+IF
+!See([GOODCUTOFF])
+!Detect(Player6)
+Allegiance(Myself,EVILCUTOFF)
+GlobalTimerNotExpired("flChasePlayer6","LOCALS")
+THEN
+RESPONSE #100
+MoveToObject(Player6)
+END
+
+IF
+See(NearestEnemyOf(Myself))
+ActionListEmpty()
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(NearestEnemyOf(Myself),30)
+END
+
+IF
+See(LastAttackerOf(Myself))
+ActionListEmpty()
+!Allegiance(Myself,ENEMY)
+AttackedBy([ANYONE],DEFAULT)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(LastAttackerOf(Myself),30)
+END
+
