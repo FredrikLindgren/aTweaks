@@ -1238,23 +1238,25 @@ BEGIN
 END
 
 // Skeleton, summoned
-ACTION_FOR_EACH file IN
-                ghastsu //Animate Dead
-BEGIN
-  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
-    COPY_EXISTING "%file%.cre" override
-      LPF make_skeleton INT_VAR newxpv = 0 END
-      LPF make_summon END
-      WRITE_ASCII 0x248 fl#sklsu #8                                 //Player-friendly summoned-skeleton script; kills itself if summoner is an enemy
-      LPF RR#MDCSC
-        STR_VAR
-          newscript = fl#lowm
-          script01 = bornwait
-          script02 = wtasight
-          script03 = dw#melee
-          script04 = bpwtsigt
-      END
-    BUT_ONLY
+ACTION_IF !MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN //Not a skeleton in this case
+  ACTION_FOR_EACH file IN
+                  ghastsu //Animate Dead
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+      COPY_EXISTING "%file%.cre" override
+        LPF make_skeleton INT_VAR newxpv = 0 END
+        LPF make_summon END
+        WRITE_ASCII 0x248 fl#sklsu #8                                 //Player-friendly summoned-skeleton script; kills itself if summoner is an enemy
+        LPF RR#MDCSC
+          STR_VAR
+            newscript = fl#lowm
+            script01 = bornwait
+            script02 = wtasight
+            script03 = dw#melee
+            script04 = bpwtsigt
+        END
+      BUT_ONLY
+    END
   END
 END
 
