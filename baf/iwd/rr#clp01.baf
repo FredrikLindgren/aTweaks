@@ -41,6 +41,15 @@ IF
 	HotKey(V)
 THEN
 	RESPONSE #100
+		SetGlobal("RR#CLPA","LOCALS",2)
+		FloatMessage(Myself,@23907) // Attacking only when no undead opponents are nearby
+END
+
+IF
+	Global("RR#CLPA","LOCALS",2)
+	HotKey(V)
+THEN
+	RESPONSE #100
 		SetGlobal("RR#CLPA","LOCALS",0)
 		FloatMessage(Myself,@236) // Not attacking enemies
 END
@@ -1196,8 +1205,8 @@ IF
 	  Class(Myself,PALADIN)
     !ModalState(Myself,TURNUNDEAD)
     OR(2)
-	  Range([EVILCUTOFF.UNDEAD],30) // an undead opponent is nearby
-      Range([CONTROLLED.UNDEAD],30) // a controlled undead is nearby
+	  Range([EVILCUTOFF.UNDEAD],13) // an undead opponent is nearby
+      Range([CONTROLLED.UNDEAD],13) // a controlled undead is nearby
 THEN
 	RESPONSE #100
 		Turn()
@@ -1220,8 +1229,8 @@ IF
 	  Class(Myself,PALADIN)
     ModalState(Myself,TURNUNDEAD)
     OR(2)
-	  !Range([EVILCUTOFF.UNDEAD],30) // no undead opponents are nearby
-      !Range([CONTROLLED.UNDEAD],30) // not controlling any undead
+	  !Range([EVILCUTOFF.UNDEAD],13) // no undead opponents are nearby
+      !Range([CONTROLLED.UNDEAD],13) // not controlling any undead
 	!See([EVILCUTOFF])
 	Delay(18)
 THEN
@@ -1242,4 +1251,20 @@ IF
 THEN
 	RESPONSE #100
 		AttackReevaluate([EVILCUTOFF],30)
+END
+
+
+// Attack the nearest enemy but not while under the effects of Invisibility and/or Sanctuary and only while there are no undead opponents nearby
+
+IF
+	Global("RR#CLPA","LOCALS",2)
+	ActionListEmpty()
+	!StateCheck(Myself,STATE_INVISIBLE)
+	CheckStatLT(Myself,1,SANCTUARY)
+	!Range([EVILCUTOFF.UNDEAD],12) // no undead opponents are nearby
+	See([EVILCUTOFF])
+	!InParty([EVILCUTOFF])
+THEN
+	RESPONSE #100
+		AttackOneRound([EVILCUTOFF]) // better use this instead of AttackReevaluate() in order to properly resume the Turning behavior at the end of the round
 END
