@@ -1,0 +1,2108 @@
+// Title: Simple Thief script
+// Date Created: June 23, 2012
+// Created by: aVENGER
+// Note: Requires Detectable Spells
+
+
+// Switch between constantly turning undead and turning undead only when undead opponents are nearby (the "D" key toggles between modes)
+
+IF
+	Global("RR#CLPS","LOCALS",0)
+	HotKey(D)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#CLPS","LOCALS",1)
+		DisplayStringHead(Myself,@23902) // Turning Undead constantly if idle
+END
+
+IF
+	Global("RR#CLPS","LOCALS",1)
+	HotKey(D)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#CLPS","LOCALS",0)
+		DisplayStringHead(Myself,@23903) // Turning Undead only when undead opponents are nearby
+END
+
+
+// Switch between attacking enemies and not attacking (the "V" key toggles between modes)
+
+IF
+	Global("RR#CLPA","LOCALS",0)
+	HotKey(V)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#CLPA","LOCALS",1)
+		DisplayStringHead(Myself,@235) // Attacking enemies
+END
+
+IF
+	Global("RR#CLPA","LOCALS",1)
+	HotKey(V)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#CLPA","LOCALS",0)
+		DisplayStringHead(Myself,@236) // Not attacking enemies
+END
+
+
+// Switch between healing and not healing (the "E" key toggles between modes)
+
+IF
+	Global("RR#CLPH","LOCALS",0)
+	HotKey(E)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#CLPH","LOCALS",1)
+		DisplayStringHead(Myself,@23904) // Healing allies only when not in combat
+END
+
+IF
+	Global("RR#CLPH","LOCALS",1)
+	HotKey(E)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#CLPH","LOCALS",2)
+		DisplayStringHead(Myself,@23905) // Healing allies even during combat
+END
+
+IF
+	Global("RR#CLPH","LOCALS",2)
+	HotKey(E)
+THEN
+	RESPONSE #100
+		SetGlobal("RR#CLPH","LOCALS",0)
+		DisplayStringHead(Myself,@23906) // Not healing allies
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_SLOW_POISON)
+    StateCheck(Myself,STATE_POISONED) // cure self first
+	!CheckStatGT(Myself,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Myself,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Myself,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Myself,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Myself,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Myself,CLERIC_SLOW_POISON)
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_SLOW_POISON)
+	See(Player1)
+    StateCheck(Player1,STATE_POISONED)
+    !StateCheck(Player1,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player1)
+	!StateCheck(Player1,STATE_NOT_TARGETABLE)
+	!StateCheck(Player1,STATE_REALLY_DEAD)
+    CheckStat(Player1,0,MINORGLOBE)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player1,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player1,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player1,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player1,CLERIC_SLOW_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_SLOW_POISON)
+	See(Player2)
+    StateCheck(Player2,STATE_POISONED)
+    !StateCheck(Player2,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player2)
+	!StateCheck(Player2,STATE_NOT_TARGETABLE)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+    CheckStat(Player2,0,MINORGLOBE)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player2,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player2,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player2,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player2,CLERIC_SLOW_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_SLOW_POISON)
+	See(Player3)
+    StateCheck(Player3,STATE_POISONED)
+    !StateCheck(Player3,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player3)
+	!StateCheck(Player3,STATE_NOT_TARGETABLE)
+	!StateCheck(Player3,STATE_REALLY_DEAD)
+    CheckStat(Player3,0,MINORGLOBE)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player3,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player3,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player3,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player3,CLERIC_SLOW_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_SLOW_POISON)
+	See(Player4)
+    StateCheck(Player4,STATE_POISONED)
+    !StateCheck(Player4,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player4)
+	!StateCheck(Player4,STATE_NOT_TARGETABLE)
+	!StateCheck(Player4,STATE_REALLY_DEAD)
+    CheckStat(Player4,0,MINORGLOBE)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player4,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player4,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player4,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player4,CLERIC_SLOW_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_SLOW_POISON)
+	See(Player5)
+    StateCheck(Player5,STATE_POISONED)
+    !StateCheck(Player5,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player5)
+	!StateCheck(Player5,STATE_NOT_TARGETABLE)
+	!StateCheck(Player5,STATE_REALLY_DEAD)
+	!CheckStat(Player5,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player5,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player5,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+    CheckStat(Player5,0,MINORGLOBE)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_TURNING)
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player5,CLERIC_SLOW_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_SLOW_POISON)
+	See(Player6)
+    StateCheck(Player6,STATE_POISONED)
+    !StateCheck(Player6,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player6)
+	!StateCheck(Player6,STATE_NOT_TARGETABLE)
+	!StateCheck(Player6,STATE_REALLY_DEAD)
+    CheckStat(Player6,0,MINORGLOBE)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player6,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player6,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player6,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player6,CLERIC_SLOW_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3102) // Slow Poison (Bhaalpower)
+    StateCheck(Myself,STATE_POISONED) // cure self first
+	!CheckStatGT(Myself,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Myself,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Myself,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Myself,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Myself,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Myself,3102)
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3102) // Slow Poison (Bhaalpower)
+	See(Player1)
+    StateCheck(Player1,STATE_POISONED)
+    !StateCheck(Player1,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player1)
+	!StateCheck(Player1,STATE_NOT_TARGETABLE)
+	!StateCheck(Player1,STATE_REALLY_DEAD)
+    CheckStat(Player1,0,MINORGLOBE)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player1,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player1,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player1,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player1,3102) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3102) // Slow Poison (Bhaalpower)
+	See(Player2)
+    StateCheck(Player2,STATE_POISONED)
+    !StateCheck(Player2,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player2)
+	!StateCheck(Player2,STATE_NOT_TARGETABLE)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+    CheckStat(Player2,0,MINORGLOBE)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player2,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player2,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player2,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player2,3102) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3102) // Slow Poison (Bhaalpower)
+	See(Player3)
+    StateCheck(Player3,STATE_POISONED)
+    !StateCheck(Player3,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player3)
+	!StateCheck(Player3,STATE_NOT_TARGETABLE)
+	!StateCheck(Player3,STATE_REALLY_DEAD)
+    CheckStat(Player3,0,MINORGLOBE)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player3,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player3,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player3,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player3,3102) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3102) // Slow Poison (Bhaalpower)
+	See(Player4)
+    StateCheck(Player4,STATE_POISONED)
+    !StateCheck(Player4,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player4)
+	!StateCheck(Player4,STATE_NOT_TARGETABLE)
+	!StateCheck(Player4,STATE_REALLY_DEAD)
+    CheckStat(Player4,0,MINORGLOBE)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player4,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player4,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player4,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player4,3102) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3102) // Slow Poison (Bhaalpower)
+	See(Player5)
+    StateCheck(Player5,STATE_POISONED)
+    !StateCheck(Player5,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player5)
+	!StateCheck(Player5,STATE_NOT_TARGETABLE)
+	!StateCheck(Player5,STATE_REALLY_DEAD)
+    CheckStat(Player5,0,MINORGLOBE)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player5,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player5,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player5,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player5,3102) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3102) // Slow Poison (Bhaalpower)
+	See(Player6)
+    StateCheck(Player6,STATE_POISONED)
+    !StateCheck(Player6,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player6)
+	!StateCheck(Player6,STATE_NOT_TARGETABLE)
+	!StateCheck(Player6,STATE_REALLY_DEAD)
+    CheckStat(Player6,0,MINORGLOBE)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player6,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player6,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player6,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player6,3102) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_NEUTRALIZE_POISON)
+    StateCheck(Myself,STATE_POISONED) // cure self first
+	!CheckStatGT(Myself,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Myself,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Myself,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Myself,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Myself,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Myself,CLERIC_NEUTRALIZE_POISON)
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_NEUTRALIZE_POISON)
+	See(Player1)
+    StateCheck(Player1,STATE_POISONED)
+    !StateCheck(Player1,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player1)
+	!StateCheck(Player1,STATE_NOT_TARGETABLE)
+	!StateCheck(Player1,STATE_REALLY_DEAD)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player1,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player1,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player1,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player1,CLERIC_NEUTRALIZE_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_NEUTRALIZE_POISON)
+	See(Player2)
+    StateCheck(Player2,STATE_POISONED)
+    !StateCheck(Player2,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player2)
+	!StateCheck(Player2,STATE_NOT_TARGETABLE)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player2,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player2,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player2,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player2,CLERIC_NEUTRALIZE_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_NEUTRALIZE_POISON)
+	See(Player3)
+    StateCheck(Player3,STATE_POISONED)
+    !StateCheck(Player3,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player3)
+	!StateCheck(Player3,STATE_NOT_TARGETABLE)
+	!StateCheck(Player3,STATE_REALLY_DEAD)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player3,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player3,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player3,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player3,CLERIC_NEUTRALIZE_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_NEUTRALIZE_POISON)
+	See(Player4)
+    StateCheck(Player4,STATE_POISONED)
+    !StateCheck(Player4,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player4)
+	!StateCheck(Player4,STATE_NOT_TARGETABLE)
+	!StateCheck(Player4,STATE_REALLY_DEAD)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player4,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player4,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player4,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player4,CLERIC_NEUTRALIZE_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_NEUTRALIZE_POISON)
+	See(Player5)
+    StateCheck(Player5,STATE_POISONED)
+    !StateCheck(Player5,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player5)
+	!StateCheck(Player5,STATE_NOT_TARGETABLE)
+	!StateCheck(Player5,STATE_REALLY_DEAD)
+	!CheckStat(Player5,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player5,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player5,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	!CheckStatGT(Player5,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_TURNING)
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player5,CLERIC_NEUTRALIZE_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_NEUTRALIZE_POISON)
+	See(Player6)
+    StateCheck(Player6,STATE_POISONED)
+    !StateCheck(Player6,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    InParty(Player6)
+	!StateCheck(Player6,STATE_NOT_TARGETABLE)
+	!StateCheck(Player6,STATE_REALLY_DEAD)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player6,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player6,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player6,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player6,CLERIC_NEUTRALIZE_POISON) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(4211) // Lay On Hands (Paladin)
+	See(Player1)
+    !StateCheck(Player1,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player1,51)
+    InParty(Player1)
+	!StateCheck(Player1,STATE_NOT_TARGETABLE)
+	!StateCheck(Player1,STATE_REALLY_DEAD)
+    CheckStat(Player1,0,MINORGLOBE)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player1,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player1,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player1,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player1,4211) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(4211) // Lay On Hands (Paladin)
+	See(Player2)
+    !StateCheck(Player2,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player2,51)
+    InParty(Player2)
+	!StateCheck(Player2,STATE_NOT_TARGETABLE)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+    CheckStat(Player2,0,MINORGLOBE)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player2,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player2,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player2,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player2,4211) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(4211) // Lay On Hands (Paladin)
+	See(Player3)
+    !StateCheck(Player3,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player3,51)
+    InParty(Player3) 
+	!StateCheck(Player3,STATE_NOT_TARGETABLE)
+	!StateCheck(Player3,STATE_REALLY_DEAD)
+    CheckStat(Player3,0,MINORGLOBE)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player3,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player3,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player3,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player3,4211) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(4211) // Lay On Hands (Paladin)
+	See(Player4)
+    !StateCheck(Player4,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player4,51)
+    InParty(Player4)
+	!StateCheck(Player4,STATE_NOT_TARGETABLE)
+	!StateCheck(Player4,STATE_REALLY_DEAD)
+    CheckStat(Player4,0,MINORGLOBE)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player4,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player4,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player4,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player4,4211) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(4211) // Lay On Hands (Paladin)
+	See(Player5)
+    HPPercentLT(Player5,51)
+    InParty(Player5)
+    !StateCheck(Player5,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+	!StateCheck(Player5,STATE_NOT_TARGETABLE)
+	!StateCheck(Player5,STATE_REALLY_DEAD)
+	!CheckStat(Player5,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player5,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player5,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+    CheckStat(Player5,0,MINORGLOBE)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_TURNING)
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player5,4211) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(4211) // Lay On Hands (Paladin)
+	See(Player6)
+    HPPercentLT(Player6,51)
+    InParty(Player6)
+    !StateCheck(Player6,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+	!StateCheck(Player6,STATE_NOT_TARGETABLE)
+	!StateCheck(Player6,STATE_REALLY_DEAD)
+    CheckStat(Player6,0,MINORGLOBE)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player6,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player6,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player6,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player6,4211) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_HEAL)
+	See(Player1)
+    !StateCheck(Player1,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player1,26)
+    InParty(Player1)
+	!StateCheck(Player1,STATE_NOT_TARGETABLE)
+	!StateCheck(Player1,STATE_REALLY_DEAD)
+    CheckStat(Player1,0,MINORGLOBE)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player1,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player1,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player1,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player1,CLERIC_HEAL) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_HEAL)
+	See(Player2)
+    !StateCheck(Player2,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player2,26)
+    InParty(Player2)
+	!StateCheck(Player2,STATE_NOT_TARGETABLE)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+    CheckStat(Player2,0,MINORGLOBE)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player2,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player2,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player2,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player2,CLERIC_HEAL) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_HEAL)
+	See(Player3)
+    !StateCheck(Player3,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player3,26)
+    InParty(Player3)
+	!StateCheck(Player3,STATE_NOT_TARGETABLE)
+	!StateCheck(Player3,STATE_REALLY_DEAD)
+    CheckStat(Player3,0,MINORGLOBE)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player3,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player3,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player3,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player3,CLERIC_HEAL) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_HEAL)
+	See(Player4)
+    !StateCheck(Player4,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player4,26)
+    InParty(Player4)
+	!StateCheck(Player4,STATE_NOT_TARGETABLE)
+	!StateCheck(Player4,STATE_REALLY_DEAD)
+    CheckStat(Player4,0,MINORGLOBE)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player4,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player4,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player4,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player4,CLERIC_HEAL) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_HEAL)
+	See(Player5)
+    !StateCheck(Player5,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player5,26)
+    InParty(Player5)
+	!StateCheck(Player5,STATE_NOT_TARGETABLE)
+	!StateCheck(Player5,STATE_REALLY_DEAD)
+	!CheckStat(Player5,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player5,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player5,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+    CheckStat(Player5,0,MINORGLOBE)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_TURNING)
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player5,CLERIC_HEAL) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_HEAL)
+	See(Player6)
+    HPPercentLT(Player6,26)
+    InParty(Player6)
+    !StateCheck(Player6,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+	!StateCheck(Player6,STATE_NOT_TARGETABLE)
+	!StateCheck(Player6,STATE_REALLY_DEAD)
+    CheckStat(Player6,0,MINORGLOBE)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player6,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player6,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player6,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player6,CLERIC_HEAL) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_MASS_CURE)
+    OR(2)
+      HPPercentLT(Myself,51)
+      HPPercentLT([PC],51)
+      HPPercentLT(SecondNearest([PC]),51)
+      HPPercentLT(ThirdNearest([PC]),51)
+      OR(2)
+        Range([PC],15)
+        Range(SecondNearest([PC]),15)
+    Range(ThirdNearest([PC]),15)
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Myself,CLERIC_MASS_CURE) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_CRITICAL_WOUNDS)
+	See(Player1)
+    !StateCheck(Player1,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player1,51)
+    InParty(Player1)
+	!StateCheck(Player1,STATE_NOT_TARGETABLE)
+	!StateCheck(Player1,STATE_REALLY_DEAD)
+    CheckStat(Player1,0,MINORGLOBE)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player1,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player1,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player1,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player1,CLERIC_CURE_CRITICAL_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_CRITICAL_WOUNDS)
+	See(Player2)
+    !StateCheck(Player2,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player2,51)
+    InParty(Player2)
+	!StateCheck(Player2,STATE_NOT_TARGETABLE)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+    CheckStat(Player2,0,MINORGLOBE)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player2,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player2,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player2,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player2,CLERIC_CURE_CRITICAL_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_CRITICAL_WOUNDS)
+	See(Player3)
+    !StateCheck(Player3,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player3,51)
+    InParty(Player3)
+	!StateCheck(Player3,STATE_NOT_TARGETABLE)
+	!StateCheck(Player3,STATE_REALLY_DEAD)
+    CheckStat(Player3,0,MINORGLOBE)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player3,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player3,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player3,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player3,CLERIC_CURE_CRITICAL_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_CRITICAL_WOUNDS)
+	See(Player4)
+    !StateCheck(Player4,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player4,51)
+    InParty(Player4)
+	!StateCheck(Player4,STATE_NOT_TARGETABLE)
+	!StateCheck(Player4,STATE_REALLY_DEAD)
+    CheckStat(Player4,0,MINORGLOBE)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player4,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player4,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player4,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player4,CLERIC_CURE_CRITICAL_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_CRITICAL_WOUNDS)
+	See(Player5)
+    !StateCheck(Player5,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player5,51)
+    InParty(Player5)
+	!StateCheck(Player5,STATE_NOT_TARGETABLE)
+	!StateCheck(Player5,STATE_REALLY_DEAD)
+	!CheckStat(Player5,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player5,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player5,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+    CheckStat(Player5,0,MINORGLOBE)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_TURNING)
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player5,CLERIC_CURE_CRITICAL_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_CRITICAL_WOUNDS)
+	See(Player6)
+    !StateCheck(Player6,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player6,51)
+    InParty(Player6)
+	!StateCheck(Player6,STATE_NOT_TARGETABLE)
+	!StateCheck(Player6,STATE_REALLY_DEAD)
+    CheckStat(Player6,0,MINORGLOBE)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player6,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player6,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player6,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player6,CLERIC_CURE_CRITICAL_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_SERIOUS_WOUNDS)
+	See(Player1)
+    !StateCheck(Player1,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player1,71)
+    InParty(Player1)
+	!StateCheck(Player1,STATE_NOT_TARGETABLE)
+	!StateCheck(Player1,STATE_REALLY_DEAD)
+    CheckStat(Player1,0,MINORGLOBE)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player1,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player1,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player1,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player1,CLERIC_CURE_SERIOUS_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_SERIOUS_WOUNDS)
+	See(Player2)
+    !StateCheck(Player2,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player2,71)
+    InParty(Player2)
+	!StateCheck(Player2,STATE_NOT_TARGETABLE)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+    CheckStat(Player2,0,MINORGLOBE)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player2,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player2,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player2,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player2,CLERIC_CURE_SERIOUS_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_SERIOUS_WOUNDS)
+	See(Player3)
+    !StateCheck(Player3,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player3,71)
+    InParty(Player3)
+	!StateCheck(Player3,STATE_NOT_TARGETABLE)
+	!StateCheck(Player3,STATE_REALLY_DEAD)
+    CheckStat(Player3,0,MINORGLOBE)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player3,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player3,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player3,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player3,CLERIC_CURE_SERIOUS_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_SERIOUS_WOUNDS)
+	See(Player4)
+    !StateCheck(Player4,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player4,71)
+    InParty(Player4)
+	!StateCheck(Player4,STATE_NOT_TARGETABLE)
+	!StateCheck(Player4,STATE_REALLY_DEAD)
+    CheckStat(Player4,0,MINORGLOBE)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player4,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player4,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player4,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player4,CLERIC_CURE_SERIOUS_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_SERIOUS_WOUNDS)
+	See(Player5)
+    HPPercentLT(Player5,71)
+    InParty(Player5)
+    !StateCheck(Player5,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+	!StateCheck(Player5,STATE_NOT_TARGETABLE)
+	!StateCheck(Player5,STATE_REALLY_DEAD)
+	!CheckStat(Player5,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player5,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player5,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+    CheckStat(Player5,0,MINORGLOBE)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_TURNING)
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player5,CLERIC_CURE_SERIOUS_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_SERIOUS_WOUNDS)
+	See(Player6)
+    HPPercentLT(Player6,71)
+    InParty(Player6)
+    !StateCheck(Player6,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+	!StateCheck(Player6,STATE_NOT_TARGETABLE)
+	!StateCheck(Player6,STATE_REALLY_DEAD)
+    CheckStat(Player6,0,MINORGLOBE)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player6,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player6,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player6,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player6,CLERIC_CURE_SERIOUS_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_MEDIUM_WOUNDS)
+	See(Player1)
+    !StateCheck(Player1,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player1,86)
+    InParty(Player1)
+	!StateCheck(Player1,STATE_NOT_TARGETABLE)
+	!StateCheck(Player1,STATE_REALLY_DEAD)
+    CheckStat(Player1,0,MINORGLOBE)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player1,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player1,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player1,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player1,CLERIC_CURE_MEDIUM_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_MEDIUM_WOUNDS)
+	See(Player2)
+    !StateCheck(Player2,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player2,86)
+    InParty(Player2)
+	!StateCheck(Player2,STATE_NOT_TARGETABLE)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+    CheckStat(Player2,0,MINORGLOBE)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player2,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player2,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player2,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player2,CLERIC_CURE_MEDIUM_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_MEDIUM_WOUNDS)
+	See(Player3)
+    !StateCheck(Player3,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player3,86)
+    InParty(Player3)
+	!StateCheck(Player3,STATE_NOT_TARGETABLE)
+	!StateCheck(Player3,STATE_REALLY_DEAD)
+    CheckStat(Player3,0,MINORGLOBE)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player3,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player3,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player3,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player3,CLERIC_CURE_MEDIUM_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_MEDIUM_WOUNDS)
+	See(Player4)
+    !StateCheck(Player4,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player4,86)
+    InParty(Player4)
+	!StateCheck(Player4,STATE_NOT_TARGETABLE)
+	!StateCheck(Player4,STATE_REALLY_DEAD)
+    CheckStat(Player4,0,MINORGLOBE)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player4,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player4,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player4,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player4,CLERIC_CURE_MEDIUM_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_MEDIUM_WOUNDS)
+	See(Player5)
+    !StateCheck(Player5,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player5,86)
+    InParty(Player5)
+	!StateCheck(Player5,STATE_NOT_TARGETABLE)
+	!StateCheck(Player5,STATE_REALLY_DEAD)
+	!CheckStat(Player5,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player5,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player5,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+    CheckStat(Player5,0,MINORGLOBE)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_TURNING)
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player5,CLERIC_CURE_MEDIUM_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_MEDIUM_WOUNDS)
+	See(Player6)
+    !StateCheck(Player6,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player6,86)
+    InParty(Player6)
+	!StateCheck(Player6,STATE_NOT_TARGETABLE)
+	!StateCheck(Player6,STATE_REALLY_DEAD)
+    CheckStat(Player6,0,MINORGLOBE)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player6,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player6,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player6,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player6,CLERIC_CURE_MEDIUM_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3101) // Cure Light Wounds (Bhaalpower)
+	See(Player1)
+    !StateCheck(Player1,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player1,100)
+    InParty(Player1)
+	!StateCheck(Player1,STATE_NOT_TARGETABLE)
+	!StateCheck(Player1,STATE_REALLY_DEAD)
+    CheckStat(Player1,0,MINORGLOBE)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player1,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player1,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player1,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player1,3101) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3101) // Cure Light Wounds (Bhaalpower)
+	See(Player2)
+    !StateCheck(Player2,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player2,100)
+    InParty(Player2)
+	!StateCheck(Player2,STATE_NOT_TARGETABLE)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+    CheckStat(Player2,0,MINORGLOBE)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player2,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player2,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player2,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player2,3101) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3101) // Cure Light Wounds (Bhaalpower)
+	See(Player3)
+    !StateCheck(Player3,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player3,100)
+    InParty(Player3)
+	!StateCheck(Player3,STATE_NOT_TARGETABLE)
+	!StateCheck(Player3,STATE_REALLY_DEAD)
+    CheckStat(Player3,0,MINORGLOBE)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player3,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player3,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player3,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player3,3101) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3101) // Cure Light Wounds (Bhaalpower)
+	See(Player4)
+    !StateCheck(Player4,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player4,100)
+    InParty(Player4)
+	!StateCheck(Player4,STATE_NOT_TARGETABLE)
+	!StateCheck(Player4,STATE_REALLY_DEAD)
+    CheckStat(Player4,0,MINORGLOBE)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player4,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player4,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player4,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player4,3101) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3101) // Cure Light Wounds (Bhaalpower)
+	See(Player5)
+    !StateCheck(Player5,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player5,100)
+    InParty(Player5)
+	!StateCheck(Player5,STATE_NOT_TARGETABLE)
+	!StateCheck(Player5,STATE_REALLY_DEAD)
+	!CheckStat(Player5,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player5,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player5,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+    CheckStat(Player5,0,MINORGLOBE)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_TURNING)
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player5,3101) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(3101) // Cure Light Wounds (Bhaalpower)
+	See(Player6)
+    !StateCheck(Player6,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player6,100)
+    InParty(Player6)
+	!StateCheck(Player6,STATE_NOT_TARGETABLE)
+	!StateCheck(Player6,STATE_REALLY_DEAD)
+    CheckStat(Player6,0,MINORGLOBE)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player6,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player6,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player6,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player6,3101) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_LIGHT_WOUNDS)
+	See(Player1)
+    !StateCheck(Player1,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player1,100)
+    InParty(Player1)
+	!StateCheck(Player1,STATE_NOT_TARGETABLE)
+	!StateCheck(Player1,STATE_REALLY_DEAD)
+    CheckStat(Player1,0,MINORGLOBE)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player1,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player1,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player1,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player1,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player1,CLERIC_CURE_LIGHT_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_LIGHT_WOUNDS)
+	See(Player2)
+    !StateCheck(Player2,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player2,100)
+    InParty(Player2)
+	!StateCheck(Player2,STATE_NOT_TARGETABLE)
+	!StateCheck(Player2,STATE_REALLY_DEAD)
+    CheckStat(Player2,0,MINORGLOBE)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player2,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player2,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player2,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player2,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player2,CLERIC_CURE_LIGHT_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_LIGHT_WOUNDS)
+	See(Player3)
+    !StateCheck(Player3,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player3,100)
+    InParty(Player3)
+	!StateCheck(Player3,STATE_NOT_TARGETABLE)
+	!StateCheck(Player3,STATE_REALLY_DEAD)
+    CheckStat(Player3,0,MINORGLOBE)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player3,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player3,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player3,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player3,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player3,CLERIC_CURE_LIGHT_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_LIGHT_WOUNDS)
+	See(Player4)
+    !StateCheck(Player4,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player4,100)
+    InParty(Player4)
+	!StateCheck(Player4,STATE_NOT_TARGETABLE)
+	!StateCheck(Player4,STATE_REALLY_DEAD)
+    CheckStat(Player4,0,MINORGLOBE)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player4,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player4,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player4,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player4,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player4,CLERIC_CURE_LIGHT_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_LIGHT_WOUNDS)
+	See(Player5)
+    !StateCheck(Player5,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player5,100)
+    InParty(Player5)
+	!StateCheck(Player5,STATE_NOT_TARGETABLE)
+	!StateCheck(Player5,STATE_REALLY_DEAD)
+	!CheckStat(Player5,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player5,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player5,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+    CheckStat(Player5,0,MINORGLOBE)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player5,0,WIZARD_SPELL_TURNING)
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player5,CLERIC_CURE_LIGHT_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+IF
+	ActionListEmpty()
+    GlobalGT("RR#CLPH","LOCALS",0) // Healing allies
+    OR(2)
+      Global("RR#CLPH","LOCALS",2) // Healing allies even during combat
+      CombatCounter(0) // not in combat
+    OR(2)
+	  !GlobalTimerNotExpired("RR#Cast","LOCALS")
+      CheckStatGT(Myself,0,AURACLEANSING) // Improved Alacrity
+	HaveSpell(CLERIC_CURE_LIGHT_WOUNDS)
+	See(Player6)
+    !StateCheck(Player6,-2147475450) // don't chase after panicked, berserk, confused or charmed targets
+    HPPercentLT(Player6,100)
+    InParty(Player6)
+	!StateCheck(Player6,STATE_NOT_TARGETABLE)
+	!StateCheck(Player6,STATE_REALLY_DEAD)
+    CheckStat(Player6,0,MINORGLOBE)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_DEFLECTION)
+	!CheckStatGT(Player6,0,WIZARD_SPELL_TURNING)
+	!CheckStat(Player6,2,WIZARD_SPELL_TRAP)
+	!CheckStat(Player6,1,CLERIC_SHIELD_OF_THE_ARCHONS)
+    !CheckStat(Player6,7,WIZARD_SPELL_IMMUNITY)  // Spell Immunity: Necromancy
+	CheckStatLT(Myself,50,SPELLFAILUREPRIEST)
+	!StateCheck(Myself,STATE_SILENCED)
+	!CheckStatGT(Myself,0,CLERIC_INSECT_PLAGUE)
+THEN
+	RESPONSE #100
+		SetGlobalTimer("RR#Cast","LOCALS",6)
+		Spell(Player6,CLERIC_CURE_LIGHT_WOUNDS) // note: not using LastSeenBy() here because NPC override scripts often See() each other to check for banters which can disrupt targeting
+END
+
+
+// Turn Undead when idle (doesn't interrupt player input)
+
+IF
+	ActionListEmpty()
+	Global("RR#CLPS","LOCALS",1)  // turning constantly when idle is selected
+	OR(2)
+	  Class(Myself,CLERIC_ALL)
+	  Class(Myself,PALADIN_ALL)
+	!Kit(Myself,INQUISITOR) // Inquisitors can't turn undead
+	!ModalState(TURNUNDEAD)
+THEN
+	RESPONSE #100
+		Turn()
+END
+
+
+// Turn undead when undead creatures are nearby (doesn't interrupt player input)
+
+IF
+	ActionListEmpty()
+	Global("RR#CLPS","LOCALS",0)  // Turning Undead only when undead opponents are nearby
+	OR(2)
+	  Class(Myself,CLERIC_ALL)
+	  Class(Myself,PALADIN_ALL)
+	!Kit(Myself,INQUISITOR) // Inquisitors can't turn undead
+	!ModalState(TURNUNDEAD)
+    OR(2)
+	  Range([EVILCUTOFF.UNDEAD],30) // an undead opponent is nearby
+      Range([CONTROLLED.UNDEAD],30) // a controlled undead is nearby
+THEN
+	RESPONSE #100
+		Turn()
+END
+
+
+// Stop Turning Undead if there was no combat activity for at least 18 seconds and no enemies are nearby, but only if idle (doesn't interrupt player input)
+
+IF
+	ActionListEmpty()
+	Global("RR#CLPA","LOCALS",0) // not attacking enemies
+	Global("RR#CLPS","LOCALS",0) // Turning Undead only when undead opponents are nearby
+	OR(2)
+	  Class(Myself,CLERIC_ALL)
+	  Class(Myself,PALADIN_ALL)
+	!Kit(Myself,INQUISITOR) // Inquisitors can't turn undead
+	ModalState(TURNUNDEAD)
+    OR(2)
+	  !Range([EVILCUTOFF.UNDEAD],30) // no undead opponents are nearby
+      !Range([CONTROLLED.UNDEAD],30) // not controlling any undead
+	CombatCounter(0)
+	Delay(18)
+THEN
+	RESPONSE #100
+		ClearActions(Myself)
+END
+
+
+// Attack the nearest enemy but not while under the effects of Invisibility and/or Sanctuary
+
+IF
+	Global("RR#CLPA","LOCALS",1)
+	ActionListEmpty()
+	!StateCheck(Myself,STATE_INVISIBLE)
+	CheckStatLT(Myself,1,SANCTUARY)
+	See([EVILCUTOFF])
+	!InParty([EVILCUTOFF])
+THEN
+	RESPONSE #100
+		AttackReevaluate([EVILCUTOFF],30)
+END

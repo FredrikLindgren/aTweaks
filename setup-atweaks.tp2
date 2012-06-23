@@ -1695,6 +1695,31 @@ BUT_ONLY_IF_IT_CHANGES
 
 
 
+////////////////////////////////
+// Simple Cleric/Paladin script
+////////////////////////////////
+
+BEGIN @239 DESIGNATED 239 // Simple Cleric/Paladin script
+GROUP @2 // Gameplay tweaks
+REQUIRE_PREDICATE ENGINE_IS ~tob totlm~ @92                                       // Works on ToB and IWD1 +TotLM
+
+// This tweak introduces a simple AI script for Cleric/Paladin PCs which makes them turn undead and heal allies when idle
+
+ACTION_IF GAME_IS ~totlm~ BEGIN
+  COMPILE ~atweaks/baf/iwd/rr#clp01.baf~ EVAL
+END ELSE BEGIN
+  INCLUDE "atweaks/lib/dsandstuff.tpa"                                            // Needs Detectable Spells on BG2:ToB
+  COMPILE ~atweaks/baf/rr#clp01.baf~                                              // Simple Cleric/Paladin script
+END
+COPY_EXISTING ~rr#clp01.bcs~ ~scripts\rr#clp01.bs~                                // move the script to the player scripts folder
+
+APPEND  ~SCRPDESC.2DA~ ~RR#CLP01    RR#CL001    RR#CL002~                         // Set temporary values (to be replaced with custom strings later)
+COPY_EXISTING ~SCRPDESC.2DA~               ~override~                             // Replace temporary values with proper strings
+  REPLACE ~RR#CL001~ @23900                                                       // script title
+  REPLACE ~RR#CL002~ @23901                                                       // script description
+  PRETTY_PRINT_2DA
+BUT_ONLY_IF_IT_CHANGES
+
 
 // ******************************************************* Cosmetic tweaks ********************************************************************************
 ///////////////////////////////////////////////
