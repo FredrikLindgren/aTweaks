@@ -126,7 +126,9 @@ BEGIN
           SAY 0x8 @1020 //Death Knight
           SAY 0xc @1020
         END
-        REPLACE_CRE_ITEM helmnoan #0 #0 #0 none helmet //Helmet
+        PATCH_IF SSHORT_AT LONG_AT 0x2b8 = "-1" BEGIN //Do not overwrite existing items (and we use this together with REPLACE_CRE_ITEM -.-)      
+          REPLACE_CRE_ITEM helmnoan #0 #0 #0 none helmet //Helmet
+        END
         REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
         LPF unturnable END
         LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END //Invisibility detection by script
@@ -441,6 +443,7 @@ BEGIN
           script10 = bpwtsigt
           skipfile02 = ghasts
           skipfile03 = _ghasts
+          skipfile04 = rr#ghast
       END
       LPF ADD_CRE_EFFECT
         INT_VAR
@@ -452,6 +455,12 @@ BEGIN
       END
     BUT_ONLY
   END
+END
+
+ACTION_IF FILE_EXISTS_IN_GAME rr#ghast.bcs BEGIN
+  COPY_EXISTING rr#ghast.bcs override
+    REPLACE_BCS_BLOCK "atweaks/baf/undead/fiend_ghast_old.baf" "atweaks/baf/undead/fiend_ghast_new.baf"
+  BUT_ONLY
 END
 
 COPY "atweaks/spl/undead/fl#ghaau.spl" override
@@ -792,6 +801,7 @@ BEGIN
             script01 = wtasight
             script02 = dw#melee
             script03 = bpwtsigt
+            script04 = d0mummy //quest pack, "gaze of despair"
         END
         LPF cold_spell_immunities END
       END
@@ -966,6 +976,7 @@ BEGIN
             script02 = "mummy01`"
             script03 = dw#melee
             script04 = bpwtsigt
+            script05 = d0mummy //quest pack, "gaze of despair"
         END
         LPF cold_spell_immunities END
       END
