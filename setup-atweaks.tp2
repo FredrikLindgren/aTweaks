@@ -1184,7 +1184,7 @@ EXTEND_BOTTOM dplayer3.bcs "atweaks/baf/regainbhaalpowers1.baf" EVAL
 
 OUTER_SPRINT ToBCheck ""
 EXTEND_BOTTOM ar4000.bcs "atweaks/baf/regainbhaalpowers2.baf" EVAL
-OUTER_SPRINT ToBCheck ~GGT("DefeatedJon",0)~
+OUTER_SPRINT ToBCheck ~GlobalGT("DefeatedJon","GLOBAL",0)~
 EXTEND_BOTTOM ar3000.bcs "atweaks/baf/regainbhaalpowers2.baf" EVAL
 
 
@@ -1232,9 +1232,8 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
-// Add the non-dispellable flag to druidic shapechange weapons if TobEx is detected
+// Add the non-dispellable flag to druidic shapechange weapons if TobEx is, or will be, installed
 // This will prevent the natural weapons of the shapechange forms (i.e. claws and such) from being removed by Dispel Magic and Dead Magic Zones
-ACTION_IF FILE_EXISTS_IN_GAME ~tobex_ini/tobexcore.ini~ BEGIN                      // if TobEx is installed
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
                ~brbrp~                                                             // Brown Bear shape attack
                ~brblp~                                                             // Black Bear shape attack
@@ -1249,16 +1248,12 @@ ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN                                
 COPY_EXISTING ~%file%.itm~ ~override~
   PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
 // =============================================================================== // the actual work starts from here
-    READ_BYTE 0x1b "flags"
-    PATCH_IF (("%flags%" BAND "0b00000001") = "0b00000000") BEGIN                  // if bit 24 isn't set
-      WRITE_BYTE "0x1b" ("%flags%" BOR "0b00000001")                               // set bit 24
-    END
+    WRITE_LONG 0x18 THIS | BIT24
 // =============================================================================== // the actual work ends here
 END                                                                                // ends file size check
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends second ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
-END                                                                                // ends first ACTION_IF FILE_EXISTS_IN_GAME block
 
 
 
