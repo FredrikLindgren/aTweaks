@@ -113,6 +113,7 @@ LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                   
 
 COPY ~atweaks/spl/fey/rr#pjell.spl~ ~override~                                     // Polymorph Mustard Jelly (Sirine)
 ADD_PROJECTILE ~atweaks/pro/rr#ftvap.pro~                                          // New projectile for Toxic Vapors (small area cloud)
+
 COPY ~atweaks/spl/fey/rr#ftvap.spl~ ~override~                                     // Mustard Jelly Toxic Vapors
   SAY NAME1 @1906 SAY NAME2 @1906
   READ_LONG  0x64 ab_off
@@ -120,6 +121,16 @@ COPY ~atweaks/spl/fey/rr#ftvap.spl~ ~override~                                  
   FOR(i=0; i<ab_num; i+=1) BEGIN
     WRITE_SHORT (ab_off+i*0x28+0x26) %rr#ftvap%                                    // use new projectile
   END
+  FOR (i = LONG_AT 0x6a; i < SOURCE_SIZE; i += 0x30) BEGIN
+    READ_BYTE  i + 0xc timing
+    WRITE_LONG i + 0xe timing = 1 ? 0 : 12 //2 rounds for non-instant effects
+  END
+  LPF DELETE_SPELL_EFFECT
+    INT_VAR
+      opcode_to_delete = 206 //should be cumulative according to PnP
+  END
+    
+
 COPY ~atweaks/cre/fey/rr#pjell.cre~ ~override~                                     // Mustard Jelly (PnP style)
 COPY ~atweaks/itm/fey/rr#pjell.itm~ ~override~                                     // Mustard Jelly attack (PnP style)
 COPY ~atweaks/itm/fey/rr#fsiri.itm~ ~override~                                     // Sirine's Boots (movement rate increase, destroyed when polymorphed)

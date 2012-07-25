@@ -2025,6 +2025,7 @@ IF
 	CheckStat(Myself,0,POLYMORPHED) // not polymorphed
 	!HasItem("AROW05",Myself) // Arrow of Biting
 	!HasItem("AROW10",Myself) // Arrow of Piercing
+	Range(NearestEnemyOf(Myself),5) //So we don't polymorph, take a hit in movement rate and then walk up to the enemy
 THEN
 	RESPONSE #35
 		SetInterrupt(FALSE)
@@ -2688,10 +2689,19 @@ END
 
 IF
 	Global("RR#Melee","LOCALS",1)
-    Allegiance(LastSeenBy(Myself),GOODCUTOFF) // safety check
+	Allegiance(LastSeenBy(Myself),GOODCUTOFF) // safety check
+	Range(LastSeenBy(Myself),4) //if we are within melee range
 THEN
 	RESPONSE #100
 		AttackReevaluate(LastSeenBy(Myself),30)
+END
+
+IF
+  Global("RR#Melee","LOCALS",1)
+  Allegiance(LastSeenBy(Myself),GOODCUTOFF)
+THEN
+  RESPONSE #100
+    MoveToObject(LastSeenBy(Myself)) //Walking with MoveToObject leads to smoother behaviour than walking with Attack* actions
 END
 
 IF
