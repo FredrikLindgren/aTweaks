@@ -1,4 +1,14 @@
 
+ACTION_IF GAME_IS ~tutu tutu_totsc~ BEGIN //The items in EasyTutu lack the necessary immunities; using items copied from a Fixpacked BG2 game is easier
+  OUTER_SPRINT ring95 fl#rng95
+  OUTER_SPRINT ring99 fl#rng99
+  COPY "atweaks/itm/undead/fl#rng95.itm" override
+       "atweaks/itm/undead/fl#rng99.itm" override
+END ELSE BEGIN
+  OUTER_SPRINT ring95 ring95
+  OUTER_SPRINT ring99 ring99
+END
+
 INCLUDE "atweaks/lib/dsandstuff.tpa"
 INCLUDE "atweaks/lib/undead.tpa"
 INCLUDE "atweaks/lib/c160_defs.tpa"
@@ -20,7 +30,7 @@ BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
         REPLACE_CRE_ITEM b1-8m2 #0 #0 #0 none weapon1 EQUIP
         REPLACE_CRE_ITEM immune1 #0 #0 #0 none lring
-        REPLACE_CRE_ITEM ring95 #0 #0 #0 none rring
+        REPLACE_CRE_ITEM "%ring95%" #0 #0 #0 none rring
         REMOVE_CRE_ITEM immchs
         LPF RR#MDCRE
           INT_VAR
@@ -129,7 +139,7 @@ BEGIN
         PATCH_IF SSHORT_AT LONG_AT 0x2b8 = "-1" BEGIN //Do not overwrite existing items (and we use this together with REPLACE_CRE_ITEM -.-)      
           REPLACE_CRE_ITEM helmnoan #0 #0 #0 none helmet //Helmet
         END
-        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM "%ring95%" #0 #0 #0 none lring //Standard undead immunities
         LPF unturnable END
         LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 193 END //Invisibility detection by script
         LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 0 END //AC bonus
@@ -338,22 +348,22 @@ BEGIN
         PATCH_IF c <= 80 BEGIN
           SPRINT sword $dksw("%r%")
           PATCH_IF r = 1 BEGIN
-            ADD_CRE_ITEM "%sword%" #0 #0 #0 unstealable weapon1 EQUIP
+            ADD_CRE_ITEM "%sword%" #0 #0 #0 unstealable ~weapon1 weapon2 weapon3 weapon4~ EQUIP
           END ELSE PATCH_IF r = 2 BEGIN
-            ADD_CRE_ITEM "%sword%" #0 #0 #0 unstealable weapon1 EQUIP TWOHANDED
+            ADD_CRE_ITEM "%sword%" #0 #0 #0 unstealable ~weapon1 weapon2 weapon3 weapon4~ EQUIP TWOHANDED
           END ELSE PATCH_IF r = 3 BEGIN
-            ADD_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" weapon1 EQUIP TWOHANDED
+            ADD_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" ~weapon1 weapon2 weapon3 weapon4~ EQUIP TWOHANDED
             ADD_CRE_ITEM fl#brsw #0 #0 #0 unstealable inv1
           END ELSE PATCH_IF r = 4 OR r = 6 BEGIN
-            ADD_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" weapon1 EQUIP
+            ADD_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" ~weapon1 weapon2 weapon3 weapon4~ EQUIP
             ADD_CRE_ITEM fl#brsw #0 #0 #0 unstealable inv1
           END ELSE BEGIN
             ADD_CRE_ITEM fl#dksw5 #0 #1 #0 "unstealable&undroppable" weapon1 EQUIP
-            ADD_CRE_ITEM sw1h02 #0 #0 #0 unstealable weapon2
+            ADD_CRE_ITEM sw1h02 #0 #0 #0 unstealable ~weapon2 weapon3 weapon4~
             ADD_CRE_ITEM fl#brsw #0 #0 #0 unstealable inv1
           END
         END ELSE BEGIN
-          REPLACE_CRE_ITEM sw2h01 #0 #0 #0 unstealable weapon1 EQUIP TWOHANDED
+          ADD_CRE_ITEM sw2h01 #0 #0 #0 unstealable weapon1 EQUIP TWOHANDED
         END
       END
     BUT_ONLY
@@ -376,18 +386,18 @@ ACTION_IF !BG1 OR BGT BEGIN
       r = RANDOM(1 6)
       SPRINT sword $dksw("%r%")
       PATCH_IF r = 1 BEGIN
-        REPLACE_CRE_ITEM "%sword%" #0 #0 #0 unstealable weapon1 EQUIP
+        ADD_CRE_ITEM "%sword%" #0 #0 #0 unstealable ~weapon1 weapon2 weapon3 weapon4~ EQUIP
       END ELSE PATCH_IF r = 2 BEGIN
-        REPLACE_CRE_ITEM "%sword%" #0 #0 #0 unstealable weapon1 EQUIP TWOHANDED
+        ADD_CRE_ITEM "%sword%" #0 #0 #0 unstealable ~weapon1 weapon2 weapon3 weapon4~ EQUIP TWOHANDED
       END ELSE PATCH_IF r = 3 BEGIN
-        REPLACE_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" weapon1 EQUIP TWOHANDED
+        ADD_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" ~weapon1 weapon2 weapon3 weapon4~ EQUIP TWOHANDED
         ADD_CRE_ITEM fl#brsw #0 #0 #0 unstealable inv1
       END ELSE PATCH_IF r = 4 OR r = 6 BEGIN
-        REPLACE_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" weapon1 EQUIP
+        ADD_CRE_ITEM "%sword%" #0 #0 #0 "unstealable&undroppable" ~weapon1 weapon2 weapon3 weapon4~ EQUIP
         ADD_CRE_ITEM fl#brsw #0 #0 #0 unstealable inv1
       END ELSE BEGIN
-        REPLACE_CRE_ITEM fl#dksw5 #0 #1 #0 "unstealable&undroppable" weapon1 EQUIP
-        ADD_CRE_ITEM sw2h01 #0 #0 #0 unstealable weapon2 TWOHANDED
+        ADD_CRE_ITEM fl#dksw5 #0 #1 #0 "unstealable&undroppable" weapon1 EQUIP
+        ADD_CRE_ITEM sw2h01 #0 #0 #0 unstealable ~weapon2 weapon3 weapon4~ TWOHANDED
         ADD_CRE_ITEM fl#brsw #0 #0 #0 unstealable inv1
       END
     END
@@ -590,7 +600,7 @@ BEGIN
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
         REMOVE_CRE_ITEM mage06 _mage06 immune1
-        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring
+        REPLACE_CRE_ITEM "%ring95%" #0 #0 #0 none lring
         REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring
         REPLACE_CRE_ITEM fl#glor1 #0 #0 #0 none weapon1 EQUIP
         REPLACE_CRE_ITEM fl#glor2 #0 #0 #0 none shield
@@ -1069,7 +1079,7 @@ BEGIN
     PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM "%ring95%" #0 #0 #0 none lring //Standard undead immunities
         REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring //+1 or better only
         REPLACE_CRE_ITEM fl#shad #0 #0 #0 none weapon1
         LPF RR#MDCRE
@@ -1388,7 +1398,7 @@ BEGIN
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM "%ring95%" #0 #0 #0 none lring //Standard undead immunities
         REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring
         REPLACE_CRE_ITEM fl#spect #0 #0 #0 none weapon1
         LPF RR#MDCRE
@@ -1471,7 +1481,7 @@ BEGIN
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM "%ring95%" #0 #0 #0 none lring //Standard undead immunities
         REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring
         REPLACE_CRE_ITEM fl#wigh #0 #0 #0 none weapon1
         WRITE_SHORT 0x28 30464 //animation: ghoul
@@ -1558,7 +1568,7 @@ BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
         REPLACE_CRE_ITEM immune1 #0 #0 #0 none lring
         PATCH_IF !"%SOURCE_RES%" STRING_EQUAL_CASE chwraith BEGIN
-          REPLACE_CRE_ITEM ring95 #0 #0 #0 none rring //Standard undead immunities
+          REPLACE_CRE_ITEM "%ring95%" #0 #0 #0 none rring //Standard undead immunities
         END
         PATCH_IF !"%SOURCE_RES%" STRING_EQUAL_CASE telslav BEGIN
           REPLACE_CRE_ITEM fl#wrai #0 #0 #0 none weapon1
@@ -1706,7 +1716,7 @@ BEGIN
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM "%ring95%" #0 #0 #0 none lring //Standard undead immunities
         REPLACE_CRE_ITEM fl#zomb #0 #0 #0 none weapon1
         LPF RR#MDCRE
           INT_VAR
@@ -1782,7 +1792,7 @@ BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
         SAY NAME1 @1037
         SAY NAME2 @1037
-        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM "%ring95%" #0 #0 #0 none lring //Standard undead immunities
         REPLACE_CRE_ITEM immune1 #0 #0 #0 none rring
         REPLACE_CRE_ITEM fl#zomju #0 #0 #0 none weapon1
         LPF illusion_immunity END
@@ -1870,7 +1880,7 @@ BEGIN
       PATCH_INCLUDE "atweaks/lib/fj_cre_validity.tpp"
       PATCH_IF valid BEGIN
         PATCH_INCLUDE "atweaks/lib/fj_cre_reindex.tpp"
-        REPLACE_CRE_ITEM ring95 #0 #0 #0 none lring //Standard undead immunities
+        REPLACE_CRE_ITEM "%ring95%" #0 #0 #0 none lring //Standard undead immunities
         REPLACE_CRE_ITEM fl#zomse #0 #0 #0 none weapon1
         LPF illusion_immunity END
         LPF unturnable END
@@ -1913,7 +1923,7 @@ BEGIN
             newclass = 8 //F/C
             newgen = 4 //undead
             newrace = 148 //Zombie
-            
+
             enforce = 1
         END
         LPF RR#MDCSC
@@ -2083,7 +2093,7 @@ END
          "atweaks/baf/undead/gooddeat.baf" "...atweaks/fl-inlined/%gooddeat%.baf"
   COMPILE ~atweaks/baf/undead/fl#bg1kn.baf~ "...atweaks/fl-inlined/%killgood%.baf" "...atweaks/fl-inlined/%gooddeat%.baf" EVAL
   COPY_EXISTING fl#bg1kn.bcs override
-                killgood.bcs override
+                "%killgood%.bcs" override
     REPLACE_BCS_BLOCK "...atweaks/fl-inlined/bg1kn_old.baf" "...atweaks/fl-inlined/bg1kn_new.baf"
   BUT_ONLY
 END

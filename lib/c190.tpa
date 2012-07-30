@@ -496,6 +496,12 @@ ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
 COPY_EXISTING ~sppr702.spl~  ~override/rr#srbk1.spl~                               // Backup SR's Summon Shambling Mound
 END                                                                                // ends Spell Revisions compatibility block
 
+//Back up Elemental Transformation creatures and restore them after the creature patches, for Refinements-style transformations (less work this way)
+ACTION_IF FILE_EXISTS_IN_GAME li#eltr.spl BEGIN //Refinements HLAs
+  COPY_EXISTING drufir01.cre "atweaks/backup"
+                druear01.cre "atweaks/backup"
+END
+
 
 // Ensure that the mental combat script is assigned to all elementals summoned by arcane spellcasters. Also, these elementals need to start out as NEUTRAL
 
@@ -1891,6 +1897,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
             ~TELELFIR~                                                             // Greater Fire Elemental (16 HD, Watcher's Keep)
             ~YSCARA04~                                                             // Greater Fire Elemental (16 HD, unused?)
               ~UDFIRE~                                                             // Fire Elemental (Underdark portal spawn)
+              tg#did5                                                              // Greater Fire Elemental (Refinements; special)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -1954,6 +1961,8 @@ STR_VAR                                                                         
 "script11"   = "HUMANSHT"                                                          // Big Picture shout script
 "script12"   = "BPWDASGT"                                                          // Big Picture generic AI script
 "script13"   = "BPWTSIGT"                                                          // Big Picture generic AI script
+
+skipfile01 = tg#did5
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
 LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
@@ -2044,6 +2053,27 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+
+DEFINE_PATCH_FUNCTION add_water_elemental_effects BEGIN
+  LAUNCH_PATCH_FUNCTION entangle_immunities END
+  LAUNCH_PATCH_FUNCTION web_immunity END
+  LPF ADD_CRE_EFFECT
+    INT_VAR
+      opcode = 52 //Character tint
+      target = 1
+      parameter1 = 0x02000000
+      parameter2 = 0x2
+      timing = 9
+  END
+  LPF ADD_CRE_EFFECT
+    INT_VAR
+      opcode = 66 //Translucency
+      target = 1
+      parameter1 = 100
+      timing = 9
+  END
+END
+
 // Lesser Water Elemental (8 HD)
 
 COPY    ~atweaks/cre/elementals/rr#ewatl.cre~ ~override~                           // Lesser Water Elemental (hostile)
@@ -2058,6 +2088,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+REMOVE_CRE_EFFECTS
 ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
@@ -2094,8 +2125,7 @@ STR_VAR                                                                         
 "script01"   = ""                                                                  // first AI script name
 "script02"   = "None"                                                              // second AI script name
 END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
-LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
+LPF add_water_elemental_effects END
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -2109,6 +2139,7 @@ SAY NAME1 @2119 SAY NAME2 @2119 SAY SELECT_COMMON1 @471 SAY BATTLE_CRY1 @471 SAY
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
             ~rr#ewatr~                                                             // Water Elemental (aTweaks)
+            tg#wel2                                                                // Water Elemental (Refinements)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -2116,7 +2147,11 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+REMOVE_CRE_ITEM tg#wel2
+REMOVE_CRE_EFFECTS
 ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
+REPLACE_CRE_ITEM rr#etrai #0 #0 #0 none helmet
+REPLACE_CRE_ITEM rr#ewatr #0 #0 #0 none weapon1
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "5"                                                                   // new movement rate
@@ -2153,8 +2188,7 @@ STR_VAR                                                                         
 "script01"   = ""                                                                  // first AI script name
 "script02"   = "None"                                                              // second AI script name
 END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
-LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
+LPF add_water_elemental_effects END
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -2165,6 +2199,7 @@ END                                                                             
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
             ~ELWATG01~                                                             // Greater Water Elemental
+            tg#wel3                                                                // Greater Water Elemental (Refinements)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -2173,8 +2208,9 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 SAY SELECT_COMMON1 @471 SAY BATTLE_CRY1 @471 SAY BATTLE_CRY2 @472 SAY ATTACK1 @473 SAY ATTACK2 @474 SAY DAMAGE @475 SAY DYING @476 SAY SELECT_ACTION1 @477
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+REMOVE_CRE_EFFECTS
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
-REMOVE_CRE_ITEM ~WALLPASS~                                                         // remove wallpass item
+REMOVE_CRE_ITEM ~WALLPASS~ tg#wel3
 ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 REPLACE_CRE_ITEM ~RR#EWATG~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
@@ -2220,8 +2256,7 @@ STR_VAR                                                                         
 "script06"   = "dw#melee"                                                          // SCSII melee AI script
 "script07"   = "BPWTASGT"                                                          // Big Picture generic AI script
 END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
-LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
+LPF add_water_elemental_effects END
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -2242,6 +2277,7 @@ LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END                
 // =============================================================================== // the actual work starts from here
 REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
 REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
+REMOVE_CRE_EFFECTS
 ADD_MEMORIZED_SPELL ~rr#ecncl~ #0 ~innate~ ( 1 )                                   // adds 1x Elemental Concealment
 ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                            // add elemental traits
 ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~                 // item which makes creatures invisible and untargetable while they gate in
@@ -2281,8 +2317,7 @@ STR_VAR                                                                         
 "script01"   = ""                                                                  // first AI script name
 "script02"   = "None"                                                              // second AI script name
 END                                                                                // ends FUNCTION call
-LAUNCH_PATCH_FUNCTION entangle_immunities END                                      // grant immunity to entangle spells
-LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunity to web spells and effects
+LPF add_water_elemental_effects END
 // =============================================================================== // the actual work ends here
 BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
@@ -3011,6 +3046,16 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
+//Restore the backed-up Refinements creatures (vide supra)
+ACTION_IF FILE_EXISTS_IN_GAME li#eltr.spl BEGIN
+  ACTION_IF FILE_EXISTS "atweaks/backup/drufir01.cre" BEGIN
+    COPY "atweaks/backup/drufir01.cre" override
+  END
+  ACTION_IF FILE_EXISTS "atweaks/backup/druear01.cre" BEGIN
+    COPY "atweaks/backup/druear01.cre" override
+  END
+END
+
 
 //////////////////
 // New AI Scripts
@@ -3118,11 +3163,13 @@ READ_LONG  0x6a "fx_off"
       PATCH_IF ("%opcode%" = 111 AND "%resref%" STRING_EQUAL_CASE ~EARTHRN~) BEGIN  // effect #111: Create Magical Weapon
        WRITE_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "rr#esher" #8 // use aTweaks' item
       END
-      PATCH_IF ("%opcode%" = 111 AND "%resref%" STRING_EQUAL_CASE ~PLYSALA~) BEGIN  // effect #111: Create Magical Weapon
+      PATCH_IF ("%opcode%" = 111 AND ("%resref%" STRING_EQUAL_CASE ~PLYSALA~ OR      // effect #111: Create Magical Weapon
+                                      "%resref%" STRING_EQUAL_CASE LI#PLSAL)) BEGIN  //Refinements, shapeshifting fix (we don't bother with replicating the auto-recreating items, because it is a lot of work and the user will very likely have ToBEx or eq.)
        WRITE_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "rr#eshsa" #8 // use aTweaks' item
       END
     END
   END
+
 
 // Remove Breathe Fireball ability from Fire Salamanders
 
@@ -3293,6 +3340,8 @@ ACTION_FOR_EACH ~file~ IN                                                       
             ~elemzaam~                                                             // Zaaman Rul
               ~servsu~                                                             // Aerial Servant
               ~stalke~                                                             // Invisible Stalker
+              tg#wel2                                                              // Water Elemental (Refinements)
+              tg#wel3                                                              // Greater Water Elemental (Refinements)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the designated file with an ITM extension exists
 COPY_EXISTING ~%file%.cre~ ~override~
