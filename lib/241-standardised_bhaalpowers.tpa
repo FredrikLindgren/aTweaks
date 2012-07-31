@@ -1,0 +1,14 @@
+
+// This tweak reduces the casting time of all SoA Bhaalpowers to 1 in order to match the ToB Bhaalpowers
+COPY_EXISTING ~spin101.spl~ ~override~ // Bhaalpower Cure Light Wounds
+              ~spin102.spl~ ~override~ // Bhaalpower Slow Poison
+              ~spin103.spl~ ~override~ // Bhaalpower Draw Upon Holy Might
+              ~spin104.spl~ ~override~ // Bhaalpower Larloch's Minor Drain
+              ~spin105.spl~ ~override~ // Bhaalpower Horror
+              ~spin106.spl~ ~override~ // Bhaalpower Vampiric Touch
+  READ_LONG  0x64 "abil_off"
+  READ_SHORT 0x68 "abil_num"
+  FOR ("index" = 0; "%index%" < "%abil_num%"; "index" = ("%index%" + 1)) BEGIN  // cycle through abilities
+    WRITE_SHORT ("%abil_off%" + 0x12 + ("%index%" * 0x28)) 1                    // set casting time to 1
+  END
+BUT_ONLY_IF_IT_CHANGES

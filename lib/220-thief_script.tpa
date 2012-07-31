@@ -1,0 +1,21 @@
+
+ACTION_IF GAME_IS iwd2 BEGIN
+  OUTER_SPRINT SeeDead ~,0~
+END ELSE BEGIN
+  OUTER_SPRINT SeeDead ~~
+END
+
+// This tweak introduces a simple AI script for Thief PCs which makes them search for traps or hide in shadows when idle
+ACTION_IF GAME_IS ~totlm iwd2~ BEGIN
+  COMPILE ~atweaks/baf/iwd/rr#thf01.baf~ EVAL
+END ELSE BEGIN
+  COMPILE ~aTweaks/BAF/RR#THF01.BAF~                                                // Simple Thief script
+END
+COPY_EXISTING ~RR#THF01.BCS~ ~scripts\RR#THF01.BS~                                // move the script to the player scripts folder
+
+APPEND  ~SCRPDESC.2DA~ ~RR#THF01    RR#TS001    RR#TS002~                         // Set temporary values (to be replaced with custom strings later)
+COPY_EXISTING ~SCRPDESC.2DA~               ~override~                             // Replace temporary values with proper strings
+  REPLACE ~RR#TS001~ @221                                                         // script title
+  REPLACE ~RR#TS002~ @222                                                         // script description
+  PRETTY_PRINT_2DA
+BUT_ONLY_IF_IT_CHANGES

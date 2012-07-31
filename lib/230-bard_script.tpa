@@ -1,0 +1,37 @@
+
+ACTION_IF GAME_IS iwd2 BEGIN
+  OUTER_SPRINT SeeDead ~,0~
+  OUTER_SPRINT LevelBard CLASSLEVELBARD
+END ELSE BEGIN
+  OUTER_SPRINT SeeDead ~~
+  OUTER_SPRINT LevelBard LEVEL
+END
+
+// This tweak introduces a simple AI script for Bard PCs which makes them sing the battlesong when idle
+ACTION_IF GAME_IS ~totlm iwd2~ BEGIN
+  COMPILE ~atweaks/baf/iwd/rr#brd01.baf~ EVAL
+END ELSE BEGIN
+  COMPILE ~aTweaks/BAF/RR#brd01.BAF~                                              // Simple Bard script
+END
+
+ACTION_IF FILE_EXISTS_IN_GAME ~RR#BSBI1.RR~ THEN BEGIN
+  COMPILE ~aTweaks/BAF/JES/RR#BRD01.BAF~                                          // Simple Bard script (Jesters doesn't sing while invisible)
+END
+
+ACTION_IF FILE_EXISTS_IN_GAME ~RR#BSBI2.RR~ THEN BEGIN
+  COMPILE ~aTweaks/BAF/ALT/RR#BRD01.BAF~                                          // Simple Bard script (All bards don't sing while invisible)
+END
+
+COPY_EXISTING ~RR#BRD01.BCS~ ~scripts\RR#BRD01.BS~                                // move the script to the player scripts folder
+
+APPEND  ~SCRPDESC.2DA~ ~RR#BRD01    RR#BS001    RR#BS002~                         // Set temporary values (to be replaced with custom strings later)
+
+COPY_EXISTING ~SCRPDESC.2DA~               ~override~                             // Replace temporary values with proper strings
+  REPLACE ~RR#BS001~ @231                                                         // script title
+  PATCH_IF GAME_IS ~totlm iwd2~ BEGIN
+    REPLACE ~RR#BS002~ @238
+  END ELSE BEGIN
+    REPLACE ~RR#BS002~ @232                                                         // script description
+  END
+  PRETTY_PRINT_2DA
+BUT_ONLY_IF_IT_CHANGES

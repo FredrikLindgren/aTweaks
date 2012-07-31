@@ -1,0 +1,33 @@
+
+COPY ~atweaks/spl/fey/sppr410.spl~   ~override~                                    // Call Woodland Beings spell
+  SAY DESC @1895 SAY UNIDENTIFIED_DESC @1895
+
+COPY ~atweaks/itm/rr#dinv.itm~  ~override~                                         // item which makes creatures untargetable until the gating animation finishes
+     ~atweaks/eff/fey/rr#sdrya.eff~   ~override~                                   // Summon Dryad EFF
+     ~atweaks/eff/fey/rr#shama.eff~   ~override~                                   // Summon Hamadryad EFF
+     ~atweaks/eff/fey/rr#snymp.eff~   ~override~                                   // Summon Nymph EFF
+
+COPY_EXISTING ~dry01.cre~    ~override/rr#sdrya.cre~                               // Summoned Dryad
+              ~hamasu.cre~   ~override/rr#shama.cre~                               // Summoned Hamadryad
+             ~nymphsu.cre~   ~override/rr#snymp.cre~                               // Summoned Nymph
+  ADD_CRE_ITEM ~RR#DINV~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~AMULET~               // item which makes creatures invisible and untargetable while they gate in
+  ADD_MEMORIZED_SPELL ~rr#usumn~ #0 ~innate~ ( 1 )                                 // adds 1x Unsummon
+  WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
+  WRITE_ASCIIE 0x248 "%DEST_RES%" #8                                               // Override script
+  WRITE_ASCII  0x250 ~~ #8                                                         // disable class AI script
+  WRITE_ASCII  0x258 ~~ #8                                                         // disable race AI script
+  WRITE_ASCII  0x260 ~~ #8                                                         // disable general AI script
+  WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
+  WRITE_BYTE   0x270 128                                                           // set intial allegiance to Neutral
+  WRITE_BYTE   0x275 2                                                             // set gender to Female (treated as gated creatures)
+  WRITE_LONG   0x001c 0                                                            // set gold carried to 0
+  WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32                                              // death variable
+  WRITE_ASCII  0x2cc ~~ #8                                                         // dialogue file
+  READ_LONG 0x2bc io
+  FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN                                              // Make all items unstealable&undroppable
+    WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
+  END
+
+COMPILE ~atweaks/baf/fey/rr#sdrya.baf~                                             // Summoned Dryad AI script
+        ~atweaks/baf/fey/rr#shama.baf~                                             // Summoned Hamadryad AI script
+        ~atweaks/baf/fey/rr#snymp.baf~                                             // Summoned Nymph AI script

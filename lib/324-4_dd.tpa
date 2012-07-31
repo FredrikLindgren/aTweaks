@@ -1,0 +1,54 @@
+
+COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override~                                    // IWD1's Dimension Door animation
+COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override~                                    // IWD1's Dimension Door sound effect
+COPY    ~atweaks/bam/rr#ddbg2.bam~   ~override~                                    // Default BG2 Dimension Door animation (needed for a few static animations)
+
+// Ensure that the portal in Sendai's lair always uses the BG2-style Dimension Door animation (IWD-style doesn't look so good here)
+COPY_EXISTING ~ar6108.are~ ~override~
+  READ_LONG 0xac "anim_num"
+  READ_LONG 0xb0 "anim_off"
+  FOR (index = 0 ; index < anim_num ; index = index + 1) BEGIN
+    READ_ASCII ("%anim_off%" + ("%index%" * 0x4c)) "anim_name"
+    PATCH_IF ("%anim_name%" STRING_EQUAL_CASE "SPDIMNDR") BEGIN
+      WRITE_ASCII ("%anim_off%" + 0x28 + ("%index%" * 0x4c)) "rr#ddbg2" #8 // Animation resref (BAM)
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+COPY_EXISTING_REGEXP GLOB ~.*\.dlg$~ override
+  DECOMPILE_DLG_TO_D
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~CreateCreatureDoor(\(\".+\"\),\(\[-?[0-9]+\.-?[0-9]+\]\),\([0-9]+\))~
+                                                       ~CreateVisualEffect("spdimndr",\2) Wait(1) CreateCreature(\1,\2,\3)~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~CreateCreatureObjectDoor(\(\".+\"\),\(\"?.+\"?\),\([0-9]+\),\([0-9]+\),\([0-9]+\))~
+                                                       ~CreateVisualEffectObject("spdimndr",\2) Wait(1) CreateCreatureObject(\1,\2,\3,\4,\5)~
+  COMPILE_D_TO_DLG
+IF ~CreateCreatureDoor\|CreateCreatureObjectDoor~
+BUT_ONLY
+
+COPY_EXISTING_REGEXP GLOB ~.*\.bcs$~ override
+  DECOMPILE_BCS_TO_BAF
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~CreateCreatureDoor(\(\".+\"\),\(\[-?[0-9]+\.-?[0-9]+\]\),\([0-9]+\))~
+                                                       ~CreateVisualEffect("spdimndr",\2) Wait(1) CreateCreature(\1,\2,\3)~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~CreateCreatureObjectDoor(\(\".+\"\),\(\"?.+\"?\),\([0-9]+\),\([0-9]+\),\([0-9]+\))~
+                                                       ~CreateVisualEffectObject("spdimndr",\2) Wait(1) CreateCreatureObject(\1,\2,\3,\4,\5)~
+  COMPILE_BAF_TO_BCS
+IF ~23[12]OB~
+BUT_ONLY
+
+ACTION_FOR_EACH file IN spwi402 spwi450 spwi995 BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.spl" BEGIN
+    COPY_EXISTING "%file%.spl" override
+      PATCH_IF SOURCE_SIZE > 0x72 BEGIN
+        FOR (READ_LONG 0x6a fx_off;fx_off<SOURCE_SIZE;fx_off+=0x30) BEGIN
+          READ_SHORT fx_off       opcode ELSE 999
+          READ_BYTE  fx_off + 0xc timing ELSE 999
+          READ_LONG  fx_off + 0xe time   ELSE 0
+          PATCH_IF (opcode = 68 OR opcode = 124 OR opcode = 168) AND timing = 4 AND time > 1 BEGIN
+            WRITE_LONG fx_off + 0xe 1
+          END
+        END
+      END
+    BUT_ONLY
+  END
+END

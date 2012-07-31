@@ -1,0 +1,24 @@
+
+// This tweak changes the appearance of Valygar's armor to leather (rather than chain) and changes its colorization in order to match its inventory picture
+
+COPY_EXISTING ~npchan.itm~ ~override~                                              // Valygar's armor
+  WRITE_ASCII 0x22 ~2A~ #2                                                         // set the paperdoll animation ID to leather (2A)
+    READ_LONG   0x64 "abil_off"
+    READ_SHORT  0x68 "abil_num"
+    READ_LONG   0x6a "fx_off"
+    READ_SHORT  0x70 "fx_num"
+    FOR (index2 = 0 ; index2 < fx_num ; index2 = index2 + 1) BEGIN
+      READ_SHORT ("%fx_off%" +        ("%index2%" * 0x30)) "opcode"
+      READ_SHORT ("%fx_off%" + 0x04 + ("%index2%" * 0x30)) "param1"
+      READ_SHORT ("%fx_off%" + 0x08 + ("%index2%" * 0x30)) "param2"
+      PATCH_IF (("%opcode%" = 7) AND  ("%param2%" = 5)) BEGIN                      // set character color, location - Armor (5)
+      WRITE_SHORT ("%fx_off%" + 0x04 + ("%index2%" * 0x30)) "60"                   // Color gradient 60 (dark purple)
+      END
+      PATCH_IF (("%opcode%" = 7) AND ("%param2%" = 4)) BEGIN                       // set character color, location - Strap color (4)
+      WRITE_SHORT ("%fx_off%" + 0x04 + ("%index2%" * 0x30)) "60"                   // color gradient 60 (dark purple)
+      END
+      PATCH_IF (("%opcode%" = 7) AND ("%param2%" = 0)) BEGIN                       // set character color, location - Belt Buckle (0)
+      WRITE_SHORT ("%fx_off%" + 0x04 + ("%index2%" * 0x30)) "60"                   // color gradient 60 (dark purple)
+      END
+    END
+BUT_ONLY_IF_IT_CHANGES

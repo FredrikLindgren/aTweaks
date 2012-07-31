@@ -1,0 +1,17 @@
+
+// This tweak prevents Project Image and Simulacrum clones from using quickslot items
+
+COPY_EXISTING ~PROJIMAG.SPL~ ~override~                                            // Project Image spell effects which apply to the clone
+              ~SIMULACR.SPL~ ~override~                                            // Simulacrum spell effects which apply to the clone
+  PATCH_FOR_EACH parameter2 IN 9 11 12 BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+        opcode = 144                                                               // effect: #144 (disable Button)
+        target = 1                                                                 // target: 1 (self)
+        parameter2
+        timing = 9                                                                 // timing mode: 9 (permanent after death)
+        header = 0
+        insert_point = 0
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES

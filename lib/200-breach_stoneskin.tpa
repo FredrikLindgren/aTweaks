@@ -1,0 +1,82 @@
+
+COPY_EXISTING ~stonskin.itm~ ~override~ // ring which grants the stoneskin effect while equipped (used by Mekrath, Rayic Gethras, Terminsel... etc.)
+  PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+    READ_LONG   0x64 "abil_off"
+    READ_SHORT  0x68 "abil_num"
+    READ_LONG   0x6a "fx_off"
+    READ_SHORT  0x70 "fx_num"
+    FOR (index = 0; index < "%fx_num%"; index = index + 1) BEGIN // loop through global effects
+      READ_SHORT ("%fx_off%" +        ("%index%" * 0x30)) "type" // read effect type
+      PATCH_IF ("%type%" = 218) BEGIN // if the effect is #218 (stoneskin)
+        DELETE_BYTES ("%fx_off%" +        ("%index%" * 0x30)) 0x30 // delete effect
+        SET "fx_num" = ("%fx_num%" - 1) // indicate that 1 global effect has been removed
+        SET "index" = ("%index%" - 1) // end loop
+      END
+    END
+    INSERT_BYTES("%fx_off%"       ) 0x30 // add new global effect
+    WRITE_SHORT ("%fx_off%"       ) 146 // effect: #146 (cast spell at creature)
+    WRITE_BYTE  ("%fx_off%" + 0x02) 1 // target: 1 (self)
+    WRITE_LONG  ("%fx_off%" + 0x08) 1 // param2: 1 (cast instantly)
+    WRITE_BYTE  ("%fx_off%" + 0x0c) 2 // timing mode: 2 (while equipped)
+    WRITE_BYTE  ("%fx_off%" + 0x0d) 3 // resist: 3 (dispellable and bypasses magic resistance)
+    WRITE_BYTE  ("%fx_off%" + 0x12) 100 // probability: 100%
+    WRITE_ASCII ("%fx_off%" + 0x14) ~RR#STONS~ #8 // resref: RR#STONS (cloned stoneskin which lasts forever)
+    SET "fx_num" = ("%fx_num%" + 1) // indicate that 1 global effect has been added
+    WRITE_SHORT 0x70 "%fx_num%" // update the number of global effects
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+// Clone stoneskin into a custom spell which will be used by the ring
+COPY_EXISTING ~spwi408.spl~  ~override/RR#STONS.SPL~
+  PATCH_IF (%SOURCE_SIZE%>0x71) THEN BEGIN
+    SAY NAME1 #0 // null spell name to remove combat log feedback
+    WRITE_SHORT   0x22  0    // remove casting graphics
+    WRITE_ASCII   0x10 ~~ #8 // remove casting sound
+    READ_LONG  0x64 "abil_off"
+    READ_SHORT 0x68 "abil_num"
+    READ_LONG  0x6a "fx_off"
+    SET "fx_delta" = 0
+    FOR (index = 0; index < abil_num; index = index + 1) BEGIN
+      READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+      READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+      SET "abil_fx_idx" = ("%abil_fx_idx%" + "%fx_delta%")
+      WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
+      FOR (index2 = 0; index2 < abil_fx_num; index2 = index2 + 1) BEGIN
+        READ_SHORT ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "opcode"
+        PATCH_IF ("%opcode%" = 218) BEGIN // if the effect is #218 (stoneskin)
+          WRITE_BYTE ("%fx_off%" + 0x0c + (("%abil_fx_idx%" + "%index2%") * 0x30)) 1 // set timing mode to 1 (permanent)
+          WRITE_LONG ("%fx_off%" + 0x0e + (("%abil_fx_idx%" + "%index2%") * 0x30)) 0 // null duration
+        END
+        PATCH_IF ("%opcode%" = 215 OR "%opcode%" = 174 OR "%opcode%" = 50) BEGIN // remove visual and sound fx
+          DELETE_BYTES ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) 0x30 // delete effect
+          SET "fx_delta" = "%fx_delta%" - 1
+          SET "index2" = "%index2%" - 1
+          SET "abil_fx_num" = "%abil_fx_num%" - 1
+        END
+        WRITE_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%")
+      END
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Make the Gargoyle Boots cast a proper Stoneskin spell instead of mimicking its effect
+ACTION_IF ENGINE_IS ~tob~ THEN BEGIN                                               // ToB engine required
+  ACTION_IF NOT MOD_IS_INSTALLED ITEM_REV.TP2 0 THEN BEGIN                         // Item Revisions mod check
+    COPY ~aTweaks/SPL/RR#BT12.SPL~ ~override~                                      // Empty Stoneskin spell shell (used for inheriting item effects)
+    
+    COPY_EXISTING ~boot12.itm~ ~override~                                          // Gargoyle Boots
+      LPF ITEM_EFFECT_TO_SPELL STR_VAR new_itm_spl = RR#BT12.SPL END
+      LPF DELETE_ITEM_EFFECT INT_VAR opcode_to_delete = "-1" header = 1 END
+      LPF ADD_ITEM_EFFECT
+        INT_VAR
+          opcode = 146                                                             // effect: #146 (cast spell at creature)
+          target = 1                                                               // target: 1 (self)
+          parameter2 = 1                                                           // param2: 1 (cast instantly)
+          timing = 1                                                               // timing mode: 1 (instant/permanent)
+          resist_disepl = 3                                                        // dispel/resistance: 3 (dispellable and bypasses magic resistance)
+        STR_VAR
+          resource = RR#BT12                                                       // resref: RR#BT12.SPL (newly created custom Stoneskin spell)
+      END
+  END
+END

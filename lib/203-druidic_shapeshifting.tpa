@@ -1,0 +1,53 @@
+
+// This tweak reduces the casting time of the druidic shapeshifting abilities to 0 which effectively makes them uninterruptable
+// It also flags these abilities as non-magical which prevents Wild Magic and Dead Magic zones from affecting them
+ACTION_FOR_EACH ~file~ IN
+              ~spcl611~                                                            // Druid Shapeshift Brown Bear
+              ~spcl612~                                                            // Druid Shapeshift Wolf
+              ~spcl613~                                                            // Druid Shapeshift Black Bear
+              ~spcl632~                                                            // Avenger Shapeshift Spider
+              ~spcl633~                                                            // Avenger Shapeshift Baby Wyvern
+              ~spcl634~                                                            // Avenger Shapeshift Fire Salamander
+              ~spcl643~                                                            // Shapeshifter Werewolf Transformation
+              ~spcl644~                                                            // Shapeshifter Greater Werewolf Transformation
+              ~sppr731~                                                            // Druid Fire Elemental Transformation
+              ~sppr732~                                                            // Druid Earth Elemental Transformation
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
+    COPY_EXISTING ~%file%.spl~ ~override~
+      PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN                                   // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+        READ_LONG  0x64 "abil_off"
+        READ_SHORT 0x68 "abil_num"
+        READ_BYTE  0x19 "flags"
+        PATCH_IF (("%flags%" BAND 0b01000000) != 0b01000000) BEGIN // only patch if the "simplified duration" flag is unchecked
+          WRITE_BYTE 0x19 ("%flags%" BOR 0b01000000) // add the "simplified duration" flag (this actually marks the ability as non-magical)
+        END
+        FOR ("index" = 0; "%index%" < "%abil_num%"; "index" = ("%index%" + 1)) BEGIN  // cycle through abilities
+          WRITE_SHORT ("%abil_off%" + 0x12 + ("%index%" * 0x28)) 0                    // set casting time to 0
+        END
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Add the non-dispellable flag to druidic shapechange weapons if TobEx is, or will be, installed
+// This will prevent the natural weapons of the shapechange forms (i.e. claws and such) from being removed by Dispel Magic and Dead Magic Zones
+ACTION_FOR_EACH ~file~ IN
+               ~brbrp~                                                             // Brown Bear shape attack
+               ~brblp~                                                             // Black Bear shape attack
+               ~wolfm~                                                             // Wolf shape attack
+             ~plyspid~                                                             // Sword Spider shape attack
+            ~plywyvrn~                                                             // Baby Wyvern shape attack
+             ~plysala~                                                             // Fire Salamander shape attack
+              ~drufir~                                                             // Fire Elemental shape attack
+              ~druear~                                                             // Earth Elemental shape attack
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
+    COPY_EXISTING ~%file%.itm~ ~override~
+      PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN
+        WRITE_LONG 0x18 THIS | BIT24
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END

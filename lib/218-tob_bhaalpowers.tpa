@@ -1,0 +1,25 @@
+
+ACTION_IF BGT BEGIN
+  OUTER_SPRINT BG2Check ~Global("ENDOFBG1","GLOBAL",2)~
+END ELSE BEGIN
+  OUTER_SPRINT BG2Check ~~
+END
+
+ACTION_FOR_EACH spell IN spin101 spin102 spin103 spin104 spin105 spin106 BEGIN //Stinkin' game's hard-coded to remove the SPIN###s in ToB
+  OUTER_PATCH_SAVE shell "%spell%" BEGIN
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH spin fl#gp
+  END
+  OUTER_PATCH_SAVE copy "%spell%" BEGIN
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH spin fl#bp
+  END
+  COPY_EXISTING "%spell%.spl" "override/%copy%.spl"
+  COPY "atweaks/spl/base.spl" "override/%shell%.spl"
+    LPF ADD_SPELL_EFFECT INT_VAR opcode = 171 target = 2 timing = 1 STR_VAR resource = EVAL "%copy%" END
+END
+
+EXTEND_BOTTOM dplayer3.bcs "atweaks/baf/regainbhaalpowers1.baf" EVAL
+
+OUTER_SPRINT ToBCheck ""
+EXTEND_BOTTOM ar4000.bcs "atweaks/baf/regainbhaalpowers2.baf" EVAL
+OUTER_SPRINT ToBCheck ~GlobalGT("DefeatedJon","GLOBAL",0)~
+EXTEND_BOTTOM ar3000.bcs "atweaks/baf/regainbhaalpowers2.baf" EVAL

@@ -1,0 +1,20 @@
+
+COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override~                                    // IWD1's Dimension Door animation
+COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override~                                    // IWD1's Dimension Door sound effect
+COPY    ~atweaks/bam/rr#ddbg2.bam~   ~override~                                    // Default BG2 Dimension Door animation (needed for a few static animations)
+
+COPY_EXISTING ~SPDIMNDR.VVC~ ~override~                                            // Dimension Door VVC
+  WRITE_LONG  0x34 "5"                                                             // Set the frame rate to 5
+BUT_ONLY_IF_IT_CHANGES
+
+// Ensure that the portal in Sendai's lair always uses the BG2-style Dimension Door animation (IWD-style doesn't look so good here)
+COPY_EXISTING ~ar6108.are~ ~override~
+  READ_LONG 0xac "anim_num"
+  READ_LONG 0xb0 "anim_off"
+  FOR (index = 0 ; index < anim_num ; index = index + 1) BEGIN
+    READ_ASCII ("%anim_off%" + ("%index%" * 0x4c)) "anim_name"
+    PATCH_IF ("%anim_name%" STRING_EQUAL_CASE "SPDIMNDR") BEGIN
+      WRITE_ASCII ("%anim_off%" + 0x28 + ("%index%" * 0x4c)) "rr#ddbg2" #8 // Animation resref (BAM)
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES

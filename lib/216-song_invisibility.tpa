@@ -1,0 +1,60 @@
+
+
+// Apply the tweak to Jester songs only
+ACTION_FOR_EACH ~file~ IN
+              ~SPCL751A~                                                           // default Jester song
+              ~RR#BJS00~                                                           // Rogue Rebalancing Jester song
+              ~RR#BJS02~                                                           // Rogue Rebalancing Jester Enhanced song
+              ~RR#BJS04~                                                           // Rogue Rebalancing Jester Lingering song
+                ~a!gyps~                                                           // Song and Silence Gypsy song
+              ~a!dssong~                                                           // Song and Silence Dirgesinger song
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
+    COPY_EXISTING ~%file%.spl~ ~override~
+      PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN                                   // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+        LAUNCH_PATCH_FUNCTION ~RR#AGLEF~                                           // Start FUNCTION call (my custom "Add Global Effect" function)
+          INT_VAR                                                                  // initialize variables
+            "rr#opcode" = "136"                                                    // effect: #136 (force visible)
+            "rr#target" = "1"                                                      // target: 1 (self)
+            "rr#timing" = "1"                                                      // timing mode: 1 (permanent)
+            "rr#prob1" = "100"                                                     // probability1: 100%
+        END
+        PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                         // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+// All Bard songs break invisibility
+ACTION_IF !jester_song BEGIN
+  ACTION_FOR_EACH ~file~ IN
+                  ~SPCL542A~                                                       // default Skald song
+                  ~SPCL920A~                                                       // default Enhanced Bard song HLA
+                  ~fjbarda~                                                        // G3 BG2 Fixpack Bard song #1
+                  ~fjbardb~                                                        // G3 BG2 Fixpack Bard song #2
+                  ~fjbladeb~                                                       // G3 BG2 Fixpack Blade song
+                  ~RR#BDF02~                                                       // Rogue Rebalancing True Bard song
+                  ~RR#BBL02~                                                       // Rogue Rebalancing Blade song
+                  ~RR#BSK00~                                                       // Rogue Rebalancing Skald song
+                  ~RR#BDF04~                                                       // Rogue Rebalancing True Bard Enhanced song
+                  ~RR#BDF06~                                                       // Rogue Rebalancing True Bard Lingering song
+                  ~RR#BSK02~                                                       // Rogue Rebalancing Skald Enhanced song
+                  ~RR#BSK04~                                                       // Rogue Rebalancing Skald Lingering song
+                  ~spbax2a~                                                        // Classic Adventures Harper of Twilight song
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
+      COPY_EXISTING ~%file%.spl~ ~override~
+        PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN                                 // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+          LAUNCH_PATCH_FUNCTION ~RR#AGLEF~                                         // Start FUNCTION call (my custom "Add Global Effect" function)
+            INT_VAR                                                                // initialize variables
+              "rr#opcode" = "136"                                                  // effect: #136 (force visible)
+              "rr#target" = "1"                                                    // target: 1 (self)
+              "rr#timing" = "1"                                                    // timing mode: 1 (permanent)
+              "rr#prob1" = "100"                                                   // probability1: 100%
+          END                                                                      // end FUNCTION call
+          PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                       // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
+        END
+      BUT_ONLY_IF_IT_CHANGES
+    END
+  END
+END

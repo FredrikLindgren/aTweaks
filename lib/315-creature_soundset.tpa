@@ -1,0 +1,297 @@
+
+// Give Shambling Mounds ther proper soundset
+// This tweak restores the proper soundset to Shambling Mounds. The files already existed, but were unused in the unmodded game (SHAMB01-SHAMB07.WAV)
+ACTION_FOR_EACH ~file~ IN
+              ~hgmound~                                                            // Shambling mound
+               ~hgmnd2~                                                            // Shambling mound
+             ~smound01~                                                            // Shambling mound
+             ~smoundsu~                                                            // Shambling mound
+             ~globsham~                                                            // Shambling mound (Watcher's Keep globe)
+             ~ca#shm01~                                                            // Lesser Shambler from Caedwyr's Geomantic Sorcerer mod
+             ~ca#shm02~                                                            // Shambling Mound from Caedwyr's Geomantic Sorcerer mod
+             ~ca#shm03~                                                            // Greater Shambler from Caedwyr's Geomantic Sorcerer mod
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY INITIAL_MEETING @421 SAY BATTLE_CRY1 @421 SAY BATTLE_CRY2 @422
+      SAY ATTACK1 @423 SAY ATTACK2 @424 SAY ATTACK3 @425 SAY DAMAGE @426
+      SAY DYING @427 SAY SELECT_COMMON1 @421 SAY SELECT_COMMON2 @422  
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+
+// Give Mariliths their Icewind Dale soundset
+// This gives Mariliths the Yxunomei soundset from Icewind Dale 
+COPY ~aTweaks/WAV/RR#MAR01.WAV~ ~override~                                         // IWD Marilith Initial Meeting and Battle Cry 1
+     ~aTweaks/WAV/RR#MAR02.WAV~ ~override~                                         // IWD Marilith Battle Cry 2
+     ~aTweaks/WAV/RR#MAR03.WAV~ ~override~                                         // IWD Marilith Attack 1
+     ~aTweaks/WAV/RR#MAR04.WAV~ ~override~                                         // IWD Marilith Attack 2
+     ~aTweaks/WAV/RR#MAR05.WAV~ ~override~                                         // IWD Marilith Attack 3
+     ~aTweaks/WAV/RR#MAR06.WAV~ ~override~                                         // IWD Marilith Attack 4
+     ~aTweaks/WAV/RR#MAR07.WAV~ ~override~                                         // IWD Marilith Damage
+     ~aTweaks/WAV/RR#MAR08.WAV~ ~override~                                         // IWD Marilith Dying
+     ~aTweaks/WAV/RR#MAR09.WAV~ ~override~                                         // IWD Marilith Hurt
+     ~aTweaks/WAV/RR#MAR10.WAV~ ~override~                                         // IWD Marilith Select Common 1
+
+
+ACTION_FOR_EACH ~file~ IN
+              ~DEMOSUM1~                                                           // Marilith (Demogorgon summon)
+              ~ICMARILI~                                                           // Marilith (unused?)
+              ~MELSUM05~                                                           // Marilith (Mellisan summon)
+              ~GORWOM03~                                                           // Y'tossi (Watcher's Keep final seal Huntress' party)
+              fl#hsmar                                                             //Fiendish Gating 
+              rr#hsmar                                                             //Fiendish Gating 
+              d0qpwima                                                             //Quest Pack, Infernal Thievery
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY INITIAL_MEETING @431 SAY BATTLE_CRY1 @431 SAY BATTLE_CRY2 @432
+      SAY ATTACK1 @433 SAY ATTACK2 @434 SAY ATTACK3 @435 SAY ATTACK4 @436
+      SAY DAMAGE @437 SAY DYING @438 SAY HURT @439 SAY SELECT_COMMON1 @440
+      SAY SELECT_COMMON2 @431 SAY SELECT_COMMON3 @432
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+// Special case, separate treatment for Lea'liyl
+ACTION_IF FILE_EXISTS_IN_GAME ~RR#DMARI.ITM~ BEGIN                                 // check for aTweaks' PnP Fiends component
+  COPY_EXISTING ~obsdem01.cre~ ~override~                                          // aTweaks' PnP Fiends component changes Lea'liyl into a Marilith
+    LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END               // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+    FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                   // Null soundset (code borrowed from Nythrun with thanks)
+      WRITE_LONG s1 ~-1~
+    END
+    SAY INITIAL_MEETING @431 SAY BATTLE_CRY1 @431 SAY BATTLE_CRY2 @432
+    SAY ATTACK1 @433 SAY ATTACK2 @434 SAY ATTACK3 @435 SAY ATTACK4 @436
+    SAY DAMAGE @437 SAY DYING @438 SAY HURT @439 SAY SELECT_COMMON1 @440
+    SAY SELECT_COMMON2 @431 SAY SELECT_COMMON3 @432
+  BUT_ONLY_IF_IT_CHANGES
+END
+
+
+// Standardize Dryad soundsets
+COPY ~atweaks/wav/rr#dry01.wav~ ~override~                                         // NWN Dryad Select Common 1 (giggle)
+     ~atweaks/wav/rr#dry02.wav~ ~override~                                         // NWN Dryad Battle Cry 1 (Leave me, foul creature!)
+     ~atweaks/wav/rr#dry03.wav~ ~override~                                         // NWN Dryad Battle Cry 2 (I will not allow this!)
+     ~atweaks/wav/rr#dry04.wav~ ~override~                                         // NWN Dryad Action Acknowledgement 1 (Mmmm, yes!)
+
+ACTION_FOR_EACH ~file~ IN
+              ~DRY01~                                                              // Dryad (unused?)
+              ~DRYAD01~                                                            // Dryad (unused?)
+              ~DRYAD02~                                                            // Dryad (unused?)
+              ~DRYAD03~                                                            // Dryad (unused?)
+              ~IDRYAD02~                                                           // Cania (one of Irenicus captive Dryads)
+              ~IDRYAD03~                                                           // Elyme (one of Irenicus captive Dryads)
+              ~rr#sdrya~                                                           // aTweaks' summoned Dryad
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY BATTLE_CRY1 @442 SAY BATTLE_CRY2 @443 SAY
+      SELECT_COMMON1 @441 SAY SELECT_ACTION1 @444
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Standardize Hamadryad soundsets
+ACTION_FOR_EACH ~file~ IN
+              ~VAELASA~                                                            // Vaelasa (Fairy Queen in Windsper Hills)
+              ~DRYADHA~                                                            // Hamadryad (BGT)
+              ~_DRYADHA~                                                           // Hamadryad (Tutu)
+              ~HAMASU~                                                             // deault summoned Hamadryad (unused?)
+              ~rr#shama~                                                           // aTweaks' summoned Hamadryad
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY INITIAL_MEETING #5180 SAY BATTLE_CRY1 #5182 SAY BATTLE_CRY2 #5184
+      SAY ATTACK1 #5186 SAY ATTACK2 #5188 SAY DAMAGE #6021 SAY DYING #6025
+      SAY SELECT_COMMON1 #5181 SAY SELECT_COMMON2 #5187 SAY SELECT_ACTION1 #5188
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Standardize Nymph soundsets
+ACTION_FOR_EACH ~file~ IN
+              ~HGNYMPH~                                                            // Nymph
+              ~NYMPHSU~                                                            // default summoned Nymph
+             ~rr#snymp~                                                            // aTweaks' summoned Nymph
+              ~dvnymph~                                                            // Spell Revisions' summoned Nymph
+             ~dw#nymsu~                                                            // SCSII summoned Nymph
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY BATTLE_CRY1 #5192 SAY HURT #5190 SAY DAMAGE #6029
+      SAY DYING #6031 SAY SELECT_COMMON1 #5189 SAY SELECT_ACTION1 @451
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Standardize Sirine soundsets
+ACTION_FOR_EACH ~file~ IN
+                ~SIRINE~                                                           // Sirine (BGT)
+               ~_SIRINE~                                                           // Sirine (Tutu)
+              ~SIRINE_A~                                                           // Sirine (BGT)
+              ~_IRINE_A~                                                           // Sirine (Tutu)
+              ~SIRINE_B~                                                           // Sirine (BGT)
+              ~_IRINE_B~                                                           // Sirine (Tutu)
+              ~SIRINE01~                                                           // Sirine
+              ~SIRINE02~                                                           // Sirine (BGT)
+              ~_IRINE02~                                                           // Sirine (Tutu)
+                   ~SIL~                                                           // Sil (BGT)
+                  ~_SIL~                                                           // Sil (Tutu)
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY BATTLE_CRY1 #6018 SAY BATTLE_CRY2 #6019 SAY BATTLE_CRY3 #5176
+      SAY ATTACK1 #5178 SAY ATTACK2 #6022 SAY SELECT_COMMON1 #5176
+      SAY SELECT_COMMON2 #5177 SAY SELECT_ACTION1 #6022
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Standardize Succubi soundsets
+COPY ~atweaks/wav/rr#suc01.wav~ ~override~                                         // NWN Succubus Select Common 1 (Your death shall be beautiful!)
+     ~atweaks/wav/rr#suc02.wav~ ~override~                                         // NWN Succubus Select Common 2 (Your soul shall be mine!)
+     ~atweaks/wav/rr#suc03.wav~ ~override~                                         // NWN Succubus Action Acknowledgement 1 (Hahaha!)
+     ~atweaks/wav/rr#suc04.wav~ ~override~                                         // NWN Succubus Action Acknowledgement 2 (Oh yes!)
+
+ACTION_FOR_EACH ~file~ IN
+              ~DEMSUC01~                                                           // Succubus
+              ~GORSUC01~                                                           // Succubus
+               ~GORTAN2~                                                           // Succubus
+              ~GORWOM01~                                                           // Nalmissra
+                ~KIRINH~                                                           // Kirinhale, the Succubus in Durlag's Tower (BGT)
+               ~_KIRINH~                                                           // Kirinhale, the Succubus in Durlag's Tower (Tutu)
+              ~RR#HSSUC~                                                           // aTweaks Succubus (Fiendish Gating)
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY BATTLE_CRY1 @461  SAY BATTLE_CRY2 @462 SAY SELECT_COMMON1 @461
+      SAY SELECT_COMMON2 @462 SAY SELECT_ACTION1 @463 SAY SELECT_ACTION2 @464
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Standardize Nereid soundsets
+ACTION_FOR_EACH ~file~ IN
+               ~shoal~                                                             // Shoal the Nereid (BGT)
+              ~_shoal~                                                             // Shoal the Nereid (Tutu)
+            ~rr#enere~                                                             // aTweaks' Nereid
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY BATTLE_CRY1 #5195 SAY BATTLE_CRY2 #5194 SAY ATTACK1 #6033
+      SAY DAMAGE #6035 SAY DYING #6036 SAY SELECT_COMMON1 #5193
+      SAY SELECT_COMMON2 #5197 SAY SELECT_COMMON3 #5194 SAY SELECT_ACTION1 #5197
+      PATCH_IF (("%SOURCE_RES%" STRING_EQUAL_CASE ~SHOAL~) OR ("%SOURCE_RES%" STRING_EQUAL_CASE ~_SHOAL~)) BEGIN  // additional sounds for Shoal
+        SAY INITIAL_MEETING #4829 SAY DAMAGE #12526 SAY DYING #12527 SAY SELECT_COMMON4 #4830
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Restore Frost Salamander soundsets (the creatures appear to be silent in the original game)
+ACTION_FOR_EACH ~file~ IN
+            ~salgrice~                                                             // Frost Salamander (Abazigal's Lair)
+            ~icsalcol~                                                             // Ice Salamander (Planar Sphere)
+            ~telicesa~                                                             // Ice Salamander (unused?)
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY BATTLE_CRY1 #55438 SAY BATTLE_CRY2 #55437 SAY ATTACK1 #55440SAY ATTACK2 #55439
+      SAY DAMAGE #55441 SAY DYING #55442 SAY SELECT_COMMON1 #55437 SAY SELECT_ACTION1 #55438
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Give Water Elementals their Icewind Dale soundset
+COPY ~atweaks/wav/rr#ewa01.wav~ ~override~                                         // IWD Water Elemental Select Common 1 and Battle Cry 1
+     ~atweaks/wav/rr#ewa02.wav~ ~override~                                         // IWD Water Elemental Battle Cry 2
+     ~atweaks/wav/rr#ewa03.wav~ ~override~                                         // IWD Water Elemental Attack 1
+     ~atweaks/wav/rr#ewa04.wav~ ~override~                                         // IWD Water Elemental Attack 2
+     ~atweaks/wav/rr#ewa05.wav~ ~override~                                         // IWD Water Elemental Damage
+     ~atweaks/wav/rr#ewa06.wav~ ~override~                                         // IWD Water Elemental Dying
+     ~atweaks/wav/rr#ewa07.wav~ ~override~                                         // IWD Water Elemental Action Acknowledgement 1
+
+
+ACTION_FOR_EACH ~file~ IN
+            ~elemhydr~                                                             // Olhydra
+            ~elwatg01~                                                             // Greater Water Elemental
+            ~rr#ewwei~                                                             // aTweaks' Water Weird
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY SELECT_COMMON1 @471 SAY BATTLE_CRY1 @471 SAY BATTLE_CRY2 @472SAY ATTACK1 @473
+      SAY ATTACK2 @474 SAY DAMAGE @475 SAY DYING @476 SAY SELECT_ACTION1 @477
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Give Ice Paraelementals and Ice Golems a proper soundset
+ACTION_FOR_EACH ~file~ IN
+            ~elemcryo~                                                             // Cryonax
+            ~finsol03~                                                             // Cryonax in ToB
+            ~golice01~                                                             // Ice Golem
+            ~gorgoli~                                                              // Ice Golem (Watcher's Keep)
+            ~rr#eicer~                                                             // aTweaks' Ice Paraelemental
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END             // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      FOR (s1 = 0xa4; s1 < 0x234; s1 += 0x4) BEGIN                                 // Null soundset (code borrowed from Nythrun with thanks)
+        WRITE_LONG s1 ~-1~
+      END
+      SAY SELECT_COMMON1 @481 SAY BATTLE_CRY1 @481 SAY BATTLE_CRY2 @482
+      SAY ATTACK1 @483 SAY ATTACK2 @484 SAY DAMAGE @487 SAY HURT @488 SAY DYING @489
+      SAY SELECT_ACTION1 @482
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END

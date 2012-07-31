@@ -1,0 +1,42 @@
+
+COPY ~atweaks/spl/spwi105.spl~ ~override~                                          // Color Spray
+  SAY UNIDENTIFIED_DESC @1890 SAY DESC @1890
+COPY ~atweaks/spl/mephits/rr#mracs.spl~ ~override/spin937.spl~                     // Color Spray (Radiant Mephit version)
+  SAY UNIDENTIFIED_DESC @1890 SAY DESC @1890
+
+// Patch immunity to both Color Spray versions into spells, items that cause blindness
+// Note: Color Spray should not protect the target from its own effects. It's clunky and can often cause more harm than good. 
+// The drawbacks outweigh the benefits in this case.
+
+ACTION_FOR_EACH ~file~ IN
+                ~spdr101.spl~
+                ~spin595.spl~
+                ~spin878.spl~
+                ~spin893.spl~
+                ~spin929.spl~
+                ~spin931.spl~
+                ~sppr704.spl~
+                ~sppr707.spl~
+                ~spwi106.spl~
+                ~spwi118.spl~
+                ~spwi224.spl~
+                ~spwi714.spl~
+                ~spwi815.spl~
+                ~spwi958.spl~
+                ~spwm178.spl~
+                ~chalcy2.itm~
+                ~gorwom4.itm~
+                 ~halb06.itm~
+                   ~sorb.itm~
+                 ~sw1h51.itm~
+                 ~wand19.itm~
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%~ BEGIN
+    COPY_EXISTING ~%file%~ ~override~
+      PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                     // protects against invalid files
+        LPF add_conditional_immunity INT_VAR f_Condition = 74 STR_VAR f_Spell = spwi105 END
+        LPF add_conditional_immunity INT_VAR f_Condition = 74 STR_VAR f_Spell = spin937 END
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END

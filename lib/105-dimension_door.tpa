@@ -1,0 +1,77 @@
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DDOOR.BAM~ THEN BEGIN                        // Checks for the Icewind Dale's Dimension Door animation component
+  COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override/RR#DDOOR.BAM~                     // IWD1's Dimension Door animation (custom file name)
+  COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override/RR#DDOOR.WAV~                     // IWD1's Dimension Door sound effect (custom file name)
+  COPY    ~aTweaks/VVC/RR#DDOOR.VVC~   ~override~                                  // Custom Dimension Door VVC
+END
+
+COPY ~atweaks/spl/spwi402.spl~ ~override~                                          // Dimension Door
+  SAY UNIDENTIFIED_DESC @1891 SAY DESC @1891
+
+COPY ~atweaks/itm/rr#scr1v.itm~ ~override~                                         // Dimension Door scroll
+  SAY DESC @1891
+
+ACTION_FOR_EACH ~file~ IN
+              ~BGSCRL1V~                                                           // Dimension Door scroll (BGT)
+              ~D0SCRLDD~                                                           // Dimension Door scroll (D0 Tweaks)
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
+    COPY_EXISTING ~%file%.itm~ ~override~
+      PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                     // protects against invalid files
+        SAY DESC @1891
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+ACTION_IF MOD_IS_INSTALLED SPELL_REV.TP2 0 THEN BEGIN                              // Checks for the main component of Spell Revisions
+  COPY_EXISTING ~scrl1v.itm~ ~override~                                            // Dimension Door scroll (SR)
+    PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                       // protects against invalid files
+      SAY DESC @1891
+    END
+  BUT_ONLY_IF_IT_CHANGES
+END
+
+ACTION_IF FILE_EXISTS_IN_GAME ~d0scrldd.itm~ BEGIN                                 // Check for D0Tweaks' Dimension Door component
+  COPY ~atweaks/spl/spwi402.spl~ ~override/spwi450.spl~                            // Dimension Door (D0 Tweaks)
+    SAY DESC @1891
+  COPY ~atweaks/itm/rr#scr1v.itm~ ~override/d0scrldd.itm~                          // Dimension Door scroll (D0 Tweaks)
+    SAY DESC @1891
+END
+
+ACTION_IF GAME_IS ~tutu tutu_totsc~ THEN BEGIN                                     // Tutu check
+  COPY ~atweaks/spl/spwi402.spl~ ~override/spwi450.spl~                            // Dimension Door (Tutu)
+    SAY DESC @1891
+  COPY ~atweaks/itm/rr#scr1v.itm~ ~override/_scrl1v.itm~                           // Dimension Door scroll (Tutu)
+    SAY DESC @1891
+END
+
+COPY_EXISTING_REGEXP GLOB ~^.+\.sto$~ ~override~                                   // parses through all stores in the game (even those added by mods)
+  PATCH_IF (%SOURCE_SIZE% > 0x9b) THEN BEGIN                                       // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+    READ_LONG 0x08 "itemtype" ELSE 0                                               // check store type
+    PATCH_IF ("%itemtype%" != 5) BEGIN                                             // if the store isn't a container
+      PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~d0scrldd~) AND
+               NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~BGSCRL1V~) AND
+               NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~_SCRL1V~) AND
+               FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL1U~)
+      BEGIN
+        ADD_STORE_ITEM ~rr#scr1v~ AFTER ~SCRL1U~ #1 #0 #0 ~IDENTIFIED~ #2          // Add 2x Dimension Door scroll
+      END
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+// If TobEx is present restore Dimension Door to the mage/sorcerer spell selection screen
+
+ACTION_IF FILE_EXISTS_IN_GAME ~tobex_ini/tobexcore.ini~ BEGIN                      // if TobEx is installed
+  COPY ~tobex_ini/tobexcore.ini~ ~tobex_ini~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~Externalise Mage Spell Hiding=0~ ~Externalise Mage Spell Hiding=1~
+  BUT_ONLY_IF_IT_CHANGES
+END
+
+ACTION_IF FILE_EXISTS_IN_GAME ~hidespl.2da~ BEGIN                                  // if TobEx or Tob Hacks are installed
+  COPY_EXISTING ~hidespl.2da~ ~override~
+    REPLACE_TEXTUALLY ~SPWI402~ ~RR#BLNK~                                          // Remove Dimension Door from the hidden spells list
+  BUT_ONLY_IF_IT_CHANGES
+END

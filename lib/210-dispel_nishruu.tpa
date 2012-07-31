@@ -1,0 +1,31 @@
+
+// Dispel Magic and Remove Magic are supposed to destroy Nishruu and Hakeashar. However, due to targeting issues, this doesn't work for player characters in the unmodded game. To circumvent this, a dispellable equipped effect (Detect Illusion skill modifier) is added to the Nishruu/Hakeashar attack and is then checked by the creature's script.
+
+ACTION_FOR_EACH ~file~ IN
+               ~NISHRUU~                                                           // Nishruu and Hakeashar attack
+                 ~HAKSU~                                                           // Hakeashar attack from Spell Revisions
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
+    COPY_EXISTING ~%file%.itm~ ~override~
+      PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN                                   // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+        LPF ADD_ITEM_EQEFFECT
+          INT_VAR
+            opcode = 276                                                           // effect: #276 (Detect Illusions skill modifier)
+            target = 1                                                             // target: 1 (self)
+            parameter1 = 20                                                        // param1: 20 (Statistic Modifier)
+            parameter2 = 1                                                         // param2: 1 (Type: set to value)
+            timing = 2                                                             // timing mode: 2 (while equipped)
+            resist_dispel = 3                                                      // dispel/resistance: 3 (dispellable, bypasses magic resistance)
+        END
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+EXTEND_TOP ~NISHRU01.BCS~ ~aTweaks/BAF/NISHRU01.BAF~                               // Nishruu/Hakeashar AI script
+
+COPY_EXISTING ~NISHRUSU.CRE~ ~override~                                            // Nishruu
+                 ~HAKSU.CRE~ ~override~                                            // Hakeashar
+  WRITE_BYTE 0x0272 "136"                                                          // race: MIST
+  WRITE_LONG 0x14  "0"                                                             // XP value when killed: 0 (XP is now awarded via script)
+BUT_ONLY_IF_IT_CHANGES

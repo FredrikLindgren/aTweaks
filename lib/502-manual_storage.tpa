@@ -1,0 +1,25 @@
+
+// This tweak raises the storage capacity of all containers in the game to the designated value
+
+PRINT @503 // Please enter the storage capacity value (0-65535)
+ACTION_READLN ~man_cap~
+
+OUTER_WHILE NOT (IS_AN_INT %man_cap%) BEGIN
+  PRINT @504 // The storage capacity value must be entered in the form of an integer (0-65535)
+  ACTION_READLN ~man_cap~
+END
+
+COPY_EXISTING_REGEXP GLOB ~^.+\.sto$~ ~override~                                  // parses through all stores in the game (even those added by mods)
+  PATCH_IF (%SOURCE_SIZE% > 0x9b) THEN BEGIN                                      // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+    READ_LONG 0x08 "itemtype" ELSE 0                                              // check store type
+    PATCH_IF ("%itemtype%" = 5) BEGIN                                             // if the store is a container
+      READ_SHORT 0x22 "capacity"                                                  // check the storage capacity
+      PATCH_IF ("%capacity%" < "%man_cap%") BEGIN                                 // if the storage capacity is lower than the designated value
+        WRITE_SHORT 0x22 %man_cap%                                                // set the storage capacity to the designated value
+      END
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+PRINT @505 // Container storage capacity value has been set to:
+PRINT ~%man_cap%~

@@ -1,0 +1,67 @@
+
+COPY_EXISTING ~shammr.itm~ ~override~                                                 // Spiritual Hammer at level 1
+             ~shammr2.itm~ ~override~                                                 // Spiritual Hammer at level 7
+             ~shammr3.itm~ ~override~                                                 // Spiritual Hammer at level 13
+  READ_LONG 0x64 abil_off
+  READ_SHORT 0x68 abil_num
+  READ_LONG 0x6a fx_off
+  FOR (i = 0; i < "%abil_num%"; i += 1) BEGIN
+    READ_BYTE (%abil_off% + %i% * 0x38) abil_type                                     // read ability type
+    PATCH_IF (%abil_type% = 1) BEGIN                                                  // only patch the melee ability header
+      WRITE_SHORT (0x0e + "%abil_off%") 100                                           // increase attack range
+      WRITE_BYTE  ("%abil_off%" + 0x26) 0                                             // disallow strength bonus
+      WRITE_SHORT ("%abil_off%" + 0x1a) 0                                             // damage bonus
+      WRITE_SHORT ("%abil_off%" + 0x1c) 0                                             // damage type
+      WRITE_SHORT ("%abil_off%" + 0x16) 0                                             // damage dice
+      WRITE_SHORT ("%abil_off%" + 0x18) 0                                             // dice rolls
+      READ_SHORT (%abil_off% + %i% * 0x38 + 0x1e) abil_fx_num
+      READ_SHORT (%abil_off% + %i% * 0x38 + 0x20) abil_fx_idx
+        INSERT_BYTES (%fx_off% + %abil_fx_idx% * 0x30) 0x30                           // add effect
+        WRITE_SHORT (%fx_off% + %abil_fx_idx% * 0x30) 50                              // effect: #50 (color glow by RGB)
+        WRITE_BYTE (%fx_off% + %abil_fx_idx% * 0x30 + 0x2) 2                          // target: preset target (2)
+        WRITE_LONG (%fx_off% + %abil_fx_idx% * 0x30 + 0x4) "-1771831296"              // param1: RGB color
+        WRITE_LONG (%fx_off% + %abil_fx_idx% * 0x30 + 0x8) 983040                     // param2: location and speed
+        WRITE_BYTE (%fx_off% + %abil_fx_idx% * 0x30 + 0xc) 1                          // timing: permanent (1)
+        WRITE_BYTE (%fx_off% + %abil_fx_idx% * 0x30 + 0xd) 1                          // dispel: dispellable and allows magic resistance (1)
+        WRITE_BYTE (%fx_off% + %abil_fx_idx% * 0x30 + 0x12) 100                       // probability: 100%
+      SET %abil_fx_num% += 1                                                          // update number of ability effects
+        INSERT_BYTES (%fx_off% + %abil_fx_idx% * 0x30) 0x30                           // add effect
+        WRITE_SHORT (%fx_off% + %abil_fx_idx% * 0x30) 12                              // effect: #12 (HP damage)
+        WRITE_BYTE (%fx_off% + %abil_fx_idx% * 0x30 + 0x2) 2                          // target: preset target (2)
+         PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~shammr~) BEGIN                   // Spiritual Hammer at level 1
+          WRITE_LONG (%fx_off% + %abil_fx_idx% * 0x30 + 0x4) 1                        // param1: fixed damage ammount
+         END
+         PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~shammr2~) BEGIN                  // Spiritual Hammer at level 7
+          WRITE_LONG (%fx_off% + %abil_fx_idx% * 0x30 + 0x4) 2                        // param1: fixed damage ammount
+         END
+         PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~shammr3~) BEGIN                  // Spiritual Hammer at level 13
+          WRITE_LONG (%fx_off% + %abil_fx_idx% * 0x30 + 0x4) 3                        // param1: fixed damage ammount
+         END
+        WRITE_LONG (%fx_off% + %abil_fx_idx% * 0x30 + 0x8) 4194304                    // param2: magical damage (4194304)
+        WRITE_BYTE (%fx_off% + %abil_fx_idx% * 0x30 + 0xc) 1                          // timing: permanent (1)
+        WRITE_BYTE (%fx_off% + %abil_fx_idx% * 0x30 + 0xd) 1                          // dispel: dispellable and allows magic resistance (1)
+        WRITE_BYTE (%fx_off% + %abil_fx_idx% * 0x30 + 0x12) 100                       // probability: 100%
+        WRITE_LONG (%fx_off% + %abil_fx_idx% * 0x30 + 0x1c) 1                         // dice rolls
+        WRITE_LONG (%fx_off% + %abil_fx_idx% * 0x30 + 0x20) 4                         // dice size
+      SET %abil_fx_num% += 1                                                          // update number of ability effects
+      WRITE_SHORT (%abil_off% + %i% * 0x38 + 0x1e) %abil_fx_num%
+      FOR (j = i + 1; j < "%abil_num%"; j += 1) BEGIN                                 // update ability effect indices for abilities after current one
+        READ_SHORT (%abil_off% + %j% * 0x38 + 0x20) abil_fx_idx
+        WRITE_SHORT (%abil_off% + %j% * 0x38 + 0x20) (%abil_fx_idx% + 1)
+      END
+      FOR (k = %abil_fx_idx%; k < "%abil_fx_idx%" + "%abil_fx_num%"; k += 1) BEGIN    // parse each ability effect specific to current ability
+        READ_SHORT (%fx_off% + %k% * 0x30) opcode
+        READ_LONG  (%fx_off% + %k% * 0x30 + 0x8) param2
+         PATCH_IF (%opcode% = 141 AND %param2% = 5) BEGIN                             // effect: #141 (lighting effects)
+          WRITE_LONG (%fx_off% + %k% * 0x30 + 0x8) 1                                  // param2: 1 (aqua SHEARTH)
+	 END
+       END
+      FOR (l = %abil_fx_idx%; l < "%abil_fx_idx%" + "%abil_fx_num%"; l += 1) BEGIN    // parse each ability effect specific to current ability
+        READ_BYTE (%fx_off% + %l% * 0x30 + 0xd) dispel
+         PATCH_IF NOT (%dispel% = 1) BEGIN                                            // check if the ability is dispellable and allows magic resistance
+        WRITE_BYTE (%fx_off% + %l% * 0x30 + 0xd) 1                                    // make all abilities dispellable and allow magic resistance
+	 END
+      END
+    END
+  END
+BUT_ONLY

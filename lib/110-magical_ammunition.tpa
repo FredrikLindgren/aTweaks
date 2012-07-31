@@ -1,0 +1,42 @@
+
+// This tweak adds a damage bonus to magical arrows and bolts equal to their enchantment level, as per PnP rules and as in BG1/IWD1
+
+
+ACTION_FOR_EACH ~file~ IN
+                ~AROW02~                                                           // Arrow +1
+                ~AROW11~                                                           // Arrow +2
+                ~AROW15~                                                           // Arrow +3
+                ~BOLT02~                                                           // Bolt +1
+                ~BOLT06~                                                           // Bolt +2
+                ~BOLT09~                                                           // Bolt +3
+              ~QUIVER01~                                                           // Quiver of Plenty +1 (arrows)
+              ~QUIVER02~                                                           // Case of Plenty +1 (bolts)
+              ~QUIVER03~                                                           // Quiver of Plenty +2 (arrows)
+              ~QUIVER04~                                                           // Case of Plenty +2 (bolts)
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
+    COPY_EXISTING ~%file%.itm~ ~override~
+      PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN                                   // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+        READ_LONG 0x60 enchantment                                                 // enchantment level
+        READ_LONG 0x64 abil_off                                                    // ability offset
+        READ_SHORT 0x68 abil_num                                                   // ability number
+        READ_LONG 0x6a fx_off
+        FOR (i = 0; i < "%abil_num%"; i += 1) BEGIN                                // parse each ability
+          READ_BYTE (%abil_off% + %i% * 0x38) abil_type                            // read ability type
+          PATCH_IF (%abil_type% = 2) BEGIN                                         // only patch the ranged ability header (2)
+            READ_SHORT ("%abil_off%" + 0x1a) dmg_bonus                             // damage bonus
+            PATCH_IF (%dmg_bonus% < %enchantment%) BEGIN                           // if the damage bonus is lower than the enchantment bonus       
+              WRITE_SHORT ("%abil_off%" + 0x1a) %enchantment%                      // raise the damage bonus to the enchantment level
+              READ_STRREF IDENTIFIED_DESC temp_desc                                // description update
+              INNER_PATCH_SAVE new_desc "%temp_desc%" BEGIN
+                REPLACE_TEXTUALLY ~1D6~ ~1D6 + %enchantment%~                      // change arrow description to include enchantment damage bonus
+                REPLACE_TEXTUALLY ~1D8~ ~1D8 + %enchantment%~                      // change bolt description to include enchantment damage bonus
+              END
+              SAY_EVALUATED IDENTIFIED_DESC "%new_desc%"
+            END
+          END
+        END
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END

@@ -1,0 +1,54 @@
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DDOOR.BAM~ THEN BEGIN                        // Checks for the Icewind Dale's Dimension Door animation component
+  COPY    ~aTweaks/BAM/SPDIMNDR.BAM~   ~override/RR#DDOOR.BAM~                     // IWD1's Dimension Door animation (custom file name)
+  COPY    ~aTweaks/WAV/EFF_M09.WAV~    ~override/RR#DDOOR.WAV~                     // IWD1's Dimension Door sound effect (custom file name)
+  COPY    ~aTweaks/VVC/RR#DDOOR.VVC~   ~override~                                  // Custom Dimension Door VVC
+END
+
+ACTION_FOR_EACH ~file~ IN
+              ~SPWI402~                                                            // Wizard Dimension Door
+              ~SPWI450~                                                            // Wizard Dimension Door (D0Tweak and Tutu)
+              ~SPWI505~                                                            // Wizard Shadow Door
+              ~SPWI995~                                                            // Dryad Teleport
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
+    COPY_EXISTING ~%file%.spl~ ~override~
+      PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN  // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
+        READ_LONG  0x64 "abil_off"
+        READ_SHORT 0x68 "abil_num"
+        READ_LONG  0x6a "fx_off"
+        FOR (index = 0 ; index < abil_num ; index = index + 1 ) BEGIN // cycle through abilities
+          READ_SHORT  ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
+          READ_SHORT  ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
+            FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
+            READ_SHORT ("%fx_off%" +        (0x30 * ("%index2%" + "%abil_fx_idx%"))) "opcode"
+            READ_LONG  ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "param1"
+            READ_LONG  ("%fx_off%" + 0x08 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "param2"
+            READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "resref"
+            PATCH_IF (("%opcode%" = "141") AND ("%param2%" = "38")) BEGIN  // effect #141: Lighting Effects - Dimension Door (38)
+              WRITE_SHORT ("%fx_off%"      + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "215" // effect #215: Play 3D Effect
+              WRITE_LONG  ("%fx_off%" + 0x08 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "1" // param2: 1 (play over target)
+              WRITE_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "RR#DDOOR" #8 // resref: RR#DDOOR.VVC
+              WRITE_LONG  ("%fx_off%" + 0x0e + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "1" // duration: 1
+              WRITE_BYTE  ("%fx_off%" + 0x0c + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "0" // timing mode: 0 (duration)
+              PATCH_IF ("%param1%" = "1") BEGIN // Delayed duration indicator
+                WRITE_LONG  ("%fx_off%" + 0x04 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "0" // param1: 0
+                WRITE_LONG  ("%fx_off%" + 0x0e + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "2" // duration: 2
+                WRITE_BYTE  ("%fx_off%" + 0x0c + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "3" // timing mode: 3 (delayed duration)
+              END
+              PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~SPWI995~) BEGIN // Dryad Teleport requires a 1 second delay
+                WRITE_LONG  ("%fx_off%" + 0x0e + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "1" // duration: 1
+                WRITE_BYTE  ("%fx_off%" + 0x0c + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "3" // timing mode: 3 (delayed duration)
+              END
+            END
+            PATCH_IF (("%opcode%" = "174") AND ("%resref%" STRING_EQUAL_CASE ~EFF_M09~)) BEGIN  // effect #174: Play Sound Effect
+              WRITE_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "RR#DDOOR" #8 // resref: RR#DDOOR.WAV
+              WRITE_LONG  ("%fx_off%" + 0x0e + (0x30 * ("%index2%" + "%abil_fx_idx%"))) "1" // duration: 1
+            END
+          END
+        END
+        PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                                 // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END

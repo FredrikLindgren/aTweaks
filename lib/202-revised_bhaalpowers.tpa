@@ -1,0 +1,179 @@
+
+COPY    ~aTweaks/BAM/RR#BP1E.BAM~   ~override~                                     // Drain Life icon
+COPY    ~aTweaks/BAM/RR#BP1G.BAM~   ~override~                                     // Healing Touch icon
+COPY    ~aTweaks/BAM/RR#BP2E.BAM~   ~override~                                     // Cause Affliction icon
+COPY    ~aTweaks/BAM/RR#BP2G.BAM~   ~override~                                     // Cure Affliction icon
+COPY    ~aTweaks/BAM/RR#BP3E.BAM~   ~override~                                     // Divine Wrath icon
+COPY    ~aTweaks/BAM/RR#BP3G.BAM~   ~override~                                     // Divine Might icon
+COPY    ~aTweaks/BAM/RR#BPCA.BAM~   ~override~                                     // Cause Affliction visual effect BAM
+COPY    ~aTweaks/BAM/RR#BPDW.BAM~   ~override~                                     // Divine Wrath visual effect BAM
+COPY    ~aTweaks/VVC/RR#BPRA.VVC~   ~override~                                     // Cure Affliction visual effect animation
+COPY    ~aTweaks/VVC/RR#BPCA.VVC~   ~override~                                     // Cause Affliction visual effect animation
+COPY    ~aTweaks/VVC/RR#BPDW.VVC~   ~override~                                     // Divine Wrath visual effect animation
+
+
+// Healing Touch (formerly Cure Light Wounds)
+COPY ~aTweaks/SPL/SPIN101.SPL~ ~override~                                         // Cure Light Wounds Bhaalpower
+  SAY NAME1 @242 SAY NAME2 @242                                                   // change name to Healing Touch
+COPY ~aTweaks/EFF/RR#BP1G.EFF~ ~override~                                         // Healing Touch immunity effect (for constructs, undead, extraplanars etc.)
+
+
+
+// Drain Life (formerly Larloch's Minor Drain)
+COPY ~aTweaks/SPL/SPIN104.SPL~ ~override~                                         // Larloch's Minor Drain Bhaalpower
+  SAY NAME1 @243 SAY NAME2 @243                                                   // change name to Drain Life
+COPY ~aTweaks/SPL/RR#BP1EA.SPL~ ~override~                                        // Drain Life secondary spell (heals the original caster)
+COPY ~aTweaks/EFF/RR#BP1E.EFF~ ~override~                                         // Drain Life immunity effect (for constructs, undead, extraplanars etc.)
+
+
+// Cure Affliction (formerly Slow Poison)
+ACTION_IF FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
+  COPY_EXISTING msectype.2da override
+    READ_2DA_ENTRIES_NOW r2da_msectype 2
+    FOR (i = 1; i < r2da_msectype; ++i) BEGIN
+      READ_2DA_ENTRY_FORMER r2da_msectype i 0 sectype
+      PATCH_IF "%sectype%" STRING_EQUAL_CASE fl#disease BEGIN
+        fl#Disease = i - 1
+      END
+    END
+  BUT_ONLY
+END
+
+COPY ~aTweaks/SPL/SPIN102.SPL~ ~override~                                         // Slow Poison Bhaalpower
+ SAY NAME1 @244 SAY NAME2 @244                                                    // change name to Cure Affliction
+ PATCH_IF VARIABLE_IS_SET fl#Disease AND IS_AN_INT fl#Disease BEGIN               // Remove the fl#Disease sectype whenever we would cure disease
+   READ_LONG  0x64 ao
+   READ_LONG  0x6a eo
+   READ_SHORT 0x70 ei
+   ne = 0
+   FOR (i = 0; i < SHORT_AT 0x68; ++i) BEGIN
+     ei += ne
+     WRITE_SHORT ao + 0x28*i + 0x20 ei
+     READ_SHORT  ao + 0x28*i + 0x1e ne
+     FOR (j = 0; j < ne; ++j) BEGIN
+       ip = eo + 0x30*(ei + j)
+       READ_SHORT ip fx
+       PATCH_IF fx = 79 BEGIN
+         READ_ASCII   ip       clone (0x30)
+         INSERT_BYTES ip       0x30
+         WRITE_ASCIIE ip       "%clone%"
+         WRITE_SHORT  ip       221
+         WRITE_LONG   ip + 0x4 9
+         WRITE_LONG   ip + 0x8 fl#Disease
+         ++ne
+         j = ne
+       END
+     END
+     WRITE_SHORT ao + 0x28*i + 0x1e ne
+   END
+ END
+
+COPY ~aTweaks/EFF/RR#BP2G.EFF~ ~override~                                         // Cure Affliction immunity effect (for constructs, undead, extraplanars etc.)
+
+// Cause Affliction (formerly Horror)
+COPY ~aTweaks/SPL/SPIN105.SPL~ ~override~                                         // Horror Bhaalpower
+ SAY NAME1 @245 SAY NAME2 @245                                                    // change name to Cause Affliction
+
+COPY ~aTweaks/EFF/RR#BP2E.EFF~ ~override~                                         // Cause Affliction immunity effect (for constructs, undead, extraplanars etc.)
+     ~aTweaks/SPL/RR#BP2EA.SPL~ ~override~                                        // Cause Affliction secondary spell (-2 disease penalty to STR and CON)
+     ~aTweaks/SPL/RR#BP2EB.SPL~ ~override~                                        // Cause Affliction tertiary spell (blindness and deafness)
+     ~aTweaks/SPL/RR#BP2EC.SPL~ ~override~                                        // Cause Affliction quartiary spell (feeblemind)
+     ~aTweaks/SPL/RR#BP2ED.SPL~ ~override~                                        // Cause Affliction quintiary spell (poison)
+
+
+// Divine Might (formerly Draw Upon Holy Might)
+ACTION_FOR_EACH ~file~ IN
+              ~spin103~                                                            // Draw Upon Holy Might Bhaalpower (BG1 & SoA)
+              ~bhaal2a~                                                            // Draw Upon Holy Might Bhaalpower (ToB)
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
+    COPY_EXISTING ~%file%.spl~ ~override~
+      PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN
+        SAY NAME1 @246 SAY NAME2 @246                                                     // change name to Divine Might
+        WRITE_LONG  0x34 1                                                                // set spell level to 1 (prevents scripting issues)
+        WRITE_ASCII 0x3a ~RR#BP3G~ #8                                                     // assign a new spellbook icon
+        READ_LONG   0x64 "abil_off"
+        READ_SHORT  0x68 "abil_num"
+        FOR ("index" = 0; "%index%" < "%abil_num%"; "index" = ("%index%" + 1)) BEGIN    // cycle through abilities
+          WRITE_ASCII ("%abil_off%" + 0x04 + ("%index%" * 0x28)) ~RR#BP3G~ #8           // assign a new casting icon
+          WRITE_SHORT ("%abil_off%" + 0x12 + ("%index%" * 0x28)) 1                      // set casting time to 1
+        END
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Divine Wrath (formerly Vampiric Touch)
+COPY ~aTweaks/SPL/SPIN106.SPL~ ~override~                                         // Vampiric Touch Bhaalpower
+  SAY NAME1 @247 SAY NAME2 @247                                                   // change name to Divine Wrath
+
+COPY ~aTweaks/EFF/RR#BP3E.EFF~ ~override~                                         // Divine Wrath pushback immunity effect (for large creatures)
+     ~aTweaks/SPL/RR#BP3EA.SPL~ ~override~                                        // Divine Wrath secondary spell (pushback, knockdown and panic)
+     ~aTweaks/SPL/RR#BP3EB.SPL~ ~override~                                        // Divine Wrath tertiary spell (unholy red glow visual)
+
+
+// Dynaheir shouldn't have the Cure Affliction Bhaalpower at her disposal
+COPY_EXISTING ~SPPR212.SPL~  ~override/RR#PR212.SPL~                              // Clone Slow Poison into an innate ability
+  LAUNCH_PATCH_FUNCTION ~RR#SP2IN~ INT_VAR "rr#ctime" = "1" END                   // Execute the "spell to innate ablity" function
+
+ACTION_FOR_EACH dyna IN dynahe dynahe2 dynahe4 dynahe6 _dynahe _dynahe2 _dynahe4 _dynahe6 BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%dyna%.cre" BEGIN
+    COPY_EXISTING "%dyna%.cre" ~override~
+      PATCH_IF (%SOURCE_SIZE% > 0x2d3) THEN BEGIN                                 // protects against invalid files
+        REMOVE_MEMORIZED_SPELL ~spin102~                                          // Cure Affliction Bhaalpower
+        ADD_MEMORIZED_SPELL ~RR#PR212~ #0 ~innate~                                // Adds 1x Slow Poison innate ability
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+
+// Ensure that the "Gained Special Ability X" strings are correctly displaying on BGT
+ACTION_IF GAME_IS ~bgt~ THEN BEGIN
+  COPY_EXISTING ~PLAYER1D.BCS~  ~override~                                        // Player 1 dream script
+    DECOMPILE_BCS_TO_BAF
+      REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpellRES("GOODDRM2",Player1)~ ~AddSpecialAbility("SPIN101")~
+      REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpellRES("GOODDRM4",Player1)~ ~AddSpecialAbility("SPIN102")~
+      REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpellRES("GOODDRM6",Player1)~ ~AddSpecialAbility("SPIN103")~
+      REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpellRES("BADDRM2",Player1)~ ~AddSpecialAbility("SPIN104")~
+      REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpellRES("BADDRM4",Player1)~ ~AddSpecialAbility("SPIN105")~
+      REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpellRES("BADDRM6",Player1)~ ~AddSpecialAbility("SPIN106")~
+    COMPILE_BAF_TO_BCS
+  BUT_ONLY_IF_IT_CHANGES
+END
+
+
+// Ensure that the "Gained Special Ability X" strings are correctly displaying on Tutu
+ACTION_IF GAME_IS ~tutu tutu_totsc~ THEN BEGIN
+  COPY_EXISTING ~BALDUR.BCS~  ~override~                                            // Main game script
+    DECOMPILE_BCS_TO_BAF
+      REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride(Player1,ApplySpellRES("jpglvl1",Myself))~ ~ActionOverride(Player1,AddSpecialAbility("SPIN101"))~
+      REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride(Player1,ApplySpellRES("jpglvl2",Myself))~ ~ActionOverride(Player1,AddSpecialAbility("SPIN102"))~
+      REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride(Player1,ApplySpellRES("jpglvl3",Myself))~ ~ActionOverride(Player1,AddSpecialAbility("SPIN103"))~
+      REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride(Player1,ApplySpellRES("jpelvl1",Myself))~ ~ActionOverride(Player1,AddSpecialAbility("SPIN104"))~
+      REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride(Player1,ApplySpellRES("jpelvl2",Myself))~ ~ActionOverride(Player1,AddSpecialAbility("SPIN105"))~
+      REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride(Player1,ApplySpellRES("jpelvl3",Myself))~ ~ActionOverride(Player1,AddSpecialAbility("SPIN106"))~
+      REPLACE_TEXTUALLY EXACT_MATCH ~DisplayString(Player1,88753)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~DisplayString(Player1,88754)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~DisplayString(Player1,88755)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~DisplayString(Player1,88756)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~DisplayString(Player1,88757)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~DisplayString(Player1,88758)~ ~~
+    COMPILE_BAF_TO_BCS
+  BUT_ONLY_IF_IT_CHANGES
+END
+
+
+// The Emphatic Manifestation in the Unseeing Eye quest should not be flagged as a demon since extraplanar creatures aren't affected by healing spells
+// Note: this actually undoes a change introduced by the G3 BG2 Fixpack. The creature was already flagged as "No Race" in the unmodded game
+ACTION_FOR_EACH ~file~ IN
+              ~RIFTCR04~                                                           // Emphatic Manifestation
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LAUNCH_PATCH_FUNCTION FJ_CRE_VALIDITY INT_VAR do_message = 1 END
+      WRITE_BYTE  0x0272 255                                                       // race: No Race
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END

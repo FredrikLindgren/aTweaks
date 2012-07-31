@@ -1,0 +1,106 @@
+
+// Add ToB scripting actions/triggers to SoA (borrowed from the G3 BG2 Fixpack with thanks) 
+INCLUDE ~atweaks/lib/tob2soa.tph~
+
+COPY ~aTweaks/SPL/RR#GNRT.SPL~ ~override~                                       // spell which grants the additional gnomish racial traits
+     ~aTweaks/EFF/RR#DWGOB.EFF~ ~override~                                      // to hit bonus vs. hobgoblins (and goblins since they use the same race in BG2)
+     ~aTweaks/EFF/RR#DWKOB.EFF~ ~override~                                      // +1 to hit bonus vs. kobolds
+     ~aTweaks/EFF/RR#GNRT.EFF~  ~override~                                      // -4 to hit penalty vs. gnomes (for trolls, ogres etc.)
+
+EXTEND_BOTTOM ~dplayer3.bcs~  ~aTweaks/BAF/RR#GNRT.BAF~                         // extend the party script for Player1 with the gnomish racial trait block
+EXTEND_BOTTOM ~dplayer2.bcs~  ~aTweaks/BAF/RR#GNRT.BAF~                         // extend the party script for other party members with the gnomish racial trait block
+
+// Ogre and Gnoll attack roll penalty vs. gnomes (implemented through patching all CREs of the Ogre and Gnoll race)
+
+COPY_EXISTING_REGEXP GLOB ~^.+\.cre$~ ~override~                               // check all creatures in the game
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                              // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+  PATCH_IF valid BEGIN
+    READ_BYTE 0x272 "race"                                                     // check the creature's race
+    PATCH_IF (%race% = 113 OR %race% = 110) BEGIN                              // if the creature's race is Ogre or Gnoll
+      PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                           // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+      LPF ADD_CRE_EFFECT
+        INT_VAR
+          opcode = 177                                                         // effect: #177 (use EFF file)
+          target = 1                                                           // target: 1 (self)
+          parameter1 = 0                                                       // param1: 0 (IDS Entry - anything)
+          parameter2 = 2                                                       // param2: 2 (IDS File - EA.IDS)
+          timing = 9                                                           // timing mode: 9 (permanent after death)
+        STR_VAR
+          resource = RR#GNRT
+      END
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Troll attack roll penalty vs. gnomes (implemented through patching an equipped item)
+
+COPY_EXISTING ~trollimm.itm~ ~override~                                        // a ring which is equipped by all trolls in the game
+  LPF ADD_ITEM_EQEFFECT
+    INT_VAR
+      opcode = 177                                                             // effect: #177 (use EFF file)
+      target = 1                                                               // target: 1 (self)
+      parameter1 = 0                                                           // param1: 0 (IDS Entry - anything)
+      parameter2 = 2                                                           // param2: 2 (IDS File - EA.IDS)
+      timing = 2                                                               // timing mode: 2 (while equipped)
+    STR_VAR
+      resource = GIANT3                                                        // resref: GIANT3.EFF (-4 to hit penalty vs. gnomes while equipped)
+  END
+
+
+// Giant attack roll penalty vs. gnomes (implemented through patching giant weapons, approach borrowed from the G3 BG2 Fixpack with thanks)
+
+ACTION_IF NOT MOD_IS_INSTALLED SETUP-BG2FIXPACK.TP2 106 THEN BEGIN             // G3 BG2 Fixpack OBC component check
+  ACTION_FOR_EACH ~file~ IN
+                  ~giafir~
+                  ~giafir2~
+                  ~giafir3~
+                  ~giants01~
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
+      COPY_EXISTING ~%file%.itm~ ~override~
+        PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                   // protects against invalid files
+          LPF ADD_ITEM_EQEFFECT
+            INT_VAR
+              opcode = 177                                                         // effect: #177 (use EFF file)
+              target = 1                                                           // target: 1 (self)
+              parameter1 = 0                                                       // param1: 0 (IDS Entry - anything)
+              parameter2 = 2                                                       // param2: 2 (IDS File - EA.IDS)
+              timing = 2                                                           // timing mode: 2 (while equipped)
+            STR_VAR
+              resource = GIANT3                                                    // resref: GIANT3.EFF (-4 to hit penalty vs. gnomes while equipped)
+          END
+        END
+      BUT_ONLY_IF_IT_CHANGES
+    END
+  END
+END
+
+
+// Bugbear attack roll penalty vs. gnomes (Bugbears are introduced by other mods)
+
+ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
+              ~BUGBEAR~                                                            // Bugbear (Big Picture)
+              ~BUGARCH~                                                            // Bugbear Bugarch (Big Picture)
+             ~TCBUGB01~                                                            // Bugbear (Classic Adventures)
+             ~TCBUGB02~                                                            // Bugbear 2 (Classic Adventures)
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                              // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+      PATCH_IF valid BEGIN
+        PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                             // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+        LPF ADD_CRE_EFFECT
+          INT_VAR
+            opcode = 177                                                           // effect: #177 (use EFF file)
+            target = 1                                                             // target: 1 (self)
+            parameter1 = 0                                                         // param1: 0 (IDS Entry - anything)
+            parameter2 = 2                                                         // param2: 2 (IDS File - EA.IDS)
+            timing = 9                                                             // timing mode: 9 (permanent after death)
+          STR_VAR
+            resource = RR#GNRT                                                     // resref: RR#GNRT.EFF (-4 to hit penatlty vs. gnomes)
+        END
+      END
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END

@@ -1,0 +1,79 @@
+
+// Add ToB scripting actions/triggers to SoA (borrowed from the G3 BG2 Fixpack with thanks) 
+INCLUDE ~atweaks/lib/tob2soa.tph~
+
+COPY ~aTweaks/SPL/RR#DWRT.SPL~ ~override~                                       // spell which grants the additional dwarwen racial traits
+COPY ~aTweaks/EFF/RR#DWGOB.EFF~ ~override~                                      // to hit bonus vs. hobgoblins (and goblins since they use the same race in BG2)
+COPY ~aTweaks/EFF/RR#DWORC.EFF~ ~override~                                      // +1 to hit bonus vs. orcs
+COPY ~aTweaks/EFF/RR#DWHOR.EFF~ ~override~                                      // +1 to hit bonus vs. half-orcs
+COPY ~aTweaks/EFF/RR#DWRT.EFF~  ~override~                                      // -4 to hit penalty vs. dwarves (for trolls, ogres etc.)
+EXTEND_BOTTOM ~dplayer3.bcs~  ~aTweaks/BAF/RR#DWRT.BAF~                         // extend the party script for Player1 with the dwarven racial trait block
+EXTEND_BOTTOM ~dplayer2.bcs~  ~aTweaks/BAF/RR#DWRT.BAF~                         // extend the party script for other party members with the dwarven racial trait block
+
+
+// Ogre attack roll penalty vs. dwarves (implemented through patching all CREs of the Ogre race)
+
+COPY_EXISTING_REGEXP GLOB ~^.+\.cre$~ ~override~
+  PATCH_INCLUDE ~aTweaks/lib/fj_cre_validity.tpp~                               // Nythrun's CRE validity macro (detects corrupt and invalid CREs)
+  PATCH_IF valid BEGIN
+    READ_BYTE 0x272 "race"                                                      // check the creature's race
+    PATCH_IF (%race% = 113) BEGIN                                               // if the creature's race is Ogre
+      PATCH_INCLUDE ~aTweaks/lib/fj_cre_reindex.tpp~                            // Nythrun's CRE reindex macro (this also calls the EFF macro if needed)
+      LPF ADD_CRE_EFFECT
+        INT_VAR
+          opcode = 177
+          target = 1
+          parameter1 = 0
+          parameter2 = 2
+          timing = 9
+        STR_VAR
+          resource = RR#DWRT
+      END      
+    END
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+
+// Troll attack roll penalty vs. dwarves (implemented through patching an equipped item)
+
+COPY_EXISTING ~trollimm.itm~ ~override~                                            // a ring which is equipped by all trolls in the game
+  LPF ADD_ITEM_EQEFFECT
+    INT_VAR
+      opcode = 177                                                                 // effect: #177 (use EFF file)
+      target = 1                                                                   // target: 1 (self)
+      parameter1 = 0                                                               // param1: 0 (IDS Entry - anything)
+      parameter2 = 2                                                               // param2: 2 (IDS File - EA.IDS)
+      timing = 2                                                                   // timing mode: 2 (while equipped)
+    STR_VAR
+      resource = GIANT1                                                            // resref: GIANT1.EFF (-4 to hit penalty vs. dwarves while equipped) 
+  END
+BUT_ONLY
+
+
+// Giant attack roll penalty vs. dwarves (implemented through patching giant weapons, approach borrowed from the G3 BG2 Fixpack with thanks)
+
+ACTION_IF NOT MOD_IS_INSTALLED SETUP-BG2FIXPACK.TP2 106 THEN BEGIN                 // G3 BG2 Fixpack OBC component check
+  ACTION_FOR_EACH ~file~ IN
+                  ~giafir~
+                  ~giafir2~
+                  ~giafir3~
+                  ~giants01~
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
+      COPY_EXISTING ~%file%.itm~ ~override~
+        PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
+          LPF ADD_ITEM_EQEFFECT
+            INT_VAR
+              opcode = 177                                                                 // effect: #177 (use EFF file)
+              target = 1                                                                   // target: 1 (self)
+              parameter1 = 0                                                               // param1: 0 (IDS Entry - anything)
+              parameter2 = 2                                                               // param2: 2 (IDS File - EA.IDS)
+              timing = 2                                                                   // timing mode: 2 (while equipped)
+            STR_VAR
+              resource = GIANT1                                                         // resref: GIANT1.EFF (-4 to hit penalty vs. dwarves while equipped)
+          END
+        END
+      BUT_ONLY_IF_IT_CHANGES
+    END
+  END
+END

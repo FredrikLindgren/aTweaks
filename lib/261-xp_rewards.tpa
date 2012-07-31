@@ -1,0 +1,38 @@
+
+ACTION_IF improved_xp_rewards BEGIN
+  ACTION_DEFINE_ARRAY xpbonus_locks BEGIN 0 20  20  50  50  50  100  100  100  200  200  300  300  400  400  400  500 END
+  ACTION_DEFINE_ARRAY xpbonus_traps BEGIN 0 50  50  100 100 100 200  200  200  400  400  600  600  800  800  800  1000 END
+  ACTION_DEFINE_ARRAY xpbonus_scrolls BEGIN 0 50 100 200 500 1000 3000 5000 7000 9000 END
+  ACTION_DEFINE_ARRAY xpbonus_master BEGIN nil xpbonus_locks xpbonus_traps xpbonus_scrolls END
+
+  COPY_EXISTING xpbonus.2da override
+    COUNT_2DA_COLS num_col
+    FOR (i=1;i<4;++i) BEGIN
+      SPRINT array $xpbonus_master("%i%")
+      FOR (j=1;j<num_col;++j) BEGIN
+        PATCH_IF VARIABLE_IS_SET $EVAL "%array%"("%j%") BEGIN
+          k = j
+          SET_2DA_ENTRY_LATER s2el_xpbonus i j $EVAL "%array%"("%j%")
+        END ELSE PATCH_IF i < 3 BEGIN
+          SET_2DA_ENTRY_LATER s2el_xpbonus i j $EVAL "%array%"("%k%")
+        END
+      END
+    END
+    SET_2DA_ENTRIES_NOW s2el_xpbonus num_col - 1
+    PRETTY_PRINT_2DA
+  BUT_ONLY
+END
+
+
+ACTION_IF !improved_xp_rewards BEGIN
+  COPY_EXISTING xpbonus.2da override
+    COUNT_2DA_COLS num_col
+    FOR (i=1;i<4;++i) BEGIN
+      FOR (j=1;j<num_col;++j) BEGIN
+        SET_2DA_ENTRY_LATER s2el_xpbonus i j 0
+      END
+    END
+    SET_2DA_ENTRIES_NOW s2el_xpbonus num_col - 1
+    PRETTY_PRINT_2DA
+  BUT_ONLY
+END
