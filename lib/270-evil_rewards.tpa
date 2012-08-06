@@ -1,8 +1,26 @@
 
+DEFINE_ACTION_FUNCTION work_around_function BEGIN
+  //I had hoped LOAD_TRA would not modify the global environment inside a function, but it does,
+  //so we need to undo it by loading the main tra at the end
+  LOAD_TRA ~atweaks/tra/english/evil_rewards.tra~ ~atweaks/tra/%LANGUAGE%/evil_rewards.tra~
+  
+  COPY_EXISTING misc9v.itm override
+    SAY IDENTIFIED_DESC @70
+  BUT_ONLY
+
+  COPY_EXISTING baldur.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY ~\(SetGlobal("drowEraseJournal","GLOBAL",2)\)~ ~EraseJournalEntry(@58) EraseJournalEntry(@59) \1~
+    END
+  BUT_ONLY
+
+  LOAD_TRA ~atweaks/tra/english/atweaks.tra~ ~atweaks/tra/%LANGUAGE%/atweaks.tra~
+END
+
 COMPILE ~atweaks/dlg/evil_rewards.d~ USING ~atweaks/tra/english/evil_rewards.tra~ ~atweaks/tra/%LANGUAGE%/evil_rewards.tra~
 
 //Trademeet
-COPY_EXISTING cefald01.cre ~override/fl#fald.cre~ //todo: check what SCSII does here (wrt. scripts) and accommodate
+COPY_EXISTING cefald01.cre ~override/fl#fald.cre~
   WRITE_ASCII 0x248 shoutdlg #8
   WRITE_ASCII 0x250 trevil #8
   WRITE_ASCII 0x258 cefald03 #8
@@ -14,6 +32,18 @@ COPY_EXISTING ar1901.bcs override
   END
 BUT_ONLY
 
+COPY_EXISTING bolt08.itm override
+  WRITE_SHORT 0x42 55 //Lore to identify
+BUT_ONLY
+
+COPY_EXISTING misc3f.itm override
+  WRITE_SHORT 0x42 60 //Lore to identify
+  GET_OFFSET_ARRAY ab_array ITM_V10_HEADERS
+  PHP_EACH ab_array AS i => off BEGIN
+    WRITE_BYTE off + 0x1 1 //Identify before use
+  END
+BUT_ONLY
+
 
 //Ust Natha
 COPY_EXISTING udimp.cre ~override/fl#udimp.cre~
@@ -22,7 +52,7 @@ COPY_EXISTING udimp.cre ~override/fl#udimp.cre~
   WRITE_ASCII  0x2cc fl#udimp #8
 
 EXTEND_BOTTOM udsoltri.bcs "atweaks/baf/fake_eggs.baf"
-//todo: erase the journal entries when DrowCityHostile or when you complete the quest, in either manner
+LAF work_around_function END
 
 
 //Saradush

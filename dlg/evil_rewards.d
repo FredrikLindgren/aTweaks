@@ -1,5 +1,6 @@
 
 //Windspear
+/*
 ALTER_TRANS firkra02 BEGIN 34 END BEGIN 0 END BEGIN ACTION //todo: use something less destructive than ALTER_TRANS
 ~GiveItem("clck20",LastTalkedToBy)
 TakePartyItem("misc9l")
@@ -13,15 +14,66 @@ SetGlobal("FirkraagDeal","GLOBAL",0)
 EraseJournalEntry(49476)
 EraseJournalEntry(49465)~
 END
+*/
+REPLACE_TRANS_ACTION firkra02 BEGIN 34 END BEGIN 0 END
+~AddXPObject(Player1,40500)~ ~~
+
+ADD_TRANS_ACTION firkra02 BEGIN 34 END BEGIN 0 END
+~AddXPObject(Player1,44500)~
+
+REPLACE_TRANS_ACTION firkra02 BEGIN 34 END BEGIN 0 END
+~AddXPObject(Player2,40500)~ ~AddXPObject(Player2,44500)~
+
+REPLACE_TRANS_ACTION firkra02 BEGIN 34 END BEGIN 0 END
+~AddXPObject(Player3,40500)~ ~AddXPObject(Player3,44500)~
+
+REPLACE_TRANS_ACTION firkra02 BEGIN 34 END BEGIN 0 END
+~AddXPObject(Player4,40500)~ ~AddXPObject(Player4,44500)~
+
+REPLACE_TRANS_ACTION firkra02 BEGIN 34 END BEGIN 0 END
+~AddXPObject(Player5,40500)~ ~AddXPObject(Player5,44500)~
+
+REPLACE_TRANS_ACTION firkra02 BEGIN 34 END BEGIN 0 END
+~AddXPObject(Player6,40500)~ ~AddXPObject(Player6,44500)~
+
 
 //Trademeet
+APPEND trevil01 
+IF ~~ THEN BEGIN alt_reward
+SAY @0
+COPY_TRANS trevil01 30
+END
+END
+
+ALTER_TRANS trevil01 BEGIN 26 END BEGIN 2 END BEGIN TRIGGER
+~False()~
+END
+
+ALTER_TRANS trevil01 BEGIN 27 28 END BEGIN 1 END BEGIN TRIGGER
+~False()~
+END
+
+EXTEND_BOTTOM trevil01 26 #1
+IF ~~ THEN REPLY #50663 GOTO alt_reward
+END
+
+EXTEND_BOTTOM trevil01 27 #1
+IF ~~ THEN REPLY #50686 GOTO alt_reward
+END
+
+EXTEND_BOTTOM trevil01 28 #1
+IF ~~ THEN REPLY #50691 GOTO alt_reward
+END
+
 REPLACE_TRANS_ACTION trevil01 BEGIN 39 END BEGIN 0 END
 ~GiveGoldForce(1000)~ ~GiveGoldForce(3000)~
 
-//todo: need to replace the Shield, since you also get it from Busya
+REPLACE_TRANS_ACTION trevil01 BEGIN 39 END BEGIN 0 END
+~GiveItemCreate("shld25",LastTalkedToBy,0,0,0)~
+~GiveItemCreate("misc3f",LastTalkedToBy,1,0,0) GiveItemCreate("bolt08",LastTalkedToBy,5,0,0)~
 
 ADD_TRANS_ACTION trevil01 BEGIN 39 END BEGIN 0 END
-~AddXPObject(Player1,42500) //todo: probably lower these a bit; or look into the total reward for the good path (possible accumulation)
+~AddXPObject(Player1,42500)
 AddXPObject(Player2,42500)
 AddXPObject(Player3,42500)
 AddXPObject(Player4,42500)
@@ -50,6 +102,7 @@ AddXPObject(Player6,25750)~
 
 
 //Chapter 3
+/*
 ALTER_TRANS bodhi BEGIN 22 END BEGIN 0 1 2 END BEGIN ACTION //todo: use something less destructive than ALTER_TRANS
 ~AddXPObject(Player1,45000)
 AddXPObject(Player2,45000)
@@ -59,6 +112,24 @@ AddXPObject(Player5,45000)
 AddXPObject(Player6,45000)
 TakePartyGold(15000)~
 END
+*/
+REPLACE_TRANS_ACTION bodhi BEGIN 22 END BEGIN 0 1 2 END
+~AddXPObject(Player1,36750)~ ~AddXPObject(Player1,45000)~
+
+REPLACE_TRANS_ACTION bodhi BEGIN 22 END BEGIN 0 1 2 END
+~AddXPObject(Player2,36750)~ ~AddXPObject(Player2,45000)~
+
+REPLACE_TRANS_ACTION bodhi BEGIN 22 END BEGIN 0 1 2 END
+~AddXPObject(Player3,36750)~ ~AddXPObject(Player3,45000)~
+
+REPLACE_TRANS_ACTION bodhi BEGIN 22 END BEGIN 0 1 2 END
+~AddXPObject(Player4,36750)~ ~AddXPObject(Player4,45000)~
+
+REPLACE_TRANS_ACTION bodhi BEGIN 22 END BEGIN 0 1 2 END
+~AddXPObject(Player5,36750)~ ~AddXPObject(Player5,45000)~
+
+REPLACE_TRANS_ACTION bodhi BEGIN 22 END BEGIN 0 1 2 END
+~AddXPObject(Player6,36750)~ ~AddXPObject(Player6,45000)~
 
 
 //Ust Natha
@@ -81,8 +152,8 @@ AddXPObject(Player5,99500)
 AddXPObject(Player6,99500)~
 END
 
-ALTER_TRANS uddemon BEGIN 8 END BEGIN 1 END BEGIN
-"TRIGGER" ~False()~
+ALTER_TRANS uddemon BEGIN 8 END BEGIN 1 END BEGIN TRIGGER
+~False()~
 END
 
 EXTEND_TOP uddemon 8 #1 
@@ -96,6 +167,10 @@ AddXPObject(Player3,25000)
 AddXPObject(Player4,25000)
 AddXPObject(Player5,25000)
 AddXPObject(Player6,25000)~
+
+ADD_TRANS_ACTION uddemon BEGIN 11 13 21 22 END BEGIN 0 END
+~EraseJournalEntry(@58)
+EraseJournalEntry(@59)~
 
 //Adalon's imp
 BEGIN fl#udimp
@@ -123,7 +198,7 @@ END
 APPEND udimp
 IF WEIGHT #-1 ~GlobalGT("fl#fakeeggs","GLOBAL",0)~ BEGIN phaereabode1
 SAY @57
-IF ~PartyHasItem("MISC9t")~ UNSOLVED_JOURNAL @58 DO "EraseJournalEntry(@56)" GOTO phaereabode2  //Add EraseJounal in a better way than extending baldur.bcs
+IF ~PartyHasItem("MISC9t")~ UNSOLVED_JOURNAL @58 DO "EraseJournalEntry(@56)" GOTO phaereabode2
 IF ~!PartyHasItem("MISC9t")~ UNSOLVED_JOURNAL @59 DO "EraseJournalEntry(@56)" GOTO phaereabode3
 END
 
