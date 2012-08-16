@@ -496,12 +496,6 @@ ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
 COPY_EXISTING ~sppr702.spl~  ~override/rr#srbk1.spl~                               // Backup SR's Summon Shambling Mound
 END                                                                                // ends Spell Revisions compatibility block
 
-//Back up Elemental Transformation creatures and restore them after the creature patches, for Refinements-style transformations (less work this way)
-ACTION_IF FILE_EXISTS_IN_GAME li#eltr.spl BEGIN //Refinements HLAs
-  COPY_EXISTING drufir01.cre "atweaks/backup"
-                druear01.cre "atweaks/backup"
-END
-
 
 // Ensure that the mental combat script is assigned to all elementals summoned by arcane spellcasters. Also, these elementals need to start out as NEUTRAL
 
@@ -1338,6 +1332,7 @@ ACTION_FOR_EACH ~file~ IN                                                       
                ~SUAIR~                                                             // Air Elemental (Suldanesselar, Tree of Life guardian)
             ~SWAAIR02~                                                             // Air Elemental (20+ HD, summoned, Elemental Summoning HLA)
               ~UDELDA~                                                             // Air Elemental (Underdark portal guardian)
+              li#druai                                                             // Elemental transformation air (Refinements)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -1382,6 +1377,8 @@ INT_VAR                                                                         
 "newclass" = "186"                                                                 // new class (ELEMENTAL_AIR)
 "newalign" = "34"                                                                  // new alignment (True Neutral)
 "enforce"  = "1"                                                                   // values are enforced for all creatures
+STR_VAR
+  notenf01 = li#druai
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
 STR_VAR                                                                            // Initialize strings
@@ -1400,6 +1397,7 @@ STR_VAR                                                                         
 "script12"   = "CRESHOUT"                                                          // Big Picture shout script
 "script13"   = "HUMANSHT"                                                          // Big Picture shout script
 "script14"   = "BPWDASGT"                                                          // Big Picture generic AI script
+skipfile01   = li#druai
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
 LAUNCH_PATCH_FUNCTION air_affinity END                                             // grant air affinity bonuses
@@ -1668,6 +1666,10 @@ ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                         
 REPLACE_CRE_ITEM ~RR#EEARE~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~IMMUNE3~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                          // revise weapon immunities
 REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
+SPRINT notenf_regexp "^$"
+PATCH_IF FILE_EXISTS_IN_GAME li#druea.itm BEGIN                                    //Do not enforce if Refinements is installed
+  SPRINT notenf_regexp DRUEAR01
+END
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "newmove"  = "7"                                                                   // new movement rate
@@ -1698,6 +1700,8 @@ INT_VAR                                                                         
 "newclass" = "188"                                                                 // new class (ELEMENTAL_EARTH)
 "newalign" = "34"                                                                  // new alignment (True Neutral)
 "enforce"  = "1"                                                                   // values are enforced for all creatures
+STR_VAR
+  notenf_regexp
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
 STR_VAR                                                                            // Initialize strings
@@ -1995,6 +1999,10 @@ ADD_CRE_ITEM ~RR#ETRAI~ #0 #0 #0 ~UNDROPPABLE~ ~HELMET~                         
 REPLACE_CRE_ITEM ~RR#EFIRE~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace default weapon with a more PnP accurate weapon
 REPLACE_CRE_ITEM ~IMMUNE3~ #0 #0 #0 ~UNDROPPABLE~ ~LRING~                          // revise weapon immunities
 REMOVE_CRE_ITEM ~ELEMTYPE~                                                         // remove Spell Revisions' elemental traits
+SPRINT notenf_regexp "^$"
+PATCH_IF FILE_EXISTS_IN_GAME li#drufi.itm BEGIN                                    //Do not enforce DRUFIR01 if Refinements is installed
+  SPRINT nonenf_regexp DRUFIR01
+END
 LAUNCH_PATCH_FUNCTION ~RR#MDCRE~                                                   // Starts FUNCTION call (aTweaks' Creature Modification function)
 INT_VAR                                                                            // Initialize variables
 "rr#bump"  = "1"                                                                   // NPC bump (1 = enable)
@@ -2025,6 +2033,8 @@ INT_VAR                                                                         
 "newclass" = "187"                                                                 // new class (ELEMENTAL_FIRE)
 "newalign" = "34"                                                                  // new alignment (True Neutral)
 "enforce"  = "1"                                                                   // values are enforced for all creatures
+STR_VAR
+  notenf_regexp
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
 STR_VAR                                                                            // Initialize strings
@@ -2270,6 +2280,7 @@ SAY NAME1 @2118 SAY NAME2 @2118 SAY SELECT_COMMON1 @471 SAY BATTLE_CRY1 @471 SAY
 
 ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
             ~rr#ewate~                                                             // Elder Water Elemental (aTweaks)
+            li#druwa                                                               // Elemental transformation water (Refinements)
 BEGIN                                                                              // execute the following
 ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
 COPY_EXISTING ~%file%.cre~ ~override~
@@ -2310,12 +2321,15 @@ INT_VAR                                                                         
 "newclass" = "255"                                                                 // new class (NO_CLASS)
 "newalign" = "34"                                                                  // new alignment (True Neutral)
 "enforce"  = "1"                                                                   // values are enforced for all creatures
+STR_VAR
+  notenf01 = li#druwa
 END                                                                                // ends FUNCTION call
 LAUNCH_PATCH_FUNCTION ~RR#MDCSC~                                                   // Starts FUNCTION call (aTweaks' Creature Script Modification function)
 STR_VAR                                                                            // Initialize strings
 "newscript"  = "RR#EWAT"                                                           // new AI script
 "script01"   = ""                                                                  // first AI script name
 "script02"   = "None"                                                              // second AI script name
+skipfile01   = li#druwa
 END                                                                                // ends FUNCTION call
 LPF add_water_elemental_effects END
 // =============================================================================== // the actual work ends here
@@ -3046,14 +3060,22 @@ END                                                                             
 END                                                                                // ends ACTION_FOR_EACH block
 
 
-//Restore the backed-up Refinements creatures (vide supra)
+
 ACTION_IF FILE_EXISTS_IN_GAME li#eltr.spl BEGIN
-  ACTION_IF FILE_EXISTS "atweaks/backup/drufir01.cre" BEGIN
-    COPY "atweaks/backup/drufir01.cre" override
-  END
-  ACTION_IF FILE_EXISTS "atweaks/backup/druear01.cre" BEGIN
-    COPY "atweaks/backup/druear01.cre" override
-  END
+  //Patch up Refinements' druid elemental shapes to be roughly on par with atweaks'
+  COPY_EXISTING li#druwa.itm override
+    LPF DELETE_ITEM_EQEFFECT INT_VAR opcode_to_delete = 126 END //Remove movement rate penalty
+    PATCH_FOR_EACH resource IN RR#MMSWF RR#EHYIS BEGIN //Add spell immunities
+      LPF ADD_SPELL_EFFECT
+        INT_VAR
+          opcode = 206
+          target = 1
+          timing = 2
+        STR_VAR
+          resource
+      END
+    END
+  BUT_ONLY
 END
 
 

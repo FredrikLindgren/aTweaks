@@ -964,7 +964,7 @@ BUT_ONLY_IF_IT_CHANGES
 
 COPY_EXISTING ~SPWI905.SPL~  ~override~                                            // Gate (Wizard)
               ~SPPR703.SPL~  ~override~                                            // Gate (Cleric)
-  WRITE_ASCII 0x3a fl#905c #8                                                      // new spellbook icon 
+  WRITE_ASCII 0x3a fl#905c #8                                                      // new spellbook icon //todo: for some reason this is not working for SPPR703
   READ_LONG  0x64 "abil_off" ELSE 0
   READ_SHORT 0x68 "abil_num" ELSE 0
   READ_LONG  0x6a "fx_off"   ELSE 0
@@ -1029,18 +1029,22 @@ BUT_ONLY_IF_IT_CHANGES
 COPY_EXISTING ~SCRL9N.ITM~  ~override~                                             // Gate scroll
   WRITE_ASCII 0x3a fl#905a #8                                                      // new scroll icon
   SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @753 SAY UNIDENTIFIED_DESC @753        // retain old name but set new description
+  GET_OFFSET_ARRAY ab_array ITM_V10_HEADERS
+  PHP_EACH ab_array AS i => o BEGIN
+    WRITE_ASCII o + 0x4 fl#905a #8
+  END
 BUT_ONLY_IF_IT_CHANGES
 
 
 // New AI scripts
 
 COMPILE ~aTweaks/BAF/fiends/RR#SNABA.BAF~                                                 // Summoned Nabassu AI script
-COMPILE ~aTweaks/BAF/fiends/RR#SCORN.BAF~                                                 // Summoned Cornugon AI script
-COMPILE ~aTweaks/BAF/fiends/RR#TEMPT.BAF~                                                 // Summoned Glabrezu script for tempting mortals
-COMPILE ~aTweaks/BAF/fiends/RR#SGLAB.BAF~                                                 // Summoned Glabrezu AI script
-COMPILE ~aTweaks/BAF/fiends/RR#SGELU.BAF~                                                 // Summoned Gelugon AI script
-COMPILE ~aTweaks/BAF/fiends/RR#SPITF.BAF~                                                 // Summoned Pit Fiend AI script
-COMPILE ~aTweaks/BAF/fiends/RR#SBALR.BAF~                                                 // Summoned Balor AI script
+        ~aTweaks/BAF/fiends/RR#SCORN.BAF~                                                 // Summoned Cornugon AI script
+        ~aTweaks/BAF/fiends/RR#TEMPT.BAF~                                                 // Summoned Glabrezu script for tempting mortals
+        ~aTweaks/BAF/fiends/RR#SGLAB.BAF~                                                 // Summoned Glabrezu AI script
+        ~aTweaks/BAF/fiends/RR#SGELU.BAF~                                                 // Summoned Gelugon AI script
+        ~aTweaks/BAF/fiends/RR#SPITF.BAF~                                                 // Summoned Pit Fiend AI script
+        ~aTweaks/BAF/fiends/RR#SBALR.BAF~                                                 // Summoned Balor AI script
         ~atweaks/baf/fiends/fl#sarca.baf~
         ~atweaks/baf/fiends/fl#snyca.baf~
         ~atweaks/baf/fiends/fl#sultr.baf~
