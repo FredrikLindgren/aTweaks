@@ -1,7 +1,7 @@
 
 //Windspear
 /*
-ALTER_TRANS firkra02 BEGIN 34 END BEGIN 0 END BEGIN ACTION //todo: use something less destructive than ALTER_TRANS
+ALTER_TRANS firkra02 BEGIN 34 END BEGIN 0 END BEGIN ACTION
 ~GiveItem("clck20",LastTalkedToBy)
 TakePartyItem("misc9l")
 AddXPObject(Player1,44500)
@@ -73,12 +73,12 @@ REPLACE_TRANS_ACTION trevil01 BEGIN 39 END BEGIN 0 END
 ~GiveItemCreate("misc3f",LastTalkedToBy,1,0,0) GiveItemCreate("bolt08",LastTalkedToBy,5,0,0)~
 
 ADD_TRANS_ACTION trevil01 BEGIN 39 END BEGIN 0 END
-~AddXPObject(Player1,42500)
-AddXPObject(Player2,42500)
-AddXPObject(Player3,42500)
-AddXPObject(Player4,42500)
-AddXPObject(Player5,42500)
-AddXPObject(Player6,42500)~
+~AddXPObject(Player1,37500)
+AddXPObject(Player2,37500)
+AddXPObject(Player3,37500)
+AddXPObject(Player4,37500)
+AddXPObject(Player5,37500)
+AddXPObject(Player6,37500)~
 
 
 //Inspector Aegisfield, turning Cragmoon in
@@ -103,7 +103,7 @@ AddXPObject(Player6,25750)~
 
 //Chapter 3
 /*
-ALTER_TRANS bodhi BEGIN 22 END BEGIN 0 1 2 END BEGIN ACTION //todo: use something less destructive than ALTER_TRANS
+ALTER_TRANS bodhi BEGIN 22 END BEGIN 0 1 2 END BEGIN ACTION
 ~AddXPObject(Player1,45000)
 AddXPObject(Player2,45000)
 AddXPObject(Player3,45000)
@@ -160,7 +160,7 @@ EXTEND_TOP uddemon 8 #1
 IF ~~ REPLY #52147 DO ~TakePartyItem("misc9t") SetGlobal("EggsDie","GLOBAL",1) GiveGoldForce(20000)~ GOTO 11
 END
 
-ADD_TRANS_ACTION uddemon BEGIN 7 END BEGIN 10 11 END
+ADD_TRANS_ACTION uddemon BEGIN 7 END BEGIN 0 1 2 3 4 5 6 7 8 10 11 END
 ~AddXPObject(Player1,25000)
 AddXPObject(Player2,25000)
 AddXPObject(Player3,25000)
