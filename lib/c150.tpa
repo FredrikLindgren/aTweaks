@@ -1156,10 +1156,10 @@ COPY_EXISTING ~SPCACO.EFF~ ~override~                                           
 
 COPY_EXISTING ~SPPR703.SPL~  ~override~                                            // Revert CLERIC_GATE to its original state
   SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @754 SAY UNIDENTIFIED_DESC @754      // retain old name but set new description (divine)
-WRITE_ASCII 0x3a "SPPR703C" #8                                                     // spell icon: SPPR703C
-WRITE_ASCII 0x10 "CAS_P03" #8                                                      // casting sound: CAS_P03.WAV
-WRITE_SHORT 0x25 "2"                                                               // spell school: 2 (Conjuration)
-WRITE_SHORT 0x22 "14"                                                              // casting graphics: 14 (Conjuration)
+  WRITE_ASCII 0x3a fl#905c   #8                                                    // spell icon: fl#905c
+  WRITE_ASCII 0x10 "CAS_P03" #8                                                    // casting sound: CAS_P03.WAV
+  WRITE_SHORT 0x25 "2"                                                             // spell school: 2 (Conjuration)
+  WRITE_SHORT 0x22 "14"                                                            // casting graphics: 14 (Conjuration)
   READ_LONG  0x64 "abil_off" ELSE 0
   READ_SHORT 0x68 "abil_num" ELSE 0
   READ_LONG  0x6a "fx_off"   ELSE 0
@@ -1167,7 +1167,7 @@ WRITE_SHORT 0x22 "14"                                                           
   FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN
    WRITE_SHORT ("%abil_off%" + 0x0e + (0x28 * "%index%")) "30"                     // set range to 30 (visual range)
    WRITE_SHORT ("%abil_off%" + 0x12 + (0x28 * "%index%")) "5"                      // set casting time to 5
-   WRITE_ASCII ("%abil_off%" + 0x04 + (0x28 * "%index%")) ~SPPR703B~               // revert icon to SPPR703B
+   WRITE_ASCII ("%abil_off%" + 0x04 + (0x28 * "%index%")) fl#905b #8               // set icon to fl#905b
     READ_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
     READ_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
     SET "abil_fx_idx" = ("%abil_fx_idx%" + "%delta%")
