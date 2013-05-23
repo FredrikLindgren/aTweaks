@@ -31,10 +31,6 @@ ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DS.RR~ THEN BEGIN                         
  LAUNCH_ACTION_MACRO ~label_weapons~
 END
 
-ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#EVAL.2DA~ THEN BEGIN                         // only copy the evaluation file once
-  COPY ~aTweaks/LIB/RR#EVAL.2DA~ ~override~
-END
-
 ACTION_IF !FILE_EXISTS_IN_GAME rr#trat.cre BEGIN
   COPY ~atweaks/cre/rr#trat.cre~ ~override~                                         // Targeting Rat (script aid)
   COMPILE ~atweaks/baf/rr#trat.baf~                                                 // Targeting Rat AI script
@@ -50,63 +46,38 @@ ACTION_IF !FILE_EXISTS_IN_GAME rr#usumn.spl BEGIN
     SAY NAME1 @2132 SAY NAME2 @2132
 END
 
-// Add new secondary types
+// Add new secondary types; this is already non-cumulative
 
-ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da RR#ETHER) BEGIN
-  ADD_SECTYPE RR#ETHER @707
-  APPEND RR#EVAL.2da "RR#ETHER %RR#ETHER%"
-END
-ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Disease) BEGIN
-  ADD_SECTYPE fl#Disease #2449
-  APPEND RR#EVAL.2da "fl#Disease %fl#Disease%"
-END
-ACTION_IF !FILE_CONTAINS_EVALUATED (msectype.2da fl#Fear) BEGIN
-  ADD_SECTYPE fl#Fear @1027
-  APPEND rr#eval.2da "fl#Fear %fl#Fear%"
-END
-
-LAF ret_from_eval STR_VAR f_Entry = RR#ETHER RET RR#ETHER = f_Value END            //Retrieve stored values from RR#EVAL.2da
-LAF ret_from_eval STR_VAR f_Entry = fl#Disease RET fl#Disease = f_Value END
-
-//Add new projectiles
-
-ACTION_IF !FILE_EXISTS_IN_GAME rr#spain.pro BEGIN
-  ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                        // New projectile for Symbol Pain (party friendly)
-  APPEND RR#EVAL.2da "RR#SPAIN %RR#SPAIN%"
-END
-ACTION_IF !FILE_EXISTS_IN_GAME fl#cnenp.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/fl#cnenp.pro~                                        //Invisible, cone-shaped projectile, party-friendly
-  APPEND RR#EVAL.2da "fl#cnenp %fl#cnenp%"
-END
-ACTION_IF !FILE_EXISTS_IN_GAME fl#sight.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/fl#sight.pro~                                        //Like INAREANP, but extends roughly as far as you can see
-  APPEND RR#EVAL.2da "fl#sight %fl#sight%"
-END
-ACTION_IF !FILE_EXISTS_IN_GAME rr#pyrot.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/rr#pyrot.pro~                                        // New projectile for Pyrotechnics
-  APPEND RR#EVAL.2da "rr#pyrot %rr#pyrot%"
-END
-ACTION_IF !FILE_EXISTS_IN_GAME rr#fcsng.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/rr#fcsng.pro~                                        // New projectile for Charming Song
-  APPEND RR#EVAL.2da "rr#fcsng %rr#fcsng%"
-END
-ACTION_IF !FILE_EXISTS_IN_GAME rr#icew.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/rr#icew.pro~                                         // New projectile for Wall of Ice
-  APPEND RR#EVAL.2da "rr#icew %rr#icew%"
-END
-ACTION_IF !FILE_EXISTS_IN_GAME rr#vrpo.pro BEGIN
-  ADD_PROJECTILE ~atweaks/pro/rr#vrpo.pro~                                         // New projectile for Wall of Ice
-  APPEND ~RR#EVAL.2DA~ ~rr#vrpo %rr#vrpo%~ UNLESS ~rr#vrpo~
-END
+ADD_SECTYPE RR#ETHER @707
+ADD_SECTYPE fl#Disease #2449
+ADD_SECTYPE fl#Fear @1027
 
 
-LAF ret_from_eval STR_VAR f_Entry = RR#SPAIN RET RR#SPAIN = f_Value END
-LAF ret_from_eval STR_VAR f_Entry = fl#cnenp RET fl#cnenp = f_Value END
-LAF ret_from_eval STR_VAR f_Entry = fl#sight RET fl#sight = f_Value END
-LAF ret_from_eval STR_VAR f_Entry = rr#pyrot RET rr#pyrot = f_Value END
-LAF ret_from_eval STR_VAR f_Entry = rr#fcsng RET rr#fcsng = f_Value END
-LAF ret_from_eval STR_VAR f_Entry = rr#icew  RET rr#icew =  f_Value END
-LAF ret_from_eval STR_VAR f_Entry = rr#vrpo  RET rr#vrpo =  f_Value END
+//Add new projectiles; this is also non-cumulative
+
+ADD_PROJECTILE ~aTweaks/PRO/RR#SPAIN.PRO~                                          // New projectile for Symbol Pain (party friendly)
+ADD_PROJECTILE ~atweaks/pro/fl#cnenp.pro~                                          //Invisible, cone-shaped projectile, party-friendly
+ADD_PROJECTILE ~atweaks/pro/fl#sight.pro~                                          //Like INAREANP, but extends roughly as far as you can see
+ADD_PROJECTILE ~atweaks/pro/rr#pyrot.pro~                                          // New projectile for Pyrotechnics
+ADD_PROJECTILE ~atweaks/pro/rr#fcsng.pro~                                          // New projectile for Charming Song
+ADD_PROJECTILE ~atweaks/pro/rr#icew.pro~                                           // New projectile for Wall of Ice
+ADD_PROJECTILE ~atweaks/pro/rr#vrpo.pro~                                           // New projectile for Wall of Ice
+
+//We forcibly reload all PRO variables, because there's a bug in WeiDU 231
+COPY_EXISTING missile.ids override
+  READ_2DA_ENTRIES_NOW buff 2
+  PATCH_FOR_EACH pro IN RR#SPAIN fl#cnenp fl#sight rr#pyrot rr#fcsng rr#icew rr#vrpo BEGIN
+    FOR (i = buff - 1; i >= 0; --i) BEGIN
+      READ_2DA_ENTRY_FORMER buff i 1 label
+      PATCH_IF "%label%" STRING_EQUAL_CASE "%pro%" BEGIN
+        READ_2DA_ENTRY_FORMER buff i 0 real_value
+        SET EVAL "%pro%" = real_value
+        i = "-1"
+      END
+    END
+  END
+BUT_ONLY
+
 
 // Add shared VVCs and BAMs
 
