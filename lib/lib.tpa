@@ -455,9 +455,53 @@ DEFINE_PATCH_FUNCTION integrate_sectypes_inner BEGIN
   END
 END
 
+DEFINE_PATCH_FUNCTION integrate_sectype_cre BEGIN
+  READ_LONG 0x2c4 eo
+
+  // First, check out what's already there
+  FOR (i = 0; i < LONG_AT 0x2c8; ++i) BEGIN
+    p = eo + 0x108 * i + 0x8
+    READ_LONG p fx ELSE 999
+    PATCH_IF type = 206 BEGIN // Protecton from spell
+      READ_ASCII p + 0x14 rr ELSE nil
+      TO_LOWER rr
+      SET $extended_spell_immunity("%rr%") = 1
+    END
+    PATCH_IF fx = 101 BEGIN // Immunity to effect
+      READ_LONG p + 0x10 p2 ELSE 999
+      SET $immunities("%p2%") = 1
+    END
+  END
+
+  // Then we see what, if anything, we need to do
+  PHP_EACH immunities AS type => i BEGIN
+    PATCH_IF VARIABLE_IS_SET $f_ImmunitySecType("%type%") BEGIN
+      PHP_EACH f_AddSecType AS file => SecTypeToAdd BEGIN
+        PATCH_IF "%file%" STRING_MATCHES_REGEXP ".+\.spl$" = 0 AND SecTypeToAdd = $f_ImmunitySecType("%type%") BEGIN
+          INNER_PATCH "%file%" BEGIN
+            READ_ASCII 0 spell (STRING_LENGTH "%file%" - 4)
+          END
+          TO_LOWER spell
+          PATCH_IF !VARIABLE_IS_SET $extended_spell_immunity("%spell%") BEGIN
+            LPF ADD_CRE_EFFECT
+              INT_VAR
+                opcode = 206
+                target = 1
+                timing = 9
+              STR_VAR
+                resource = EVAL "%spell%"
+            END
+          END
+        END
+      END
+    END
+  END
+END
+
+
 //Add the SecTypes to items and spells that should grant immunity or be able to remove them
 //Needs the three arrays:
-//f_AddSecType(file) = SecType -> Associates a SecType with a specific file. Items and spells that grant immunity to e.g. disease will grant immunity to this particular file (spell) as well
+//f_AddSecType(file) = SecType -> Associates a SecType with a specific file. Items and spells that grant immunity to e.g. disease will grant immunity to this particular file (spell) as well. Creatures with immunity effects will also be affected.
 //f_ImmunitySecType(opcode) = SecType -> opcode is the opcode used to determine if a spell/item should grant immunity to the file (spell).
 //f_RemoveSecType(opcode) = Secype -> opcode is the opcode used to determine if a spell/item should cure the secondary type.
 //E.g. is your secondary type covers disease you would have:
@@ -468,6 +512,11 @@ DEFINE_ACTION_FUNCTION integrate_sectypes BEGIN
   COPY_EXISTING_REGEXP GLOB ~.+\.\(spl\|itm\)$~ override
     PATCH_IF SOURCE_SIZE > 0x71 BEGIN
       LPF integrate_sectypes_inner END
+    END
+  BUT_ONLY
+  COPY_EXISTING_REGEXP GLOB ~.+\.cre$~ override
+    PATCH_IF SOURCE_SIZE > 0x2d3 BEGIN
+      LPF integrate_sectype_cre END
     END
   BUT_ONLY
 END
