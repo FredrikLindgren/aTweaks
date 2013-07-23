@@ -5,7 +5,11 @@ ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DDOOR.BAM~ THEN BEGIN                     
   COPY    ~aTweaks/VVC/RR#DDOOR.VVC~   ~override~                                  // Custom Dimension Door VVC
 END
 
-COPY ~atweaks/spl/spwi402.spl~ ~override~                                          // Dimension Door
+LAF handle_old_dd END
+
+LAF make_dimension_door STR_VAR graphic = RR#DDOOR sound = RR#DDOOR END
+
+COPY_EXISTING ~spwi402.spl~ ~override~                                             // Dimension Door
   SAY UNIDENTIFIED_DESC @1891 SAY DESC @1891
 
 COPY ~atweaks/itm/rr#scr1v.itm~ ~override~                                         // Dimension Door scroll
@@ -33,14 +37,14 @@ ACTION_IF MOD_IS_INSTALLED SPELL_REV.TP2 0 THEN BEGIN                           
 END
 
 ACTION_IF FILE_EXISTS_IN_GAME ~d0scrldd.itm~ BEGIN                                 // Check for D0Tweaks' Dimension Door component
-  COPY ~atweaks/spl/spwi402.spl~ ~override/spwi450.spl~                            // Dimension Door (D0 Tweaks)
+  COPY_EXISTING ~spwi450.spl~ ~override~                                           // Dimension Door (D0 Tweaks)
     SAY DESC @1891
   COPY ~atweaks/itm/rr#scr1v.itm~ ~override/d0scrldd.itm~                          // Dimension Door scroll (D0 Tweaks)
     SAY DESC @1891
 END
 
 ACTION_IF GAME_IS ~tutu tutu_totsc~ THEN BEGIN                                     // Tutu check
-  COPY ~atweaks/spl/spwi402.spl~ ~override/spwi450.spl~                            // Dimension Door (Tutu)
+  COPY_EXISTING ~spwi450.spl~ ~override~                                           // Dimension Door (Tutu)
     SAY DESC @1891
   COPY ~atweaks/itm/rr#scr1v.itm~ ~override/_scrl1v.itm~                           // Dimension Door scroll (Tutu)
     SAY DESC @1891
@@ -50,15 +54,11 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.sto$~ ~override~                                
   PATCH_IF (%SOURCE_SIZE% > 0x9b) THEN BEGIN                                       // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
     READ_LONG 0x08 "itemtype" ELSE 0                                               // check store type
     PATCH_IF ("%itemtype%" != 5) BEGIN                                             // if the store isn't a container
-      PATCH_IF NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~d0scrldd~) AND
-               NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~BGSCRL1V~) AND
-               NOT FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~_SCRL1V~) AND
-               FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~SCRL1U~)
-      BEGIN
-        ADD_STORE_ITEM ~rr#scr1v~ AFTER ~SCRL1U~ #1 #0 #0 ~IDENTIFIED~ #2          // Add 2x Dimension Door scroll
-      END
+      ADD_STORE_ITEM ~rr#scr1v~ AFTER ~SCRL1U~ #1 #0 #0 ~IDENTIFIED~ #2            // Add 2x Dimension Door scroll
     END
   END
+IF "_?SCRL1U" //confusion
+UNLESS "d0scrldd\|BGSCRL1V\|_SCRL1V" //DD from d0Tweaks, BGT and Tutu
 BUT_ONLY_IF_IT_CHANGES
 
 

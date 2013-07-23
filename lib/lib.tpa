@@ -2657,3 +2657,128 @@ DEFINE_PATCH_FUNCTION make_summon STR_VAR slot = boots BEGIN
     ADD_MEMORIZED_SPELL rr#usumn #0 innate (1)                       //'Unsummon' spell
   END ELSE PATCH_FAIL "make_summon: incorrect signature or below minimum file size (%SOURCE_FILE%)"
 END
+
+/*
+ * Basically, with their vanilla scripts, Davaeorn and Andris can
+ * act buggy with the IWD/PnP Dimension Door spell, so we keep them
+ * on the old spell.
+ */
+DEFINE_ACTION_FUNCTION handle_old_dd BEGIN
+  ACTION_IF !FILE_EXISTS_IN_GAME fl#ddold.spl AND
+            !FILE_EXISTS_IN_GAME dw#mage.mrk AND
+            GAME_IS ~tutu tutu_totsc bgt~
+
+  BEGIN
+    COPY_EXISTING spwi402.spl "override/fl#ddold.spl"
+
+    ACTION_FOR_EACH script IN "%TUTU_VAR%andris"
+                              "davaeorn"
+                              "_avaeorn"
+    BEGIN
+      ACTION_IF FILE_EXISTS_IN_GAME "%script%.bcs" BEGIN
+        COPY_EXISTING "%script%.bcs" override
+          DECOMPILE_AND_PATCH BEGIN
+            REPLACE_TEXTUALLY
+              ~ForceSpellPoint(\(.+\),WIZARD_DIMENSION_DOOR)~
+              ~ForceSpellPointRES("fl#ddold",\1)~
+            REPLACE_TEXTUALLY
+              ~SpellNoDec(\(.+\),WIZARD_DIMENSION_DOOR)~
+              ~SpellNoDecRES("fl#ddold",\1)~
+          END
+        BUT_ONLY
+        UNLESS "fl#ddold"
+      END
+    END
+  END
+END
+
+DEFINE_ACTION_FUNCTION make_dimension_door
+  STR_VAR
+    graphic = ""
+    sound = ""
+BEGIN
+  ACTION_FOR_EACH spell IN spwi402 spwi450 BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%spell%.spl" BEGIN
+      COPY "atweaks/spl/spwi402.spl" "override/%spell%.spl"
+        FOR (off = LONG_AT 0x6a; off < BUFFER_LENGTH; off += 0x30) BEGIN
+          READ_SHORT off opcode
+          PATCH_IF opcode = 215 BEGIN // play animation
+            WRITE_ASCIIE off + 0x14 "%graphic%" #8 // resref
+            WRITE_LONG off + 0x8 0 //p2: play over target, unattached
+          END
+          PATCH_IF opcode = 174 BEGIN // play sound
+            WRITE_ASCIIE off + 0x14 "%sound%" #8 // resref
+          END
+        END
+      BUT_ONLY
+    END
+  END
+END
+
+DEFINE_PATCH_FUNCTION dd_animation
+  INT_VAR
+    off = "-1"
+    opcode = 999
+    p2 = "-1"
+  STR_VAR
+    rr = ""
+    graphic = ""
+BEGIN
+  PATCH_IF opcode = 141 AND p2 = 38 BEGIN // lighting effect: dimension door
+    WRITE_SHORT  off        215 // play animation
+    WRITE_LONG   off + 0x8  0 // p2: play over target, unattached
+    WRITE_BYTE   off + 0xc  0 // timing
+    WRITE_LONG   off + 0xe  1 // duration
+    WRITE_ASCIIE off + 0x14 "%graphic%" #8 // resref
+  END
+END
+
+DEFINE_PATCH_FUNCTION dd_sound
+  INT_VAR
+    off = "-1"
+    opcode = 999
+  STR_VAR
+    rr = ""
+    sound = ""
+BEGIN
+  PATCH_IF opcode = 174 AND "%rr%" STRING_EQUAL_CASE EFF_M09 BEGIN // play sound
+    WRITE_LONG   off + 0xe  1 // duration
+    WRITE_ASCIIE off + 0x14 "%sound%" #8 // resref
+  END
+END
+
+DEFINE_ACTION_FUNCTION make_shadow_door
+  STR_VAR
+    graphic = ""
+    sound = ""
+BEGIN
+  COPY_EXISTING spwi505.spl override
+    FOR (off = LONG_AT 0x6a; off < BUFFER_LENGTH; off += 0x30) BEGIN
+      READ_SHORT off        opcode
+      READ_LONG  off + 0x8  p2
+      READ_ASCII off + 0x14 rr
+      LPF dd_animation INT_VAR off opcode p2 STR_VAR rr graphic END
+      LPF dd_sound INT_VAR off opcode STR_VAR rr sound END
+    END
+  BUT_ONLY
+END
+
+DEFINE_ACTION_FUNCTION make_dryad_teleport
+  STR_VAR
+    graphic = ""
+    sound = ""
+BEGIN
+  COPY_EXISTING spwi995.spl override
+    FOR (off = LONG_AT 0x6a; off < BUFFER_LENGTH; off += 0x30) BEGIN
+      READ_SHORT off opcode
+      READ_LONG  off + 0x8 p2
+      LPF dd_animation INT_VAR off opcode p2 STR_VAR rr graphic END
+      LPF dd_sound INT_VAR off opcode STR_VAR rr sound END
+      PATCH_IF opcode = 68 BEGIN // unsummon
+        // Dryad Teleport can't be instant; it breaks cutscenes.
+        WRITE_BYTE  off + 0xc  4 // timing
+        WRITE_LONG  off + 0xe  1 // duration
+      END
+    END
+  BUT_ONLY
+END
