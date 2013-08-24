@@ -20,16 +20,21 @@ ACTION_IF NOT FILE_EXISTS_IN_GAME ~RR#DS.RR~ THEN BEGIN                         
  OUTER_SPRINT ~oldfiles~ ~aTweaks/LIB/DS/oldfiles_kelsey.2da~
  OUTER_SPRINT ~oldswapfile~ ~aTweaks/LIB/DS/oldds_swap.2da~
  LAUNCH_ACTION_MACRO ~fix_old_DS_scripts~
- APPEND stats.ids "109 CLERIC_HALLOW" UNLESS CLERIC_HALLOW                         //Ensure that CLERIC_HALLOW is in there
-
- INCLUDE "atweaks/lib/DS/label_weapons.tph"                                        //Lifted from SCSII
- OUTER_SET ~weapon_enchantment_stat~=109
- OUTER_SET ~weapon_enchantment_type~=233
- /// The assumption is that slot 109 ("CLERIC_HALLOW") is used to indicate weapon enchantment. It's a proficiency,
- /// not a scripting state - that's what
- /// the ~type~ codes
- LAUNCH_ACTION_MACRO ~label_weapons~
 END
+
+ACTION_IF NOT FILE_EXISTS_IN_GAME fl#labelled_weapons.mrk BEGIN
+  INCLUDE "atweaks/lib/DS/label_weapons.tph"                                        //Lifted from SCSII
+  OUTER_SET ~weapon_enchantment_stat~=109
+  OUTER_SET ~weapon_enchantment_type~=233
+  /// The assumption is that slot 109 ("CLERIC_HALLOW") is used to indicate weapon enchantment. It's a proficiency,
+  /// not a scripting state - that's what
+  /// the ~type~ codes
+  LAUNCH_ACTION_MACRO ~label_weapons~
+  COPY_EXISTING sw1h01.itm "override/fl#labelled_weapons.mrk"
+END
+
+APPEND stats.ids "109 CLERIC_HALLOW" UNLESS CLERIC_HALLOW                         //Ensure that CLERIC_HALLOW is in there
+
 
 ACTION_IF !FILE_EXISTS_IN_GAME rr#trat.cre BEGIN
   COPY ~atweaks/cre/rr#trat.cre~ ~override~                                         // Targeting Rat (script aid)
