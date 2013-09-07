@@ -2782,3 +2782,30 @@ BEGIN
     END
   BUT_ONLY
 END
+
+DEFINE_PATCH_FUNCTION fiend_summoning_spell
+  INT_VAR
+    duration = 120
+  STR_VAR
+    lawful = rr#scorn
+    lcneutral = fl#sarca
+    chaotic = spcaco
+BEGIN
+  LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = 177 END
+  SET $p1("%lawful%") = 16 // MASK_LAWFUL
+  SET $p1("%lcneutral%") = 32 // MASK_LCNEUTRAL
+  SET $p1("%chaotic%") = 48 // MASK_CHAOTIC
+  PATCH_FOR_EACH resource IN "%lawful%" "%lcneutral%" "%chaotic%" BEGIN
+    LPF ADD_SPELL_EFFECT
+      INT_VAR
+        opcode = 177
+        target = 1
+        parameter1 = $p1("%resource%")
+        parameter2 = 8
+        resist_dispel = 2
+        duration
+      STR_VAR
+        resource
+    END
+  END
+END

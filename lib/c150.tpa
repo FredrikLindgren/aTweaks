@@ -472,16 +472,14 @@ COPY_EXISTING ~AR3004.ARE~ ~override~                                           
 BUT_ONLY_IF_IT_CHANGES
 
 
-
-
-//////////
-//Yugoloth
-//////////
+////////////////////////////////////////
+// Yugoloth
+////////////////////////////////////////
 
 //Ultroloth
 COPY "atweaks/cre/fiendbase.cre" "override/fl#sultr.cre"
   LPF make_ultroloth END
-    
+
 //Nycaloth
 COPY "atweaks/cre/fiendbase.cre" "override/fl#snyca.cre"
   LPF make_nycaloth END
@@ -491,11 +489,9 @@ COPY "atweaks/cre/fiendbase.cre" "override/fl#sarca.cre"
   LPF make_arcanaloth END
 
 
-
-
-///////////////
+////////////////////////////////////////
 // Nonaligned
-///////////////
+////////////////////////////////////////
 
 //Shadow Fiend
 ACTION_FOR_EACH file IN
@@ -552,114 +548,35 @@ BEGIN
 END
 
 
-
-//Create scripts and creatures outside the ACTION_IF in case SCSII is installed after 
-COMPILE ~atweaks/baf/fiends/fl#nabsu.baf~
-        ~atweaks/baf/fiends/fl#corsu.baf~
-        ~atweaks/baf/fiends/fl#glasu.baf~
-        ~atweaks/baf/fiends/fl#gelsu.baf~
-        ~atweaks/baf/fiends/fl#balsu.baf~
-        ~atweaks/baf/fiends/fl#pitsu.baf~
-        
-COPY_EXISTING ~demnab01.cre~ ~override/fl#nabsu.cre~
-              ~telcor1.cre~  ~override/fl#corsu.cre~
-             ~demgla01.cre~  ~override/fl#glasu.cre~
-              ~rr#hgel.cre~  ~override/fl#gelsu.cre~
-             ~dembal01.cre~  ~override/fl#balsu.cre~
-             ~dempit01.cre~  ~override/fl#pitsu.cre~
-  WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
-  WRITE_ASCIIE 0x248 "%DEST_RES%" #8                                               // summoned script
-  WRITE_ASCII  0x250 ~~ #8                                                         // disable class AI script
-  WRITE_ASCII  0x258 ~~ #8                                                         // disable race AI script
-  WRITE_ASCII  0x260 ~~ #8                                                         // disable general AI script
-  WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
-  WRITE_BYTE   0x270 255                                                           //Enemy                                                                                                                                  
-  WRITE_BYTE   0x275 1                                                             //Male 
-  WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32                                              //script name 
-  READ_LONG 0x2bc io
-  FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN                                              //Make all items unstealable&undroppable
-    WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
-  END
-  PATCH_IF FILE_EXISTS_IN_GAME dw#sumfi.itm AND !FILE_CONTAINS_EVALUATED ("%SOURCE_FILE%" "dw#sumfi") BEGIN
-    ADD_CRE_ITEM "dw#sumfi" #0 #0 #0 none boots
-  END
-
-//Commandeer SCSII's private fiend-summoning spells and have them summon SCSII-aTweaks hybrids
-ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND !FiendsOriginal BEGIN //FiendsOriginal eq "do not alter mod-added fiends"
-  
-  ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND FILE_EXISTS_IN_GAME dw#pitsu.eff BEGIN //If SCSII Improved Fiends is installed
-    OUTER_SPRINT $crefile("dw#cacof") "fl#nabsu"
-    OUTER_SPRINT $crefile("dw#sumbf") "fl#corsu"  
-    OUTER_SPRINT $crefile("dw#sumgl") "fl#glasu"
-    OUTER_SPRINT $crefile("dw#sumco") "fl#gelsu"
-    OUTER_SPRINT $crefile("dw#basum") "fl#balsu"
-    OUTER_SPRINT $crefile("dw#pitsu") "fl#pitsu"
-    
-    COPY_EXISTING "dw#cacof.eff" override
-                  "dw#sumbf.eff" override
-                  "dw#sumgl.eff" override
-                  "dw#sumco.eff" override
-                  "dw#basum.eff" override
-                  "dw#pitsu.eff" override
-      WRITE_ASCIIE 0x30 $crefile("%SOURCE_RES%") #8
-    BUT_ONLY
-  END /* ELSE BEGIN //Otherwise it is just SCSII Smarter Mages
-    
-    //These are copies of Mordenkainen's Sword; change them to conjure up the appropriate fiend instead
-    COPY_EXISTING dw#sumgl.spl override 
-                  dw#sumco.spl override
-                  dw#cacof.spl override
-                  dw#sumbf.spl override
-      
-      
-    //These are copies of Gate; change the other to conjure up a Balor
-    COPY_EXISTING dw#gatem.spl override
-                  dw#basum.spl override
-      
-      
-  END*/
-END
-
-//SCSII colours these dudes green, but we turn them into glabrezus and mariliths
-ACTION_IF FILE_EXISTS_IN_GAME dw#fiends_notinnate.mrk OR FILE_EXISTS_IN_GAME dw#fiends_innate.mrk BEGIN
-  COPY_EXISTING abydem01.cre override
-		obsdem01.cre override
-    LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 51 END
-END
-
-
+//////////////////////////////////////////////////////////////////////
 // New dialogues
+//////////////////////////////////////////////////////////////////////
 
-ACTION_IF FILE_EXISTS_IN_GAME ~x#amelia.dlg~ BEGIN
-  COMPILE ~atweaks/dlg/x#amelia.d~                                                        // Make Amelia change into a Sirine instead of a Fire Elemental (BG1 NPCs)
-END
-
-COMPILE ~atweaks/dlg/obsdem05.d~                                                          // revised Planar Sphere Nabassu dialogue (adds mephit/quasit spawning)
+// revised Planar Sphere Nabassu dialogue (adds mephit/quasit spawning)
+COMPILE ~atweaks/dlg/obsdem05.d~
 
 // Revised Planar Sphere Tanar'ri dialogue (removes mephit/quasit spawning)
-COPY_EXISTING abydem01.dlg override 
+COPY_EXISTING abydem01.dlg override
   DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("imp01",[1217.1897],2)~ ~~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("imp01",[1030.2269],9)~ ~~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("imp01",[932.1837],0)~ ~~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("impqua01",[780.1918],15)~ ~~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("impqua01",[1289.2230],7)~ ~~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("mepfir01",[1179.2257],7)~ ~~
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH ~CreateCreature("mepfir01",[1345.2081],4)~ ~~
+    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("imp01",[1217.1897],2)~ ~~
+    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("imp01",[1030.2269],9)~ ~~
+    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("imp01",[932.1837],0)~ ~~
+    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("impqua01",[780.1918],15)~ ~~
+    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("impqua01",[1289.2230],7)~ ~~
+    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("mepfir01",[1179.2257],7)~ ~~
+    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("mepfir01",[1345.2081],4)~ ~~
   END
 BUT_ONLY
 
 // Make the Planar Sphere demons' dialogue files pause the game
-
-COPY_EXISTING ~ABYDEM01.DLG~ ~override~
-              ~OBSDEM01.DLG~ ~override~
-              ~OBSDEM05.DLG~ ~override~
+COPY_EXISTING abydem01.dlg override
+              obsdem01.dlg override
+              obsdem05.dlg override
   WRITE_LONG 0x30 0
-BUT_ONLY_IF_IT_CHANGES
+BUT_ONLY
 
 // Special case, inlined script change for the new Nabassu in the Planar Sphere quest
-
-<<<<<<<<atweaks/inlined/obsdem05.baf
+<<<<<<<< .../atweaks/inlined/obsdem05.baf
 IF
 	Global("RR#Intd","LOCALS",0)
 	NumTimesTalkedTo(0)
@@ -671,121 +588,541 @@ THEN
 		StartDialogueNoSet([PC])
 END
 >>>>>>>>
+COMPILE ~.../atweaks/inlined/obsdem05.baf~
 
-COMPILE ~atweaks/inlined/obsdem05.baf~
 
-
+////////////////////////////////////////////////////////////////////////////////
 // New AI Scripts
+////////////////////////////////////////////////////////////////////////////////
 
-COMPILE ~aTweaks/BAF/fiends/RR#HQUAS.BAF~                                                 // Hostile Quasit AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HALUF.BAF~                                                 // Hostile Alu-Fiend AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HCAMB.BAF~                                                 // Hostile Cambion AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HMAUR.BAF~                                                 // Hostile Maurezhi AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HSUCC.BAF~                                                 // Hostile Succubus AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HNABA.BAF~                                                 // Hostile Nabassu AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HGLAB.BAF~                                                 // Hostile Glabrezu AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HMARI.BAF~                                                 // Hostile Marilith AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HBALR.BAF~                                                 // Hostile Balor AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HIMP.BAF~                                                  // Hostile Imp AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HFCAT.BAF~                                                 // Hostile Hellcat AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HERIN.BAF~                                                 // Hostile Erinyes AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HBFND.BAF~                                                 // Hostile Bone Fiend AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HABIS.BAF~                                                 // Hostile Abishai AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HCORN.BAF~                                                 // Hostile Cornugon AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HGELU.BAF~                                                 // Hostile Gelugon AI script
-COMPILE ~aTweaks/BAF/fiends/RR#HPITF.BAF~                                                 // Hostile Pit Fiend AI script
-COMPILE ~aTweaks/BAF/fiends/RR#KARAS.BAF~                                                 // Ka'rashur's reinforcement summoning script
-COMPILE ~aTweaks/BAF/fiends/RR#TAHAZ.BAF~                                                 // Tahazzar's reinforcement summoning script
-COMPILE "atweaks/baf/fiends/fl#shafi.baf" //Shadow Fiend
-        "atweaks/baf/fiends/fl#shaf2.baf" //Devil Shade
+COMPILE ~atweaks/baf/fiends/rr#hquas.baf~ // Quasit
+        ~atweaks/baf/fiends/rr#haluf.baf~ // Alu-Fiend
+        ~atweaks/baf/fiends/rr#hcamb.baf~ // Cambion
+        ~atweaks/baf/fiends/rr#hmaur.baf~ // Maurezhi
+        ~atweaks/baf/fiends/rr#hsucc.baf~ // Succubus
+        ~atweaks/baf/fiends/rr#hnaba.baf~ // Nabassu
+        ~atweaks/baf/fiends/rr#hglab.baf~ // Glabrezu
+        ~atweaks/baf/fiends/rr#hmari.baf~ // Marilith
+        ~atweaks/baf/fiends/rr#hbalr.baf~ // Balor
+        ~atweaks/baf/fiends/rr#himp.baf~  // Imp
+        ~atweaks/baf/fiends/rr#hfcat.baf~ // Hellcat
+        ~atweaks/baf/fiends/rr#herin.baf~ // Erinyes
+        ~atweaks/baf/fiends/rr#hbfnd.baf~ // Bone Fiend
+        ~atweaks/baf/fiends/rr#habis.baf~ // Abishai
+        ~atweaks/baf/fiends/rr#hcorn.baf~ // Cornugon
+        ~atweaks/baf/fiends/rr#hgelu.baf~ // Gelugon
+        ~atweaks/baf/fiends/rr#hpitf.baf~ // Pit Fiend
+        ~atweaks/baf/fiends/rr#karas.baf~ // Ka'rashur's reinforcement summoning script
+        ~atweaks/baf/fiends/rr#tahaz.baf~ // Tahazzar's reinforcement summoning script
+        ~atweaks/baf/fiends/fl#shafi.baf~ // Shadow Fiend
+        ~atweaks/baf/fiends/fl#shaf2.baf~ // Devil Shade
 
-EXTEND_TOP ~KARASH.BCS~ ~aTweaks/BAF/fiends/KARASH.BAF~                                   // make Ka'rashur use aTweaks' Pit Fiend script once he goes hostile
-EXTEND_TOP ~TAHAZZ.BCS~ ~aTweaks/BAF/fiends/TAHAZZ.BAF~                                   // make Tahazzar use aTweaks' Balor script once he goes hostile
+// Make Ka'rashur use aTweaks' Pit Fiend script once he goes hostile
+EXTEND_TOP karash.bcs ~atweaks/baf/fiends/karash.baf~
+// Make Tahazzar use aTweaks' Balor script once he goes hostile
+EXTEND_TOP tahazz.bcs ~atweaks/baf/fiends/tahazz.baf~
 
-COPY_EXISTING ~KETTAATK.BCS~ ~override~                                            // fix the Glabrezu spawning in the Guarded Compound
-DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~ForceSpell(LastTrigger(Myself),WIZARD_SUMMON_FIEND)~ ~CreateCreatureObject("DEMGLA01",LastTrigger(Myself),0,0,0)~
-  REPLACE_TEXTUALLY EXACT_MATCH ~ForceSpellRES("dw#sumgl",LastTrigger(Myself))~ ~CreateCreatureObject("DEMGLA01",LastTrigger(Myself),0,0,0)~ // SCSII
-COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
-
-COPY_EXISTING ~CUT215A.BCS~ ~override~                                             // Succubus Kiss cutscene in Watcher's Keep maze
-DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride("gorsuc01",ForceSpell(Player1,PHASE_SPIDER_TELEPORT))~ ~ActionOverride("gorsuc01",ForceSpellRES("RR#TELWE",Player1))~ // Teleport Without Error
-  REPLACE_TEXTUALLY EXACT_MATCH ~ActionOverride("gorsuc01",ForceSpell(Player1,SUCCUBUS_KISS))~ ~ActionOverride("gorsuc01",ForceSpellRES("RR#SKISS",Player1))~ // Kiss
-COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
-
-COPY_EXISTING ~GORSUCCU.BCS~ ~override~                                             // Watcher's Keep Succubus escape script
-DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~ForceSpell(Myself,DRYAD_TELEPORT)~ ~ForceSpellRES("RR#TELAW",Myself)~ // Teleport away
-COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
-
-COPY_EXISTING ~TELQUA1.BCS~ ~override~                                             // Watcher's Keep Quasit script (Wild Magic room)
-              ~TELQUA2.BCS~ ~override~                                             // Watcher's Keep Quasit script (Wild Magic room)
-DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpell(Myself,WIZARD_INVISIBILITY)~ ~SpellNoDec(Myself,WIZARD_INVISIBILITY)~ // Prevent annoying perma-invisibility
-COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
-
-COPY_EXISTING ~OBSDEM01.BCS~ ~override~                                            // restore Lea'liyl's original dialogue
-DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~Detect([PC])~ ~NumTimesTalkedTo(0) Detect([PC])~
-  REPLACE_TEXTUALLY EXACT_MATCH ~SetGlobal("summon","LOCALS",1)~ ~SetGlobal("summon","LOCALS",1) FaceObject([PC]) StartDialogueNoSet([PC])~
-COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
-
-//Add another Shadow Fiend to the playhouse encounter, because the new Shadow Fiends are weak-sauce compared to Bioware's creative take on them
-COPY_EXISTING ar0510.bcs override
+// Fix the Glabrezu spawning in the Guarded Compound
+COPY_EXISTING kettaatk.bcs override
   DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPSTRENH",\[915\.463\])\)~ ~\1 CreateVisualEffect("SPSTRENH",[893.482])~
-    REPLACE_TEXTUALLY ~\(CreateCreature("SHADFI01",\[915\.463\],0)\)~ ~\1 CreateCreature("SHADFI01",[893.482],0)~
+    REPLACE_TEXTUALLY EXACT_MATCH
+      ~ForceSpell(LastTrigger(Myself),WIZARD_SUMMON_FIEND)~
+      ~CreateCreatureObject("DEMGLA01",LastTrigger(Myself),0,0,0)~
+    REPLACE_TEXTUALLY EXACT_MATCH
+      ~ForceSpellRES("dw#sumgl",LastTrigger(Myself))~
+      ~CreateCreatureObject("DEMGLA01",LastTrigger(Myself),0,0,0)~ // SCSII
   END
 BUT_ONLY
 
-// The Pit Fiend summoned through the portal in the maze below Spellhold should not be attacked before the gating animation is complete
+// Succubus Kiss cutscene in Watcher's Keep maze
+COPY_EXISTING cut215a.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH
+      ~ActionOverride("gorsuc01",ForceSpell(Player1,PHASE_SPIDER_TELEPORT))~
+      ~ActionOverride("gorsuc01",ForceSpellRES("RR#TELWE",Player1))~ // Teleport Without Error
+    REPLACE_TEXTUALLY EXACT_MATCH
+      ~ActionOverride("gorsuc01",ForceSpell(Player1,SUCCUBUS_KISS))~
+      ~ActionOverride("gorsuc01",ForceSpellRES("RR#SKISS",Player1))~ // Kiss
+  END
+BUT_ONLY
 
-COPY_EXISTING ~ppportal.bcs~ ~override~ // Spellhold maze portal script
-DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~ReallyForceSpell(Myself,SUMMON_PIT_FIEND)~ ~SetInterrupt(FALSE) CreateVisualEffect("SPPORTAL",[245.500]) Wait(1) CreateCreature("DEMPIT01",[245.500],0) SetInterrupt(TRUE)~
-COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
+// Watcher's Keep Succubus escape script
+COPY_EXISTING gorsuccu.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH
+      ~ForceSpell(Myself,DRYAD_TELEPORT)~
+      ~ForceSpellRES("RR#TELAW",Myself)~ // Teleport away
+  END
+BUT_ONLY
+
+// Prevent annoying perma-invisibility
+COPY_EXISTING telqua1.bcs override // Watcher's Keep Quasit script (Wild Magic room)
+              telqua2.bcs override // Watcher's Keep Quasit script (Wild Magic room)
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH
+      ~ApplySpell(Myself,WIZARD_INVISIBILITY)~
+      ~SpellNoDec(Myself,WIZARD_INVISIBILITY)~
+  END
+BUT_ONLY
+
+// Restore Lea'liyl's original dialogue
+COPY_EXISTING obsdem01.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH
+      ~Detect([PC])~ ~NumTimesTalkedTo(0) Detect([PC])~
+    REPLACE_TEXTUALLY EXACT_MATCH
+      ~SetGlobal("summon","LOCALS",1)~
+      ~SetGlobal("summon","LOCALS",1) FaceObject([PC]) StartDialogueNoSet([PC])~
+  END
+BUT_ONLY
+
+// Add another Shadow Fiend to the playhouse encounter, because the new
+// Shadow Fiends are weak-sauce compared to Bioware's creative take on them
+COPY_EXISTING ar0510.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY
+      ~\(CreateVisualEffect("SPSTRENH",\[915\.463\])\)~
+      ~\1 CreateVisualEffect("SPSTRENH",[893.482])~
+    REPLACE_TEXTUALLY
+      ~\(CreateCreature("SHADFI01",\[915\.463\],0)\)~
+      ~\1 CreateCreature("SHADFI01",[893.482],0)~
+  END
+BUT_ONLY
+
+// The Pit Fiend summoned through the portal in the maze below Spellhold
+// should not be attacked before the gating animation is complete
+COPY_EXISTING ppportal.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH
+      ~ReallyForceSpell(Myself,SUMMON_PIT_FIEND)~
+      ~SetInterrupt(FALSE) CreateVisualEffect("SPPORTAL",[245.500])
+       Wait(1) CreateCreature("DEMPIT01",[245.500],0) SetInterrupt(TRUE)~
+  END
+BUT_ONLY
 
 
-//Fix minhp items so the wearer can't be killed by the Nabassu's Death Gaze
-COPY_EXISTING ABAZRING.ITM override
-              BHAALHP1.ITM override
-              FINMEL01.ITM override
-              GORFIRG.ITM override
-              ICEREGEN.ITM override
-              IMOENHP1.ITM override
-              JONHP1.ITM override
-              MEL01.ITM override
-              MINHP1.ITM override
-              MINHP20.ITM override
-              MINHP60.ITM override
-              MONHP01.ITM override
-              MONHP1.ITM override
-              MONHP20.ITM override
-              MONHP80.ITM override
-              SENGUA04.ITM override
-              SUREHP1.ITM override
-              TSTATUE.ITM override
-  PATCH_IF SOURCE_SIZE > 0x71 BEGIN
-    LPF ADD_ITEM_EQEFFECT 
-      INT_VAR
-        opcode = 206
-        target = 1
-        timing = 2
-      STR_VAR
-        resource = rr#dgaze
+//////////////////////////////////////////////////////////////////////
+// Creature changes, summons
+//////////////////////////////////////////////////////////////////////
+
+OUTER_SPRINT $sscript(demnabsu) rr#snaba
+OUTER_SPRINT $sscript(demglasu) rr#sglab
+OUTER_SPRINT $sscript(dempitsu) rr#spitf
+
+COPY_EXISTING demnabsu.cre ~override/demnabsu.cre~
+              telcor1.cre  ~override/rr#scorn.cre~
+              demglasu.cre ~override/demglasu.cre~
+              rr#hgel.cre  ~override/rr#sgelu.cre~
+              dempitsu.cre ~override/dempitsu.cre~
+              telbal1.cre  ~override/rr#sbalr.cre~
+              fl#sultr.cre ~override/fl#sultr.cre~
+              fl#snyca.cre ~override/fl#snyca.cre~
+              fl#sarca.cre ~override/fl#sarca.cre~
+  WRITE_LONG 0x10 2 // Clear flags, leave only "no corpse"
+  WRITE_LONG 0x14 0 // XP is handled by script
+  PATCH_IF VARIABLE_IS_SET $sscript("%DEST_RES%") BEGIN
+    WRITE_ASCIIE 0x248 $sscript("%DEST_RES%") #8 // Summoned script
+  END ELSE BEGIN
+    WRITE_ASCIIE 0x248 "%DEST_RES%" #8
+  END
+  WRITE_ASCII  0x250 ~~ #8 // Class
+  WRITE_ASCII  0x258 ~~ #8 // Race
+  WRITE_ASCII  0x260 ~~ #8 // General
+  WRITE_ASCII  0x268 ~~ #8 // Default
+  WRITE_BYTE   0x270 128 // Initially neutral
+  WRITE_BYTE   0x275 9 // SUMMONED_DEMON
+  WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32 // Script name
+  // Make all items unstealable&undroppable
+  READ_LONG 0x2bc io
+  FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN
+    WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
+  END
+  PATCH_IF FILE_EXISTS_IN_GAME dw#sumfi.itm AND
+           !FILE_CONTAINS_EVALUATED ("%SOURCE_FILE%" "dw#sumfi")
+  BEGIN
+    ADD_CRE_ITEM dw#sumfi #0 #0 #0 none boots
+  END
+
+
+//////////////////////////////////////////////////////////////////////
+// Spell changes, summons
+//////////////////////////////////////////////////////////////////////
+
+COPY_EXISTING spcaco.eff override // Summon Cacofiend
+              spfiend.eff override // Summon Fiend
+              spgate.eff override // Gate
+  WRITE_LONG  0x18 0 // Power (in case the spell is cast directly on a Rakshasa or something)
+BUT_ONLY
+
+////////////////////////////////////////
+//Cacofiend
+////////////////////////////////////////
+
+COPY_EXISTING spwi707.spl override // Cacofiend
+  SAY NAME1 #17320 SAY NAME2 #17320
+  SAY DESC @751 SAY UNIDENTIFIED_DESC @751
+  WRITE_SHORT 0x1e BIT8 // Exclude diviners
+  WRITE_SHORT 0x22 14 // Casting animation: conj
+  WRITE_SHORT 0x25 2 // School: conj
+  GET_OFFSET_ARRAY aa 0x64 4 0x68 2 0 0 0x28
+  PHP_EACH aa AS i => off BEGIN
+    WRITE_SHORT off + 0x0e 30 // Range
+    WRITE_SHORT off + 0x12 7 // Casting time
+  END
+  LPF fiend_summoning_spell
+    INT_VAR
+      duration = 120
+    STR_VAR
+      lawful = rr#scorn
+      lcneutral = fl#sarca
+      chaotic = spcaco
+  END
+BUT_ONLY
+
+COPY_EXISTING spcaco.eff override // Summon Nabassu
+  WRITE_ASCII 0x30 DEMNABSU #8 // Resref
+BUT_ONLY
+
+COPY_EXISTING spcaco.eff ~override/rr#scorn.eff~ // Summon Cornugon
+              spcaco.eff ~override/fl#sarca.eff~ // Summon Arcanaloth
+  WRITE_ASCIIE 0x30 "%DEST_RES%" #8 // Resref
+BUT_ONLY
+
+////////////////////////////////////////
+// Summon Fiend
+////////////////////////////////////////
+
+COPY_EXISTING spwi807.spl override // Summon Fiend
+  SAY NAME1 #17360 SAY NAME2 #17360
+  SAY DESC @752 SAY UNIDENTIFIED_DESC @752
+  GET_OFFSET_ARRAY aa 0x64 4 0x68 2 0 0 0x28
+  PHP_EACH aa AS i => off BEGIN
+    WRITE_SHORT off + 0x0e 30 // Range
+    WRITE_SHORT off + 0x12 8 // Casting time
+  END
+  LPF fiend_summoning_spell
+    INT_VAR
+      duration = 198
+    STR_VAR
+      lawful = rr#sgelu
+      lcneutral = fl#snyca
+      chaotic = spfiend
+  END
+BUT_ONLY
+
+COPY_EXISTING spfiend.eff override // Summon Glabrezu
+  WRITE_ASCII 0x30 DEMGLASU #8 // Resref
+
+COPY_EXISTING spfiend.eff ~override/rr#sgelu.eff~ // Summon Gelugon
+              spfiend.eff ~override/fl#snyca.eff~ // Summon Nycaloth
+  WRITE_ASCIIE 0x30 "%DEST_RES%" #8 // Resref
+BUT_ONLY
+
+////////////////////////////////////////
+// Gate
+////////////////////////////////////////
+
+COPY_EXISTING spwi905.spl override // Gate (Wizard)
+  SAY NAME1 #14260 SAY NAME2 #14260
+  SAY DESC @753 SAY UNIDENTIFIED_DESC @753
+  WRITE_ASCII 0x3a fl#905c #8 // New spellbook icon
+  GET_OFFSET_ARRAY aa 0x64 4 0x68 2 0 0 0x28
+  PHP_EACH aa AS i => off BEGIN
+    WRITE_ASCII off + 0x4 fl#905b #8 // New icon (stone background)
+    WRITE_SHORT off + 0x0e 30 // Range
+    WRITE_SHORT off + 0x12 9 // Casting time
+  END
+  LPF fiend_summoning_spell
+    INT_VAR
+      duration = 396
+    STR_VAR
+      lawful = spgate
+      lcneutral = fl#sultr
+      chaotic = rr#sbalr
+  END
+BUT_ONLY
+
+COPY_EXISTING sppr703.spl override // Gate (Cleric)
+  SAY NAME1 #14260 SAY NAME2 #14260
+  SAY DESC @754 SAY UNIDENTIFIED_DESC @754
+  WRITE_ASCII 0x3a fl#905c #8 // New spellbook icon
+  WRITE_ASCII 0x10 CAS_P03 #8 // Casting sound
+  WRITE_SHORT 0x25 2 // Spell school (Conjuration)
+  WRITE_SHORT 0x22 14 // Casting graphics (Conjuration)
+  GET_OFFSET_ARRAY aa 0x64 4 0x68 2 0 0 0x28
+  PHP_EACH aa AS i => off BEGIN
+    WRITE_ASCII off + 0x4 fl#905b #8 // New icon (stone background)
+    WRITE_SHORT off + 0x0e 30 // Range
+    WRITE_SHORT off + 0x12 5 // Casting time
+  END
+  LPF fiend_summoning_spell
+    INT_VAR
+      duration = 396
+    STR_VAR
+      lawful = spgate
+      lcneutral = fl#sultr
+      chaotic = rr#sbalr
+  END
+BUT_ONLY
+
+COPY_EXISTING spgate.eff override // Summon Pit Fiend
+  WRITE_ASCII 0x30 DEMPITSU #8 // Resref
+BUT_ONLY
+
+COPY_EXISTING spgate.eff ~override/rr#sbalr.eff~ // Summon Balor
+              spgate.eff ~override/fl#sultr.eff~ // Summon Ultroloth
+  WRITE_ASCIIE 0x30 "%DEST_RES%" #8 // Resref
+BUT_ONLY
+
+////////////////////////////////////////
+// Scroll changes
+////////////////////////////////////////
+
+COPY_EXISTING scrl8i.itm override // Cacofiend scroll
+  SAY NAME1 #17320 SAY NAME2 #17320
+  SAY DESC @751 SAY UNIDENTIFIED_DESC @751
+  WRITE_BYTE 0x2d THIS BAND BNOT BIT2 // Remove illusionist flag
+  WRITE_BYTE 0x2d THIS BOR BIT0 // Add diviner flag
+BUT_ONLY
+
+COPY_EXISTING scrl9b.itm override // Summon Fiend scroll
+  SAY NAME1 #17360 SAY NAME2 #17360
+  SAY DESC @752 SAY UNIDENTIFIED_DESC @752
+BUT_ONLY
+
+COPY_EXISTING scrl9n.itm override // Gate scroll
+  WRITE_ASCII 0x3a fl#905a #8 // New scroll icon
+  SAY NAME1 #14260 SAY NAME2 #14260
+  SAY DESC @753 SAY UNIDENTIFIED_DESC @753
+  GET_OFFSET_ARRAY aa ITM_V10_HEADERS
+  PHP_EACH aa AS i => off BEGIN
+    WRITE_ASCII off + 0x4 fl#905a #8
+  END
+BUT_ONLY
+
+
+//////////////////////////////////////////////////////////////////////
+// Scripts, summons
+//////////////////////////////////////////////////////////////////////
+
+COMPILE ~atweaks/baf/fiends/rr#snaba.baf~ // Summoned Nabassu AI script
+        ~atweaks/baf/fiends/rr#scorn.baf~ // Summoned Cornugon AI script
+        ~atweaks/baf/fiends/rr#tempt.baf~ // Summoned Glabrezu script for tempting mortals
+        ~atweaks/baf/fiends/rr#sglab.baf~ // Summoned Glabrezu AI script
+        ~atweaks/baf/fiends/rr#sgelu.baf~ // Summoned Gelugon AI script
+        ~atweaks/baf/fiends/rr#spitf.baf~ // Summoned Pit Fiend AI script
+        ~atweaks/baf/fiends/rr#sbalr.baf~ // Summoned Balor AI script
+        ~atweaks/baf/fiends/fl#sarca.baf~ // Summoned Arcanaloth AI script
+        ~atweaks/baf/fiends/fl#snyca.baf~ // Summoned Nycaloth AI script
+        ~atweaks/baf/fiends/fl#sultr.baf~ // Summoned Ultroloth AI script
+
+// Replace RunAwayFrom() with RandomWalkContinuous()
+// Reasoning: RunAwayFrom() often tends to slow down the game
+COPY_EXISTING runenemy.bcs override // Innocent bystander run away script
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~RunAwayFrom(LastSeenBy(Myself),30)~
+                      ~RandomWalkContinuous()~
+  END
+BUT_ONLY
+
+// Make innocent bystanders run away from summoned fiends
+EXTEND_TOP runenemy.bcs ~atweaks/baf/fiends/runenemy.baf~
+
+// Note: this is basically a bugfix, as ApplySpell() casts the
+// spell at 1st level even if the caster's level is higher
+COPY_EXISTING mage20b.bcs override // High level mage script
+              hellgen.bcs override // Enslaved Genie (Tears of Bhaal)
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY
+      ~ApplySpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~
+      ~ReallyForceSpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~
+  END
+BUT_ONLY
+
+
+//////////////////////////////////////////////////////////////////////
+// Dialogue changes
+//////////////////////////////////////////////////////////////////////
+
+ACTION_FOR_EACH file IN
+                gorbat1 // Ka'rashur (Baatezu Leader in Watcher's Keep)
+                gortan1 // Tahazzar (Tanar'ri Leader in Watcher's Keep)
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.dlg~ BEGIN
+    COPY_EXISTING ~%file%.dlg~ override
+     PATCH_IF SOURCE_SIZE > 0x01 BEGIN
+       DECOMPILE_AND_PATCH BEGIN
+         REPLACE_TEXTUALLY EXACT_MATCH
+           ~SetGlobal("BatEnemy","GLOBAL",1)~
+           ~SetGlobal("BatEnemy","GLOBAL",1) Enemy() Help()~
+         REPLACE_TEXTUALLY EXACT_MATCH
+           ~SetGlobal("TanEnemy","GLOBAL",1)~
+           ~SetGlobal("TanEnemy","GLOBAL",1) Enemy() Help()~
+       END
+     END
+   BUT_ONLY
+  END
+END
+
+
+//////////////////////////////////////////////////////////////////////
+// New load screen hints
+//////////////////////////////////////////////////////////////////////
+
+COPY_EXISTING loadhint.2da override
+              loadh25.2da override
+  COUNT_2DA_ROWS 2 rows
+  PATCH_FOR_EACH traref IN
+                 9000 // Etheralness tip
+                 9001 // Death Gaze tip
+                 9002 // Fiend gating tip
+                 9004 // Extraplanar healing immunity tip
+  BEGIN
+    strref = RESOLVE_STR_REF ((AT traref))
+    INSERT_2DA_ROW rows 2 ~%rows% %strref%~
+    ++rows
+  END
+  //PRETTY_PRINT_2DA // Uncomment at WeiDU 232 or later
+BUT_ONLY
+
+
+//////////////////////////////////////////////////////////////////////
+// More sensible encounters
+//////////////////////////////////////////////////////////////////////
+
+// Replace the Abishai and the Demon Knight near Diaytha with a
+// Glabrezu and a Balor
+COPY_EXISTING ar6105.are override // Ogremoch's lair in Sendai's enclave
+  GET_OFFSET_ARRAY aa 0x54 4 0x58 2 0 0 0x110
+  PHP_EACH aa AS i => off BEGIN
+    READ_ASCII off + 0x80 file
+    PATCH_IF "%file%" STRING_EQUAL_CASE DEMABI01 BEGIN
+      WRITE_ASCII off + 0x80 DEMGLA01 #8
+    END
+    PATCH_IF "%file%" STRING_EQUAL_CASE DEATHKNI BEGIN
+      WRITE_ASCII off + 0x80 DEMBAL01 #8
     END
   END
 BUT_ONLY
 
+// Melissan should not summon Bone Fiends during the final battle in
+// order to avoid Blood War issues
+COPY_EXISTING meliss01.bcs override
+              meliss02.bcs override
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~MELSUM02~ ~MELSUM01~
+  END
+BUT_ONLY
 
-//Account for Spell Revisions being incompatible with aTweaks
+
+//////////////////////////////////////////////////////////////////////
+// Compatibility
+//////////////////////////////////////////////////////////////////////
+
+// Make sure summoned fiends have fiend immunities
+COPY_EXISTING demnabsu.cre override // Nabassu
+              demglasu.cre override // Glabrezu
+              dempitsu.cre override // Pit Fiend
+  PATCH_IF !FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ RINGDEMN) BEGIN
+    ADD_CRE_ITEM RINGDEMN #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ RRING
+  END
+BUT_ONLY
+
+////////////////////////////////////////
+// BG1 NPC
+////////////////////////////////////////
+
+// Make Amelia change into a Sirine instead of a Fire Elemental
+ACTION_IF FILE_EXISTS_IN_GAME x#amelia.dlg BEGIN
+  COMPILE ~atweaks/dlg/x#amelia.d~
+END
+
+////////////////////////////////////////
+// SCS
+////////////////////////////////////////
+
+// Create scripts and creatures outside the ACTION_IF in case SCSII is installed after
+COMPILE ~atweaks/baf/fiends/fl#nabsu.baf~
+        ~atweaks/baf/fiends/fl#corsu.baf~
+        ~atweaks/baf/fiends/fl#glasu.baf~
+        ~atweaks/baf/fiends/fl#gelsu.baf~
+        ~atweaks/baf/fiends/fl#balsu.baf~
+        ~atweaks/baf/fiends/fl#pitsu.baf~
+
+COPY_EXISTING demnab01.cre ~override/fl#nabsu.cre~
+              telcor1.cre  ~override/fl#corsu.cre~
+              demgla01.cre ~override/fl#glasu.cre~
+              rr#hgel.cre  ~override/fl#gelsu.cre~
+              dembal01.cre ~override/fl#balsu.cre~
+              dempit01.cre ~override/fl#pitsu.cre~
+  WRITE_LONG 0x10 2 // Clear flags, leave only "no corpse"
+  WRITE_ASCIIE 0x248 "%DEST_RES%" #8 // Summoned script
+  WRITE_ASCII  0x250 ~~ #8 // Class
+  WRITE_ASCII  0x258 ~~ #8 // Race
+  WRITE_ASCII  0x260 ~~ #8 // General
+  WRITE_ASCII  0x268 ~~ #8 // Default
+  WRITE_BYTE   0x270 255 // Enemy
+  WRITE_BYTE   0x275 1 // Male
+  WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32 // Script name
+  // Make all items unstealable&undroppable
+  READ_LONG 0x2bc io
+  FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN
+    WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
+  END
+  PATCH_IF FILE_EXISTS_IN_GAME dw#sumfi.itm AND
+           !FILE_CONTAINS_EVALUATED ("%SOURCE_FILE%" "dw#sumfi")
+  BEGIN
+    ADD_CRE_ITEM "dw#sumfi" #0 #0 #0 none boots
+  END
+
+//Commandeer SCSII's private fiend-summoning spells and have them summon SCSII-aTweaks hybrids
+ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND !FiendsOriginal BEGIN //FiendsOriginal eq "do not alter mod-added fiends"
+
+  ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND FILE_EXISTS_IN_GAME dw#pitsu.eff BEGIN //If SCSII Improved Fiends is installed
+    OUTER_SPRINT $crefile(dw#cacof) fl#nabsu
+    OUTER_SPRINT $crefile(dw#sumbf) fl#corsu
+    OUTER_SPRINT $crefile(dw#sumgl) fl#glasu
+    OUTER_SPRINT $crefile(dw#sumco) fl#gelsu
+    OUTER_SPRINT $crefile(dw#basum) fl#balsu
+    OUTER_SPRINT $crefile(dw#pitsu) fl#pitsu
+
+    COPY_EXISTING dw#cacof.eff override
+                  dw#sumbf.eff override
+                  dw#sumgl.eff override
+                  dw#sumco.eff override
+                  dw#basum.eff override
+                  dw#pitsu.eff override
+      WRITE_ASCIIE 0x30 $crefile("%SOURCE_RES%") #8
+    BUT_ONLY
+  END /* ELSE BEGIN //Otherwise it is just SCSII Smarter Mages
+
+    //These are copies of Mordenkainen's Sword; change them to conjure up the appropriate fiend instead
+    COPY_EXISTING dw#sumgl.spl override
+                  dw#sumco.spl override
+                  dw#cacof.spl override
+                  dw#sumbf.spl override
+
+
+    //These are copies of Gate; change the other to conjure up a Balor
+    COPY_EXISTING dw#gatem.spl override
+                  dw#basum.spl override
+
+
+  END*/
+END
+
+//SCSII colours these dudes green, but we turn them into glabrezus and mariliths
+ACTION_IF FILE_EXISTS_IN_GAME dw#fiends_notinnate.mrk OR FILE_EXISTS_IN_GAME dw#fiends_innate.mrk BEGIN
+  COPY_EXISTING abydem01.cre override
+		obsdem01.cre override
+    LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 51 END
+END
+
+////////////////////////////////////////
+// Spell Revisions
+////////////////////////////////////////
+
+//Restore Protection from SUMMONED_DEMON to Protection from Evil
 ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
   COPY_EXISTING spcl213.spl override
                 spcl233.spl override
@@ -796,429 +1133,25 @@ ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
       READ_LONG  0x64 ao
       READ_LONG  0x6a eo
       READ_SHORT 0x70 ei
-      FOR (i=0;i<SHORT_AT 0x68;++i) BEGIN
-        WRITE_SHORT ao + 0x28*i + 0x20 ei
-        READ_SHORT  ao + 0x28*i + 0x1e ne
-        FOR (j=0;j<ne;++j) BEGIN
-          READ_SHORT eo + 0x30*(ei + j) type
+      FOR (i = 0; i < SHORT_AT 0x68; ++i) BEGIN
+        WRITE_SHORT ao + 0x28 * i + 0x20 ei
+        READ_SHORT  ao + 0x28 * i + 0x1e ne
+        FOR (j = 0; j < ne; ++j) BEGIN
+          READ_SHORT eo + 0x30 * (ei + j) type
           PATCH_IF type = 219 BEGIN
-            READ_ASCII     eo + 0x30*(ei + j)       copy (0x30)
-            INSERT_BYTES   eo + 0x30*(ei + j)       0x30
-              WRITE_ASCIIE eo + 0x30*(ei + j)       "%copy%"
-              WRITE_SHORT  eo + 0x30*(ei + j)       100
-              WRITE_LONG   eo + 0x30*(ei + j) + 0x4 9
-              WRITE_LONG   eo + 0x30*(ei + j) + 0x8 7
+            READ_ASCII     eo + 0x30 * (ei + j)       copy (0x30)
+            INSERT_BYTES   eo + 0x30 * (ei + j)       0x30
+              WRITE_ASCIIE eo + 0x30 * (ei + j)       "%copy%"
+              WRITE_SHORT  eo + 0x30 * (ei + j)       100
+              WRITE_LONG   eo + 0x30 * (ei + j) + 0x4 9
+              WRITE_LONG   eo + 0x30 * (ei + j) + 0x8 7
             ++ne
             j=ne
           END
         END
-        WRITE_SHORT ao + 0x28*i + 0x1e ne
+        WRITE_SHORT ao + 0x28 * i + 0x1e ne
         ei += ne
       END
     END
   BUT_ONLY
 END
-
-// Creature changes
-
-OUTER_SPRINT $sscript(demnabsu)   rr#snaba
-OUTER_SPRINT $sscript(demglasu)   rr#sglab
-OUTER_SPRINT $sscript(dempitsu)   rr#spitf
-
-COPY_EXISTING demnabsu.cre "override/demnabsu.cre"
-              telcor1.cre  "override/rr#scorn.cre"
-              demglasu.cre "override/demglasu.cre"
-              rr#hgel.cre  "override/rr#sgelu.cre"
-              dempitsu.cre "override/dempitsu.cre"
-              telbal1.cre  "override/rr#sbalr.cre"
-              fl#sultr.cre "override/fl#sultr.cre"
-              fl#snyca.cre "override/fl#snyca.cre"
-              fl#sarca.cre "override/fl#sarca.cre"
-  WRITE_LONG 0x10 2                                                                // clear flags, leave only "no corpse"
-  WRITE_LONG 0x14 0                                                                //XP is handled by script
-  PATCH_IF VARIABLE_IS_SET $sscript("%DEST_RES%") BEGIN
-    WRITE_ASCIIE 0x248 $sscript("%DEST_RES%") #8                                     // summoned script
-  END ELSE BEGIN
-    WRITE_ASCIIE 0x248 "%DEST_RES%" #8
-  END
-  WRITE_ASCII  0x250 ~~ #8                                                         // disable class AI script
-  WRITE_ASCII  0x258 ~~ #8                                                         // disable race AI script
-  WRITE_ASCII  0x260 ~~ #8                                                         // disable general AI script
-  WRITE_ASCII  0x268 ~~ #8                                                         // disable default AI script
-  WRITE_BYTE   0x270 128                                                           //Initially neutral
-  WRITE_BYTE   0x275 9                                                             //SUMMONED_DEMON 
-  WRITE_ASCIIE 0x280 ~%DEST_RES%~ #32                                              //script name
-  READ_LONG 0x2bc io
-  FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN                                              //Make all items unstealable&undroppable
-    WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
-  END
-  PATCH_IF FILE_EXISTS_IN_GAME dw#sumfi.itm AND !FILE_CONTAINS_EVALUATED ("%SOURCE_FILE%" "dw#sumfi") BEGIN
-    ADD_CRE_ITEM "dw#sumfi" #0 #0 #0 none boots
-  END
-
-
-// Spell changes
-
-COPY_EXISTING ~spcaco.eff~ ~override~                                              // Summon Cacofiend effect file
-             ~spfiend.eff~ ~override~                                              // Summon Fiend effect file
-              ~spgate.eff~ ~override~                                              // Gate effect file
-  WRITE_LONG  0x18 "0"                                                             // power: 0 (in case the spell is cast directly on a Rakshasa or something)
-BUT_ONLY_IF_IT_CHANGES
-
-
-COPY_EXISTING ~SPWI707.SPL~  ~override~                                            // Cacofiend
-SAY NAME1 #17320 SAY NAME2 #17320  SAY DESC @751 SAY UNIDENTIFIED_DESC @751        // retain old name but set new description
-  WRITE_SHORT 0x1e BIT8                                                            //Exclude diviners
-  WRITE_SHORT 0x22 14                                                              //Casting animation: conj
-  WRITE_SHORT 0x25 2                                                               //School: conj
-  READ_LONG  0x64 "abil_off" ELSE 0
-  READ_SHORT 0x68 "abil_num" ELSE 0
-  READ_LONG  0x6a "fx_off"   ELSE 0
-  SET "delta" = 0
-  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN
-   WRITE_SHORT ("%abil_off%" + 0x0e + (0x28 * "%index%")) "30"                     // set range to 30 (visual range)
-   WRITE_SHORT ("%abil_off%" + 0x12 + (0x28 * "%index%")) "7"                      // set casting time to 7
-    READ_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
-    READ_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
-    SET "abil_fx_idx" = ("%abil_fx_idx%" + "%delta%")
-    WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
-    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
-     READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
-     READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "resref"
-      PATCH_IF (("%opcode%" = "177") AND ("%resref%" STRING_EQUAL_CASE ~SPCACO~)) BEGIN  // effect #177: Use EFF File
-        WRITE_BYTE            ("%fx_off%" + 0x03 + ("%abil_fx_idx%" * 0x30)) "0"                // power: 0
-        WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "48"               // param1: 48 (MASK_CHAOTIC)
-        WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"                // param2: 8 (ALIGN.IDS)
-        WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "120"              // duration: 120 (20 rounds)
-        READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // clone effect
-        SET "index2"= "%abil_fx_num%" // kills loop
-        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
-          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
-          WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "16"             // param1: 16 (MASK_LAWFUL)
-          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"              // param2: 8 (ALIGN.IDS)
-          WRITE_ASCII           ("%fx_off%" + 0x14 + ("%abil_fx_idx%" * 0x30)) "RR#SCORN" #8    // resref: RR#SCORN (Cornugon)
-        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
-          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
-          WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "32"             // param1: 32 (MASK_LCNEUTRAL)
-          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"              // param2: 8 (ALIGN.IDS)
-          WRITE_ASCII           ("%fx_off%" + 0x14 + ("%abil_fx_idx%" * 0x30)) "fl#sarca" #8    // resref: fl#sarca (Arcanaloth)
-        SET "delta" = "%delta%" + 2                                                             // mark 2 new effects as added
-        WRITE_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%" + 2)
-      END
-    END
-  END
-BUT_ONLY_IF_IT_CHANGES
-
-COPY_EXISTING ~SPCACO.EFF~ ~override/RR#SCORN.EFF~                                 // create new Summon Cornugon effect file
-               spcaco.eff  ~override/fl#sarca.eff~                                 //EFF for Arcanaloth 
-  WRITE_ASCIIE 0x30 "%DEST_RES%" #8                                                // resref
-BUT_ONLY_IF_IT_CHANGES
-
-
-COPY_EXISTING ~SPWI807.SPL~  ~override~                                            // Summon Fiend
-SAY NAME1 #17360 SAY NAME2 #17360  SAY DESC @752 SAY UNIDENTIFIED_DESC @752        // retain old name but set new description
-  READ_LONG  0x64 "abil_off" ELSE 0
-  READ_SHORT 0x68 "abil_num" ELSE 0
-  READ_LONG  0x6a "fx_off"   ELSE 0
-  SET "delta" = 0
-  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN
-   WRITE_SHORT ("%abil_off%" + 0x0e + (0x28 * "%index%")) "30"                     // set range to 30 (visual range)
-   WRITE_SHORT ("%abil_off%" + 0x12 + (0x28 * "%index%")) "8"                      // set casting time to 8
-    READ_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
-    READ_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
-    SET "abil_fx_idx" = ("%abil_fx_idx%" + "%delta%")
-    WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
-    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
-     READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
-     READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "resref"
-      PATCH_IF (("%opcode%" = "177") AND ("%resref%" STRING_EQUAL_CASE ~SPFIEND~)) BEGIN  // effect #177: Use EFF File
-        WRITE_BYTE            ("%fx_off%" + 0x03 + ("%abil_fx_idx%" * 0x30)) "0"                // power: 0
-        WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "48"               // param1: 48 (MASK_CHAOTIC)
-        WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"                // param2: 8 (ALIGN.IDS)
-        WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "198"              // duration: 198 (33 rounds)
-        READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // clone effect
-        SET "index2"= "%abil_fx_num%" // kills loop
-        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
-          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
-          WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "16"             // param1: 16 (MASK_LAWFUL)
-          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"              // param2: 8 (ALIGN.IDS)
-          WRITE_ASCII           ("%fx_off%" + 0x14 + ("%abil_fx_idx%" * 0x30)) "RR#SGELU" #8    // resref: RR#SGELU (Gelugon)
-        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
-          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
-          WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "32"             // param1: 32 (MASK_LCNEUTRAL)
-          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"              // param2: 8 (ALIGN.IDS)
-          WRITE_ASCII           ("%fx_off%" + 0x14 + ("%abil_fx_idx%" * 0x30)) "fl#snyca" #8    // resref: fl#snyca (Nycaloth)
-        SET "delta" = "%delta%" + 2                                                             // mark 2 new effects as added
-        WRITE_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%" + 2)
-      END
-    END
-  END
-BUT_ONLY_IF_IT_CHANGES
-
-COPY_EXISTING ~SPFIEND.EFF~ ~override/RR#SGELU.EFF~                                // create new Summon Gelugon effect file
-               spfiend.eff  ~override/fl#snyca.eff~                                //Nycaloth
-  WRITE_ASCIIE 0x30 "%DEST_RES%" #8                                                // resref
-BUT_ONLY_IF_IT_CHANGES
-
-       
-
-COPY_EXISTING ~SPWI905.SPL~  ~override~                                            // Gate (Wizard)
-              ~SPPR703.SPL~  ~override~                                            // Gate (Cleric)
-  WRITE_ASCII 0x3a fl#905c #8                                                      // new spellbook icon //todo: for some reason this is not working for SPPR703
-  READ_LONG  0x64 "abil_off" ELSE 0
-  READ_SHORT 0x68 "abil_num" ELSE 0
-  READ_LONG  0x6a "fx_off"   ELSE 0
-  SET "delta" = 0
-  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN
-    WRITE_ASCII abil_off + 0x28*index + 0x4 fl#905b #8                             // new icon (stone background) 
-    WRITE_SHORT ("%abil_off%" + 0x0e + (0x28 * "%index%")) "30"                     // set range to 30 (visual range)
-    PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~SPWI905~) BEGIN                      // Arcane version
-      WRITE_SHORT ("%abil_off%" + 0x12 + (0x28 * "%index%")) "9"                     // set casting time to 9
-      SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @753 SAY UNIDENTIFIED_DESC @753    // retain old name but set new description (arcane)
-    END
-    PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~SPPR703~) BEGIN                      // Divine version
-      WRITE_SHORT ("%abil_off%" + 0x12 + (0x28 * "%index%")) "5"                     // set casting time to 5
-      SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @754 SAY UNIDENTIFIED_DESC @754    // retain old name but set new description (divine)
-    END
-    READ_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
-    READ_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
-    SET "abil_fx_idx" = ("%abil_fx_idx%" + "%delta%")
-    WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
-    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
-     READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
-     READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "resref"
-      PATCH_IF (("%opcode%" = "177") AND ("%resref%" STRING_EQUAL_CASE ~SPGATE~)) BEGIN  // effect #177: Use EFF File
-        WRITE_BYTE            ("%fx_off%" + 0x03 + ("%abil_fx_idx%" * 0x30)) "0"                // power: 0
-        WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "16"               // param1: 16 (MASK_LAWFUL)
-        WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"                // param2: 8 (ALIGN.IDS)
-        WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "396"              // duration: 396 (66 rounds)
-        READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // clone effect
-        SET "index2"= "%abil_fx_num%" // kills loop
-        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
-          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
-          WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "48"             // param1: 48 (MASK_CHAOTIC)
-          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"              // param2: 8 (ALIGN.IDS)
-          WRITE_ASCII           ("%fx_off%" + 0x14 + ("%abil_fx_idx%" * 0x30)) "RR#SBALR" #8    // resref: RR#SBALR (Balor)
-        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
-          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
-          WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "32"             // param1: 32 (MASK_LCNEUTRAL)
-          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"              // param2: 8 (ALIGN.IDS)
-          WRITE_ASCII           ("%fx_off%" + 0x14 + ("%abil_fx_idx%" * 0x30)) "fl#sultr" #8    // resref: fl#sultr (Ultroloth)
-        SET "delta" = "%delta%" + 2                                                             // mark 2 new effects as added
-        WRITE_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%" + 2)
-      END
-    END
-  END
-BUT_ONLY_IF_IT_CHANGES
-
-COPY_EXISTING ~SPGATE.EFF~ ~override/RR#SBALR.EFF~                                 // create new Summon Balor effect file
-               spgate.eff  ~override/fl#sultr.eff~                                 //Ultroloth  
-  WRITE_ASCIIE 0x30 "%DEST_RES%" #8                                                // resref
-BUT_ONLY_IF_IT_CHANGES
-
-
-
-// Item changes
-
-COPY_EXISTING ~SCRL8I.ITM~  ~override~                                             // Cacofiend scroll
-  SAY NAME1 #17320 SAY NAME2 #17320  SAY DESC @751 SAY UNIDENTIFIED_DESC @751        // retain old name but set new description
-BUT_ONLY_IF_IT_CHANGES
-COPY_EXISTING ~SCRL9B.ITM~  ~override~                                             // Summon Fiend scroll
-  SAY NAME1 #17360 SAY NAME2 #17360  SAY DESC @752 SAY UNIDENTIFIED_DESC @752        // retain old name but set new description
-BUT_ONLY_IF_IT_CHANGES
-COPY_EXISTING ~SCRL9N.ITM~  ~override~                                             // Gate scroll
-  WRITE_ASCII 0x3a fl#905a #8                                                      // new scroll icon
-  SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @753 SAY UNIDENTIFIED_DESC @753        // retain old name but set new description
-  GET_OFFSET_ARRAY ab_array ITM_V10_HEADERS
-  PHP_EACH ab_array AS i => o BEGIN
-    WRITE_ASCII o + 0x4 fl#905a #8
-  END
-BUT_ONLY_IF_IT_CHANGES
-
-
-// New AI scripts
-
-COMPILE ~aTweaks/BAF/fiends/RR#SNABA.BAF~                                                 // Summoned Nabassu AI script
-        ~aTweaks/BAF/fiends/RR#SCORN.BAF~                                                 // Summoned Cornugon AI script
-        ~aTweaks/BAF/fiends/RR#TEMPT.BAF~                                                 // Summoned Glabrezu script for tempting mortals
-        ~aTweaks/BAF/fiends/RR#SGLAB.BAF~                                                 // Summoned Glabrezu AI script
-        ~aTweaks/BAF/fiends/RR#SGELU.BAF~                                                 // Summoned Gelugon AI script
-        ~aTweaks/BAF/fiends/RR#SPITF.BAF~                                                 // Summoned Pit Fiend AI script
-        ~aTweaks/BAF/fiends/RR#SBALR.BAF~                                                 // Summoned Balor AI script
-        ~atweaks/baf/fiends/fl#sarca.baf~
-        ~atweaks/baf/fiends/fl#snyca.baf~
-        ~atweaks/baf/fiends/fl#sultr.baf~
-        
-COPY_EXISTING ~RUNENEMY.BCS~  ~override~                                           // innocent bystander run away script
-  DECOMPILE_BCS_TO_BAF                                                             // replace RunAwayFrom() with RandomWalkContinuous()
-    REPLACE_TEXTUALLY ~RunAwayFrom(LastSeenBy(Myself),30)~ ~RandomWalkContinuous()~
-  COMPILE_BAF_TO_BCS                                                               // reasoning: RunAwayFrom() often tends to slow down the game
-BUT_ONLY_IF_IT_CHANGES
-EXTEND_TOP ~RUNENEMY.BCS~ ~aTweaks/BAF/fiends/RUNENEMY.BAF~                               // Make innocent bystanders run away from summoned Fiends
-
-
-COPY_EXISTING ~MAGE20B.BCS~ ~override~                                             // high level mage script
-              ~HELLGEN.BCS~ ~override~                                             // Enslaved Genie (Tears of Bhaal)
-DECOMPILE_BCS_TO_BAF                                                               // note: this is basically a bugfix, as ApplySpell() casts the spell at 1st level even if the caster's level is higher than that
-  REPLACE_TEXTUALLY EXACT_MATCH ~ApplySpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~ ~ReallyForceSpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~
-COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
-
-
-// Dialogue changes
-
-ACTION_FOR_EACH ~file~ IN                                                          // for each of the following files
-              ~gorbat1~                                                            // Ka'rashur's dialogue (Baatezu Leader in Watcher's Keep)
-              ~gortan1~                                                            // Tahazzar's dialogue (Tanar'ri Leader in Watcher's Keep)
-BEGIN                                                                              // execute the following
-ACTION_IF FILE_EXISTS_IN_GAME ~%file%.dlg~ BEGIN                                   // if the designated file with a SPL extension exists
-COPY_EXISTING ~%file%.dlg~ ~override~
-PATCH_IF (%SOURCE_SIZE% > 0x01) THEN BEGIN                                         // file size sanity check (filters out 0 byte files i.e. ALLOW_MISSING)
-// =============================================================================== // the actual work starts from here
- DECOMPILE_DLG_TO_D
-  REPLACE_TEXTUALLY EXACT_MATCH ~SetGlobal("BatEnemy","GLOBAL",1)~ ~SetGlobal("BatEnemy","GLOBAL",1) Enemy() Help()~
-  REPLACE_TEXTUALLY EXACT_MATCH ~SetGlobal("TanEnemy","GLOBAL",1)~ ~SetGlobal("TanEnemy","GLOBAL",1) Enemy() Help()~
- COMPILE_D_TO_DLG
-// =============================================================================== // the actual work ends here
-END                                                                                // ends file size check
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
-END                                                                                // ends ACTION_FOR_EACH block
-
-
-// New load screen hints
-
-COPY_EXISTING ~LOADHINT.2DA~ ~override~                                            // Load screen hints (SoA)
-               ~LOADH25.2DA~ ~override~                                            // Load screen hints (ToB)
-COUNT_2DA_ROWS 2 rows
-INSERT_2DA_ROW rows 2 ~%rows%          RR#9000~
-SET rows = rows + 1
-INSERT_2DA_ROW rows 2 ~%rows%          RR#9001~
-SET rows = rows + 1
-INSERT_2DA_ROW rows 2 ~%rows%          RR#9002~
-SET rows = rows + 1
-INSERT_2DA_ROW rows 2 ~%rows%          RR#9004~
-REPLACE ~RR#9000~ @9000                                                            // Etheralness tip
-REPLACE ~RR#9001~ @9001                                                            // Death Gaze tip
-REPLACE ~RR#9002~ @9002                                                            // Fiend gating tip
-REPLACE ~RR#9004~ @9004                                                            // Extraplanar healing immunity tip
-BUT_ONLY_IF_IT_CHANGES
-
-
-// More sensible encounters
-
-// Replace the Abishai and the Demon Knight near Diaytha with a Glabrezu and a Balor
-
-COPY_EXISTING ~ar6105.are~ ~override~                                              // Ogremoch's lair in Sendai's enclave
-  READ_LONG  0x54 "actor_off"
-  READ_SHORT 0x58 "actor_num"
-  WHILE ("%actor_num%" > 0) BEGIN
-    SET "actor_num" = ("%actor_num%" - 1)
-    READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
-    PATCH_IF ("%cre_file%" STRING_EQUAL_CASE "DEMABI01") BEGIN
-      WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~DEMGLA01~ #8
-    END
-    PATCH_IF ("%cre_file%" STRING_EQUAL_CASE "DEATHKNI") BEGIN
-      WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~DEMBAL01~ #8
-    END
-  END
-BUT_ONLY_IF_IT_CHANGES
-
-
-// Mellisan should not summon Bone Fiends during the final battle in order to avoid Blood War issues
-
-COPY_EXISTING ~meliss01.bcs~ ~override~
-              ~meliss02.bcs~ ~override~
-DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~MELSUM02~ ~MELSUM01~
-COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
-
-
-
-// ================================================
-// Spell Revisions compatibility block starts here
-// ================================================
-
-ACTION_IF MOD_IS_INSTALLED SPELL_REV.TP2 0 THEN BEGIN                              // Checks for the main component of Spell Revisions
-
-COPY_EXISTING ~scrl8i.itm~ ~override~                                              // Restore default Summon Cacofiend scroll usability flags
-  PATCH_IF (SOURCE_SIZE > 0x71) THEN BEGIN                                         // protects against invalid files
-    READ_BYTE  0x2d "use"
-    WRITE_BYTE 0x2d ("%use%" BAND 0b11111011)                                      // removes illusionist flag
-    READ_BYTE  0x2d "use"
-    WRITE_BYTE 0x2d ("%use%" BOR  0b00000001)                                      // adds diviner flag
-  END
-BUT_ONLY_IF_IT_CHANGES
-
-COPY_EXISTING ~SPCACO.EFF~ ~override~                                              // Summon Cacofiend effect file
-  WRITE_ASCII 0x30 ~DEMNABSU~ #8                                                   // resref: SPCACO (Nabassu) i.e. revert from Death Knight
-
-COPY_EXISTING ~SPPR703.SPL~  ~override~                                            // Revert CLERIC_GATE to its original state
-  SAY NAME1 #14260 SAY NAME2 #14260  SAY DESC @754 SAY UNIDENTIFIED_DESC @754      // retain old name but set new description (divine)
-  WRITE_ASCII 0x3a fl#905c   #8                                                    // spell icon: fl#905c
-  WRITE_ASCII 0x10 "CAS_P03" #8                                                    // casting sound: CAS_P03.WAV
-  WRITE_SHORT 0x25 "2"                                                             // spell school: 2 (Conjuration)
-  WRITE_SHORT 0x22 "14"                                                            // casting graphics: 14 (Conjuration)
-  READ_LONG  0x64 "abil_off" ELSE 0
-  READ_SHORT 0x68 "abil_num" ELSE 0
-  READ_LONG  0x6a "fx_off"   ELSE 0
-  SET "delta" = 0
-  FOR (index = 0 ; index < abil_num ; index = index + 1) BEGIN
-   WRITE_SHORT ("%abil_off%" + 0x0e + (0x28 * "%index%")) "30"                     // set range to 30 (visual range)
-   WRITE_SHORT ("%abil_off%" + 0x12 + (0x28 * "%index%")) "5"                      // set casting time to 5
-   WRITE_ASCII ("%abil_off%" + 0x04 + (0x28 * "%index%")) fl#905b #8               // set icon to fl#905b
-    READ_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) "abil_fx_num"
-    READ_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "abil_fx_idx"
-    SET "abil_fx_idx" = ("%abil_fx_idx%" + "%delta%")
-    WRITE_SHORT ("%abil_off%" + 0x20 + (0x28 * "%index%")) "%abil_fx_idx%"
-    FOR (index2 = 0 ; index2 < abil_fx_num ; index2 = index2 + 1) BEGIN
-     READ_SHORT ("%fx_off%" +        (0x30 * ("%abil_fx_idx%" + "%index2%"))) "opcode"
-     READ_ASCII ("%fx_off%" + 0x14 + (0x30 * ("%abil_fx_idx%" + "%index2%"))) "resref"
-      PATCH_IF (("%opcode%" = "177") AND ("%resref%" STRING_EQUAL_CASE ~SPCACO~)) BEGIN         // effect #177: Use EFF File
-        WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "16"               // param1: 16 (MASK_LAWFUL)
-        WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"                // param2: 8 (ALIGN.IDS)
-        WRITE_LONG            ("%fx_off%" + 0x0e + ("%abil_fx_idx%" * 0x30)) "198"              // duration: 198 (33 rounds)
-        WRITE_ASCII           ("%fx_off%" + 0x14 + ("%abil_fx_idx%" * 0x30)) "SPGATE" #8        // resref: SPGATE (Pit Fiend)
-        READ_ASCII ("%fx_off%" +        (("%abil_fx_idx%" + "%index2%") * 0x30)) "clone_fx" (0x30) // clone effect
-        SET "index2"= "%abil_fx_num%" // kills loop
-        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
-          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
-          WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "48"             // param1: 48 (MASK_CHAOTIC)
-          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"              // param2: 8 (ALIGN.IDS)
-          WRITE_ASCII           ("%fx_off%" + 0x14 + ("%abil_fx_idx%" * 0x30)) "RR#SBALR" #8    // resref: RR#SBALR (Balor)
-        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
-          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
-          WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "32"             // param1: 32 (MASK_LCNEUTRAL)
-          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"              // param2: 8 (ALIGN.IDS)
-          WRITE_BYTE            ("%fx_off%" + 0x12 + ("%abil_fx_idx%" * 0x30)) "100"            // probability1: 100
-          WRITE_BYTE            ("%fx_off%" + 0x13 + ("%abil_fx_idx%" * 0x30)) "51"             // probability2: 51
-          WRITE_ASCII           ("%fx_off%" + 0x14 + ("%abil_fx_idx%" * 0x30)) "RR#SBALR" #8    // resref: RR#SBALR (Balor)
-        INSERT_BYTES            ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) 0x30             // new effect
-          WRITE_EVALUATED_ASCII ("%fx_off%" +        ("%abil_fx_idx%" * 0x30)) "%clone_fx%"     // cloned effect
-          WRITE_LONG            ("%fx_off%" + 0x04 + ("%abil_fx_idx%" * 0x30)) "32"             // param1: 32 (MASK_LCNEUTRAL)
-          WRITE_LONG            ("%fx_off%" + 0x08 + ("%abil_fx_idx%" * 0x30)) "8"              // param2: 8 (ALIGN.IDS)
-          WRITE_BYTE            ("%fx_off%" + 0x12 + ("%abil_fx_idx%" * 0x30)) "50"             // probability1: 50
-          WRITE_BYTE            ("%fx_off%" + 0x13 + ("%abil_fx_idx%" * 0x30)) "0"              // probability2: 0
-        SET "delta" = "%delta%" + 3                                                             // mark 3 new effects as added
-        WRITE_SHORT ("%abil_off%" + 0x1e + (0x28 * "%index%")) ("%abil_fx_num%" + 3)
-      END
-    END
-  END
-BUT_ONLY_IF_IT_CHANGES
-
-
-COPY_EXISTING ~DEMNABSU.CRE~ ~override~                                            // Nabassu
-              ~DEMGLASU.CRE~ ~override~                                            // Glabrezu
-              ~DEMPITSU.CRE~ ~override~                                            // Pit Fiend
-  PATCH_IF !FILE_CONTAINS_EVALUATED (~%SOURCE_FILE%~ ~RINGDEMN~) BEGIN             // if the creature doesn't possess Fiend immunities
-    ADD_CRE_ITEM ~RINGDEMN~ #0 #0 #0 ~UNSTEALABLE&UNDROPPABLE~ ~RRING~             // add Fiend immunity ring
-  END
-BUT_ONLY_IF_IT_CHANGES
-END                                                                                // ends check for the main component of Spell Revisions
-
-
-// =============================================
-// Spell Revisions compatibility block ends here
-// =============================================
-
