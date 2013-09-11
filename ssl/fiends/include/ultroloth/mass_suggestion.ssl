@@ -1,0 +1,28 @@
+//Mass Suggestion
+IF TRIGGER
+  Allegiance(Myself,GOODCUTOFF)
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+  TargetBlock(EnemiesInOrder)
+  General(scstarget,HUMANOID)
+  NumCreatureGT([EVILCUTOFF.HUMANOID],4)
+  !Race(scstarget,RAKSHASA)
+  TriggerBlock(Disabled|MR50|SIEnc|Charm)
+  GlobalLT("flMassSuggestion","LOCALS",1)
+THEN DO
+  Action(ForceSpellRESMyself,"fl#mssug"|100|50)
+  IncrementGlobal("flMassSuggestion","LOCALS",1)
+END
+
+IF TRIGGER
+  Allegiance(Myself,EVILCUTOFF)
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+  TargetBlock(EnemiesInOrder)
+  General(scstarget,HUMANOID)
+  NumCreatureGT([GOODCUTOFF.HUMANOID],3)
+  !Race(scstarget,RAKSHASA)
+  TriggerBlock(Disabled|MR50|SIEnc|Charm)
+  GlobalLT("flMassSuggestion","LOCALS",1)
+THEN DO
+  Action(ForceSpellRESMyself,"fl#mssug"|100|50)
+  IncrementGlobal("flMassSuggestion","LOCALS",1)
+END

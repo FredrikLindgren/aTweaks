@@ -1,0 +1,47 @@
+//Symbol, Death
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SICon|Slayable|NotSummoned)
+  OR(4)
+    Class(scstarget,MAGE)
+    Class(scstarget,MAGE_THIEF)
+    Class(scstarget,CLERIC_MAGE)
+    HPPercentLT(scstarget,40)
+  GlobalLT("flSymbol","LOCALS",1)
+THEN DO
+  Action(ForceSpellRES,"RR#WI817"|100|100)
+  IncrementGlobal("flSymbol","LOCALS",1)
+END
+
+//Symbol, Stun
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SICon|Stun|NotSummoned)
+  GlobalLT("flSymbol","LOCALS",1)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#WI816"|50|100)
+  IncrementGlobal("flSymbol","LOCALS",1)
+END
+
+//Symbol, Pain
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SICon|Stun|NotSummoned)
+  GlobalLT("flSymbol","LOCALS",1)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#SPAIN"|50|100)
+  IncrementGlobal("flSymbol","LOCALS",1)
+END
+
+//Symbol, Fear
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SICon|Fear|NotSummoned)
+  GlobalLT("flSymbol","LOCALS",1)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#WI811"|50|100)
+  IncrementGlobal("flSymbol","LOCALS",1)
+END

@@ -1,0 +1,45 @@
+//Animate Dead
+IF TRIGGER
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+  TargetBlock(EnemiesInOrder)
+  OR(3)
+    Class(scstarget,MAGE_ALL)
+    Class(scstarget,BARD_ALL)
+    Class(scstarget,DRUID_ALL)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"fl#adead"|50|100)
+END
+
+IF
+  See([GOODCUTOFF.UNDEAD.0.SKELETON_WARRIOR])
+  Allegiance(Myself,GOODCUTOFF)
+  Name("fl#propertyoftheyugoloth2",LastSeenBy(Myself))
+  !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+  !GlobalTimerNotExpired("flUltrolothSkelWa","LOCALS")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flUltrolothSkelWa","LOCALS",12)
+END
+
+IF
+  See([EVILCUTOFF.UNDEAD.0.SKELETON_WARRIOR])
+  Allegiance(Myself,EVILCUTOFF)
+  Name("fl#propertyoftheyugoloth2",LastSeenBy(Myself))
+  !StateCheck(LastSeenBy(Myself),STATE_DISABLED)
+  !GlobalTimerNotExpired("flUltrolothSkelWa","LOCALS")
+THEN
+  RESPONSE #100
+    SetGlobalTimer("flUltrolothSkelWa","LOCALS",12)
+END
+
+IF
+  !GlobalTimerNotExpired("flFireStormTimer","LOCALS")
+  !GlobalTimerNotExpired("flUltrolothSkelWa","LOCALS")
+  !GlobalTimerNotExpired("flCast","LOCALS")
+THEN
+  RESPONSE #100
+    ForceSpellRES("fl#adead",Myself)
+    SetGlobalTimer("flUltrolothSkelWa","LOCALS",12)
+    SetGlobalTimer("flCast","LOCALS",6)
+END

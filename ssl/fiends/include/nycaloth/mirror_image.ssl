@@ -1,0 +1,11 @@
+//Mirror Image if there's no True Sight
+IF TRIGGER
+  Target(NearestEnemyOf(Myself))
+  TriggerBlock(NoEnemyTrueSight)
+  !StateCheck(Myself,STATE_MIRRORIMAGE)
+  !Class(LastSeenBy(Myself),INNOCENT) //Don't mirror image just because some stinking peasant went enemy
+  GlobalLT("flMirrorImage","LOCALS",3)
+THEN DO
+  Action(ForceSpellRESMyself,"RR#WI212")
+  IncrementGlobal("flMirrorImage","LOCALS",1)
+END

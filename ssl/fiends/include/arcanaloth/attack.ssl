@@ -1,0 +1,36 @@
+//Gun for susceptible spellcasters primarily
+IF TRIGGER
+  HasItem("melfmet",Myself)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|PierceRes75|WeaponImmunity)
+  OR(2)
+    CheckStatLT(scstarget,100,RESISTFIRE)
+    !CheckStatGT(scstarget,0,STONESKINS)
+  OR(5)
+    Class(scstarget,MAGE_ALL)
+    Class(scstarget,BARD_ALL)
+    Class(scstarget,CLERIC_ALL)
+    Class(scstarget,CLERIC_RANGER)
+    Class(scstarget,DRUID_ALL)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+//Then anyone else
+IF TRIGGER
+  HasItem("melfmet",Myself)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|PierceRes75|WeaponImmunity)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  HasItem("melfmet",Myself)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(PierceResFull|WeaponImmunity)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+INCLUDE FILE(fiends/include/standard_attack.ssl)

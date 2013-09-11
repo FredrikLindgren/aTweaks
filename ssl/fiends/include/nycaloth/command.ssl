@@ -1,0 +1,24 @@
+//Command
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,6)
+  LevelLT(scstarget,6)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|SIEnc|Sleep|MR50|Stoneskin|MirrorImage)
+  GlobalLT("flCommand","LOCALS",3)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#PR102"|100|100)
+  IncrementGlobal("flCommand","LOCALS",1)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrderShort)
+  Range(scstarget,6)
+  TriggerBlock(Disabled|MinorGlobe|SpellTurning|SIEnc|Sleep|MR50|Stoneskin|MirrorImage)
+  GlobalLT("flCommand","LOCALS",3)
+  !Race(scstarget,RAKSHASA)
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#PR102"|50|100)
+  IncrementGlobal("flCommand","LOCALS",1)
+END

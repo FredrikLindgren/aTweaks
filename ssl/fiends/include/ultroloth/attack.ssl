@@ -1,0 +1,58 @@
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunityUltroloth|MagicDamageFull)
+  StateCheck(scstarget,STATE_IMMOBILE)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(EnemyMagesAndPriests)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull|MirrorImage)
+  !Range(scstarget,6)
+  OR(4)
+    Class(scstarget,MAGE_ALL) //Otherwise the script can misbehave, with this block executing for pretty much everyone (due to the targeting, a non-mage, none-priest can be LastSeenBy(Myself) from somewhere above)
+    Class(scstarget,DRUID_ALL)
+    Class(scstarget,CLERIC_ALL)
+    Class(scstarget,CLERIC_RANGER)  
+THEN DO
+  Combine()
+  Action(ForceSpellRES,"RR#TELWE"|100|100)
+END
+
+IF TRIGGER
+  TargetBlock(EnemyMagesAndPriests)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull|MirrorImage)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
+  !Range(scstarget,6)
+THEN DO
+  Action(ForceSpellRES,"RR#TELWE")
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|WeaponImmunityUltroloth|MagicDamageFull)
+THEN DO
+  AttackOneRound(scstarget)
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunityUltroloth|MagicDamageFull)
+  !Range(scstarget,6)
+THEN DO
+  Action(ForceSpellRES,"RR#TELWE")
+END
+
+IF TRIGGER
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(WeaponImmunityUltroloth|MagicDamageFull)
+THEN DO
+  AttackOneRound(scstarget)
+END
