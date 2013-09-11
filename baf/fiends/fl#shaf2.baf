@@ -18,6 +18,7 @@ THEN
 RESPONSE #100
 SetGlobalTimer("flRestTimer","LOCALS",2400)
 SetGlobal("flRest","LOCALS",1)
+Continue()
 END
 
 IF
@@ -475,9 +476,7 @@ Range([PC.0.0.MAGE],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.MAGE],30)
 END
 
 IF
@@ -511,9 +510,7 @@ Range([PC.0.0.MAGE_THIEF],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE_THIEF])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.MAGE_THIEF],30)
 END
 
 IF
@@ -547,9 +544,7 @@ Range([PC.0.0.MAGE_ALL],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE_ALL])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.MAGE_ALL],30)
 END
 
 IF
@@ -583,9 +578,7 @@ Range([PC.0.0.THIEF],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.THIEF])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.THIEF],30)
 END
 
 IF
@@ -619,9 +612,7 @@ Range([PC.0.0.BARD],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.BARD])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.BARD],30)
 END
 
 IF
@@ -655,9 +646,7 @@ Range([PC.0.0.THIEF_ALL],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.THIEF_ALL])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.THIEF_ALL],30)
 END
 
 IF
@@ -691,9 +680,7 @@ Range([PC.0.0.DRUID],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.DRUID])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.DRUID],30)
 END
 
 IF
@@ -727,9 +714,7 @@ Range([PC.0.0.CLERIC],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.CLERIC])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.CLERIC],30)
 END
 
 IF
@@ -763,9 +748,7 @@ Range([PC],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC],30)
 END
 
 IF
@@ -799,9 +782,7 @@ Range(SecondNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(SecondNearest([PC]),30)
 END
 
 IF
@@ -835,9 +816,7 @@ Range(ThirdNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(ThirdNearest([PC]),30)
 END
 
 IF
@@ -871,9 +850,7 @@ Range(NearestEnemyOf(Myself),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(NearestEnemyOf(Myself))
-RESPONSE #50
-Continue()
+AttackReevaluate(NearestEnemyOf(Myself),30)
 END
 
 IF
@@ -907,9 +884,7 @@ Range(SecondNearestEnemyOf(Myself),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearestEnemyOf(Myself))
-RESPONSE #50
-Continue()
+AttackReevaluate(SecondNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -943,9 +918,7 @@ Range(ThirdNearestEnemyOf(Myself),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearestEnemyOf(Myself))
-RESPONSE #50
-Continue()
+AttackReevaluate(ThirdNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -979,9 +952,7 @@ Range(FourthNearestEnemyOf(Myself),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FourthNearestEnemyOf(Myself))
-RESPONSE #50
-Continue()
+AttackReevaluate(FourthNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -1015,9 +986,7 @@ Range(FifthNearestEnemyOf(Myself),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FifthNearestEnemyOf(Myself))
-RESPONSE #50
-Continue()
+AttackReevaluate(FifthNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -1051,14 +1020,407 @@ Range(SixthNearestEnemyOf(Myself),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SixthNearestEnemyOf(Myself))
-RESPONSE #50
+AttackReevaluate(SixthNearestEnemyOf(Myself),30)
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.MAGE])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.MAGE],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.MAGE])
+CheckStatLT([PC.0.0.MAGE],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.MAGE],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE],0,HELD)
+!StateCheck([PC.0.0.MAGE],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE],EVILCUTOFF)
+!HPPercentGT([PC.0.0.MAGE],25)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.MAGE])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.MAGE_THIEF])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_THIEF],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_THIEF],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_THIEF],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_THIEF],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.MAGE_THIEF])
+CheckStatLT([PC.0.0.MAGE_THIEF],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,HELD)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_THIEF],EVILCUTOFF)
+!HPPercentGT([PC.0.0.MAGE_THIEF],25)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.MAGE_THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.MAGE_ALL])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.MAGE_ALL],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_ALL],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_ALL],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.MAGE_ALL])
+CheckStatLT([PC.0.0.MAGE_ALL],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE_ALL],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE_ALL],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.MAGE_ALL],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE_ALL],0,HELD)
+!StateCheck([PC.0.0.MAGE_ALL],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_ALL],EVILCUTOFF)
+!HPPercentGT([PC.0.0.MAGE_ALL],25)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.MAGE_ALL])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.THIEF])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.THIEF],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.THIEF])
+CheckStatLT([PC.0.0.THIEF],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.THIEF],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.THIEF],0,HELD)
+!StateCheck([PC.0.0.THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF],EVILCUTOFF)
+!HPPercentGT([PC.0.0.THIEF],25)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.BARD])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.BARD],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.BARD],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.BARD],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.BARD],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.BARD],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.BARD])
+CheckStatLT([PC.0.0.BARD],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.BARD],0,STONESKINS)
+!StateCheck([PC.0.0.BARD],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.BARD],STATE_DISABLED)
+!CheckStatGT([PC.0.0.BARD],0,HELD)
+!StateCheck([PC.0.0.BARD],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.BARD],EVILCUTOFF)
+!HPPercentGT([PC.0.0.BARD],25)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.BARD])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.THIEF_ALL])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.THIEF_ALL],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF_ALL],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF_ALL],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.THIEF_ALL])
+CheckStatLT([PC.0.0.THIEF_ALL],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.THIEF_ALL],0,STONESKINS)
+!StateCheck([PC.0.0.THIEF_ALL],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.THIEF_ALL],STATE_DISABLED)
+!CheckStatGT([PC.0.0.THIEF_ALL],0,HELD)
+!StateCheck([PC.0.0.THIEF_ALL],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF_ALL],EVILCUTOFF)
+!HPPercentGT([PC.0.0.THIEF_ALL],25)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.THIEF_ALL])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.DRUID])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.DRUID],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.DRUID],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.DRUID],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.DRUID],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.DRUID],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.DRUID])
+CheckStatLT([PC.0.0.DRUID],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.DRUID],0,STONESKINS)
+!StateCheck([PC.0.0.DRUID],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.DRUID],STATE_DISABLED)
+!CheckStatGT([PC.0.0.DRUID],0,HELD)
+!StateCheck([PC.0.0.DRUID],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.DRUID],EVILCUTOFF)
+!HPPercentGT([PC.0.0.DRUID],25)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.DRUID])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.CLERIC])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.CLERIC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.CLERIC],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.CLERIC],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.CLERIC],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.CLERIC],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.CLERIC])
+CheckStatLT([PC.0.0.CLERIC],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.CLERIC],0,STONESKINS)
+!StateCheck([PC.0.0.CLERIC],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.CLERIC],STATE_DISABLED)
+!CheckStatGT([PC.0.0.CLERIC],0,HELD)
+!StateCheck([PC.0.0.CLERIC],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.CLERIC],EVILCUTOFF)
+!HPPercentGT([PC.0.0.CLERIC],25)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.CLERIC])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC])
+CheckStatLT([PC],50,RESISTCRUSHING)
+!CheckStatGT([PC],0,STONESKINS)
+!StateCheck([PC],STATE_MIRRORIMAGE)
+!StateCheck([PC],STATE_DISABLED)
+!CheckStatGT([PC],0,HELD)
+!StateCheck([PC],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC],EVILCUTOFF)
+!HPPercentGT([PC],25)
+
+THEN
+RESPONSE #100
+MoveToObject([PC])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(SecondNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",SecondNearest([PC]))
+CheckStatLT(SecondNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(SecondNearest([PC]),0,STONESKINS)
+!StateCheck(SecondNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(SecondNearest([PC]),STATE_DISABLED)
+!CheckStatGT(SecondNearest([PC]),0,HELD)
+!StateCheck(SecondNearest([PC]),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearest([PC]),EVILCUTOFF)
+!HPPercentGT(SecondNearest([PC]),25)
+
+THEN
+RESPONSE #100
+MoveToObject(SecondNearest([PC]))
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(ThirdNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",ThirdNearest([PC]))
+CheckStatLT(ThirdNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(ThirdNearest([PC]),0,STONESKINS)
+!StateCheck(ThirdNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(ThirdNearest([PC]),STATE_DISABLED)
+!CheckStatGT(ThirdNearest([PC]),0,HELD)
+!StateCheck(ThirdNearest([PC]),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearest([PC]),EVILCUTOFF)
+!HPPercentGT(ThirdNearest([PC]),25)
+
+THEN
+RESPONSE #100
+MoveToObject(ThirdNearest([PC]))
+RESPONSE #100
 Continue()
 END
 
 IF
 See([PC.0.0.MAGE])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.MAGE],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1088,14 +1450,11 @@ Range([PC.0.0.MAGE],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.MAGE],30)
 END
 
 IF
 See([PC.0.0.MAGE_THIEF])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1125,14 +1484,11 @@ Range([PC.0.0.MAGE_THIEF],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE_THIEF])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.MAGE_THIEF],30)
 END
 
 IF
 See([PC.0.0.MAGE_ALL])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.MAGE_ALL],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1162,14 +1518,11 @@ Range([PC.0.0.MAGE_ALL],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE_ALL])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.MAGE_ALL],30)
 END
 
 IF
 See([PC.0.0.THIEF])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.THIEF],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1199,14 +1552,11 @@ Range([PC.0.0.THIEF],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.THIEF])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.THIEF],30)
 END
 
 IF
 See([PC.0.0.BARD])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.BARD],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1236,14 +1586,11 @@ Range([PC.0.0.BARD],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.BARD])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.BARD],30)
 END
 
 IF
 See([PC.0.0.THIEF_ALL])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.THIEF_ALL],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1273,14 +1620,11 @@ Range([PC.0.0.THIEF_ALL],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.THIEF_ALL])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.THIEF_ALL],30)
 END
 
 IF
 See([PC.0.0.DRUID])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.DRUID],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1310,14 +1654,11 @@ Range([PC.0.0.DRUID],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.DRUID])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.DRUID],30)
 END
 
 IF
 See([PC.0.0.CLERIC])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.CLERIC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1347,14 +1688,11 @@ Range([PC.0.0.CLERIC],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.CLERIC])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.CLERIC],30)
 END
 
 IF
 See([PC])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1384,14 +1722,11 @@ Range([PC],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC],30)
 END
 
 IF
 See(SecondNearest([PC]))
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(SecondNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1421,14 +1756,11 @@ Range(SecondNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(SecondNearest([PC]),30)
 END
 
 IF
 See(ThirdNearest([PC]))
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(ThirdNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1458,15 +1790,216 @@ Range(ThirdNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(ThirdNearest([PC]),30)
+END
+
+IF
+See(NearestEnemyOf(Myself))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(NearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(NearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",NearestEnemyOf(Myself))
+CheckStatLT(NearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(NearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(NearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+!StateCheck(NearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(NearestEnemyOf(Myself),0,HELD)
+!StateCheck(NearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(NearestEnemyOf(Myself),EVILCUTOFF)
+!HPPercentGT(NearestEnemyOf(Myself),50)
+Range(NearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(NearestEnemyOf(Myself),30)
+END
+
+IF
+See(SecondNearestEnemyOf(Myself))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",SecondNearestEnemyOf(Myself))
+CheckStatLT(SecondNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SecondNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SecondNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearestEnemyOf(Myself),EVILCUTOFF)
+!HPPercentGT(SecondNearestEnemyOf(Myself),50)
+Range(SecondNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(SecondNearestEnemyOf(Myself),30)
+END
+
+IF
+See(ThirdNearestEnemyOf(Myself))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",ThirdNearestEnemyOf(Myself))
+CheckStatLT(ThirdNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(ThirdNearestEnemyOf(Myself),0,HELD)
+!StateCheck(ThirdNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearestEnemyOf(Myself),EVILCUTOFF)
+!HPPercentGT(ThirdNearestEnemyOf(Myself),50)
+Range(ThirdNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(ThirdNearestEnemyOf(Myself),30)
+END
+
+IF
+See(FourthNearestEnemyOf(Myself))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(FourthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(FourthNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(FourthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(FourthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(FourthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",FourthNearestEnemyOf(Myself))
+CheckStatLT(FourthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FourthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FourthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearestEnemyOf(Myself),EVILCUTOFF)
+!HPPercentGT(FourthNearestEnemyOf(Myself),50)
+Range(FourthNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(FourthNearestEnemyOf(Myself),30)
+END
+
+IF
+See(FifthNearestEnemyOf(Myself))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(FifthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(FifthNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(FifthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(FifthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(FifthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",FifthNearestEnemyOf(Myself))
+CheckStatLT(FifthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(FifthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(FifthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearestEnemyOf(Myself),EVILCUTOFF)
+!HPPercentGT(FifthNearestEnemyOf(Myself),50)
+Range(FifthNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(FifthNearestEnemyOf(Myself),30)
+END
+
+IF
+See(SixthNearestEnemyOf(Myself))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SixthNearestEnemyOf(Myself),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SixthNearestEnemyOf(Myself),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SixthNearestEnemyOf(Myself),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SixthNearestEnemyOf(Myself),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SixthNearestEnemyOf(Myself),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",SixthNearestEnemyOf(Myself))
+CheckStatLT(SixthNearestEnemyOf(Myself),50,RESISTCRUSHING)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,STONESKINS)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_MIRRORIMAGE)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_DISABLED)
+!CheckStatGT(SixthNearestEnemyOf(Myself),0,HELD)
+!StateCheck(SixthNearestEnemyOf(Myself),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearestEnemyOf(Myself),EVILCUTOFF)
+!HPPercentGT(SixthNearestEnemyOf(Myself),50)
+Range(SixthNearestEnemyOf(Myself),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(SixthNearestEnemyOf(Myself),30)
 END
 
 IF
 ActionListEmpty()
 See([PC.0.0.MAGE])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.MAGE],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1492,7 +2025,7 @@ CheckStatLT([PC.0.0.MAGE],50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.MAGE],EVILCUTOFF)
 !HPPercentGT([PC.0.0.MAGE],50)
-!TargetUnreachable([PC.0.0.MAGE])
+
 THEN
 RESPONSE #100
 MoveToObject([PC.0.0.MAGE])
@@ -1503,7 +2036,6 @@ END
 IF
 ActionListEmpty()
 See([PC.0.0.MAGE_THIEF])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1529,7 +2061,7 @@ CheckStatLT([PC.0.0.MAGE_THIEF],50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.MAGE_THIEF],EVILCUTOFF)
 !HPPercentGT([PC.0.0.MAGE_THIEF],50)
-!TargetUnreachable([PC.0.0.MAGE_THIEF])
+
 THEN
 RESPONSE #100
 MoveToObject([PC.0.0.MAGE_THIEF])
@@ -1540,7 +2072,6 @@ END
 IF
 ActionListEmpty()
 See([PC.0.0.MAGE_ALL])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.MAGE_ALL],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1566,7 +2097,7 @@ CheckStatLT([PC.0.0.MAGE_ALL],50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.MAGE_ALL],EVILCUTOFF)
 !HPPercentGT([PC.0.0.MAGE_ALL],50)
-!TargetUnreachable([PC.0.0.MAGE_ALL])
+
 THEN
 RESPONSE #100
 MoveToObject([PC.0.0.MAGE_ALL])
@@ -1577,7 +2108,6 @@ END
 IF
 ActionListEmpty()
 See([PC.0.0.THIEF])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.THIEF],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1603,7 +2133,7 @@ CheckStatLT([PC.0.0.THIEF],50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.THIEF],EVILCUTOFF)
 !HPPercentGT([PC.0.0.THIEF],50)
-!TargetUnreachable([PC.0.0.THIEF])
+
 THEN
 RESPONSE #100
 MoveToObject([PC.0.0.THIEF])
@@ -1614,7 +2144,6 @@ END
 IF
 ActionListEmpty()
 See([PC.0.0.BARD])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.BARD],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1640,7 +2169,7 @@ CheckStatLT([PC.0.0.BARD],50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.BARD],EVILCUTOFF)
 !HPPercentGT([PC.0.0.BARD],50)
-!TargetUnreachable([PC.0.0.BARD])
+
 THEN
 RESPONSE #100
 MoveToObject([PC.0.0.BARD])
@@ -1651,7 +2180,6 @@ END
 IF
 ActionListEmpty()
 See([PC.0.0.THIEF_ALL])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.THIEF_ALL],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1677,7 +2205,7 @@ CheckStatLT([PC.0.0.THIEF_ALL],50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.THIEF_ALL],EVILCUTOFF)
 !HPPercentGT([PC.0.0.THIEF_ALL],50)
-!TargetUnreachable([PC.0.0.THIEF_ALL])
+
 THEN
 RESPONSE #100
 MoveToObject([PC.0.0.THIEF_ALL])
@@ -1688,7 +2216,6 @@ END
 IF
 ActionListEmpty()
 See([PC.0.0.DRUID])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.DRUID],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1714,7 +2241,7 @@ CheckStatLT([PC.0.0.DRUID],50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.DRUID],EVILCUTOFF)
 !HPPercentGT([PC.0.0.DRUID],50)
-!TargetUnreachable([PC.0.0.DRUID])
+
 THEN
 RESPONSE #100
 MoveToObject([PC.0.0.DRUID])
@@ -1725,7 +2252,6 @@ END
 IF
 ActionListEmpty()
 See([PC.0.0.CLERIC])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC.0.0.CLERIC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1751,7 +2277,7 @@ CheckStatLT([PC.0.0.CLERIC],50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.CLERIC],EVILCUTOFF)
 !HPPercentGT([PC.0.0.CLERIC],50)
-!TargetUnreachable([PC.0.0.CLERIC])
+
 THEN
 RESPONSE #100
 MoveToObject([PC.0.0.CLERIC])
@@ -1762,7 +2288,6 @@ END
 IF
 ActionListEmpty()
 See([PC])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1788,7 +2313,7 @@ CheckStatLT([PC],50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC],EVILCUTOFF)
 !HPPercentGT([PC],50)
-!TargetUnreachable([PC])
+
 THEN
 RESPONSE #100
 MoveToObject([PC])
@@ -1799,7 +2324,6 @@ END
 IF
 ActionListEmpty()
 See(SecondNearest([PC]))
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(SecondNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1825,7 +2349,7 @@ CheckStatLT(SecondNearest([PC]),50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SecondNearest([PC]),EVILCUTOFF)
 !HPPercentGT(SecondNearest([PC]),50)
-!TargetUnreachable(SecondNearest([PC]))
+
 THEN
 RESPONSE #100
 MoveToObject(SecondNearest([PC]))
@@ -1836,7 +2360,6 @@ END
 IF
 ActionListEmpty()
 See(ThirdNearest([PC]))
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(ThirdNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -1862,7 +2385,7 @@ CheckStatLT(ThirdNearest([PC]),50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(ThirdNearest([PC]),EVILCUTOFF)
 !HPPercentGT(ThirdNearest([PC]),50)
-!TargetUnreachable(ThirdNearest([PC]))
+
 THEN
 RESPONSE #100
 MoveToObject(ThirdNearest([PC]))
@@ -1900,9 +2423,7 @@ Range([PC.0.0.MAGE],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.MAGE],30)
 END
 
 IF
@@ -1935,9 +2456,7 @@ Range([PC.0.0.MAGE_THIEF],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE_THIEF])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.MAGE_THIEF],30)
 END
 
 IF
@@ -1970,9 +2489,7 @@ Range([PC.0.0.MAGE_ALL],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE_ALL])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.MAGE_ALL],30)
 END
 
 IF
@@ -2005,9 +2522,7 @@ Range([PC.0.0.THIEF],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.THIEF])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.THIEF],30)
 END
 
 IF
@@ -2040,9 +2555,7 @@ Range([PC.0.0.BARD],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.BARD])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.BARD],30)
 END
 
 IF
@@ -2075,9 +2588,7 @@ Range([PC.0.0.THIEF_ALL],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.THIEF_ALL])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.THIEF_ALL],30)
 END
 
 IF
@@ -2110,9 +2621,7 @@ Range([PC.0.0.DRUID],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.DRUID])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC.0.0.DRUID],30)
 END
 
 IF
@@ -2145,8 +2654,490 @@ Range([PC.0.0.CLERIC],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.CLERIC])
-RESPONSE #50
+AttackReevaluate([PC.0.0.CLERIC],30)
+END
+
+IF
+See([PC])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC])
+CheckStatLT([PC],50,RESISTCRUSHING)
+!CheckStatGT([PC],0,STONESKINS)
+!StateCheck([PC],STATE_MIRRORIMAGE)
+!StateCheck([PC],STATE_DISABLED)
+!CheckStatGT([PC],0,HELD)
+!StateCheck([PC],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC],EVILCUTOFF)
+Range([PC],5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate([PC],30)
+END
+
+IF
+See(SecondNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",SecondNearest([PC]))
+CheckStatLT(SecondNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(SecondNearest([PC]),0,STONESKINS)
+!StateCheck(SecondNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(SecondNearest([PC]),STATE_DISABLED)
+!CheckStatGT(SecondNearest([PC]),0,HELD)
+!StateCheck(SecondNearest([PC]),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearest([PC]),EVILCUTOFF)
+Range(SecondNearest([PC]),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(SecondNearest([PC]),30)
+END
+
+IF
+See(ThirdNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",ThirdNearest([PC]))
+CheckStatLT(ThirdNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(ThirdNearest([PC]),0,STONESKINS)
+!StateCheck(ThirdNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(ThirdNearest([PC]),STATE_DISABLED)
+!CheckStatGT(ThirdNearest([PC]),0,HELD)
+!StateCheck(ThirdNearest([PC]),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearest([PC]),EVILCUTOFF)
+Range(ThirdNearest([PC]),5)
+THEN
+RESPONSE #100
+EquipMostDamagingMelee()
+AttackReevaluate(ThirdNearest([PC]),30)
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.MAGE])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.MAGE],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.MAGE])
+CheckStatLT([PC.0.0.MAGE],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.MAGE],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE],0,HELD)
+!StateCheck([PC.0.0.MAGE],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.MAGE])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.MAGE_THIEF])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_THIEF],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_THIEF],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_THIEF],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_THIEF],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.MAGE_THIEF])
+CheckStatLT([PC.0.0.MAGE_THIEF],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE_THIEF],0,HELD)
+!StateCheck([PC.0.0.MAGE_THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_THIEF],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.MAGE_THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.MAGE_ALL])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.MAGE_ALL],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_ALL],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_ALL],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.MAGE_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.MAGE_ALL])
+CheckStatLT([PC.0.0.MAGE_ALL],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.MAGE_ALL],0,STONESKINS)
+!StateCheck([PC.0.0.MAGE_ALL],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.MAGE_ALL],STATE_DISABLED)
+!CheckStatGT([PC.0.0.MAGE_ALL],0,HELD)
+!StateCheck([PC.0.0.MAGE_ALL],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.MAGE_ALL],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.MAGE_ALL])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.THIEF])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.THIEF],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.THIEF])
+CheckStatLT([PC.0.0.THIEF],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.THIEF],0,STONESKINS)
+!StateCheck([PC.0.0.THIEF],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.THIEF],STATE_DISABLED)
+!CheckStatGT([PC.0.0.THIEF],0,HELD)
+!StateCheck([PC.0.0.THIEF],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.THIEF])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.BARD])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.BARD],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.BARD],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.BARD],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.BARD],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.BARD],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.BARD])
+CheckStatLT([PC.0.0.BARD],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.BARD],0,STONESKINS)
+!StateCheck([PC.0.0.BARD],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.BARD],STATE_DISABLED)
+!CheckStatGT([PC.0.0.BARD],0,HELD)
+!StateCheck([PC.0.0.BARD],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.BARD],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.BARD])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.THIEF_ALL])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.THIEF_ALL],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF_ALL],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF_ALL],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.THIEF_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.THIEF_ALL])
+CheckStatLT([PC.0.0.THIEF_ALL],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.THIEF_ALL],0,STONESKINS)
+!StateCheck([PC.0.0.THIEF_ALL],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.THIEF_ALL],STATE_DISABLED)
+!CheckStatGT([PC.0.0.THIEF_ALL],0,HELD)
+!StateCheck([PC.0.0.THIEF_ALL],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.THIEF_ALL],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.THIEF_ALL])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.DRUID])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.DRUID],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.DRUID],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.DRUID],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.DRUID],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.DRUID],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.DRUID])
+CheckStatLT([PC.0.0.DRUID],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.DRUID],0,STONESKINS)
+!StateCheck([PC.0.0.DRUID],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.DRUID],STATE_DISABLED)
+!CheckStatGT([PC.0.0.DRUID],0,HELD)
+!StateCheck([PC.0.0.DRUID],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.DRUID],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.DRUID])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC.0.0.CLERIC])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC.0.0.CLERIC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC.0.0.CLERIC],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC.0.0.CLERIC],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC.0.0.CLERIC],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC.0.0.CLERIC],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC.0.0.CLERIC])
+CheckStatLT([PC.0.0.CLERIC],50,RESISTCRUSHING)
+!CheckStatGT([PC.0.0.CLERIC],0,STONESKINS)
+!StateCheck([PC.0.0.CLERIC],STATE_MIRRORIMAGE)
+!StateCheck([PC.0.0.CLERIC],STATE_DISABLED)
+!CheckStatGT([PC.0.0.CLERIC],0,HELD)
+!StateCheck([PC.0.0.CLERIC],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC.0.0.CLERIC],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC.0.0.CLERIC])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See([PC])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC])
+CheckStatLT([PC],50,RESISTCRUSHING)
+!CheckStatGT([PC],0,STONESKINS)
+!StateCheck([PC],STATE_MIRRORIMAGE)
+!StateCheck([PC],STATE_DISABLED)
+!CheckStatGT([PC],0,HELD)
+!StateCheck([PC],STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC])
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(SecondNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",SecondNearest([PC]))
+CheckStatLT(SecondNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(SecondNearest([PC]),0,STONESKINS)
+!StateCheck(SecondNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(SecondNearest([PC]),STATE_DISABLED)
+!CheckStatGT(SecondNearest([PC]),0,HELD)
+!StateCheck(SecondNearest([PC]),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(SecondNearest([PC]))
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(ThirdNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",ThirdNearest([PC]))
+CheckStatLT(ThirdNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(ThirdNearest([PC]),0,STONESKINS)
+!StateCheck(ThirdNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(ThirdNearest([PC]),STATE_DISABLED)
+!CheckStatGT(ThirdNearest([PC]),0,HELD)
+!StateCheck(ThirdNearest([PC]),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(ThirdNearest([PC]))
+RESPONSE #100
 Continue()
 END
 
@@ -2180,9 +3171,7 @@ Range([PC],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC],30)
 END
 
 IF
@@ -2215,9 +3204,7 @@ Range(SecondNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(SecondNearest([PC]),30)
 END
 
 IF
@@ -2250,111 +3237,7 @@ Range(ThirdNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearest([PC]))
-RESPONSE #50
-Continue()
-END
-
-IF
-See([PC])
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat([PC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat([PC],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat([PC],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat([PC],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat([PC],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",[PC])
-CheckStatLT([PC],50,RESISTCRUSHING)
-!CheckStatGT([PC],0,STONESKINS)
-!StateCheck([PC],STATE_MIRRORIMAGE)
-!StateCheck([PC],STATE_DISABLED)
-!CheckStatGT([PC],0,HELD)
-!StateCheck([PC],STATE_STONE_DEATH)
-Allegiance(Myself,ENEMY)
-!Allegiance([PC],EVILCUTOFF)
-THEN
-RESPONSE #100
-EquipMostDamagingMelee()
-AttackOneRound([PC])
-RESPONSE #100
-Continue()
-END
-
-IF
-See(SecondNearest([PC]))
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(SecondNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(SecondNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(SecondNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(SecondNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(SecondNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",SecondNearest([PC]))
-CheckStatLT(SecondNearest([PC]),50,RESISTCRUSHING)
-!CheckStatGT(SecondNearest([PC]),0,STONESKINS)
-!StateCheck(SecondNearest([PC]),STATE_MIRRORIMAGE)
-!StateCheck(SecondNearest([PC]),STATE_DISABLED)
-!CheckStatGT(SecondNearest([PC]),0,HELD)
-!StateCheck(SecondNearest([PC]),STATE_STONE_DEATH)
-Allegiance(Myself,ENEMY)
-!Allegiance(SecondNearest([PC]),EVILCUTOFF)
-THEN
-RESPONSE #100
-EquipMostDamagingMelee()
-AttackOneRound(SecondNearest([PC]))
-RESPONSE #100
-Continue()
-END
-
-IF
-See(ThirdNearest([PC]))
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat(ThirdNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat(ThirdNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat(ThirdNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat(ThirdNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat(ThirdNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",ThirdNearest([PC]))
-CheckStatLT(ThirdNearest([PC]),50,RESISTCRUSHING)
-!CheckStatGT(ThirdNearest([PC]),0,STONESKINS)
-!StateCheck(ThirdNearest([PC]),STATE_MIRRORIMAGE)
-!StateCheck(ThirdNearest([PC]),STATE_DISABLED)
-!CheckStatGT(ThirdNearest([PC]),0,HELD)
-!StateCheck(ThirdNearest([PC]),STATE_STONE_DEATH)
-Allegiance(Myself,ENEMY)
-!Allegiance(ThirdNearest([PC]),EVILCUTOFF)
-THEN
-RESPONSE #100
-EquipMostDamagingMelee()
-AttackOneRound(ThirdNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(ThirdNearest([PC]),30)
 END
 
 IF
@@ -2383,12 +3266,11 @@ CheckStatLT(FourthNearest([PC]),50,RESISTCRUSHING)
 !StateCheck(FourthNearest([PC]),STATE_STONE_DEATH)
 Allegiance(Myself,ENEMY)
 !Allegiance(FourthNearest([PC]),EVILCUTOFF)
+Range(FourthNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FourthNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(FourthNearest([PC]),30)
 END
 
 IF
@@ -2417,12 +3299,11 @@ CheckStatLT(FifthNearest([PC]),50,RESISTCRUSHING)
 !StateCheck(FifthNearest([PC]),STATE_STONE_DEATH)
 Allegiance(Myself,ENEMY)
 !Allegiance(FifthNearest([PC]),EVILCUTOFF)
+Range(FifthNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FifthNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(FifthNearest([PC]),30)
 END
 
 IF
@@ -2451,306 +3332,16 @@ CheckStatLT(SixthNearest([PC]),50,RESISTCRUSHING)
 !StateCheck(SixthNearest([PC]),STATE_STONE_DEATH)
 Allegiance(Myself,ENEMY)
 !Allegiance(SixthNearest([PC]),EVILCUTOFF)
+Range(SixthNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SixthNearest([PC]))
-RESPONSE #100
-Continue()
-END
-
-IF
-ActionListEmpty()
-See([PC.0.0.MAGE])
-
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat([PC.0.0.MAGE],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",[PC.0.0.MAGE])
-!StateCheck([PC.0.0.MAGE],STATE_DISABLED)
-!CheckStatGT([PC.0.0.MAGE],0,HELD)
-!StateCheck([PC.0.0.MAGE],STATE_STONE_DEATH)
-CheckStatLT([PC.0.0.MAGE],50,RESISTCRUSHING)
-!CheckStatGT([PC.0.0.MAGE],0,STONESKINS)
-!StateCheck([PC.0.0.MAGE],STATE_MIRRORIMAGE)
-Allegiance(Myself,ENEMY)
-!Allegiance([PC.0.0.MAGE],EVILCUTOFF)
-!TargetUnreachable([PC.0.0.MAGE])
-THEN
-RESPONSE #100
-MoveToObject([PC.0.0.MAGE])
-RESPONSE #100
-Continue()
-END
-
-IF
-ActionListEmpty()
-See([PC.0.0.MAGE_THIEF])
-
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat([PC.0.0.MAGE_THIEF],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE_THIEF],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE_THIEF],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE_THIEF],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE_THIEF],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",[PC.0.0.MAGE_THIEF])
-!StateCheck([PC.0.0.MAGE_THIEF],STATE_DISABLED)
-!CheckStatGT([PC.0.0.MAGE_THIEF],0,HELD)
-!StateCheck([PC.0.0.MAGE_THIEF],STATE_STONE_DEATH)
-CheckStatLT([PC.0.0.MAGE_THIEF],50,RESISTCRUSHING)
-!CheckStatGT([PC.0.0.MAGE_THIEF],0,STONESKINS)
-!StateCheck([PC.0.0.MAGE_THIEF],STATE_MIRRORIMAGE)
-Allegiance(Myself,ENEMY)
-!Allegiance([PC.0.0.MAGE_THIEF],EVILCUTOFF)
-!TargetUnreachable([PC.0.0.MAGE_THIEF])
-THEN
-RESPONSE #100
-MoveToObject([PC.0.0.MAGE_THIEF])
-RESPONSE #100
-Continue()
-END
-
-IF
-ActionListEmpty()
-See([PC.0.0.MAGE_ALL])
-
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat([PC.0.0.MAGE_ALL],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE_ALL],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE_ALL],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat([PC.0.0.MAGE_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",[PC.0.0.MAGE_ALL])
-!StateCheck([PC.0.0.MAGE_ALL],STATE_DISABLED)
-!CheckStatGT([PC.0.0.MAGE_ALL],0,HELD)
-!StateCheck([PC.0.0.MAGE_ALL],STATE_STONE_DEATH)
-CheckStatLT([PC.0.0.MAGE_ALL],50,RESISTCRUSHING)
-!CheckStatGT([PC.0.0.MAGE_ALL],0,STONESKINS)
-!StateCheck([PC.0.0.MAGE_ALL],STATE_MIRRORIMAGE)
-Allegiance(Myself,ENEMY)
-!Allegiance([PC.0.0.MAGE_ALL],EVILCUTOFF)
-!TargetUnreachable([PC.0.0.MAGE_ALL])
-THEN
-RESPONSE #100
-MoveToObject([PC.0.0.MAGE_ALL])
-RESPONSE #100
-Continue()
-END
-
-IF
-ActionListEmpty()
-See([PC.0.0.THIEF])
-
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat([PC.0.0.THIEF],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat([PC.0.0.THIEF],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat([PC.0.0.THIEF],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat([PC.0.0.THIEF],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat([PC.0.0.THIEF],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",[PC.0.0.THIEF])
-!StateCheck([PC.0.0.THIEF],STATE_DISABLED)
-!CheckStatGT([PC.0.0.THIEF],0,HELD)
-!StateCheck([PC.0.0.THIEF],STATE_STONE_DEATH)
-CheckStatLT([PC.0.0.THIEF],50,RESISTCRUSHING)
-!CheckStatGT([PC.0.0.THIEF],0,STONESKINS)
-!StateCheck([PC.0.0.THIEF],STATE_MIRRORIMAGE)
-Allegiance(Myself,ENEMY)
-!Allegiance([PC.0.0.THIEF],EVILCUTOFF)
-!TargetUnreachable([PC.0.0.THIEF])
-THEN
-RESPONSE #100
-MoveToObject([PC.0.0.THIEF])
-RESPONSE #100
-Continue()
-END
-
-IF
-ActionListEmpty()
-See([PC.0.0.BARD])
-
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat([PC.0.0.BARD],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat([PC.0.0.BARD],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat([PC.0.0.BARD],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat([PC.0.0.BARD],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat([PC.0.0.BARD],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",[PC.0.0.BARD])
-!StateCheck([PC.0.0.BARD],STATE_DISABLED)
-!CheckStatGT([PC.0.0.BARD],0,HELD)
-!StateCheck([PC.0.0.BARD],STATE_STONE_DEATH)
-CheckStatLT([PC.0.0.BARD],50,RESISTCRUSHING)
-!CheckStatGT([PC.0.0.BARD],0,STONESKINS)
-!StateCheck([PC.0.0.BARD],STATE_MIRRORIMAGE)
-Allegiance(Myself,ENEMY)
-!Allegiance([PC.0.0.BARD],EVILCUTOFF)
-!TargetUnreachable([PC.0.0.BARD])
-THEN
-RESPONSE #100
-MoveToObject([PC.0.0.BARD])
-RESPONSE #100
-Continue()
-END
-
-IF
-ActionListEmpty()
-See([PC.0.0.THIEF_ALL])
-
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat([PC.0.0.THIEF_ALL],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat([PC.0.0.THIEF_ALL],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat([PC.0.0.THIEF_ALL],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat([PC.0.0.THIEF_ALL],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat([PC.0.0.THIEF_ALL],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",[PC.0.0.THIEF_ALL])
-!StateCheck([PC.0.0.THIEF_ALL],STATE_DISABLED)
-!CheckStatGT([PC.0.0.THIEF_ALL],0,HELD)
-!StateCheck([PC.0.0.THIEF_ALL],STATE_STONE_DEATH)
-CheckStatLT([PC.0.0.THIEF_ALL],50,RESISTCRUSHING)
-!CheckStatGT([PC.0.0.THIEF_ALL],0,STONESKINS)
-!StateCheck([PC.0.0.THIEF_ALL],STATE_MIRRORIMAGE)
-Allegiance(Myself,ENEMY)
-!Allegiance([PC.0.0.THIEF_ALL],EVILCUTOFF)
-!TargetUnreachable([PC.0.0.THIEF_ALL])
-THEN
-RESPONSE #100
-MoveToObject([PC.0.0.THIEF_ALL])
-RESPONSE #100
-Continue()
-END
-
-IF
-ActionListEmpty()
-See([PC.0.0.DRUID])
-
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat([PC.0.0.DRUID],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat([PC.0.0.DRUID],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat([PC.0.0.DRUID],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat([PC.0.0.DRUID],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat([PC.0.0.DRUID],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",[PC.0.0.DRUID])
-!StateCheck([PC.0.0.DRUID],STATE_DISABLED)
-!CheckStatGT([PC.0.0.DRUID],0,HELD)
-!StateCheck([PC.0.0.DRUID],STATE_STONE_DEATH)
-CheckStatLT([PC.0.0.DRUID],50,RESISTCRUSHING)
-!CheckStatGT([PC.0.0.DRUID],0,STONESKINS)
-!StateCheck([PC.0.0.DRUID],STATE_MIRRORIMAGE)
-Allegiance(Myself,ENEMY)
-!Allegiance([PC.0.0.DRUID],EVILCUTOFF)
-!TargetUnreachable([PC.0.0.DRUID])
-THEN
-RESPONSE #100
-MoveToObject([PC.0.0.DRUID])
-RESPONSE #100
-Continue()
-END
-
-IF
-ActionListEmpty()
-See([PC.0.0.CLERIC])
-
-OR(2)
-CheckStatGT(Myself,0,CLERIC_HALLOW)
-CheckStat([PC.0.0.CLERIC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
-OR(2)
-CheckStat(Myself,0,CLERIC_HALLOW)
-!CheckStat([PC.0.0.CLERIC],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,2,CLERIC_HALLOW)
-!CheckStat([PC.0.0.CLERIC],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,3,CLERIC_HALLOW)
-!CheckStat([PC.0.0.CLERIC],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-OR(2)
-CheckStatGT(Myself,5,CLERIC_HALLOW)
-!CheckStat([PC.0.0.CLERIC],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
-!HasItem("MORSWORD",[PC.0.0.CLERIC])
-!StateCheck([PC.0.0.CLERIC],STATE_DISABLED)
-!CheckStatGT([PC.0.0.CLERIC],0,HELD)
-!StateCheck([PC.0.0.CLERIC],STATE_STONE_DEATH)
-CheckStatLT([PC.0.0.CLERIC],50,RESISTCRUSHING)
-!CheckStatGT([PC.0.0.CLERIC],0,STONESKINS)
-!StateCheck([PC.0.0.CLERIC],STATE_MIRRORIMAGE)
-Allegiance(Myself,ENEMY)
-!Allegiance([PC.0.0.CLERIC],EVILCUTOFF)
-!TargetUnreachable([PC.0.0.CLERIC])
-THEN
-RESPONSE #100
-MoveToObject([PC.0.0.CLERIC])
-RESPONSE #100
-Continue()
+AttackReevaluate(SixthNearest([PC]),30)
 END
 
 IF
 ActionListEmpty()
 See([PC])
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat([PC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -2767,15 +3358,15 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat([PC],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !HasItem("MORSWORD",[PC])
-!StateCheck([PC],STATE_DISABLED)
-!CheckStatGT([PC],0,HELD)
-!StateCheck([PC],STATE_STONE_DEATH)
 CheckStatLT([PC],50,RESISTCRUSHING)
 !CheckStatGT([PC],0,STONESKINS)
 !StateCheck([PC],STATE_MIRRORIMAGE)
+!StateCheck([PC],STATE_DISABLED)
+!CheckStatGT([PC],0,HELD)
+!StateCheck([PC],STATE_STONE_DEATH)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC],EVILCUTOFF)
-!TargetUnreachable([PC])
+
 THEN
 RESPONSE #100
 MoveToObject([PC])
@@ -2786,7 +3377,6 @@ END
 IF
 ActionListEmpty()
 See(SecondNearest([PC]))
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(SecondNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -2803,15 +3393,15 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(SecondNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !HasItem("MORSWORD",SecondNearest([PC]))
-!StateCheck(SecondNearest([PC]),STATE_DISABLED)
-!CheckStatGT(SecondNearest([PC]),0,HELD)
-!StateCheck(SecondNearest([PC]),STATE_STONE_DEATH)
 CheckStatLT(SecondNearest([PC]),50,RESISTCRUSHING)
 !CheckStatGT(SecondNearest([PC]),0,STONESKINS)
 !StateCheck(SecondNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(SecondNearest([PC]),STATE_DISABLED)
+!CheckStatGT(SecondNearest([PC]),0,HELD)
+!StateCheck(SecondNearest([PC]),STATE_STONE_DEATH)
 Allegiance(Myself,ENEMY)
 !Allegiance(SecondNearest([PC]),EVILCUTOFF)
-!TargetUnreachable(SecondNearest([PC]))
+
 THEN
 RESPONSE #100
 MoveToObject(SecondNearest([PC]))
@@ -2822,7 +3412,6 @@ END
 IF
 ActionListEmpty()
 See(ThirdNearest([PC]))
-
 OR(2)
 CheckStatGT(Myself,0,CLERIC_HALLOW)
 CheckStat(ThirdNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
@@ -2839,18 +3428,123 @@ OR(2)
 CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStat(ThirdNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
 !HasItem("MORSWORD",ThirdNearest([PC]))
-!StateCheck(ThirdNearest([PC]),STATE_DISABLED)
-!CheckStatGT(ThirdNearest([PC]),0,HELD)
-!StateCheck(ThirdNearest([PC]),STATE_STONE_DEATH)
 CheckStatLT(ThirdNearest([PC]),50,RESISTCRUSHING)
 !CheckStatGT(ThirdNearest([PC]),0,STONESKINS)
 !StateCheck(ThirdNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(ThirdNearest([PC]),STATE_DISABLED)
+!CheckStatGT(ThirdNearest([PC]),0,HELD)
+!StateCheck(ThirdNearest([PC]),STATE_STONE_DEATH)
 Allegiance(Myself,ENEMY)
 !Allegiance(ThirdNearest([PC]),EVILCUTOFF)
-!TargetUnreachable(ThirdNearest([PC]))
+
 THEN
 RESPONSE #100
 MoveToObject(ThirdNearest([PC]))
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(FourthNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(FourthNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",FourthNearest([PC]))
+CheckStatLT(FourthNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(FourthNearest([PC]),0,STONESKINS)
+!StateCheck(FourthNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(FourthNearest([PC]),STATE_DISABLED)
+!CheckStatGT(FourthNearest([PC]),0,HELD)
+!StateCheck(FourthNearest([PC]),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(FourthNearest([PC]))
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(FifthNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(FifthNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",FifthNearest([PC]))
+CheckStatLT(FifthNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(FifthNearest([PC]),0,STONESKINS)
+!StateCheck(FifthNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(FifthNearest([PC]),STATE_DISABLED)
+!CheckStatGT(FifthNearest([PC]),0,HELD)
+!StateCheck(FifthNearest([PC]),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(FifthNearest([PC]))
+RESPONSE #100
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(SixthNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SixthNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",SixthNearest([PC]))
+CheckStatLT(SixthNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(SixthNearest([PC]),0,STONESKINS)
+!StateCheck(SixthNearest([PC]),STATE_MIRRORIMAGE)
+!StateCheck(SixthNearest([PC]),STATE_DISABLED)
+!CheckStatGT(SixthNearest([PC]),0,HELD)
+!StateCheck(SixthNearest([PC]),STATE_STONE_DEATH)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(SixthNearest([PC]))
 RESPONSE #100
 Continue()
 END
@@ -2880,12 +3574,11 @@ CheckStatLT([PC],50,RESISTCRUSHING)
 !CheckStatGT([PC],0,STONESKINS)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC],EVILCUTOFF)
+Range([PC],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC],30)
 END
 
 IF
@@ -2913,12 +3606,11 @@ CheckStatLT(SecondNearest([PC]),50,RESISTCRUSHING)
 !CheckStatGT(SecondNearest([PC]),0,STONESKINS)
 Allegiance(Myself,ENEMY)
 !Allegiance(SecondNearest([PC]),EVILCUTOFF)
+Range(SecondNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(SecondNearest([PC]),30)
 END
 
 IF
@@ -2946,12 +3638,11 @@ CheckStatLT(ThirdNearest([PC]),50,RESISTCRUSHING)
 !CheckStatGT(ThirdNearest([PC]),0,STONESKINS)
 Allegiance(Myself,ENEMY)
 !Allegiance(ThirdNearest([PC]),EVILCUTOFF)
+Range(ThirdNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(ThirdNearest([PC]),30)
 END
 
 IF
@@ -2979,12 +3670,11 @@ CheckStatLT(FourthNearest([PC]),50,RESISTCRUSHING)
 !CheckStatGT(FourthNearest([PC]),0,STONESKINS)
 Allegiance(Myself,ENEMY)
 !Allegiance(FourthNearest([PC]),EVILCUTOFF)
+Range(FourthNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FourthNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(FourthNearest([PC]),30)
 END
 
 IF
@@ -3012,12 +3702,11 @@ CheckStatLT(FifthNearest([PC]),50,RESISTCRUSHING)
 !CheckStatGT(FifthNearest([PC]),0,STONESKINS)
 Allegiance(Myself,ENEMY)
 !Allegiance(FifthNearest([PC]),EVILCUTOFF)
+Range(FifthNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FifthNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(FifthNearest([PC]),30)
 END
 
 IF
@@ -3045,10 +3734,213 @@ CheckStatLT(SixthNearest([PC]),50,RESISTCRUSHING)
 !CheckStatGT(SixthNearest([PC]),0,STONESKINS)
 Allegiance(Myself,ENEMY)
 !Allegiance(SixthNearest([PC]),EVILCUTOFF)
+Range(SixthNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SixthNearest([PC]))
+AttackReevaluate(SixthNearest([PC]),30)
+END
+
+IF
+ActionListEmpty()
+See([PC])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC])
+!StateCheck([PC],STATE_DISABLED)
+!CheckStatGT([PC],0,HELD)
+!StateCheck([PC],STATE_STONE_DEATH)
+CheckStatLT([PC],50,RESISTCRUSHING)
+!CheckStatGT([PC],0,STONESKINS)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC])
+RESPONSE #50
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(SecondNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",SecondNearest([PC]))
+!StateCheck(SecondNearest([PC]),STATE_DISABLED)
+!CheckStatGT(SecondNearest([PC]),0,HELD)
+!StateCheck(SecondNearest([PC]),STATE_STONE_DEATH)
+CheckStatLT(SecondNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(SecondNearest([PC]),0,STONESKINS)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(SecondNearest([PC]))
+RESPONSE #50
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(ThirdNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",ThirdNearest([PC]))
+!StateCheck(ThirdNearest([PC]),STATE_DISABLED)
+!CheckStatGT(ThirdNearest([PC]),0,HELD)
+!StateCheck(ThirdNearest([PC]),STATE_STONE_DEATH)
+CheckStatLT(ThirdNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(ThirdNearest([PC]),0,STONESKINS)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(ThirdNearest([PC]))
+RESPONSE #50
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(FourthNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(FourthNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",FourthNearest([PC]))
+!StateCheck(FourthNearest([PC]),STATE_DISABLED)
+!CheckStatGT(FourthNearest([PC]),0,HELD)
+!StateCheck(FourthNearest([PC]),STATE_STONE_DEATH)
+CheckStatLT(FourthNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(FourthNearest([PC]),0,STONESKINS)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(FourthNearest([PC]))
+RESPONSE #50
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(FifthNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(FifthNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",FifthNearest([PC]))
+!StateCheck(FifthNearest([PC]),STATE_DISABLED)
+!CheckStatGT(FifthNearest([PC]),0,HELD)
+!StateCheck(FifthNearest([PC]),STATE_STONE_DEATH)
+CheckStatLT(FifthNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(FifthNearest([PC]),0,STONESKINS)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(FifthNearest([PC]))
+RESPONSE #50
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(SixthNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SixthNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",SixthNearest([PC]))
+!StateCheck(SixthNearest([PC]),STATE_DISABLED)
+!CheckStatGT(SixthNearest([PC]),0,HELD)
+!StateCheck(SixthNearest([PC]),STATE_STONE_DEATH)
+CheckStatLT(SixthNearest([PC]),50,RESISTCRUSHING)
+!CheckStatGT(SixthNearest([PC]),0,STONESKINS)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(SixthNearest([PC]))
 RESPONSE #50
 Continue()
 END
@@ -3077,12 +3969,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 CheckStatLT([PC],50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC],EVILCUTOFF)
+Range([PC],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC])
-RESPONSE #50
-Continue()
+AttackReevaluate([PC],30)
 END
 
 IF
@@ -3109,12 +4000,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 CheckStatLT(SecondNearest([PC]),50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SecondNearest([PC]),EVILCUTOFF)
+Range(SecondNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(SecondNearest([PC]),30)
 END
 
 IF
@@ -3141,12 +4031,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 CheckStatLT(ThirdNearest([PC]),50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(ThirdNearest([PC]),EVILCUTOFF)
+Range(ThirdNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(ThirdNearest([PC]),30)
 END
 
 IF
@@ -3173,12 +4062,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 CheckStatLT(FourthNearest([PC]),50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(FourthNearest([PC]),EVILCUTOFF)
+Range(FourthNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FourthNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(FourthNearest([PC]),30)
 END
 
 IF
@@ -3205,12 +4093,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 CheckStatLT(FifthNearest([PC]),50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(FifthNearest([PC]),EVILCUTOFF)
+Range(FifthNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FifthNearest([PC]))
-RESPONSE #50
-Continue()
+AttackReevaluate(FifthNearest([PC]),30)
 END
 
 IF
@@ -3237,10 +4124,207 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 CheckStatLT(SixthNearest([PC]),50,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SixthNearest([PC]),EVILCUTOFF)
+Range(SixthNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SixthNearest([PC]))
+AttackReevaluate(SixthNearest([PC]),30)
+END
+
+IF
+ActionListEmpty()
+See([PC])
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat([PC],0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat([PC],4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat([PC],1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat([PC],2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat([PC],3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",[PC])
+!StateCheck([PC],STATE_DISABLED)
+!CheckStatGT([PC],0,HELD)
+!StateCheck([PC],STATE_STONE_DEATH)
+CheckStatLT([PC],50,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance([PC],EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject([PC])
+RESPONSE #50
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(SecondNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SecondNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SecondNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",SecondNearest([PC]))
+!StateCheck(SecondNearest([PC]),STATE_DISABLED)
+!CheckStatGT(SecondNearest([PC]),0,HELD)
+!StateCheck(SecondNearest([PC]),STATE_STONE_DEATH)
+CheckStatLT(SecondNearest([PC]),50,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(SecondNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(SecondNearest([PC]))
+RESPONSE #50
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(ThirdNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(ThirdNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(ThirdNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",ThirdNearest([PC]))
+!StateCheck(ThirdNearest([PC]),STATE_DISABLED)
+!CheckStatGT(ThirdNearest([PC]),0,HELD)
+!StateCheck(ThirdNearest([PC]),STATE_STONE_DEATH)
+CheckStatLT(ThirdNearest([PC]),50,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(ThirdNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(ThirdNearest([PC]))
+RESPONSE #50
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(FourthNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(FourthNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(FourthNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",FourthNearest([PC]))
+!StateCheck(FourthNearest([PC]),STATE_DISABLED)
+!CheckStatGT(FourthNearest([PC]),0,HELD)
+!StateCheck(FourthNearest([PC]),STATE_STONE_DEATH)
+CheckStatLT(FourthNearest([PC]),50,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(FourthNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(FourthNearest([PC]))
+RESPONSE #50
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(FifthNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(FifthNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(FifthNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",FifthNearest([PC]))
+!StateCheck(FifthNearest([PC]),STATE_DISABLED)
+!CheckStatGT(FifthNearest([PC]),0,HELD)
+!StateCheck(FifthNearest([PC]),STATE_STONE_DEATH)
+CheckStatLT(FifthNearest([PC]),50,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(FifthNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(FifthNearest([PC]))
+RESPONSE #50
+Continue()
+END
+
+IF
+ActionListEmpty()
+See(SixthNearest([PC]))
+OR(2)
+CheckStatGT(Myself,0,CLERIC_HALLOW)
+CheckStat(SixthNearest([PC]),0,WIZARD_PROTECTION_FROM_NORMAL_WEAPONS)
+OR(2)
+CheckStat(Myself,0,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),4,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,2,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),1,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,3,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),2,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+OR(2)
+CheckStatGT(Myself,5,CLERIC_HALLOW)
+!CheckStat(SixthNearest([PC]),3,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)
+!HasItem("MORSWORD",SixthNearest([PC]))
+!StateCheck(SixthNearest([PC]),STATE_DISABLED)
+!CheckStatGT(SixthNearest([PC]),0,HELD)
+!StateCheck(SixthNearest([PC]),STATE_STONE_DEATH)
+CheckStatLT(SixthNearest([PC]),50,RESISTCRUSHING)
+Allegiance(Myself,ENEMY)
+!Allegiance(SixthNearest([PC]),EVILCUTOFF)
+
+THEN
+RESPONSE #100
+MoveToObject(SixthNearest([PC]))
 RESPONSE #50
 Continue()
 END
@@ -3269,12 +4353,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC],75,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC],EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC],30)
 END
 
 IF
@@ -3301,12 +4384,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(SecondNearest([PC]),75,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SecondNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(SecondNearest([PC]),30)
 END
 
 IF
@@ -3333,12 +4415,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(ThirdNearest([PC]),75,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(ThirdNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(ThirdNearest([PC]),30)
 END
 
 IF
@@ -3365,12 +4446,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(FourthNearest([PC]),75,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(FourthNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FourthNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(FourthNearest([PC]),30)
 END
 
 IF
@@ -3397,12 +4477,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(FifthNearest([PC]),75,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(FifthNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FifthNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(FifthNearest([PC]),30)
 END
 
 IF
@@ -3429,12 +4508,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(SixthNearest([PC]),75,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SixthNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SixthNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(SixthNearest([PC]),30)
 END
 
 IF
@@ -3461,12 +4539,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC],99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC],EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC],30)
 END
 
 IF
@@ -3493,12 +4570,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(SecondNearest([PC]),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SecondNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(SecondNearest([PC]),30)
 END
 
 IF
@@ -3525,12 +4601,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(ThirdNearest([PC]),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(ThirdNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(ThirdNearest([PC]),30)
 END
 
 IF
@@ -3557,12 +4632,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(FourthNearest([PC]),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(FourthNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FourthNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(FourthNearest([PC]),30)
 END
 
 IF
@@ -3589,12 +4663,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(FifthNearest([PC]),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(FifthNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FifthNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(FifthNearest([PC]),30)
 END
 
 IF
@@ -3621,12 +4694,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(SixthNearest([PC]),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SixthNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SixthNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(SixthNearest([PC]),30)
 END
 
 IF
@@ -3653,12 +4725,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(NearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(NearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(NearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(NearestEnemyOf(Myself),30)
 END
 
 IF
@@ -3685,12 +4756,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(SecondNearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SecondNearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(SecondNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -3717,12 +4787,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(ThirdNearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(ThirdNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -3749,12 +4818,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(FourthNearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(FourthNearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FourthNearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(FourthNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -3781,12 +4849,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(FifthNearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(FifthNearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FifthNearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(FifthNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -3813,12 +4880,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(SixthNearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SixthNearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SixthNearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(SixthNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -3842,13 +4908,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC.0.0.MAGE],99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.MAGE],EVILCUTOFF)
+ActionListEmpty()
 Range([PC.0.0.MAGE],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC.0.0.MAGE],30)
 END
 
 IF
@@ -3872,13 +4937,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC.0.0.MAGE_THIEF],99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.MAGE_THIEF],EVILCUTOFF)
+ActionListEmpty()
 Range([PC.0.0.MAGE_THIEF],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE_THIEF])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC.0.0.MAGE_THIEF],30)
 END
 
 IF
@@ -3902,13 +4966,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC.0.0.MAGE_ALL],99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.MAGE_ALL],EVILCUTOFF)
+ActionListEmpty()
 Range([PC.0.0.MAGE_ALL],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.MAGE_ALL])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC.0.0.MAGE_ALL],30)
 END
 
 IF
@@ -3932,13 +4995,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC.0.0.THIEF],99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.THIEF],EVILCUTOFF)
+ActionListEmpty()
 Range([PC.0.0.THIEF],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.THIEF])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC.0.0.THIEF],30)
 END
 
 IF
@@ -3962,13 +5024,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC.0.0.BARD],99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.BARD],EVILCUTOFF)
+ActionListEmpty()
 Range([PC.0.0.BARD],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.BARD])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC.0.0.BARD],30)
 END
 
 IF
@@ -3992,13 +5053,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC.0.0.THIEF_ALL],99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.THIEF_ALL],EVILCUTOFF)
+ActionListEmpty()
 Range([PC.0.0.THIEF_ALL],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.THIEF_ALL])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC.0.0.THIEF_ALL],30)
 END
 
 IF
@@ -4022,13 +5082,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC.0.0.DRUID],99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.DRUID],EVILCUTOFF)
+ActionListEmpty()
 Range([PC.0.0.DRUID],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.DRUID])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC.0.0.DRUID],30)
 END
 
 IF
@@ -4052,13 +5111,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC.0.0.CLERIC],99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC.0.0.CLERIC],EVILCUTOFF)
+ActionListEmpty()
 Range([PC.0.0.CLERIC],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC.0.0.CLERIC])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC.0.0.CLERIC],30)
 END
 
 IF
@@ -4082,13 +5140,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT([PC],99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance([PC],EVILCUTOFF)
+ActionListEmpty()
 Range([PC],5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound([PC])
-RESPONSE #100
-Continue()
+AttackReevaluate([PC],30)
 END
 
 IF
@@ -4112,13 +5169,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(SecondNearest([PC]),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SecondNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 Range(SecondNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(SecondNearest([PC]),30)
 END
 
 IF
@@ -4142,13 +5198,12 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(ThirdNearest([PC]),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(ThirdNearest([PC]),EVILCUTOFF)
+ActionListEmpty()
 Range(ThirdNearest([PC]),5)
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearest([PC]))
-RESPONSE #100
-Continue()
+AttackReevaluate(ThirdNearest([PC]),30)
 END
 
 IF
@@ -4172,12 +5227,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(NearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(NearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(NearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(NearestEnemyOf(Myself),30)
 END
 
 IF
@@ -4201,12 +5255,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(SecondNearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SecondNearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SecondNearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(SecondNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -4230,12 +5283,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(ThirdNearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(ThirdNearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(ThirdNearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(ThirdNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -4259,12 +5311,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(FourthNearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(FourthNearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FourthNearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(FourthNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -4288,12 +5339,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(FifthNearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(FifthNearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(FifthNearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(FifthNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -4317,12 +5367,11 @@ CheckStatGT(Myself,5,CLERIC_HALLOW)
 !CheckStatGT(SixthNearestEnemyOf(Myself),99,RESISTCRUSHING)
 Allegiance(Myself,ENEMY)
 !Allegiance(SixthNearestEnemyOf(Myself),EVILCUTOFF)
+ActionListEmpty()
 THEN
 RESPONSE #100
 EquipMostDamagingMelee()
-AttackOneRound(SixthNearestEnemyOf(Myself))
-RESPONSE #100
-Continue()
+AttackReevaluate(SixthNearestEnemyOf(Myself),30)
 END
 
 IF
@@ -4399,20 +5448,22 @@ MoveToObject(Player6)
 END
 
 IF
-ActionListEmpty()
 See(NearestEnemyOf(Myself))
+ActionListEmpty()
 THEN
 RESPONSE #100
-AttackOneRound(LastSeenBy(Myself))
+EquipMostDamagingMelee()
+AttackReevaluate(NearestEnemyOf(Myself),30)
 END
 
 IF
+See(LastAttackerOf(Myself))
 ActionListEmpty()
 !Allegiance(Myself,ENEMY)
 AttackedBy([ANYONE],DEFAULT)
-See(LastAttackerOf(Myself))
 THEN
 RESPONSE #100
-AttackOneRound(LastAttackerOf(Myself))
+EquipMostDamagingMelee()
+AttackReevaluate(LastAttackerOf(Myself),30)
 END
 
