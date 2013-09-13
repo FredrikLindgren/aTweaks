@@ -2809,3 +2809,27 @@ BEGIN
     END
   END
 END
+
+DEFINE_PATCH_FUNCTION minimum_proficiency
+  INT_VAR
+    value = 1
+    proficiency = 0
+BEGIN
+  PATCH_IF value >= 0 AND proficiency >= 0 BEGIN
+    coveredp = 0
+    GET_OFFSET_ARRAY effect_array 0x2c4 4 0x2c8 4 0 0 0x108
+    PHP_EACH effect_array AS i => off BEGIN
+      READ_LONG off + 0x08 opcode
+      READ_LONG off + 0x14 stars
+      READ_LONG off + 0x18 prof
+      PATCH_IF opcode = 233 AND prof = proficiency AND stars >= value BEGIN
+        coveredp = 1
+      END
+    END
+    PATCH_IF !coveredp BEGIN
+      SET_BG2_PROFICIENCY proficiency value
+    END
+  END ELSE BEGIN
+    PATCH_WARN "WARNING: minimum_proficiency received illegal arguments: value = %value%, proficiency = %proficiency%"
+  END
+END

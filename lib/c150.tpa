@@ -1048,6 +1048,9 @@ COMPILE ~atweaks/baf/fiends/fl#nabsu.baf~
         ~atweaks/baf/fiends/fl#gelsu.baf~
         ~atweaks/baf/fiends/fl#balsu.baf~
         ~atweaks/baf/fiends/fl#pitsu.baf~
+        ~atweaks/baf/fiends/fl#arcsu.baf~
+        ~atweaks/baf/fiends/fl#nycsu.baf~
+        ~atweaks/baf/fiends/fl#ultsu.baf~
 
 COPY_EXISTING demnab01.cre ~override/fl#nabsu.cre~
               telcor1.cre  ~override/fl#corsu.cre~
@@ -1055,6 +1058,9 @@ COPY_EXISTING demnab01.cre ~override/fl#nabsu.cre~
               rr#hgel.cre  ~override/fl#gelsu.cre~
               dembal01.cre ~override/fl#balsu.cre~
               dempit01.cre ~override/fl#pitsu.cre~
+              fl#sarca.cre ~override/fl#arcsu.cre~
+              fl#snyca.cre ~override/fl#nycsu.cre~
+              fl#sultr.cre ~override/fl#ultsu.cre~
   WRITE_LONG 0x10 2 // Clear flags, leave only "no corpse"
   WRITE_ASCIIE 0x248 "%DEST_RES%" #8 // Summoned script
   WRITE_ASCII  0x250 ~~ #8 // Class
@@ -1075,44 +1081,109 @@ COPY_EXISTING demnab01.cre ~override/fl#nabsu.cre~
     ADD_CRE_ITEM "dw#sumfi" #0 #0 #0 none boots
   END
 
-//Commandeer SCSII's private fiend-summoning spells and have them summon SCSII-aTweaks hybrids
-ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND !FiendsOriginal BEGIN //FiendsOriginal eq "do not alter mod-added fiends"
+// Commandeer SCSII's fiend-summoning spells and
+// have them summon SCSII-aTweaks hybrids
+ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND !FiendsOriginal BEGIN
+  OUTER_SPRINT $crefile(dw#cacof) fl#nabsu
+  OUTER_SPRINT $crefile(dw#sumbf) fl#corsu
+  OUTER_SPRINT $crefile(dw#sumgl) fl#glasu
+  OUTER_SPRINT $crefile(dw#sumco) fl#gelsu
+  OUTER_SPRINT $crefile(dw#basum) fl#balsu
+  OUTER_SPRINT $crefile(dw#pitsu) fl#pitsu
+  OUTER_SPRINT $crefile(dw#gatem) fl#pitsu
+  OUTER_SPRINT $crefile(dw#gatep) fl#pitsu
+  OUTER_SPRINT $crefile(dw#sumya) fl#arcsu
+  OUTER_SPRINT $crefile(dw#sumyn) fl#nycsu
+  OUTER_SPRINT $crefile(dw#sumyu) fl#ultsu
 
-  ACTION_IF FILE_EXISTS_IN_GAME dw#cacof.eff AND FILE_EXISTS_IN_GAME dw#pitsu.eff BEGIN //If SCSII Improved Fiends is installed
-    OUTER_SPRINT $crefile(dw#cacof) fl#nabsu
-    OUTER_SPRINT $crefile(dw#sumbf) fl#corsu
-    OUTER_SPRINT $crefile(dw#sumgl) fl#glasu
-    OUTER_SPRINT $crefile(dw#sumco) fl#gelsu
-    OUTER_SPRINT $crefile(dw#basum) fl#balsu
-    OUTER_SPRINT $crefile(dw#pitsu) fl#pitsu
+  ACTION_FOR_EACH res IN
+                  dw#cacof
+                  dw#sumbf
+                  dw#sumya
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%res%.eff" BEGIN
+      COPY_EXISTING fl#sarca.eff "override/%res%.eff"
+        WRITE_ASCIIE 0x30 $crefile("%DEST_RES%") #8
+      BUT_ONLY
+    END
+  END
 
-    COPY_EXISTING dw#cacof.eff override
-                  dw#sumbf.eff override
-                  dw#sumgl.eff override
-                  dw#sumco.eff override
-                  dw#basum.eff override
-                  dw#pitsu.eff override
-      WRITE_ASCIIE 0x30 $crefile("%SOURCE_RES%") #8
-    BUT_ONLY
-  END /* ELSE BEGIN //Otherwise it is just SCSII Smarter Mages
+  ACTION_FOR_EACH res IN
+                  dw#sumgl
+                  dw#sumco
+                  dw#sumyn
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%res%.eff" BEGIN
+      COPY_EXISTING fl#snyca.eff "override/%res%.eff"
+        WRITE_ASCIIE 0x30 $crefile("%DEST_RES%") #8
+      BUT_ONLY
+    END
+  END
 
-    //These are copies of Mordenkainen's Sword; change them to conjure up the appropriate fiend instead
-    COPY_EXISTING dw#sumgl.spl override
-                  dw#sumco.spl override
-                  dw#cacof.spl override
-                  dw#sumbf.spl override
+  ACTION_FOR_EACH res IN
+                  dw#basum
+                  dw#pitsu
+                  dw#gatem
+                  dw#gatep
+                  dw#sumyu
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%res%.eff" BEGIN
+      COPY_EXISTING fl#sultr.eff "override/%res%.eff"
+        WRITE_ASCIIE 0x30 $crefile("%SOURCE_RES%") #8
+      BUT_ONLY
+    END
+  END
 
+  OUTER_SET $name(dw#cacof) = 17320
+  OUTER_SET $name(dw#sumbf) = 17320
+  OUTER_SET $name(dw#sumya) = 17320
+  OUTER_SET $name(dw#sumgl) = 17360
+  OUTER_SET $name(dw#sumco) = 17360
+  OUTER_SET $name(dw#sumyn) = 17360
+  OUTER_SET $name(dw#basum) = 14260
+  OUTER_SET $name(dw#pitsu) = 14260
+  OUTER_SET $name(dw#gatem) = 14260
+  OUTER_SET $name(dw#gatep) = 14260
+  OUTER_SET $name(dw#sumyu) = 14260
 
-    //These are copies of Gate; change the other to conjure up a Balor
-    COPY_EXISTING dw#gatem.spl override
-                  dw#basum.spl override
-
-
+/* // This looks like bunk; most of these spells do not exist; SCS uses the regular spells
+  ACTION_IF MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN
+    ACTION_FOR_EACH res IN
+                    dw#cacof
+                    dw#sumbf
+                    dw#sumya
+                    dw#sumgl
+                    dw#sumco
+                    dw#sumyn
+                    dw#basum
+                    dw#pitsu
+                    dw#gatem
+                    dw#gatep
+                    dw#sumyu
+    BEGIN
+      ACTION_IF FILE_EXISTS_IN_GAME "%res%.spl" BEGIN
+        COPY_EXISTING "%res%.spl" override
+          WRITE_LONG  0x8  $name("%SOURCE_RES%")
+          PATCH_IF "%SOURCE_RES%" STRING_EQUAL_CASE "dw#gatep" BEGIN
+            WRITE_ASCII 0x10 CAS_P03
+          END ELSE BEGIN
+            WRITE_ASCII 0x10 CAS_M03
+          END
+          WRITE_LONG  0x1e BIT8 // Exclude Diviner
+          WRITE_SHORT 0x22 14   // Conjuration
+          WRITE_BYTE  0x25 2    // Conjurer
+          WRITE_BYTE  0x27 6    // Conjuration
+        BUT_ONLY
+      END
+    END
   END*/
 END
 
+
 //SCSII colours these dudes green, but we turn them into glabrezus and mariliths
-ACTION_IF FILE_EXISTS_IN_GAME dw#fiends_notinnate.mrk OR FILE_EXISTS_IN_GAME dw#fiends_innate.mrk BEGIN
+ACTION_IF FILE_EXISTS_IN_GAME dw#fiends_notinnate.mrk OR
+          FILE_EXISTS_IN_GAME dw#fiends_innate.mrk OR
+          FILE_EXISTS_IN_GAME dw#fiends.mrk BEGIN
   COPY_EXISTING abydem01.cre override
 		obsdem01.cre override
     LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 51 END

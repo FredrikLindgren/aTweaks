@@ -1318,6 +1318,16 @@ DEFINE_PATCH_FUNCTION make_balor BEGIN
     REPLACE_CRE_ITEM ~RR#DBALR~ #0 #0 #0 ~UNDROPPABLE~ ~WEAPON1~ EQUIP                 // replace right hand weapon with a Vorpal Sword
     REPLACE_CRE_ITEM ~RR#DBAL2~ #0 #0 #0 ~UNDROPPABLE~ ~SHIELD~                        // replace left hand weapon with a Flaming Whip
     SET_BG2_PROFICIENCY PROFICIENCY2WEAPON 3
+    LPF minimum_proficiency
+      INT_VAR
+        value = 1
+        proficiency = IDS_OF_SYMBOL (stats PROFICIENCYLONGSWORD)
+    END
+    LPF minimum_proficiency
+      INT_VAR
+        value = 1
+        proficiency = IDS_OF_SYMBOL (stats PROFICIENCYFLAILMORNINGSTAR)
+    END
     REMOVE_CRE_ITEM ~HELMNOAN~                                                         // removes HELMNOAN.ITM (no critical hit immunity in PnP)
     REMOVE_KNOWN_SPELLS                                                                // Remove all known spells from the current creature
     REMOVE_MEMORIZED_SPELLS                                                            // Remove all memorized spells from the current creature
@@ -1401,12 +1411,14 @@ DEFINE_PATCH_FUNCTION make_balor BEGIN
         "skipfile03" = "GORDEMC1"                                                      // skip script patching for a designated file
     END                                                                                // ends FUNCTION call
     PATCH_IF FiendsScripts = 0 BEGIN                                                   // Only do this if we're not just adding aTweaks scripting
-    LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                    // grant immunities to fire-based area effect spells
-    LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                              // grant immunities to electricity-based area effect spells
-    LAUNCH_PATCH_FUNCTION hover_immunities END                                         // grant immunities to ground-based spells
-    LAUNCH_PATCH_FUNCTION web_immunity END                                             // grant immunities to web spells
-    LAUNCH_PATCH_FUNCTION ~entangle_immunities~ END                                    // add immunity to Entangle spells and abilities
-    LAUNCH_PATCH_FUNCTION ~insect_spell_immunities~ END                                // add immunity to insect spells
+      SET_BG2_PROFICIENCY PROFICIENCYLONGSWORD 1
+      SET_BG2_PROFICIENCY PROFICIENCYFLAILMORNINGSTAR 1
+      LAUNCH_PATCH_FUNCTION fire_spell_immunities END                                  // grant immunities to fire-based area effect spells
+      LAUNCH_PATCH_FUNCTION electrical_spell_immunities END                            // grant immunities to electricity-based area effect spells
+      LAUNCH_PATCH_FUNCTION hover_immunities END                                       // grant immunities to ground-based spells
+      LAUNCH_PATCH_FUNCTION web_immunity END                                           // grant immunities to web spells
+      LAUNCH_PATCH_FUNCTION ~entangle_immunities~ END                                  // add immunity to Entangle spells and abilities
+      LAUNCH_PATCH_FUNCTION ~insect_spell_immunities~ END                              // add immunity to insect spells
     END
     PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE ~BALOR01~) BEGIN                        // special case, an (unused?) Balor should be flagged as hostile
       WRITE_BYTE  0x270 "255"                                                          // set initial allegiance to ENEMY
