@@ -1,4 +1,5 @@
 IF TRIGGER
+  IgnoreBlock(NoFriendlyFire)
   Global("flDecideMinorSequencer","LOCALS",2)
   TargetBlock(EnemiesInOrder)
   TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIEvo|CanCastMage|FireRes75)
@@ -8,4 +9,17 @@ IF TRIGGER
 THEN DO
   Combine()
   Action(MinorSequencer,WIZARD_AGANNAZAR_SCORCHER,WIZARD_AGANNAZAR_SCORCHER|100|50)
+END
+
+IF TRIGGER
+  RequireBlock(NoFriendlyFire)
+  Global("flDecideMinorSequencer","LOCALS",2)
+  TargetBlock(EnemiesInOrder)
+  TriggerBlock(Disabled|MR50|SpellTurning|MinorGlobe|SIEvo|CanCastMage|MagicDamage75)
+  !HasItemEquiped("clck26",scstarget)
+  !Race(scstarget,RAKSHASA)
+  !Race(scstarget,LICH)
+THEN DO
+    Combine()
+    Action(MinorSequencer,WIZARD_MAGIC_MISSILE,WIZARD_MAGIC_MISSILE|100|50)
 END
