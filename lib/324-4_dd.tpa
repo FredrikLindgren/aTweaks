@@ -19,11 +19,29 @@ BUT_ONLY_IF_IT_CHANGES
 
 DEFINE_PATCH_FUNCTION replace_create_creature_door BEGIN
   DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~CreateCreatureDoor(\(\".+\"\),\(\[-?[0-9]+\.-?[0-9]+\]\),\([0-9]+\))~
-                                                       ~SetInterrupt(FALSE) CreateVisualEffect("spdimndr",\2) CreateCreature(\1,\2,\3) SetInterrupt(TRUE)~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP
+      ~ActionOverride(\(.+\),CreateCreatureDoor(\(\".+\"\),\(\[-?[0-9]+\.-?[0-9]+\]\),\([0-9]+\)))~
+      ~ActionOverride(\1,CreateVisualEffect("spdimndr",\3))
+       ActionOverride(\1,CreateCreature(\2,\3,\4))~
 
-    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~CreateCreatureObjectDoor(\(\".+\"\),\(\"?.+\"?\),\([0-9]+\),\([0-9]+\),\([0-9]+\))~
-                                                       ~SetInterrupt(FALSE) CreateVisualEffectObject("spdimndr",\2) CreateCreatureObject(\1,\2,\3,\4,\5) SetInterrupt(TRUE)~
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP
+      ~ActionOverride(\(.+\),CreateCreatureObjectDoor(\(\".+\"\),\(\"?.+\"?\),\([0-9]+\),\([0-9]+\),\([0-9]+\)))~
+      ~ActionOverride(\1,CreateVisualEffectObject("spdimndr",\3))
+       ActionOverride(\1,CreateCreatureObject(\2,\3,\4,\5,\6))~
+
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP
+      ~CreateCreatureDoor(\(\".+\"\),\(\[-?[0-9]+\.-?[0-9]+\]\),\([0-9]+\))~
+      ~SetInterrupt(FALSE)
+       CreateVisualEffect("spdimndr",\2)
+       CreateCreature(\1,\2,\3)
+       SetInterrupt(TRUE)~
+
+    REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP
+      ~CreateCreatureObjectDoor(\(\".+\"\),\(\"?.+\"?\),\([0-9]+\),\([0-9]+\),\([0-9]+\))~
+      ~SetInterrupt(FALSE)
+       CreateVisualEffectObject("spdimndr",\2)
+       CreateCreatureObject(\1,\2,\3,\4,\5)
+       SetInterrupt(TRUE)~
   END
 END
 
