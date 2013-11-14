@@ -1,8 +1,12 @@
 
+ACTION_IF GAME_IS ~bgee bg2ee~ BEGIN
+  OUTER_SPRINT bgee "/bgee"
+END ELSE OUTER_SPRINT bgee ""
+
 DEFINE_ACTION_FUNCTION work_around_function BEGIN
   //I had hoped LOAD_TRA would not modify the global environment inside a function, but it does,
   //so we need to undo it by loading the main tra at the end
-  LOAD_TRA ~atweaks/tra/english/evil_rewards.tra~ ~atweaks/tra/%LANGUAGE%/evil_rewards.tra~
+  LOAD_TRA ~atweaks/tra%bgee%/english/evil_rewards.tra~ ~atweaks/tra%bgee%/%LANGUAGE%/evil_rewards.tra~
   
   COPY_EXISTING misc9v.itm override
     SAY IDENTIFIED_DESC @70
@@ -14,10 +18,12 @@ DEFINE_ACTION_FUNCTION work_around_function BEGIN
     END
   BUT_ONLY
 
-  LOAD_TRA ~atweaks/tra/english/atweaks.tra~ ~atweaks/tra/%LANGUAGE%/atweaks.tra~
+  LOAD_TRA ~atweaks/tra%bgee%/english/atweaks.tra~ ~atweaks/tra%bgee%/%LANGUAGE%/atweaks.tra~
 END
 
-COMPILE ~atweaks/dlg/evil_rewards.d~ USING ~atweaks/tra/english/evil_rewards.tra~ ~atweaks/tra/%LANGUAGE%/evil_rewards.tra~
+COMPILE ~atweaks/dlg/evil_rewards.d~ USING
+        ~atweaks/tra%bgee%/english/evil_rewards.tra~
+        ~atweaks/tra%bgee%/%LANGUAGE%/evil_rewards.tra~
 
 //Trademeet
 COPY_EXISTING bolt08.itm override
