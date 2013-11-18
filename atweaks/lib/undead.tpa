@@ -26,13 +26,15 @@ COPY ~atweaks/itm/rr#dinv.itm~  override
 
 //Sensible Encounters
 
-//Replace the Vampyre with a Spectre, because Vampyres are not undead and Spectres are underrepresented
-COPY_EXISTING nevmtrap.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY ~"nevm4"~ ~"spectr01"~
-  END
-BUT_ONLY
-IF nevm4
+ACTION_IF GAME_IS ~soa tob bgt bg2ee~ BEGIN
+  //Replace the Vampyre with a Spectre, because Vampyres are not undead and Spectres are underrepresented
+  COPY_EXISTING nevmtrap.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY ~"nevm4"~ ~"spectr01"~
+    END
+  BUT_ONLY
+  IF nevm4
+END
 
 //Replace Shadow Fiend with a Wraith, because Shadow Fiends are not undead
 COPY_EXISTING ar1401.bcs override

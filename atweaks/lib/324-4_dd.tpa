@@ -5,17 +5,19 @@ COPY    ~atweaks/bam/rr#ddbg2.bam~   ~override~                                 
 
 LAF handle_old_dd END
 
-// Ensure that the portal in Sendai's lair always uses the BG2-style Dimension Door animation (IWD-style doesn't look so good here)
-COPY_EXISTING ~ar6108.are~ ~override~
-  READ_LONG 0xac "anim_num"
-  READ_LONG 0xb0 "anim_off"
-  FOR (index = 0 ; index < anim_num ; index = index + 1) BEGIN
-    READ_ASCII ("%anim_off%" + ("%index%" * 0x4c)) "anim_name"
-    PATCH_IF ("%anim_name%" STRING_EQUAL_CASE "SPDIMNDR") BEGIN
-      WRITE_ASCII ("%anim_off%" + 0x28 + ("%index%" * 0x4c)) "rr#ddbg2" #8 // Animation resref (BAM)
+ACTION_IF GAME_IS ~tob bgt bg2ee~ BEGIN
+  // Ensure that the portal in Sendai's lair always uses the BG2-style Dimension Door animation (IWD-style doesn't look so good here)
+  COPY_EXISTING ~ar6108.are~ ~override~
+    READ_LONG 0xac "anim_num"
+    READ_LONG 0xb0 "anim_off"
+    FOR (index = 0 ; index < anim_num ; index = index + 1) BEGIN
+      READ_ASCII ("%anim_off%" + ("%index%" * 0x4c)) "anim_name"
+      PATCH_IF ("%anim_name%" STRING_EQUAL_CASE "SPDIMNDR") BEGIN
+        WRITE_ASCII ("%anim_off%" + 0x28 + ("%index%" * 0x4c)) "rr#ddbg2" #8 // Animation resref (BAM)
+      END
     END
-  END
-BUT_ONLY_IF_IT_CHANGES
+  BUT_ONLY_IF_IT_CHANGES
+END
 
 DEFINE_PATCH_FUNCTION replace_create_creature_door BEGIN
   DECOMPILE_AND_PATCH BEGIN

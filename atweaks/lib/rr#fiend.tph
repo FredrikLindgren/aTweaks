@@ -118,35 +118,50 @@ COPY ~aTweaks/EFF/RR#DGZ03.EFF~ ~override~                                      
 COPY ~aTweaks/SPL/RR#DGZRM.SPL~ ~override~                                         // Death Gaze removal (curse is lifted after the creature dies)
 
 //Fix minhp items so the wearer can't be killed by the Nabassu's Death Gaze
-COPY_EXISTING abazring.itm override
-              bhaalhp1.itm override
-              finmel01.itm override
-              gorfirg.itm override
-              iceregen.itm override
-              imoenhp1.itm override
-              jonhp1.itm override
-              mel01.itm override
-              minhp1.itm override
-              minhp20.itm override
-              minhp60.itm override
-              monhp01.itm override
-              monhp1.itm override
-              monhp20.itm override
-              monhp80.itm override
-              sengua04.itm override
-              surehp1.itm override
-              tstatue.itm override
-  PATCH_IF SOURCE_SIZE > 0x71 BEGIN
-    LPF ADD_ITEM_EQEFFECT
-      INT_VAR
-        opcode = 206
-        target = 1
-        timing = 2
-      STR_VAR
-        resource = rr#dgaze
-    END
+ACTION_FOR_EACH file IN
+                abazring
+                bhaalhp1
+                bprng1
+                finmel01
+                gorfirg
+                iceregen
+                imoenhp1
+                jonhp1
+                mel01
+                mihp1
+                minhp1
+                minhp20
+                minhp60
+                monhp01
+                monhp1
+                monhp20
+                monhp80
+                ohdmhp1
+                ohhexam1
+                ohhexam2
+                ohhexam3
+                ohhexam4
+                ohhexam5
+                ref1
+                sengua04
+                surehp1
+                tstatue
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
+    COPY_EXISTING ~%file%.itm~ override
+      PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+        LPF ADD_ITEM_EQEFFECT
+          INT_VAR
+            opcode = 206
+            target = 1
+            timing = 2
+          STR_VAR
+            resource = rr#dgaze
+        END
+      END
+    BUT_ONLY
   END
-BUT_ONLY
+END
 
 COPY ~aTweaks/SPL/RR#DFA1.SPL~  ~override~                                         // Fear Aura (Cornugon, Gelugon and Bone Fiend)
   SAY NAME1 @672 SAY NAME2 @672
