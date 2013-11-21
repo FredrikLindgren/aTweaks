@@ -1645,41 +1645,43 @@ COPY_EXISTING b1-6.itm "override/fl#wrai.itm"
      END
    END
 
-//Spawned creature inside the Shadow Temple
-COPY_EXISTING wraith01.cre "override/fl#sdwra.cre"
-  WRITE_ASCIIL 0x248 gensht01 sdshadow fl#higmc
+ACTION_IF !BG1 OR BGT BEGIN
+  //Spawned creature inside the Shadow Temple
+  COPY_EXISTING wraith01.cre "override/fl#sdwra.cre"
+    WRITE_ASCIIL 0x248 gensht01 sdshadow fl#higmc
 
-//Spawned creatures outside the Shadow Temple
-COPY_EXISTING wraith01.cre "override/fl#stwra.cre"
-  WRITE_ASCIIE 0x280 "%DEST_RES%" #32
+  //Spawned creatures outside the Shadow Temple
+  COPY_EXISTING wraith01.cre "override/fl#stwra.cre"
+    WRITE_ASCIIE 0x280 "%DEST_RES%" #32
 
-//Replace Shadow Fiends in Saradush sewers with souped-up wraiths
-COPY_EXISTING wraith01.cre "override/fl#swr01.cre"
-              wraith01.cre "override/fl#swr02.cre"
-  WRITE_ASCIIL 0x248 sewsha01 fl#higmc //scripts
-  PATCH_MATCH "%DEST_RES%"
-  WITH
-    fl#swr01
-    BEGIN
-      WRITE_ASCII 0x280 sewsha01 #32 //script name
+  //Replace Shadow Fiends in Saradush sewers with souped-up wraiths
+  COPY_EXISTING wraith01.cre "override/fl#swr01.cre"
+                wraith01.cre "override/fl#swr02.cre"
+    WRITE_ASCIIL 0x248 sewsha01 fl#higmc //scripts
+    PATCH_MATCH "%DEST_RES%"
+    WITH
+      fl#swr01
+      BEGIN
+        WRITE_ASCII 0x280 sewsha01 #32 //script name
+      END
+      DEFAULT
+        WRITE_ASCII 0x280 sewsha02 #32
     END
-    DEFAULT
-      WRITE_ASCII 0x280 sewsha02 #32
-  END
-  LPF RR#MDCRE
-    INT_VAR
-      newhp = 59
-      newapr = 4
-      newac = 1
-      newth = 9
-      newfr = 100
-      newcr = 100
-      newar = 100
-      newrs = 30
-      newrc = 30
-      newrp = 30
-      newrm = 30
-  END
+    LPF RR#MDCRE
+      INT_VAR
+        newhp = 59
+        newapr = 4
+        newac = 1
+        newth = 9
+        newfr = 100
+        newcr = 100
+        newar = 100
+        newrs = 30
+        newrc = 30
+        newrp = 30
+        newrm = 30
+    END
+END
 
 
 
@@ -2022,13 +2024,14 @@ COPY "atweaks/spl/base.spl" "override/fl#zomsd.spl"
 OUTER_SET $f_AddSecType(fl#zomsd.spl) = DiseaseSecType
 
 
-
-//Replace the stupid run-away-and-or-attack script with one that is just responsible for running away
-COPY_EXISTING sahlace.cre override
-              sahskel.cre override
-              sahzomb.cre override
-  REPLACE_TEXTUALLY sahamb01 fl#saham (8)
-BUT_ONLY
+ACTION_IF !BG1 OR BGT BEGIN
+  //Replace the stupid run-away-and-or-attack script with one that is just responsible for running away
+  COPY_EXISTING sahlace.cre override
+                sahskel.cre override
+                sahzomb.cre override
+    REPLACE_TEXTUALLY sahamb01 fl#saham (8)
+  BUT_ONLY
+END
 
 
 

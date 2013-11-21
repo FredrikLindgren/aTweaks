@@ -1243,110 +1243,112 @@ COMPILE ~atweaks/baf/mephits/rr#mste.baf~                                       
 // More sensible mephit encounters
 ///////////////////////////////////
 
+ACTION_IF !BG1 OR BGT BEGIN
+  // In Rayic Gethras' home, fire and magma mephits are mixed with ice mephits
+  // Replace ice mephits with dust mephits who are immune to fire
 
-// In Rayic Gethras' home, fire and magma mephits are mixed with ice mephits
-// Replace ice mephits with dust mephits who are immune to fire
-
-COPY_EXISTING ~AR0315.ARE~ ~override~                                              // Rayic Gethras' home, ground floor
-  REPLACE_TEXTUALLY CASE_INSENSITIVE "MEPICE01" "MEPSTE01"                         // replace Ice Mephits with Steam Mephits (note: name lengths must be the same)
-BUT_ONLY_IF_IT_CHANGES
+  COPY_EXISTING ~AR0315.ARE~ ~override~                                              // Rayic Gethras' home, ground floor
+    REPLACE_TEXTUALLY CASE_INSENSITIVE "MEPICE01" "MEPSTE01"                         // replace Ice Mephits with Steam Mephits (note: name lengths must be the same)
+  BUT_ONLY_IF_IT_CHANGES
 
 
-// In the the air room of Irenicus' dungeon, fire mephits are placed alongside non fire-resistant mephits so replace them with smoke mephits
-// Also, replace one Mist Mephit with a Steam Mephit since mist and steam mephits don't get along very well
+  // In the the air room of Irenicus' dungeon, fire mephits are placed alongside non fire-resistant mephits so replace them with smoke mephits
+  // Also, replace one Mist Mephit with a Steam Mephit since mist and steam mephits don't get along very well
 
-COPY_EXISTING ~AR0601.ARE~ ~override~                                              // Irenicus' dungeon, air room
-  REPLACE_TEXTUALLY CASE_INSENSITIVE "MEPFIR01" "MEPSMO01"                         // replace Fire Mephits with Smoke Mephits (note: name lengths must be the same)
-  READ_LONG  0x54 "actor_off"
-  READ_SHORT 0x58 "actor_num"
-  WHILE ("%actor_num%" > 0) BEGIN
-    SET "actor_num" = ("%actor_num%" - 1)
-    READ_SHORT ("%actor_off%" + 0x20 + ("%actor_num%" * 0x110)) "x_coord"
-    READ_SHORT ("%actor_off%" + 0x22 + ("%actor_num%" * 0x110)) "y_coord"
-    READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
-    PATCH_IF (("%cre_file%" STRING_EQUAL_CASE "MEPMIS01") AND ("%x_coord%" = 1455)) BEGIN
+  COPY_EXISTING ~AR0601.ARE~ ~override~                                              // Irenicus' dungeon, air room
+    REPLACE_TEXTUALLY CASE_INSENSITIVE "MEPFIR01" "MEPSMO01"                         // replace Fire Mephits with Smoke Mephits (note: name lengths must be the same)
+    READ_LONG  0x54 "actor_off"
+    READ_SHORT 0x58 "actor_num"
+    WHILE ("%actor_num%" > 0) BEGIN
+      SET "actor_num" = ("%actor_num%" - 1)
+      READ_SHORT ("%actor_off%" + 0x20 + ("%actor_num%" * 0x110)) "x_coord"
+      READ_SHORT ("%actor_off%" + 0x22 + ("%actor_num%" * 0x110)) "y_coord"
+      READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
+      PATCH_IF (("%cre_file%" STRING_EQUAL_CASE "MEPMIS01") AND ("%x_coord%" = 1455)) BEGIN
         WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~MEPSTE01~ #8
       END
     END
-BUT_ONLY_IF_IT_CHANGES
+  BUT_ONLY_IF_IT_CHANGES
 
 
-// In the Spellhold maze, ice and smoke mephits are placed near a Rahshasa who usually kills them with a Cloudkill. 
-// Replace them with air and mineral mephits who are immune to gas-based spells
+  // In the Spellhold maze, ice and smoke mephits are placed near a Rahshasa who usually kills them with a Cloudkill. 
+  // Replace them with air and mineral mephits who are immune to gas-based spells
 
-COPY_EXISTING ~AR1512.ARE~ ~override~                                              // Spellhold maze
-  REPLACE_TEXTUALLY CASE_INSENSITIVE "MEPICE01" "MEPMIN01"                         // replace Ice Mephit with Mineral Mephit (note: name lengths must be the same)
-  REPLACE_TEXTUALLY CASE_INSENSITIVE "MEPSMO01" "MEPMIN01"                         // replace Smoke Mephit with Mineral Mephit (note: name lengths must be the same)
-BUT_ONLY_IF_IT_CHANGES
+  COPY_EXISTING ~AR1512.ARE~ ~override~                                              // Spellhold maze
+    REPLACE_TEXTUALLY CASE_INSENSITIVE "MEPICE01" "MEPMIN01"                         // replace Ice Mephit with Mineral Mephit (note: name lengths must be the same)
+    REPLACE_TEXTUALLY CASE_INSENSITIVE "MEPSMO01" "MEPMIN01"                         // replace Smoke Mephit with Mineral Mephit (note: name lengths must be the same)
+  BUT_ONLY_IF_IT_CHANGES
 
 
-// The random spawning 2DA handles mephits suboptimally
-// Change it to spawn mephits which won't interfere with each other (i.e. they are all immune to each other's area-effect abilities)
+  // The random spawning 2DA handles mephits suboptimally
+  // Change it to spawn mephits which won't interfere with each other (i.e. they are all immune to each other's area-effect abilities)
 
-COPY_EXISTING ~SPAWNGRP.2DA~ ~override~                                            // random monster group spawn table
-  REPLACE_TEXTUALLY CASE_INSENSITIVE ~Mepair01~ ~Meplig01~                         // Replace Air Mephits with Lightning Mephits
-  REPLACE_TEXTUALLY CASE_INSENSITIVE ~Mepice01~ ~Mepsal01~                         // Replace Ice Mephits with Salt Mephits
-  REPLACE_TEXTUALLY CASE_INSENSITIVE ~Mepsmo01~ ~Mepste01~                         // Replace Smoke Mephits with Steam Mephits
-BUT_ONLY_IF_IT_CHANGES
-
+  COPY_EXISTING ~SPAWNGRP.2DA~ ~override~                                            // random monster group spawn table
+    REPLACE_TEXTUALLY CASE_INSENSITIVE ~Mepair01~ ~Meplig01~                         // Replace Air Mephits with Lightning Mephits
+    REPLACE_TEXTUALLY CASE_INSENSITIVE ~Mepice01~ ~Mepsal01~                         // Replace Ice Mephits with Salt Mephits
+    REPLACE_TEXTUALLY CASE_INSENSITIVE ~Mepsmo01~ ~Mepste01~                         // Replace Smoke Mephits with Steam Mephits
+  BUT_ONLY_IF_IT_CHANGES
+END
 
 
 //////////////
 // Misc stuff
 //////////////
 
-// A Shadow Thief and an Ice Mephit that are fighting in Irenicus' dungeon need special treatment
+ACTION_IF !BG1 OR BGT BEGIN
+  // A Shadow Thief and an Ice Mephit that are fighting in Irenicus' dungeon need special treatment
 
-COPY_EXISTING ~ar0603.are~ ~override~
-  READ_LONG  0x54 "actor_off"
-  READ_SHORT 0x58 "actor_num"
-  FOR (index = 0 ; index < actor_num ; index = index + 1) BEGIN
-    READ_ASCII ("%actor_off%" + 0x80 + ("%index%" * 0x110)) "cre_file"
-    PATCH_IF ("%cre_file%" STRING_COMPARE_CASE "mepice01" = 0) BEGIN               // ice mephit
-      WRITE_ASCII ("%actor_off%" + 0x50 + ("%index%" * 0x110)) ~~ #8               // erase override script
-      SET "index" = "%actor_num%" // kills loop
+  COPY_EXISTING ~ar0603.are~ ~override~
+    READ_LONG  0x54 "actor_off"
+    READ_SHORT 0x58 "actor_num"
+    FOR (index = 0 ; index < actor_num ; index = index + 1) BEGIN
+      READ_ASCII ("%actor_off%" + 0x80 + ("%index%" * 0x110)) "cre_file"
+      PATCH_IF ("%cre_file%" STRING_COMPARE_CASE "mepice01" = 0) BEGIN               // ice mephit
+        WRITE_ASCII ("%actor_off%" + 0x50 + ("%index%" * 0x110)) ~~ #8               // erase override script
+        SET "index" = "%actor_num%" // kills loop
+      END
     END
-  END
-BUT_ONLY_IF_IT_CHANGES
+  BUT_ONLY_IF_IT_CHANGES
 
-COPY_EXISTING ~ISHTHF01.CRE~ ~override~                                            // Shadow Thief
- WRITE_BYTE  0x270 128                                                             // set allegiance to NEUTRAL
-BUT_ONLY_IF_IT_CHANGES
+  COPY_EXISTING ~ISHTHF01.CRE~ ~override~                                            // Shadow Thief
+    WRITE_BYTE  0x270 128                                                             // set allegiance to NEUTRAL
+  BUT_ONLY_IF_IT_CHANGES
 
-<<<<<<<<atweaks/inlined/baf/mephits/ishthf1.baf
-IF
+  <<<<<<<<atweaks/inlined/baf/mephits/ishthf1.baf
+  IF
 	Allegiance(Myself,NEUTRAL)
 	Detect([PC])
-THEN
+  THEN
 	RESPONSE #100
 		ChangeEnemyAlly(Myself,GOODBUTBLUE)
+  END
+  >>>>>>>>
+
+  EXTEND_TOP ~ISHTHF01.BCS~  ~atweaks/inlined/baf/mephits/ishthf1.baf~
+
+
+  // Mephit portals in Irenicus' dungeon spawn mephits on game reload even when they've been destroyed
+
+  COPY_EXISTING ~MEPHSP01.BCS~ ~override~                                            // Smoke Mephit portal script
+                ~MEPHSP02.BCS~ ~override~                                            // Ice Mephit portal script
+                ~MEPHSP03.BCS~ ~override~                                            // Magma Mephit portal script
+                ~MEPHSP04.BCS~ ~override~                                            // Radiant Mephit portal script
+   DECOMPILE_BCS_TO_BAF
+     REPLACE_TEXTUALLY EXACT_MATCH ~See([PC])~ ~!StateCheck(Myself,STATE_REALLY_DEAD) See([PC])~
+   COMPILE_BAF_TO_BCS
+   BUT_ONLY_IF_IT_CHANGES 
+
+
+  // New load screen hints
+
+  COPY_EXISTING ~LOADHINT.2DA~ ~override~                                            // Load screen hints (SoA)
+                ~LOADH25.2DA~ ~override~                                            // Load screen hints (ToB)
+    COUNT_2DA_ROWS 2 rows
+    INSERT_2DA_ROW rows 2 ~%rows%          RR#9003~
+    SET rows = rows + 1
+    REPLACE ~RR#9003~ @9003                                                            // Mephit gating tip
+  BUT_ONLY_IF_IT_CHANGES
 END
->>>>>>>>
-
-EXTEND_TOP ~ISHTHF01.BCS~  ~atweaks/inlined/baf/mephits/ishthf1.baf~
-
-
-// Mephit portals in Irenicus' dungeon spawn mephits on game reload even when they've been destroyed
-
-COPY_EXISTING ~MEPHSP01.BCS~ ~override~                                            // Smoke Mephit portal script
-              ~MEPHSP02.BCS~ ~override~                                            // Ice Mephit portal script
-              ~MEPHSP03.BCS~ ~override~                                            // Magma Mephit portal script
-              ~MEPHSP04.BCS~ ~override~                                            // Radiant Mephit portal script
- DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~See([PC])~ ~!StateCheck(Myself,STATE_REALLY_DEAD) See([PC])~
- COMPILE_BAF_TO_BCS
- BUT_ONLY_IF_IT_CHANGES 
-
-
-// New load screen hints
-
-COPY_EXISTING ~LOADHINT.2DA~ ~override~                                            // Load screen hints (SoA)
-               ~LOADH25.2DA~ ~override~                                            // Load screen hints (ToB)
-COUNT_2DA_ROWS 2 rows
-INSERT_2DA_ROW rows 2 ~%rows%          RR#9003~
-SET rows = rows + 1
-REPLACE ~RR#9003~ @9003                                                            // Mephit gating tip
-BUT_ONLY_IF_IT_CHANGES
 
 
 // Make Wand of Cloudkill cast the proper Cloudkill spell instead of mimicking its effects 

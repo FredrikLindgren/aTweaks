@@ -25,8 +25,7 @@ END
 COPY ~atweaks/itm/rr#dinv.itm~  override
 
 //Sensible Encounters
-
-ACTION_IF GAME_IS ~soa tob bgt bg2ee~ BEGIN
+ACTION_IF !BG1 OR BGT BEGIN
   //Replace the Vampyre with a Spectre, because Vampyres are not undead and Spectres are underrepresented
   COPY_EXISTING nevmtrap.bcs override
     DECOMPILE_AND_PATCH BEGIN
@@ -34,114 +33,114 @@ ACTION_IF GAME_IS ~soa tob bgt bg2ee~ BEGIN
     END
   BUT_ONLY
   IF nevm4
-END
 
-//Replace Shadow Fiend with a Wraith, because Shadow Fiends are not undead
-COPY_EXISTING ar1401.bcs override
-              ar5013.bcs override
-              spwndead.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY ~"sdshadfi"~ ~"fl#sdwra"~
-    REPLACE_TEXTUALLY ~"shadfi01"~ ~"wraith01"~
-  END
-BUT_ONLY
-
-COPY_EXISTING ar1404.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY ~"shadfi01"~ ~"fl#stwra"~
-  END
-BUT_ONLY
-IF shadfi01
-
-COPY_EXISTING cut247a.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY ~"sewsha01"~ ~"fl#swr01"~
-    REPLACE_TEXTUALLY ~"sewsha02"~ ~"fl#swr02"~
-  END
-BUT_ONLY
-
-//Replace Shadow Fiends with mummies, for triple-mummy goodness
-COPY_EXISTING ar0813.are override
-  READ_LONG  0x54 ao
-  FOR (i = 0; i < SHORT_AT 0x58; ++i) BEGIN
-    READ_ASCII ao + 0x110 * i + 0x80 resref
-    PATCH_IF "%resref%" STRING_EQUAL_CASE shadfi01 BEGIN
-      WRITE_ASCII ao + 0x110 * i        Mummy #32
-      WRITE_LONG  ao + 0x110 * i + 0x30 57472 //IC_MUMMY
-      WRITE_ASCII ao + 0x110 * i + 0x80 mummy01 #8
+  //Replace Shadow Fiend with a Wraith, because Shadow Fiends are not undead
+  COPY_EXISTING ar1401.bcs override
+                ar5013.bcs override
+                spwndead.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY ~"sdshadfi"~ ~"fl#sdwra"~
+      REPLACE_TEXTUALLY ~"shadfi01"~ ~"wraith01"~
     END
-  END
-BUT_ONLY
-IF shadfi01
+  BUT_ONLY
 
-//Replace Shadow Fiends with Wraiths
-COPY_EXISTING ar1202.are override
-  READ_LONG 0xc0 reo
-  FOR (i = 0; i < 10; ++i) BEGIN
-    READ_ASCII reo + 0x48 + 0x8 * i resref
-    PATCH_IF "%resref%" STRING_EQUAL_CASE shadfi01 BEGIN
-      WRITE_ASCII reo + 0x48 + 0x8 * i wraith01 #8
+  COPY_EXISTING ar1404.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY ~"shadfi01"~ ~"fl#stwra"~
     END
-  END
-BUT_ONLY
-IF shadfi01
+  BUT_ONLY
+  IF shadfi01
 
-//Replace Shadow Fiends with Wraiths
-COPY_EXISTING ar1404.are override
-  READ_LONG  0x54 ao
-  FOR (i = 0; i < SHORT_AT 0x58; ++i) BEGIN
-    READ_ASCII ao + 0x110 * i + 0x80 resref
-    PATCH_IF "%resref%" STRING_EQUAL_CASE shadfi01 BEGIN
-      WRITE_ASCII ao + 0x110 * i        Wraith #32
-      WRITE_ASCII ao + 0x110 * i + 0x80 fl#stwra #8
+  COPY_EXISTING cut247a.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY ~"sewsha01"~ ~"fl#swr01"~
+      REPLACE_TEXTUALLY ~"sewsha02"~ ~"fl#swr02"~
     END
-  END
-BUT_ONLY
-IF shadfi01
+  BUT_ONLY
 
-//Ungroup Shadow Fiends from undead random encounters; PATCHING 2DA TABLES, ALWAYS A DELIGHT
-COPY_EXISTING spawngrp.2da override
-  COUNT_2DA_COLS num_col
-  READ_2DA_ENTRIES_NOW rspawngrp num_col - 1 //Because this row has one column less
-  FOR (i = 0; i < num_col - 1; ++i) BEGIN
-    READ_2DA_ENTRY_FORMER rspawngrp 0 i e
-    PATCH_IF "%e%" STRING_EQUAL_CASE rdundea2 OR
-             "%e%" STRING_EQUAL_CASE rdshad
-    BEGIN
-      FOR (j = 1; j < rspawngrp; ++j) BEGIN
-        READ_2DA_ENTRY_FORMER rspawngrp j i + 1 f //Because that row has one column less
-        PATCH_IF "%f%" STRING_EQUAL_CASE shadfi01 BEGIN
-          SET_2DA_ENTRY_LATER sspawngrp j i + 1 wraith01
-        END
+  //Replace Shadow Fiends with mummies, for triple-mummy goodness
+  COPY_EXISTING ar0813.are override
+    READ_LONG  0x54 ao
+    FOR (i = 0; i < SHORT_AT 0x58; ++i) BEGIN
+      READ_ASCII ao + 0x110 * i + 0x80 resref
+      PATCH_IF "%resref%" STRING_EQUAL_CASE shadfi01 BEGIN
+        WRITE_ASCII ao + 0x110 * i        Mummy #32
+        WRITE_LONG  ao + 0x110 * i + 0x30 57472 //IC_MUMMY
+        WRITE_ASCII ao + 0x110 * i + 0x80 mummy01 #8
       END
     END
-    SET_2DA_ENTRIES_NOW sspawngrp num_col - 1
-    PRETTY_PRINT_2DA
-  END
-BUT_ONLY
+  BUT_ONLY
+  IF shadfi01
 
-//mummies and ghasts are not so great either; mummies shouldn't really be out and about in that way either
+  //Replace Shadow Fiends with Wraiths
+  COPY_EXISTING ar1202.are override
+    READ_LONG 0xc0 reo
+    FOR (i = 0; i < 10; ++i) BEGIN
+      READ_ASCII reo + 0x48 + 0x8 * i resref
+      PATCH_IF "%resref%" STRING_EQUAL_CASE shadfi01 BEGIN
+        WRITE_ASCII reo + 0x48 + 0x8 * i wraith01 #8
+      END
+    END
+  BUT_ONLY
+  IF shadfi01
 
-//Throw in some subservient undead together with the Underdark Death Knights
-COPY_EXISTING udsac.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[3071\.1172\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[3032.1145])~
-    REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[2929\.1562\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[2945.1608])~
-    REPLACE_TEXTUALLY ~\(CreateCreature("uddeath2",\[3071\.1172\],12)\)~ ~\1 CreateCreature("skelwa01",[3032.1145],12)~
-    REPLACE_TEXTUALLY ~\(CreateCreature("uddeath",\[2929\.1562\],12)\)~ ~\1 CreateCreature("skelwa01",[2945.1608],12)~
-  END
-BUT_ONLY
+  //Replace Shadow Fiends with Wraiths
+  COPY_EXISTING ar1404.are override
+    READ_LONG  0x54 ao
+    FOR (i = 0; i < SHORT_AT 0x58; ++i) BEGIN
+      READ_ASCII ao + 0x110 * i + 0x80 resref
+      PATCH_IF "%resref%" STRING_EQUAL_CASE shadfi01 BEGIN
+        WRITE_ASCII ao + 0x110 * i        Wraith #32
+        WRITE_ASCII ao + 0x110 * i + 0x80 fl#stwra #8
+      END
+    END
+  BUT_ONLY
+  IF shadfi01
 
-//Add some subservient undead to the Death Knight encounter in Watcher's Keep
-COPY_EXISTING ar3007.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[550\.390\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[500.374])~
-    REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[383\.505\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[367.453])~
-    REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[574\.683\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[510.684])~
-    REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[801\.611\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[842.565])~
-    REPLACE_TEXTUALLY ~\(CreateCreature("[a-z0-9#]+",\[550\.390\],0)\)~ ~\1 CreateCreature("skelwa01",[500.374],0)~
-    REPLACE_TEXTUALLY ~\(CreateCreature("[a-z0-9#]+",\[383\.505\],12)\)~ ~\1 CreateCreature("banshe01",[367.453],12)~
-    REPLACE_TEXTUALLY ~\(CreateCreature("[a-z0-9#]+",\[574\.683\],10)\)~ ~\1 CreateCreature("banshe01",[510.684],10)~
-    REPLACE_TEXTUALLY ~\(CreateCreature("[a-z0-9#]+",\[801\.611\],6)\)~ ~\1 CreateCreature("skelwa01",[842.565],6)~
-  END
-BUT_ONLY
+  //Ungroup Shadow Fiends from undead random encounters; PATCHING 2DA TABLES, ALWAYS A DELIGHT
+  COPY_EXISTING spawngrp.2da override
+    COUNT_2DA_COLS num_col
+    READ_2DA_ENTRIES_NOW rspawngrp num_col - 1 //Because this row has one column less
+    FOR (i = 0; i < num_col - 1; ++i) BEGIN
+      READ_2DA_ENTRY_FORMER rspawngrp 0 i e
+      PATCH_IF "%e%" STRING_EQUAL_CASE rdundea2 OR
+               "%e%" STRING_EQUAL_CASE rdshad
+      BEGIN
+        FOR (j = 1; j < rspawngrp; ++j) BEGIN
+          READ_2DA_ENTRY_FORMER rspawngrp j i + 1 f //Because that row has one column less
+          PATCH_IF "%f%" STRING_EQUAL_CASE shadfi01 BEGIN
+            SET_2DA_ENTRY_LATER sspawngrp j i + 1 wraith01
+          END
+        END
+      END
+      SET_2DA_ENTRIES_NOW sspawngrp num_col - 1
+      PRETTY_PRINT_2DA
+    END
+  BUT_ONLY
+
+  //mummies and ghasts are not so great either; mummies shouldn't really be out and about in that way either
+
+  //Throw in some subservient undead together with the Underdark Death Knights
+  COPY_EXISTING udsac.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[3071\.1172\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[3032.1145])~
+      REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[2929\.1562\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[2945.1608])~
+      REPLACE_TEXTUALLY ~\(CreateCreature("uddeath2",\[3071\.1172\],12)\)~ ~\1 CreateCreature("skelwa01",[3032.1145],12)~
+      REPLACE_TEXTUALLY ~\(CreateCreature("uddeath",\[2929\.1562\],12)\)~ ~\1 CreateCreature("skelwa01",[2945.1608],12)~
+    END
+  BUT_ONLY
+
+  //Add some subservient undead to the Death Knight encounter in Watcher's Keep
+  COPY_EXISTING ar3007.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[550\.390\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[500.374])~
+      REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[383\.505\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[367.453])~
+      REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[574\.683\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[510.684])~
+      REPLACE_TEXTUALLY ~\(CreateVisualEffect("SPPORTAL",\[801\.611\])\)~ ~\1 CreateVisualEffect("SPPORTAL",[842.565])~
+      REPLACE_TEXTUALLY ~\(CreateCreature("[a-z0-9#]+",\[550\.390\],0)\)~ ~\1 CreateCreature("skelwa01",[500.374],0)~
+      REPLACE_TEXTUALLY ~\(CreateCreature("[a-z0-9#]+",\[383\.505\],12)\)~ ~\1 CreateCreature("banshe01",[367.453],12)~
+      REPLACE_TEXTUALLY ~\(CreateCreature("[a-z0-9#]+",\[574\.683\],10)\)~ ~\1 CreateCreature("banshe01",[510.684],10)~
+      REPLACE_TEXTUALLY ~\(CreateCreature("[a-z0-9#]+",\[801\.611\],6)\)~ ~\1 CreateCreature("skelwa01",[842.565],6)~
+    END
+  BUT_ONLY
+END

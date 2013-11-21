@@ -271,30 +271,32 @@ BEGIN
 END
 
 
-// Replace one generic Tanar'ri with a Nabassu inside the Planar Sphere
+ACTION_IF !BG1 OR BGT BEGIN
+  // Replace one generic Tanar'ri with a Nabassu inside the Planar Sphere
 
-COPY_EXISTING ~AR0414.ARE~ ~override~                                              // Planar Sphere, Abyssal Plane
-  READ_LONG  0x54 "actor_off"
-  READ_SHORT 0x58 "actor_num"
-  WHILE ("%actor_num%" > 0) BEGIN
-    SET "actor_num" = ("%actor_num%" - 1)
-    READ_SHORT ("%actor_off%" + 0x20 + ("%actor_num%" * 0x110)) "x_coord"
-    READ_SHORT ("%actor_off%" + 0x22 + ("%actor_num%" * 0x110)) "y_coord"
-    READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
-    PATCH_IF (("%cre_file%" STRING_EQUAL_CASE "ABYDEM01") AND ("%x_coord%" = 2155)) BEGIN
-      WRITE_ASCII ("%actor_off%" +        ("%actor_num%" * 0x110)) ~Nabassu~ #32
-      WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~OBSDEM05~ #8
+  COPY_EXISTING ~AR0414.ARE~ ~override~                                              // Planar Sphere, Abyssal Plane
+    READ_LONG  0x54 "actor_off"
+    READ_SHORT 0x58 "actor_num"
+    WHILE ("%actor_num%" > 0) BEGIN
+      SET "actor_num" = ("%actor_num%" - 1)
+      READ_SHORT ("%actor_off%" + 0x20 + ("%actor_num%" * 0x110)) "x_coord"
+      READ_SHORT ("%actor_off%" + 0x22 + ("%actor_num%" * 0x110)) "y_coord"
+      READ_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) "cre_file"
+      PATCH_IF (("%cre_file%" STRING_EQUAL_CASE "ABYDEM01") AND ("%x_coord%" = 2155)) BEGIN
+        WRITE_ASCII ("%actor_off%" +        ("%actor_num%" * 0x110)) ~Nabassu~ #32
+        WRITE_ASCII ("%actor_off%" + 0x80 + ("%actor_num%" * 0x110)) ~OBSDEM05~ #8
+      END
     END
-  END
-BUT_ONLY_IF_IT_CHANGES
+  BUT_ONLY_IF_IT_CHANGES
 
 
-// Special case, the restored Planar Sphere Nabassu needs a heart and an allegiance change
+  // Special case, the restored Planar Sphere Nabassu needs a heart and an allegiance change
 
-COPY_EXISTING ~obsdem05.cre~ ~override~                                            // Restored Planar Sphere Nabassu
-  ADD_CRE_ITEM "MISC6M" #0 #0 #0 none inv1                                         // Demon Heart
-  WRITE_BYTE  0x270 "255"                                                          // set initial allegiance to ENEMY
-BUT_ONLY_IF_IT_CHANGES
+  COPY_EXISTING ~obsdem05.cre~ ~override~                                            // Restored Planar Sphere Nabassu
+    ADD_CRE_ITEM "MISC6M" #0 #0 #0 none inv1                                         // Demon Heart
+    WRITE_BYTE  0x270 "255"                                                          // set initial allegiance to ENEMY
+  BUT_ONLY_IF_IT_CHANGES
+END
 
 
 // Nabassu
@@ -467,9 +469,11 @@ LAUNCH_PATCH_FUNCTION poison_spell_immunities END                               
   WRITE_BYTE  0x275 1                                                              //gender: male
   WRITE_ASCII 0x280 ~RR#HGELU~ #32                                                 // assign new death variable
 
-COPY_EXISTING ~AR3004.ARE~ ~override~                                              // Watcher's Keep maze
-  REPLACE_TEXTUALLY CASE_INSENSITIVE "GORDEM2" "RR#HGEL"                           // replace Velithuu with Gelugon (note: name lengths must be the same)
-BUT_ONLY_IF_IT_CHANGES
+ACTION_IF !BG1 OR BGT BEGIN
+  COPY_EXISTING ~AR3004.ARE~ ~override~                                              // Watcher's Keep maze
+    REPLACE_TEXTUALLY CASE_INSENSITIVE "GORDEM2" "RR#HGEL"                           // replace Velithuu with Gelugon (note: name lengths must be the same)
+  BUT_ONLY_IF_IT_CHANGES
+END
 
 
 ////////////////////////////////////////
@@ -552,43 +556,45 @@ END
 // New dialogues
 //////////////////////////////////////////////////////////////////////
 
-// revised Planar Sphere Nabassu dialogue (adds mephit/quasit spawning)
-COMPILE ~atweaks/dlg/obsdem05.d~
+ACTION_IF !BG1 OR BGT BEGIN
+  // revised Planar Sphere Nabassu dialogue (adds mephit/quasit spawning)
+  COMPILE ~atweaks/dlg/obsdem05.d~
 
-// Revised Planar Sphere Tanar'ri dialogue (removes mephit/quasit spawning)
-COPY_EXISTING abydem01.dlg override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("imp01",[1217.1897],2)~ ~~
-    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("imp01",[1030.2269],9)~ ~~
-    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("imp01",[932.1837],0)~ ~~
-    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("impqua01",[780.1918],15)~ ~~
-    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("impqua01",[1289.2230],7)~ ~~
-    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("mepfir01",[1179.2257],7)~ ~~
-    REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("mepfir01",[1345.2081],4)~ ~~
-  END
-BUT_ONLY
+  // Revised Planar Sphere Tanar'ri dialogue (removes mephit/quasit spawning)
+  COPY_EXISTING abydem01.dlg override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("imp01",[1217.1897],2)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("imp01",[1030.2269],9)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("imp01",[932.1837],0)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("impqua01",[780.1918],15)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("impqua01",[1289.2230],7)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("mepfir01",[1179.2257],7)~ ~~
+      REPLACE_TEXTUALLY EXACT_MATCH ~CreateCreature("mepfir01",[1345.2081],4)~ ~~
+    END
+  BUT_ONLY
 
-// Make the Planar Sphere demons' dialogue files pause the game
-COPY_EXISTING abydem01.dlg override
-              obsdem01.dlg override
-              obsdem05.dlg override
-  WRITE_LONG 0x30 0
-BUT_ONLY
+  // Make the Planar Sphere demons' dialogue files pause the game
+  COPY_EXISTING abydem01.dlg override
+                obsdem01.dlg override
+                obsdem05.dlg override
+    WRITE_LONG 0x30 0
+  BUT_ONLY
 
-// Special case, inlined script change for the new Nabassu in the Planar Sphere quest
-<<<<<<<< .../atweaks/inlined/obsdem05.baf
-IF
+  // Special case, inlined script change for the new Nabassu in the Planar Sphere quest
+  <<<<<<<< .../atweaks/inlined/obsdem05.baf
+  IF
 	Global("RR#Intd","LOCALS",0)
 	NumTimesTalkedTo(0)
         See([PC])
-THEN
+  THEN
 	RESPONSE #100
 		SetGlobal("RR#Intd","LOCALS",1)
 		FaceObject([PC])
 		StartDialogueNoSet([PC])
+  END
+  >>>>>>>>
+  COMPILE ~.../atweaks/inlined/obsdem05.baf~
 END
->>>>>>>>
-COMPILE ~.../atweaks/inlined/obsdem05.baf~
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -617,88 +623,90 @@ COMPILE ~atweaks/baf/fiends/rr#hquas.baf~ // Quasit
         ~atweaks/baf/fiends/fl#shafi.baf~ // Shadow Fiend
         ~atweaks/baf/fiends/fl#shaf2.baf~ // Devil Shade
 
-// Make Ka'rashur use aTweaks' Pit Fiend script once he goes hostile
-EXTEND_TOP karash.bcs ~atweaks/baf/fiends/karash.baf~
-// Make Tahazzar use aTweaks' Balor script once he goes hostile
-EXTEND_TOP tahazz.bcs ~atweaks/baf/fiends/tahazz.baf~
+ACTION_IF !BG1 OR BGT BEGIN
+  // Make Ka'rashur use aTweaks' Pit Fiend script once he goes hostile
+  EXTEND_TOP karash.bcs ~atweaks/baf/fiends/karash.baf~
+  // Make Tahazzar use aTweaks' Balor script once he goes hostile
+  EXTEND_TOP tahazz.bcs ~atweaks/baf/fiends/tahazz.baf~
 
-// Fix the Glabrezu spawning in the Guarded Compound
-COPY_EXISTING kettaatk.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY EXACT_MATCH
-      ~ForceSpell(LastTrigger(Myself),WIZARD_SUMMON_FIEND)~
-      ~CreateCreatureObject("DEMGLA01",LastTrigger(Myself),0,0,0)~
-    REPLACE_TEXTUALLY EXACT_MATCH
-      ~ForceSpellRES("dw#sumgl",LastTrigger(Myself))~
-      ~CreateCreatureObject("DEMGLA01",LastTrigger(Myself),0,0,0)~ // SCSII
-  END
-BUT_ONLY
+  // Fix the Glabrezu spawning in the Guarded Compound
+  COPY_EXISTING kettaatk.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY EXACT_MATCH
+        ~ForceSpell(LastTrigger(Myself),WIZARD_SUMMON_FIEND)~
+        ~CreateCreatureObject("DEMGLA01",LastTrigger(Myself),0,0,0)~
+      REPLACE_TEXTUALLY EXACT_MATCH
+        ~ForceSpellRES("dw#sumgl",LastTrigger(Myself))~
+        ~CreateCreatureObject("DEMGLA01",LastTrigger(Myself),0,0,0)~ // SCSII
+    END
+  BUT_ONLY
 
-// Succubus Kiss cutscene in Watcher's Keep maze
-COPY_EXISTING cut215a.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY EXACT_MATCH
-      ~ActionOverride("gorsuc01",ForceSpell(Player1,PHASE_SPIDER_TELEPORT))~
-      ~ActionOverride("gorsuc01",ForceSpellRES("RR#TELWE",Player1))~ // Teleport Without Error
-    REPLACE_TEXTUALLY EXACT_MATCH
-      ~ActionOverride("gorsuc01",ForceSpell(Player1,SUCCUBUS_KISS))~
-      ~ActionOverride("gorsuc01",ForceSpellRES("RR#SKISS",Player1))~ // Kiss
-  END
-BUT_ONLY
+  // Succubus Kiss cutscene in Watcher's Keep maze
+  COPY_EXISTING cut215a.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY EXACT_MATCH
+        ~ActionOverride("gorsuc01",ForceSpell(Player1,PHASE_SPIDER_TELEPORT))~
+        ~ActionOverride("gorsuc01",ForceSpellRES("RR#TELWE",Player1))~ // Teleport Without Error
+      REPLACE_TEXTUALLY EXACT_MATCH
+        ~ActionOverride("gorsuc01",ForceSpell(Player1,SUCCUBUS_KISS))~
+        ~ActionOverride("gorsuc01",ForceSpellRES("RR#SKISS",Player1))~ // Kiss
+    END
+  BUT_ONLY
 
-// Watcher's Keep Succubus escape script
-COPY_EXISTING gorsuccu.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY EXACT_MATCH
-      ~ForceSpell(Myself,DRYAD_TELEPORT)~
-      ~ForceSpellRES("RR#TELAW",Myself)~ // Teleport away
-  END
-BUT_ONLY
+  // Watcher's Keep Succubus escape script
+  COPY_EXISTING gorsuccu.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY EXACT_MATCH
+        ~ForceSpell(Myself,DRYAD_TELEPORT)~
+        ~ForceSpellRES("RR#TELAW",Myself)~ // Teleport away
+    END
+  BUT_ONLY
 
-// Prevent annoying perma-invisibility
-COPY_EXISTING telqua1.bcs override // Watcher's Keep Quasit script (Wild Magic room)
-              telqua2.bcs override // Watcher's Keep Quasit script (Wild Magic room)
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY EXACT_MATCH
-      ~ApplySpell(Myself,WIZARD_INVISIBILITY)~
-      ~SpellNoDec(Myself,WIZARD_INVISIBILITY)~
-  END
-BUT_ONLY
+  // Prevent annoying perma-invisibility
+  COPY_EXISTING telqua1.bcs override // Watcher's Keep Quasit script (Wild Magic room)
+                telqua2.bcs override // Watcher's Keep Quasit script (Wild Magic room)
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY EXACT_MATCH
+        ~ApplySpell(Myself,WIZARD_INVISIBILITY)~
+        ~SpellNoDec(Myself,WIZARD_INVISIBILITY)~
+    END
+  BUT_ONLY
 
-// Restore Lea'liyl's original dialogue
-COPY_EXISTING obsdem01.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY EXACT_MATCH
-      ~Detect([PC])~ ~NumTimesTalkedTo(0) Detect([PC])~
-    REPLACE_TEXTUALLY EXACT_MATCH
-      ~SetGlobal("summon","LOCALS",1)~
-      ~SetGlobal("summon","LOCALS",1) FaceObject([PC]) StartDialogueNoSet([PC])~
-  END
-BUT_ONLY
+  // Restore Lea'liyl's original dialogue
+  COPY_EXISTING obsdem01.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY EXACT_MATCH
+        ~Detect([PC])~ ~NumTimesTalkedTo(0) Detect([PC])~
+      REPLACE_TEXTUALLY EXACT_MATCH
+        ~SetGlobal("summon","LOCALS",1)~
+        ~SetGlobal("summon","LOCALS",1) FaceObject([PC]) StartDialogueNoSet([PC])~
+    END
+  BUT_ONLY
 
-// Add another Shadow Fiend to the playhouse encounter, because the new
-// Shadow Fiends are weak-sauce compared to Bioware's creative take on them
-COPY_EXISTING ar0510.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY
-      ~\(CreateVisualEffect("SPSTRENH",\[915\.463\])\)~
-      ~\1 CreateVisualEffect("SPSTRENH",[893.482])~
-    REPLACE_TEXTUALLY
-      ~\(CreateCreature("SHADFI01",\[915\.463\],0)\)~
-      ~\1 CreateCreature("SHADFI01",[893.482],0)~
-  END
-BUT_ONLY
+  // Add another Shadow Fiend to the playhouse encounter, because the new
+  // Shadow Fiends are weak-sauce compared to Bioware's creative take on them
+  COPY_EXISTING ar0510.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY
+        ~\(CreateVisualEffect("SPSTRENH",\[915\.463\])\)~
+        ~\1 CreateVisualEffect("SPSTRENH",[893.482])~
+      REPLACE_TEXTUALLY
+        ~\(CreateCreature("SHADFI01",\[915\.463\],0)\)~
+        ~\1 CreateCreature("SHADFI01",[893.482],0)~
+    END
+  BUT_ONLY
 
-// The Pit Fiend summoned through the portal in the maze below Spellhold
-// should not be attacked before the gating animation is complete
-COPY_EXISTING ppportal.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY EXACT_MATCH
-      ~ReallyForceSpell(Myself,SUMMON_PIT_FIEND)~
-      ~SetInterrupt(FALSE) CreateVisualEffect("SPPORTAL",[245.500])
-       Wait(1) CreateCreature("DEMPIT01",[245.500],0) SetInterrupt(TRUE)~
-  END
-BUT_ONLY
+  // The Pit Fiend summoned through the portal in the maze below Spellhold
+  // should not be attacked before the gating animation is complete
+  COPY_EXISTING ppportal.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY EXACT_MATCH
+        ~ReallyForceSpell(Myself,SUMMON_PIT_FIEND)~
+        ~SetInterrupt(FALSE) CreateVisualEffect("SPPORTAL",[245.500])
+         Wait(1) CreateCreature("DEMPIT01",[245.500],0) SetInterrupt(TRUE)~
+    END
+  BUT_ONLY
+END
 
 
 //////////////////////////////////////////////////////////////////////
@@ -928,16 +936,18 @@ BUT_ONLY
 // Make innocent bystanders run away from summoned fiends
 EXTEND_TOP runenemy.bcs ~atweaks/baf/fiends/runenemy.baf~
 
-// Note: this is basically a bugfix, as ApplySpell() casts the
-// spell at 1st level even if the caster's level is higher
-COPY_EXISTING mage20b.bcs override // High level mage script
-              hellgen.bcs override // Enslaved Genie (Tears of Bhaal)
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY
-      ~ApplySpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~
-      ~ReallyForceSpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~
-  END
-BUT_ONLY
+ACTION_IF !BG1 OR BGT BEGIN
+  // Note: this is basically a bugfix, as ApplySpell() casts the
+  // spell at 1st level even if the caster's level is higher
+  COPY_EXISTING mage20b.bcs override // High level mage script
+                hellgen.bcs override // Enslaved Genie (Tears of Bhaal)
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY
+        ~ApplySpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~
+        ~ReallyForceSpell(Myself,WIZARD_PROTECTION_FROM_EVIL)~
+    END
+  BUT_ONLY
+END
 
 
 //////////////////////////////////////////////////////////////////////
@@ -969,50 +979,54 @@ END
 // New load screen hints
 //////////////////////////////////////////////////////////////////////
 
-COPY_EXISTING loadhint.2da override
-              loadh25.2da override
-  COUNT_2DA_ROWS 2 rows
-  PATCH_FOR_EACH traref IN
-                 9000 // Etheralness tip
-                 9001 // Death Gaze tip
-                 9002 // Fiend gating tip
-                 9004 // Extraplanar healing immunity tip
-  BEGIN
-    strref = RESOLVE_STR_REF ((AT traref))
-    INSERT_2DA_ROW rows 2 ~%rows% %strref%~
-    ++rows
-  END
-  //PRETTY_PRINT_2DA // Uncomment at WeiDU 232 or later
-BUT_ONLY
+ACTION_IF !BG1 OR BGT BEGIN
+  COPY_EXISTING loadhint.2da override
+                loadh25.2da override
+    COUNT_2DA_ROWS 2 rows
+    PATCH_FOR_EACH traref IN
+                   9000 // Etheralness tip
+                   9001 // Death Gaze tip
+                   9002 // Fiend gating tip
+                   9004 // Extraplanar healing immunity tip
+    BEGIN
+      strref = RESOLVE_STR_REF ((AT traref))
+      INSERT_2DA_ROW rows 2 ~%rows% %strref%~
+      ++rows
+    END
+    PRETTY_PRINT_2DA
+  BUT_ONLY
+END
 
 
 //////////////////////////////////////////////////////////////////////
 // More sensible encounters
 //////////////////////////////////////////////////////////////////////
 
-// Replace the Abishai and the Demon Knight near Diaytha with a
-// Glabrezu and a Balor
-COPY_EXISTING ar6105.are override // Ogremoch's lair in Sendai's enclave
-  GET_OFFSET_ARRAY aa 0x54 4 0x58 2 0 0 0x110
-  PHP_EACH aa AS i => off BEGIN
-    READ_ASCII off + 0x80 file
-    PATCH_IF "%file%" STRING_EQUAL_CASE DEMABI01 BEGIN
-      WRITE_ASCII off + 0x80 DEMGLA01 #8
+ACTION_IF !BG1 OR BGT BEGIN
+  // Replace the Abishai and the Demon Knight near Diaytha with a
+  // Glabrezu and a Balor
+  COPY_EXISTING ar6105.are override // Ogremoch's lair in Sendai's enclave
+    GET_OFFSET_ARRAY aa 0x54 4 0x58 2 0 0 0x110
+    PHP_EACH aa AS i => off BEGIN
+      READ_ASCII off + 0x80 file
+      PATCH_IF "%file%" STRING_EQUAL_CASE DEMABI01 BEGIN
+        WRITE_ASCII off + 0x80 DEMGLA01 #8
+      END
+      PATCH_IF "%file%" STRING_EQUAL_CASE DEATHKNI BEGIN
+        WRITE_ASCII off + 0x80 DEMBAL01 #8
+      END
     END
-    PATCH_IF "%file%" STRING_EQUAL_CASE DEATHKNI BEGIN
-      WRITE_ASCII off + 0x80 DEMBAL01 #8
-    END
-  END
-BUT_ONLY
+  BUT_ONLY
 
-// Melissan should not summon Bone Fiends during the final battle in
-// order to avoid Blood War issues
-COPY_EXISTING meliss01.bcs override
-              meliss02.bcs override
-  DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY ~MELSUM02~ ~MELSUM01~
-  END
-BUT_ONLY
+  // Melissan should not summon Bone Fiends during the final battle in
+  // order to avoid Blood War issues
+  COPY_EXISTING meliss01.bcs override
+                meliss02.bcs override
+    DECOMPILE_AND_PATCH BEGIN
+      REPLACE_TEXTUALLY ~MELSUM02~ ~MELSUM01~
+    END
+  BUT_ONLY
+END
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1181,9 +1195,10 @@ END
 
 
 //SCSII colours these dudes green, but we turn them into glabrezus and mariliths
-ACTION_IF FILE_EXISTS_IN_GAME dw#fiends_notinnate.mrk OR
+ACTION_IF (!BG! OR BGT) AND
+          (FILE_EXISTS_IN_GAME dw#fiends_notinnate.mrk OR
           FILE_EXISTS_IN_GAME dw#fiends_innate.mrk OR
-          FILE_EXISTS_IN_GAME dw#fiends.mrk BEGIN
+          FILE_EXISTS_IN_GAME dw#fiends.mrk) BEGIN
   COPY_EXISTING abydem01.cre override
 		obsdem01.cre override
     LPF DELETE_CRE_EFFECT INT_VAR opcode_to_delete = 51 END
