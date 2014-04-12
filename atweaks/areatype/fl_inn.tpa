@@ -3,6 +3,8 @@
 //VERSION 1
 //////////////////////////////////
 //This WeiDU .tpa file will install the FL_INN area type by claiming the first unoccupied area-type bit, appending the necessary label to areatype.ids and write the associated numerical value to the bitfield at 0x48 in the .are file in a pre-determined list of areas. Everything is done in a non-cumulative manner.
+
+//Requires BG1 Platform-Abstraction Layer
 //////////////////////////////////
 
 ///add CA
@@ -12,19 +14,13 @@ DEFINE_PATCH_FUNCTION fl#write_area_type INT_VAR fl#areatype = FL_INN BEGIN
     WRITE_SHORT 0x48 THIS BOR (1 << fl#areatype)
   END
 END
- 
+
 DEFINE_ACTION_FUNCTION fl#inn_add_area_type RET FL_INN BEGIN //By wrapping it in a function we do not accidentally contaminate the install environment with our variables
 
-  ACTION_IF GAME_IS ~tutu tutu_totsc bgee~ BEGIN //We do a fair amount of checking what platform we are on, so to marginally speed things up we only check the game files once
-    OUTER_SET BG1 = 1
-    OUTER_SET BG2 = 0
-  END ELSE ACTION_IF GAME_IS bgt BEGIN
-    OUTER_SET BG1 = 1
-    OUTER_SET BG2 = 1
-  END ELSE BEGIN
-    OUTER_SET BG1 = 0
-    OUTER_SET BG2 = 1
-  END 
+  // Work-around for a bug in BG: EE
+  ACTION_IF GAME_IS ~bgee~ AND !FILE_CONTAINS_EVALUATED (areatype.ids "CANRESTOTHER") BEGIN
+    APPEND areatype.ids "128 CANRESTOTHER"
+  END
 
   ADD_AREA_TYPE FL_INN
 
@@ -55,7 +51,7 @@ DEFINE_ACTION_FUNCTION fl#inn_add_area_type RET FL_INN BEGIN //By wrapping it in
     /*CtB:*/ ar3651 ar3652
     /*FFT:*/ ys0160 ys0381 ys0382 ys0383 ys0396 ys0413 ys0414
     /*NEJ:*/ tt1008 tt2114 tt2115
-  BEGIN  
+  BEGIN
     ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
       COPY_EXISTING "%area%.are" override
         LPF fl#write_area_type END
@@ -63,8 +59,8 @@ DEFINE_ACTION_FUNCTION fl#inn_add_area_type RET FL_INN BEGIN //By wrapping it in
     END
   END
 
-  ACTION_IF BG2 BEGIN
-    ACTION_FOR_EACH area IN 
+  ACTION_IF GAME_IS ~soa tob bgt bg2ee~ BEGIN
+    ACTION_FOR_EACH area IN
       /*BG2:*/ ar0021 ar0022 ar0313 ar0314 ar0406 ar0509 ar0510 ar0511 ar0513 ar0514 ar0515 ar0704 ar0709 ar0712 ar1105 ar1602 ar2010 ar2202 ar2203 ar5003 ar5501
     BEGIN
       ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
@@ -74,84 +70,28 @@ DEFINE_ACTION_FUNCTION fl#inn_add_area_type RET FL_INN BEGIN //By wrapping it in
       END
     END
   END
-  
-  ACTION_DEFINE_ASSOCIATIVE_ARRAY fl#inn_areatype_bgt_compat_are BEGIN
-    ar0103 => ar7203
-    ar0104 => ar7204
-    ar0105 => ar7205
-    ar0106 => ar7206
-    ar0107 => ar7207
-    ar0114 => ar7214
-    ar0115 => ar7215
-    ar0116 => ar7216
-    ar0117 => ar7217
-    ar0118 => ar7218
-    ar0119 => ar7219
-    ar0120 => ar7220
-    ar0121 => ar7221
-    ar0133 => ar7233
-    ar0134 => ar7234
-    ar0135 => ar7235
-    ar0136 => ar7236
-    ar0154 => ar7254
-    ar0165 => ar7265
-    ar0166 => ar7266
-    ar0171 => ar7271
-    ar0705 => ar7705
-    ar0706 => ar7706
-    ar0720 => ar7720
-    ar1001 => aru001
-    ar1109 => ar8009
-    ar1110 => ar8010
-    ar1215 => ar8115
-    ar2301 => ar6801
-    ar2302 => ar6802
-    ar2303 => ar6803
-    ar2616 => ar6516
-    ar2617 => ar6517
-    ar2629 => ar6529
-    ar2630 => ar6530
-    ar3303 => ar6703
-    ar3304 => ar6704
-    ar3305 => ar6705
-    ar3306 => ar6706
-    ar3307 => ar6707
-    ar3308 => ar6708
-    ar3351 => ar6751
-    ar3352 => ar6752
-    ar3357 => ar6757
-    ar4801 => ar3701
-    ar4809 => ar3709
-  END
 
-  ACTION_IF BG1 BEGIN
+  ACTION_IF GAME_IS ~tutu tutu_totsc bgt bgee~ BEGIN
     ACTION_FOR_EACH area IN
       /*BG1:*/ ar0103 ar0104 ar0105 ar0106 ar0107 ar0114 ar0115 ar0116 ar0117 ar0118 ar0119 ar0120 ar0121 ar0133 ar0134 ar0135 ar0136 ar0154 ar0165 ar0166 ar0171 ar0705 ar0706 ar0720 ar0807 ar0808 ar1001 ar1109 ar1110 ar1306 ar1307 ar1215 ar2301 ar2302 ar2303 ar2616 ar2617 ar2629 ar2630 ar3303 ar3304 ar3305 ar3306 ar3307 ar3308 ar3351 ar3352 ar3357 ar4801 ar4809
     BEGIN
-      ACTION_IF !BG2 AND "%area%" STRING_MATCHES_REGEXP "ar[0-9]+$" = 0 BEGIN
-        OUTER_PATCH_SAVE area "%area%" BEGIN
-          WRITE_ASCII 0 fw
-        END
-      END
-      ACTION_IF BG2 AND VARIABLE_IS_SET $fl#inn_areatype_bgt_compat_are("%area%") BEGIN
-        OUTER_SPRINT area $fl#inn_areatype_bgt_compat_are("%area%")
-      END
-      ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
-        COPY_EXISTING "%area%.are" override
+      LAF fl#bg1pal STR_VAR file = EVAL "%area%.are" RET area = file END
+      ACTION_IF FILE_EXISTS_IN_GAME "%area%" BEGIN
+        COPY_EXISTING "%area%" override
           LPF fl#write_area_type END
         BUT_ONLY
       END
     END
   END
-  
+
 END //DEFINE_ACTION_FUNCTION
 
 ACTION_IF ENGINE_IS ~soa tob bgee bg2ee~ BEGIN
-  
+
   LAF fl#inn_add_area_type RET FL_INN = FL_INN END
 
 END
 ELSE BEGIN
   PRINT ~WARNING: FL_INN is only available for games based on the BG2 engine~
 END
-  
+

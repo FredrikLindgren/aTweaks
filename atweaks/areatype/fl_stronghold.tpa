@@ -42,6 +42,11 @@ DEFINE_ACTION_FUNCTION fl#stronghold_add_area_type RET FL_STRONGHOLD fl#Strongho
     !AreaCheck("ar1107")
     !Global("RangerProtector","GLOBAL",6)~
 
+  // Work-around for a bug in BG: EE
+  ACTION_IF GAME_IS ~bgee~ AND !FILE_CONTAINS_EVALUATED (areatype.ids "CANRESTOTHER") BEGIN
+    APPEND areatype.ids "128 CANRESTOTHER"
+  END
+
   ADD_AREA_TYPE FL_STRONGHOLD
   
 /*  
