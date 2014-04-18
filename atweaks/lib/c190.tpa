@@ -453,6 +453,17 @@ BEGIN                                                                           
 END                                                                                // ends PATCH_FOR_EACH
 BUT_ONLY_IF_IT_CHANGES
 
+COPY_EXISTING rr#etrai.itm ~override/fl#etrsu.itm~                                 // As RR#ETRAI, but lacking immunity to Death Spell (for use by summoned elementals)
+  GET_OFFSET_ARRAY ea ITM_V10_GEN_EFFECTS
+  PHP_EACH ea AS _ => off BEGIN
+    READ_SHORT off opcode
+    READ_ASCII off + 0x14 resref
+    PATCH_IF opcode = 206 AND "%resref%" STRING_EQUAL_CASE "SPWI605" BEGIN
+      WRITE_BYTE off + 0x12 0                                                       // null the probability
+    END
+  END
+BUT_ONLY
+
 COPY ~atweaks/itm/rr#dinv.itm~  ~override~                                         // item which makes creatures untargetable until the gating animation finishes
 COPY ~atweaks/itm/elementals/rr#easer.itm~ ~override~                              // Aerial Servant attack
 COPY ~atweaks/itm/elementals/rr#efsal.itm~ ~override~                              // Fire Salamander spear attack
@@ -3378,6 +3389,10 @@ ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                
 COPY_EXISTING ~%file%.cre~ ~override~
   PATCH_IF (SOURCE_SIZE > 0x2d3) THEN BEGIN                                        // protects against invalid files
 // =============================================================================== // the actual work starts from here
+    READ_BYTE 0x275 gender
+    PATCH_IF gender = 6 OR gender = 20 BEGIN                                       // If SUMMONED
+      REPLACE_CRE_ITEM fl#etrsu #0 #0 #0 undroppable helmet                        // no immunity to Death Spell
+    END
     READ_BYTE 0x10 "flags"                                                         // read initial flags
     PATCH_IF (("%flags%" BAND "0b00000010") = "0b00000000") BEGIN                  // if bit 1 isn't set 
       WRITE_BYTE "0x10" ("%flags%" BOR "0b00000010")                               // set bit 1 (enable No Corpse flag)
