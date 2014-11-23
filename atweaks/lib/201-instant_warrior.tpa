@@ -2,21 +2,24 @@
 // This tweak reduces the casting time of warrior innate abilities to 0
 // It also flags these abilities as non-magical which prevents Wild Magic and Dead Magic zones from affecting them
 
-COPY_EXISTING ~spin117.spl~ ~override~ // Minsc Berserk
-              ~spcl144.spl~ ~override~ // Kensai Kai
-              ~spcl152.spl~ ~override~ // Barbarian Rage
-              ~spcl211.spl~ ~override~ // Paladin Lay On Hands
-              ~spcl321.spl~ ~override~ // Berserker Enrage
-             ~spcl321d.spl~ ~override~ // Berserker Enrage secondary effect (becoming winded)
-              ~spcl815.spl~ ~override~ // Monk Lay On Hands
-              ~spin827.spl~ ~override~ // Mazzy Lay On Hands
-  READ_LONG  0x64 "abil_off"
-  READ_SHORT 0x68 "abil_num"
-  READ_BYTE  0x19 "flags"
-  PATCH_IF (("%flags%" BAND 0b01000000) != 0b01000000) BEGIN // only patch if the "simplified duration" flag is unchecked
-    WRITE_BYTE 0x19 ("%flags%" BOR 0b01000000) // add the "simplified duration" flag (this actually marks the ability as non-magical)
+ACTION_FOR_EACH spell IN
+                spin117 // Minsc Berserk
+                spcl144 // Kensai Kai
+                spcl152 // Barbarian Rage
+                spcl211 // Paladin Lay On Hands
+                spcl321 // Berserker Enrage
+                spcl321d // Berserker Enrage secondary effect (becoming winded)
+                spcl815 // Monk Lay On Hands
+                spin827 // Mazzy Lay On Hands
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%spell%.spl" BEGIN
+    COPY_EXISTING "%spell%.spl" override
+      WRITE_BYTE 0x19 THIS BOR BIT6 // Add 'non-magical ability'
+      LPF ALTER_SPELL_HEADER
+        INT_VAR
+          header_type = "-1"
+          speed = 0
+      END
+    BUT_ONLY
   END
-  FOR ("index" = 0; "%index%" < "%abil_num%"; "index" = ("%index%" + 1)) BEGIN  // cycle through abilities
-    WRITE_SHORT ("%abil_off%" + 0x12 + ("%index%" * 0x28)) 0                    // set casting time to 0
-  END
-BUT_ONLY_IF_IT_CHANGES
+END
