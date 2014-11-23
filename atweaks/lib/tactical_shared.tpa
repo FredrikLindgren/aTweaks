@@ -1,4 +1,4 @@
-INCLUDE ~atweaks/lib/ds.tpa~
+INCLUDE ~atweaks/lib/symbols.tpa~
 
 ACTION_IF NOT FILE_EXISTS_IN_GAME fl#labelled_weapons.mrk BEGIN
   INCLUDE "atweaks/lib/DS/label_weapons.tph"                                        //Lifted from SCSII
@@ -10,9 +10,6 @@ ACTION_IF NOT FILE_EXISTS_IN_GAME fl#labelled_weapons.mrk BEGIN
   LAUNCH_ACTION_MACRO ~label_weapons~
   COPY_EXISTING sw1h01.itm "override/fl#labelled_weapons.mrk"
 END
-
-APPEND stats.ids "109 CLERIC_HALLOW" UNLESS CLERIC_HALLOW                         //Ensure that CLERIC_HALLOW is in there
-
 
 ACTION_IF !FILE_EXISTS_IN_GAME rr#trat.cre BEGIN
   COPY ~atweaks/cre/rr#trat.cre~ ~override~                                         // Targeting Rat (script aid)
@@ -115,48 +112,6 @@ INT_VAR                                                                         
  END                                                                               // end FUNCTION call
 PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                                 // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
 BUT_ONLY_IF_IT_CHANGES
-
-
-
-// STATE.IDS additions (mirrors G3 BG2 Fixpack, SCSII and IESDP code)
-
-APPEND ~STATE.IDS~ ~0x80101FEF CD_STATE_NOTVALID~ UNLESS ~CD_STATE_NOTVALID~                   // CamDawg's custom IsValidForPartyDialogue() state
-APPEND ~STATE.IDS~ ~0x00000FC0 STATE_REALLY_DEAD~ UNLESS ~0x00000FC0 STATE_REALLY_DEAD~        // includes all possible death states (normal, frozen...)
-APPEND ~STATE.IDS~ ~0x00102029 STATE_HARMLESS~ UNLESS ~0x00102029 STATE_HARMLESS~              // includes Feeblemind, Charmed, Helpless, Stunned, Sleeping
-APPEND ~STATE.IDS~ ~0x60400010 STATE_ILLUSIONS~ UNLESS ~0x60400010 STATE_ILLUSIONS~            // includes Invisible, Imp. Invisibility, Mirror Image, Blur
-APPEND ~STATE.IDS~ ~0x80040004 STATE_RANGED_TARGET~ UNLESS ~0x80040004 STATE_RANGED_TARGET~    // includes Blind, Confused, Panic
-APPEND ~STATE.IDS~ ~0x00000029 STATE_IMMOBILE~ UNLESS ~0x00000029 STATE_IMMOBILE~              // includes Helpless, Stunned, Sleeping
-APPEND ~STATE.IDS~ ~0x00400010 STATE_NOT_TARGETABLE~ UNLESS ~0x00400010 STATE_NOT_TARGETABLE~  // includes Improved Invisibility and plain Invisibility
-APPEND ~STATE.IDS~ ~0x8010202D STATE_DISABLED~ UNLESS ~0x8010202D STATE_DISABLED~              // includes Helpless, Stunned, Panic, Sleeping, Charmed, Feebleminded, Confused
-
-
-// TRIGGER.IDS additions (mirrors G3 BG2 Fixpack code)
-
-APPEND ~TRIGGER.IDS~ ~0x00A1 SpellCastOnMeRES(S:Spell*,O:Caster*)~
-              UNLESS ~0x00A1 SpellCastOnMeRES(S:Spell\*,O:Caster\*)~
-APPEND ~TRIGGER.IDS~ ~0x0091 SpellCastRES(S:Spell*,O:Object*)~
-              UNLESS ~0x0091 SpellCastRES(S:Spell\*,O:Object\*)~
-APPEND ~TRIGGER.IDS~ ~0x00A6 SpellCastPriestRES(S:Spell*,O:Object*)~
-              UNLESS ~0x00A6 SpellCastPriestRES(S:Spell\*,O:Object\*)~
-APPEND ~TRIGGER.IDS~ ~0x00A7 SpellCastInnateRES(S:Spell*,O:Object*)~
-              UNLESS ~0x00A7 SpellCastInnateRES(S:Spell\*,O:Object\*)~
-APPEND ~TRIGGER.IDS~ ~0x4031 HaveSpellRES(S:Spell*)~
-              UNLESS ~0x4031 HaveSpellRES(S:Spell\*)~
-APPEND ~TRIGGER.IDS~ ~0x40D5 ActuallyInCombat()~
-              UNLESS ~0x40D5 ActuallyInCombat()~
-
-
-// ACTION.IDS additions (mirrors G3 BG2 Fixpack code)
-
-APPEND ~ACTION.IDS~ ~147 RemoveSpellRES(S:Spell*)~
-             UNLESS ~147 RemoveSpellRES(S:Spell\*)~
-
-
-// SPELL.IDS additions (mirrors G3 BG2 Fixpack code)
-
-APPEND ~spell.ids~ ~1718 CLERIC_SYMBOL_STUN~      UNLESS ~^1718 CLERIC_SYMBOL_STUN~
-APPEND ~spell.ids~ ~1719 CLERIC_SYMBOL_DEATH~     UNLESS ~^1719 CLERIC_SYMBOL_DEATH~
-
 
 // Fix a mistargeted opcode in the Death Ward spell which prevents Detectable Spells from noticing it correctly (mirrors G3 BG2 Fixpack code)
 
