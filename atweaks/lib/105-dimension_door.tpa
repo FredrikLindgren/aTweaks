@@ -12,6 +12,7 @@ LAF make_dimension_door STR_VAR graphic = RR#DDOOR sound = RR#DDOOR END
 COPY_EXISTING ~spwi402.spl~ ~override~                                             // Dimension Door
   SAY UNIDENTIFIED_DESC @1891 SAY DESC @1891
 
+
 COPY ~atweaks/itm/rr#scr1v.itm~ ~override~                                         // Dimension Door scroll
   SAY DESC @1891
 
@@ -74,4 +75,12 @@ ACTION_IF FILE_EXISTS_IN_GAME ~hidespl.2da~ BEGIN                               
   COPY_EXISTING ~hidespl.2da~ ~override~
     REPLACE_TEXTUALLY ~SPWI402~ ~RR#BLNK~                                          // Remove Dimension Door from the hidden spells list
   BUT_ONLY_IF_IT_CHANGES
+END
+
+ACTION_IF GAME_IS ~iwdee~ BEGIN                                                   // use the proper animation on IWD:EE
+  COPY_EXISTING ~spwi402.spl~ ~override~                                          // Dimension Door
+    WRITE_ASCII 0x10 ~#EFF_M09~ #8 // casting sound
+    LPF ALTER_EFFECT INT_VAR check_globals = 0 check_headers = 1 match_opcode = 215 STR_VAR resource = ~DDOORH~ END
+    LPF ALTER_EFFECT INT_VAR check_globals = 0 check_headers = 1 match_opcode = 174 STR_VAR resource = ~#EFF_M09~ END
+  BUT_ONLY
 END
