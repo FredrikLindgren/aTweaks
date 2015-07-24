@@ -1265,10 +1265,9 @@ ACTION_IF !MOD_IS_INSTALLED spell_rev.tp2 0 BEGIN //Not a skeleton in this case
       COPY_EXISTING "%file%.cre" override
         LPF make_skeleton INT_VAR newxpv = 0 END
         LPF make_summon END
-        WRITE_ASCII 0x248 fl#sklsu #8                                 //Player-friendly summoned-skeleton script; kills itself if summoner is an enemy
         LPF RR#MDCSC
           STR_VAR
-            newscript = fl#lowm
+            newscript = fl#sklsu // Swaps to fl#lowm for hostile summons
             script01 = bornwait
             script02 = wtasight
             script03 = dw#melee
@@ -1368,10 +1367,9 @@ BEGIN
     COPY_EXISTING "%file%.cre" override
       LPF make_skeleton_warrior INT_VAR newxpv = 0 END
       LPF make_summon END
-      WRITE_ASCII 0x248 fl#skwsu #8                                 //Player-friendly summoned-skeleton-warrior script; self-destructs if summoner is enemy
       LPF RR#MDCSC
         STR_VAR
-          newscript = fl#sklwm
+          newscript = fl#skwsu // Swaps to fl#sklwm for hostile summons
           script01 = wtasight
           script02 = dw#melee
           script03 = bpwtsigt
