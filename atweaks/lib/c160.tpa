@@ -877,14 +877,14 @@ COPY "atweaks/spl/undead/fl#mum.spl" override
     END
   END
   //Already on the spl: display string: disease, immunity to cure spells, portrait icon, colour pulse
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#mum END //Non-cumulativity
   FOR (i=1;i<6;++i) BEGIN
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 2 parameter2 = 9 timing = 4 duration = i*7200 END //2 points of chr
   END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*7200 END //death, disintegration-style
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1035) timing = 4 duration = 5*7200 END //display a waring a day before insta-death
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1036) timing = 4 duration = 6*7200 - 1 END //display flavour text right before insta-death
-  
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*7200 insert_point = "-1" END //death, disintegration-style
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 insert_point = "-1" STR_VAR resource = fl#mum END //Non-cumulativity
+
 //Spells and items that cure and protect against disease and fear are patched at the end
 
 OUTER_SET $f_AddSecType(fl#mum.spl) = DiseaseSecType
@@ -1017,21 +1017,21 @@ COPY "atweaks/spl/undead/fl#mum.spl" "override/fl#gmum.spl"
   END
   interval = 1200 //Four hours
   //Already on the spl: display string: disease, immunity to cure spells, portrait icon, colour pulse
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#gmum END //non-cumulativity
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 STR_VAR resource = fl#mum END //immunity from regular mummy rot
   FOR (i=1;i<6;++i) BEGIN
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 2 parameter2 = 9 timing = 4 duration = i*interval END //2 points of chr
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 4 timing = 4 duration = i*interval END //1 point of str
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 78 target = 2 parameter1 = 1 parameter2 = 6 timing = 4 duration = i*interval END //1 point of con
   END
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*interval END //death, disintigration-style
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1035) timing = 4 duration = 5*interval END //display a waring a time unit before insta-death
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1036) timing = 4 duration = 6*interval - 1 END //display flavour text right before insta-death
   PATCH_FOR_EACH parameter2 IN 0 1 BEGIN
     LPF ADD_SPELL_EFFECT INT_VAR opcode = 145 target = 2 parameter2 duration = 6*interval END //disable spellcasting
   END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 142 target = 2 parameter2 = 83 duration = 6*interval END //portrait: spell failure
-  
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 13 target = 2 parameter2 = 512 timing = 4 duration = 6*interval insert_point = "-1" END //death, disintigration-style
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 1 insert_point = "-1" STR_VAR resource = fl#gmum END //non-cumulativity
+
 OUTER_SET $f_AddSecType(fl#gmum.spl) = DiseaseSecType
 
 //Fear aura
@@ -1965,6 +1965,7 @@ COPY "atweaks/spl/base.spl" "override/fl#zomse.spl" //Aura
       target = 2
       duration = 30
       savingthrow = BIT2
+      insert_point = "-1"
     STR_VAR
       resource = fl#zomse
   END
