@@ -395,7 +395,7 @@ sub process_line {
 			}	
 
 		}
-		elsif ($scsline=~m/IgnoreBlock/eq "1") {
+		elsif ($scsline=~m/IgnoreBlock/ eq "1") {
 			extract_from_brackets;
 			@temparray=split('\|',$scsline);
 			foreach $8 (@temparray) {
@@ -405,7 +405,7 @@ sub process_line {
 			}
 
 		}
-		elsif ($scsline=~m/RequireBlock/eq "1") {
+		elsif ($scsline=~m/RequireBlock/ eq "1") {
 			extract_from_brackets;
 			@temparray=split('\|',$scsline);
 			$requirecheck="No";
@@ -508,7 +508,7 @@ sub process_line {
 			$ignorethisresponse = "No";
 
 		}
-		elsif ($scsline=~m/IgnoreBlock/eq "1") {
+		elsif ($scsline=~m/IgnoreBlock/ eq "1") {
 			extract_from_brackets;
 			@temparray=split('\|',$scsline);
 			foreach $8 (@temparray) {
@@ -522,7 +522,7 @@ sub process_line {
 			}
 
 		}
-		elsif ($scsline=~m/RequireBlock/eq "1") {
+		elsif ($scsline=~m/RequireBlock/ eq "1") {
 			extract_from_brackets;
 			@temparray=split('\|',$scsline);
 			$requirecheck="No";
@@ -539,8 +539,7 @@ sub process_line {
 					}
 			}
 
-		}
-		else {
+		} else {
 			if ($baflocation eq "responses") {
 				push @bafactionarray,$scsline;
 			} else {
