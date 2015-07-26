@@ -7,6 +7,7 @@ COPY ~atweaks/itm/rr#dinv.itm~  ~override~                                      
      ~atweaks/eff/fey/rr#shama.eff~   ~override~                                   // Summon Hamadryad EFF
      ~atweaks/eff/fey/rr#snymp.eff~   ~override~                                   // Summon Nymph EFF
 
+ACTION_IF !GAME_IS ~iwdee~ BEGIN                                                   // not on IWD:EE
 COPY_EXISTING ~dry01.cre~    ~override/rr#sdrya.cre~                               // Summoned Dryad
               ~hamasu.cre~   ~override/rr#shama.cre~                               // Summoned Hamadryad
              ~nymphsu.cre~   ~override/rr#snymp.cre~                               // Summoned Nymph
@@ -27,6 +28,13 @@ COPY_EXISTING ~dry01.cre~    ~override/rr#sdrya.cre~                            
   FOR (i=0;i<LONG_AT 0x2c0;++i) BEGIN                                              // Make all items unstealable&undroppable
     WRITE_BYTE io + 0x14*i + 0x10 THIS BOR 10
   END
+END                                                                                // ends IWD:EE check
+
+ACTION_IF GAME_IS ~iwdee~ BEGIN                                                    // there are no fey creatures in IWD:EE so we need to create them from scratch
+COPY ~atweaks/cre/fey/rr#sdrya.cre~  ~override~                                    // Summoned Dryad
+     ~atweaks/cre/fey/rr#shama.cre~  ~override~                                    // Summoned Hamadryad
+     ~atweaks/cre/fey/rr#snymp.cre~  ~override~                                    // Summoned Nymph
+END                                                                                // ends IWD:EE check
 
 COMPILE ~atweaks/baf/fey/rr#sdrya.baf~                                             // Summoned Dryad AI script
         ~atweaks/baf/fey/rr#shama.baf~                                             // Summoned Hamadryad AI script

@@ -97,6 +97,7 @@ COPY ~atweaks/vvc/rr#cwatr.vvc~ ~override~                                      
 
 // Assign the Enchantment school to enchantment based spell-like abilities and make them turn the caster visible
 
+ACTION_IF !GAME_IS ~iwdee~ BEGIN // not on IWD:EE
 COPY_EXISTING ~SPWI929.SPL~                ~override~                              // Succubus Charm Female
               ~SPWI930.SPL~                ~override~                              // Succubus Charm Male
 WRITE_ASCII 0x10 "CAS_M05" #8                                                      // casting sound: CAS_M05.WAV
@@ -112,9 +113,11 @@ INT_VAR                                                                         
  END                                                                               // end FUNCTION call
 PATCH_INCLUDE ~aTweaks/lib/fj_spl_itm_reindex.tpp~                                 // Nythrun's SPL/ITM re-indexer macro (needed for Global Effects)
 BUT_ONLY_IF_IT_CHANGES
+END
 
 // Fix a mistargeted opcode in the Death Ward spell which prevents Detectable Spells from noticing it correctly (mirrors G3 BG2 Fixpack code)
 
+ACTION_IF !GAME_IS ~iwdee~ BEGIN // not on IWD:EE
 COPY_EXISTING ~sppr409.spl~ ~override~
   READ_LONG  0x64 "abil_off"
   READ_SHORT 0x68 "abil_num"
@@ -130,6 +133,7 @@ COPY_EXISTING ~sppr409.spl~ ~override~
     END
   END
 BUT_ONLY_IF_IT_CHANGES
+END
 
 
 // Revised Critical Hit feedback string (removes helmet reference)
@@ -138,7 +142,7 @@ STRING_SET ~20696~ @2122   // Critical Hit Averted
 
 
 // Externalize cause wound item effects to spells
-
+ACTION_IF !GAME_IS ~iwdee~ BEGIN // not on IWD:EE
 ACTION_IF !FILE_EXISTS_IN_GAME ~rr#csw.spl~ BEGIN                                  // safety check, do this only once
 COPY ~atweaks/spl/rr#csw.spl~ ~override~                                           // Cause Serious Wounds (shell spell)
 COPY ~atweaks/spl/rr#ccw.spl~ ~override~                                           // Cause Critical Wounds (shell spell)
@@ -181,6 +185,7 @@ BUT_ONLY_IF_IT_CHANGES
 END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_PHP_EACH
 END                                                                                // ends safety check
+END
 
 //Tag celestials, for detectability (mirrors code in SCSII)
 ACTION_FOR_EACH celestial IN

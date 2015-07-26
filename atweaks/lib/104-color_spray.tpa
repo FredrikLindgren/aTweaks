@@ -1,13 +1,20 @@
 
 COPY ~atweaks/spl/spwi105.spl~ ~override~                                          // Color Spray
   SAY UNIDENTIFIED_DESC @1890 SAY DESC @1890
+  PATCH_IF GAME_IS ~iwdee~ BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR insert_point = 0 target = 2 opcode = 324 duration = 1 parameter2 = 23 END // do not affect blinded creatures
+  END
+
 COPY ~atweaks/spl/mephits/rr#mracs.spl~ ~override/spin937.spl~                     // Color Spray (Radiant Mephit version)
   SAY UNIDENTIFIED_DESC @1890 SAY DESC @1890
+  PATCH_IF GAME_IS ~iwdee~ BEGIN
+    LPF ADD_SPELL_EFFECT INT_VAR insert_point = 0 target = 2 opcode = 324 duration = 1 parameter2 = 23 END // do not affect blinded creatures
+  END
 
 // Patch immunity to both Color Spray versions into spells, items that cause blindness
 // Note: Color Spray should not protect the target from its own effects. It's clunky and can often cause more harm than good. 
 // The drawbacks outweigh the benefits in this case.
-
+ACTION_IF !GAME_IS ~iwdee~ BEGIN // not needed on IWD:EE
 ACTION_FOR_EACH ~file~ IN
                 ~spdr101.spl~
                 ~spin595.spl~
@@ -39,4 +46,5 @@ BEGIN
       END
     BUT_ONLY_IF_IT_CHANGES
   END
+END
 END

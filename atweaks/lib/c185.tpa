@@ -561,14 +561,17 @@ BUT_ONLY_IF_IT_CHANGES
 
 // Wild animals should not attack fey creatures unless provoked
 
-COPY_EXISTING ~BEAR.BCS~ ~override~                                                // Bear AI script
-             ~CBEAR.BCS~ ~override~                                                // Cave Bear AI script
-              ~WOLF.BCS~ ~override~                                                // Wolf AI script
- DECOMPILE_BCS_TO_BAF
-  REPLACE_TEXTUALLY EXACT_MATCH ~!See([PC.0.0.CLERIC_RANGER])~ ~!See([PC.0.0.CLERIC_RANGER]) !See([GOODCUTOFF.0.FAIRY])~
-  REPLACE_TEXTUALLY EXACT_MATCH ~Class(NearestEnemyOf(Myself),RANGER)~ ~OR(2) Class(NearestEnemyOf(Myself),RANGER) Race(NearestEnemyOf(Myself),FAIRY)~
- COMPILE_BAF_TO_BCS
-BUT_ONLY_IF_IT_CHANGES
+ACTION_FOR_EACH script IN bear cbear wolf BEGIN
+ACTION_IF FILE_EXISTS_IN_GAME ~%script%.bcs~ BEGIN
+COPY_EXISTING ~%script%.bcs~ ~override~
+ DECOMPILE_AND_PATCH BEGIN
+   REPLACE_TEXTUALLY EXACT_MATCH ~!See([PC.0.0.CLERIC_RANGER])~ ~!See([PC.0.0.CLERIC_RANGER]) !See([GOODCUTOFF.0.FAIRY])~
+   REPLACE_TEXTUALLY EXACT_MATCH ~Class(NearestEnemyOf(Myself),RANGER)~ ~OR(2) Class(NearestEnemyOf(Myself),RANGER) Race(NearestEnemyOf(Myself),FAIRY)~
+ END
+BUT_ONLY
+END
+END
+
 
 
 <<<<<<<<atweaks/inlined/baf/fey/wildemp.baf
@@ -741,4 +744,14 @@ END
 
 ACTION_IF FILE_EXISTS_IN_GAME ~_AR1700.BCS~ BEGIN                                  // if the designated file exists
   EXTEND_BOTTOM ~_AR1700.BCS~  ~atweaks/inlined/baf/fey/rr#chama.baf~              // extend the Cloakwood 4 area script (Tutu)
+END
+
+
+ACTION_IF GAME_IS ~iwdee~ BEGIN                                                   // use the proper dimension door animation on IWD:EE
+  COPY_EXISTING ~rr#ddoor.spl~ ~override~                                         // Dimension Door
+                ~rr#ddor2.spl~ ~override~                                         // Dimension Door
+    WRITE_ASCII 0x10 ~#EFF_M09~ #8 // casting sound
+    LPF ALTER_EFFECT INT_VAR check_globals = 0 check_headers = 1 match_opcode = 215 STR_VAR resource = ~DDOORH~ END
+    LPF ALTER_EFFECT INT_VAR check_globals = 0 check_headers = 1 match_opcode = 174 STR_VAR resource = ~#EFF_M09~ END
+  BUT_ONLY
 END
