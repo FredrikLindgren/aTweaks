@@ -271,7 +271,7 @@ BEGIN
 END
 
 
-ACTION_IF !BG1 OR BGT BEGIN
+ACTION_IF GAME_INCLUDES ~soa~ BEGIN
   // Replace one generic Tanar'ri with a Nabassu inside the Planar Sphere
 
   COPY_EXISTING ~AR0414.ARE~ ~override~                                              // Planar Sphere, Abyssal Plane
@@ -409,7 +409,7 @@ ACTION_IF FiendsOriginal = 0 BEGIN
   END
 END
 
-ACTION_IF GAME_IS ~tob bgt bg2ee~ BEGIN
+ACTION_IF GAME_INCLUDES ~tob~ BEGIN
   STRING_SET 73946 @749 // Update Elminster's Ecologies: Appendix IIIa
 END
 
@@ -472,7 +472,7 @@ LAUNCH_PATCH_FUNCTION poison_spell_immunities END                               
   WRITE_BYTE  0x275 1                                                              //gender: male
   WRITE_ASCII 0x280 ~RR#HGELU~ #32                                                 // assign new death variable
 
-ACTION_IF !BG1 OR BGT BEGIN
+ACTION_IF GAME_INCLUDES ~tob~ BEGIN
   COPY_EXISTING ~AR3004.ARE~ ~override~                                              // Watcher's Keep maze
     REPLACE_TEXTUALLY CASE_INSENSITIVE "GORDEM2" "RR#HGEL"                           // replace Velithuu with Gelugon (note: name lengths must be the same)
   BUT_ONLY_IF_IT_CHANGES
@@ -559,7 +559,7 @@ END
 // New dialogues
 //////////////////////////////////////////////////////////////////////
 
-ACTION_IF !BG1 OR BGT BEGIN
+ACTION_IF GAME_INCLUDES ~soa~ BEGIN
   // revised Planar Sphere Nabassu dialogue (adds mephit/quasit spawning)
   COMPILE ~atweaks/dlg/obsdem05.d~
 
@@ -626,7 +626,7 @@ COMPILE ~atweaks/baf/fiends/rr#hquas.baf~ // Quasit
         ~atweaks/baf/fiends/fl#shafi.baf~ // Shadow Fiend
         ~atweaks/baf/fiends/fl#shaf2.baf~ // Devil Shade
 
-ACTION_IF !BG1 OR BGT BEGIN
+ACTION_IF GAME_INCLUDES ~tob~ BEGIN
   // Make Ka'rashur use aTweaks' Pit Fiend script once he goes hostile
   EXTEND_TOP karash.bcs ~atweaks/baf/fiends/karash.baf~
   // Make Tahazzar use aTweaks' Balor script once he goes hostile
@@ -939,7 +939,7 @@ BUT_ONLY
 // Make innocent bystanders run away from summoned fiends
 EXTEND_TOP runenemy.bcs ~atweaks/baf/fiends/runenemy.baf~
 
-ACTION_IF !BG1 OR BGT BEGIN
+ACTION_IF GAME_INCLUDES ~soa~ BEGIN
   // Note: this is basically a bugfix, as ApplySpell() casts the
   // spell at 1st level even if the caster's level is higher
   COPY_EXISTING mage20b.bcs override // High level mage script
@@ -982,7 +982,7 @@ END
 // New load screen hints
 //////////////////////////////////////////////////////////////////////
 
-ACTION_IF !BG1 OR BGT BEGIN
+ACTION_IF GAME_INCLUDES ~tob~ BEGIN
   COPY_EXISTING loadhint.2da override
                 loadh25.2da override
     COUNT_2DA_ROWS 2 rows
@@ -1005,7 +1005,7 @@ END
 // More sensible encounters
 //////////////////////////////////////////////////////////////////////
 
-ACTION_IF !BG1 OR BGT BEGIN
+ACTION_IF GAME_INCLUDES ~tob~ BEGIN
   // Replace the Abishai and the Demon Knight near Diaytha with a
   // Glabrezu and a Balor
   COPY_EXISTING ar6105.are override // Ogremoch's lair in Sendai's enclave
@@ -1198,7 +1198,7 @@ END
 
 
 //SCSII colours these dudes green, but we turn them into glabrezus and mariliths
-ACTION_IF (!BG1 OR BGT) AND
+ACTION_IF GAME_INCLUDES ~soa~ AND
           (FILE_EXISTS_IN_GAME dw#fiends_notinnate.mrk OR
           FILE_EXISTS_IN_GAME dw#fiends_innate.mrk OR
           FILE_EXISTS_IN_GAME dw#fiends.mrk) BEGIN
