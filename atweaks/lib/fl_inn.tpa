@@ -1,0 +1,121 @@
+/*
+ *  Inn area type "FL_INN"
+ *  https://github.com/FredrikLindgren/areatype
+ *  Copyright (C) 2015  Fredrik Lindgren, a.k.a., Wisp
+ *
+ *  This script is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. The following additional
+ *  permissions apply:
+ *
+ *  Section 4: Conveying Verbatim Copies
+ *  You are only required to retain any existing notices of copyright
+ *  and absence of warranty.
+ *
+ *  This script is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this script.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+//add compatibility with CA
+
+OUTER_SPRINT fl#areatype#inn#version "1.0.0"
+
+DEFINE_PATCH_FUNCTION fl#areatype#inn#write_area_type
+  INT_VAR
+    areatype = FL_INN
+BEGIN
+  PATCH_IF SOURCE_SIZE > 0x11b BEGIN
+    WRITE_SHORT 0x48 THIS BOR (1 << areatype)
+  END
+END
+
+DEFINE_ACTION_FUNCTION fl#areatype#inn#add_area_type
+  RET
+    FL_INN
+BEGIN
+
+  // Work-around for a bug in BG: EE
+  ACTION_IF GAME_IS ~bgee~ AND !FILE_CONTAINS_EVALUATED (areatype.ids "CANRESTOTHER") BEGIN
+    APPEND areatype.ids "128 CANRESTOTHER"
+  END
+
+  ADD_AREA_TYPE FL_INN
+
+  /*
+   * Mod-added areas
+   */
+  ACTION_FOR_EACH area IN
+    /*Bonehill:*/ bh0107 bh0120 bh0123 bh0115 bh2020 bh2024
+    /*Aran Whitehand:*/ "c-ar01" /*"c-ar02" "c-ar03"*/
+    /*TDD:*/ arpo06 arpo07 dd0118 dd0119 dd1008 dd1008b dd3302 dd3334 dd3335
+    /*RoT:*/ ra3901 ra5104 ra5105 rr3104 rr3105 rr3117 rr3118 rr3305 rr3312
+    /*Undying:*/ cm7000 cm7100
+    /*NTotSC*/ ar33pb
+    /*Soubar:*/ ar4262 ar4263 ar4264 ar4265 ar4266 ar4267 ar4268 ar4269 ar4271
+                ar4272 ar4273 ar4274 ar4275 ar4276
+    /*CtB:*/ ar3651 ar3652
+    /*FFT:*/ ys0160 ys0381 ys0382 ys0383 ys0396 ys0413 ys0414
+    /*NEJ:*/ tt1008 tt2114 tt2115
+  BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
+      COPY_EXISTING "%area%.are" override
+        LPF fl#areatype#inn#write_area_type END
+      BUT_ONLY
+    END
+  END
+
+  /*
+   * SoA areas
+   */
+  ACTION_IF GAME_INCLUDES ~soa~ BEGIN
+    ACTION_FOR_EACH area IN
+      /*BG2:*/ ar0021 ar0022 ar0313 ar0314 ar0406 ar0509 ar0510 ar0511 ar0513
+               ar0514 ar0515 ar0704 ar0709 ar0712 ar1105 ar1602 ar2010 ar2202
+               ar2203 ar5003 ar5501
+    BEGIN
+      ACTION_IF FILE_EXISTS_IN_GAME "%area%.are" BEGIN
+        COPY_EXISTING "%area%.are" override
+          LPF fl#areatype#inn#write_area_type END
+        BUT_ONLY
+      END
+    END
+  END
+
+  /*
+   * BG1 areas
+   */
+  ACTION_IF GAME_INCLUDES ~bg1~ BEGIN
+    ACTION_FOR_EACH area IN
+      /*BG1:*/ ar0103 ar0104 ar0105 ar0106 ar0107 ar0114 ar0115 ar0116 ar0117
+               ar0118 ar0119 ar0120 ar0121 ar0133 ar0134 ar0135 ar0136 ar0154
+               ar0165 ar0166 ar0171 ar0705 ar0706 ar0720 ar0807 ar0808 ar1001
+               ar1109 ar1110 ar1306 ar1307 ar1215 ar2301 ar2302 ar2303 ar2616
+               ar2617 ar2629 ar2630 ar3303 ar3304 ar3305 ar3306 ar3307 ar3308
+               ar3351 ar3352 ar3357 ar4801 ar4809
+    BEGIN
+      LAF fl#bg1pal STR_VAR file = EVAL "%area%.are" RET area = file END
+      ACTION_IF FILE_EXISTS_IN_GAME "%area%" BEGIN
+        COPY_EXISTING "%area%" override
+          LPF fl#areatype#inn#write_area_type END
+        BUT_ONLY
+      END
+    END
+  END
+
+END //DEFINE_ACTION_FUNCTION
+
+ACTION_IF ENGINE_IS ~soa tob bgee bg2ee~ BEGIN
+  LAF fl#areatype#inn#add_area_type
+    RET
+      FL_INN
+  END
+END ELSE BEGIN
+  PRINT ~WARNING: FL_INN is only available for games based on the BG2 engine~
+END
