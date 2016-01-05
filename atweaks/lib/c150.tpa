@@ -20,7 +20,8 @@ ACTION_FOR_EACH ~file~ IN
 BEGIN                                                                              // execute the following
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
     COPY_EXISTING ~%file%.cre~ ~override~
-      LPF make_imp END                                                         
+      LPF make_imp END
+      WRITE_BYTE 0x275 1 // Male
     BUT_ONLY_IF_IT_CHANGES
   END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
@@ -47,6 +48,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_hellcat END
+      WRITE_BYTE 0x275 1 // Male
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -86,6 +88,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_erinyes END
+      WRITE_BYTE 0x275 2 // Female
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -101,6 +104,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_bone_fiend END
+      WRITE_BYTE 0x275 1 // Male
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -115,6 +119,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_abishai END
+      WRITE_BYTE 0x275 1 // Male
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -131,6 +136,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_cornugon END
+      WRITE_BYTE 0x275 1 // Male
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -144,7 +150,19 @@ ACTION_FOR_EACH ~file~ IN
                ~TELPIT1~                                                           // Pit Fiend
                ~TELPIT2~                                                           // Pit Fiend
                ~GORBAT1~                                                           // Ka'rashur (Watcher's Keep Baatezu leader)
-               dempitsu                                                            //Summoned Pit Fiend  
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_pit_fiend END
+      WRITE_BYTE 0x275 1 // Male
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+// Pit Fiend, summoned
+
+ACTION_FOR_EACH file IN
+                dempitsu                                                           //Summoned Pit Fiend
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
@@ -160,6 +178,7 @@ ACTION_IF FiendsOriginal = 0 BEGIN
     ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
       COPY_EXISTING "%file%.cre" override
         LPF make_pit_fiend INT_VAR enforce = 1 END
+        WRITE_BYTE 0x275 1 // Male
       BUT_ONLY
     END
   END
@@ -180,6 +199,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_quasit END
+      WRITE_BYTE 0x275 1 // Male
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -203,6 +223,7 @@ BEGIN                                                                           
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN                                   // if the file exists
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_cambion END
+      WRITE_BYTE 0x275 1 // Male
     BUT_ONLY_IF_IT_CHANGES
   END                                                                                // ends ACTION_IF FILE_EXISTS_IN_GAME block
 END                                                                                // ends ACTION_FOR_EACH block
@@ -214,6 +235,7 @@ ACTION_IF FiendsOriginal = 0 BEGIN
     ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
       COPY_EXISTING "%file%.cre" override
         LPF make_cambion INT_VAR enforce = 1 END
+        WRITE_BYTE 0x275 1 // Male
       BUT_ONLY
     END
   END
@@ -232,6 +254,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_alu-fiend END
+      WRITE_BYTE 0x275 2 // Female
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -247,6 +270,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_maurezhi END
+      WRITE_BYTE 0x275 1 // Male
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -266,6 +290,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_succubus END
+      WRITE_BYTE 0x275 2 // Female
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -316,7 +341,17 @@ ACTION_FOR_EACH ~file~ IN
               ~TANARI01~                                                           // Tanar'ri (Nabassu within the Planar Sphere)
                  ~TANAR~                                                           // Aec'Letec (BGT)
                 ~_TANAR~                                                           // Aec'Letec (Tutu)
-                demnabsu                                                           //Summoned Nabassu  
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_nabassu END
+      WRITE_BYTE 0x275 1 // Male
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+ACTION_FOR_EACH file IN
+                demnabsu                                                           //Summoned Nabassu
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
@@ -332,6 +367,7 @@ ACTION_IF FiendsOriginal = 0 BEGIN
     ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
       COPY_EXISTING "%file%.cre" override
         LPF make_nabassu INT_VAR enforce = 1 END
+        WRITE_BYTE 0x275 1 // Male
       BUT_ONLY
     END
   END
@@ -357,6 +393,16 @@ ACTION_FOR_EACH ~file~ IN
               ~MELSUM01~                                                           // Glabrezu
                ~TELTAN1~                                                           // Glabrezu
                ~TELTAN2~                                                           // Glabrezu
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+    COPY_EXISTING ~%file%.cre~ ~override~
+      LPF make_glabrezu END
+      WRITE_BYTE 0x275 1 // Male
+    BUT_ONLY_IF_IT_CHANGES
+  END
+END
+
+ACTION_FOR_EACH file IN
                demglasu                                                            //Summoned Glabrezu
 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
@@ -375,6 +421,7 @@ ACTION_IF FiendsOriginal = 0 BEGIN
     ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
       COPY_EXISTING "%file%.cre" override
         LPF make_glabrezu INT_VAR enforce = 1 END
+        WRITE_BYTE 0x275 1 // Male
       BUT_ONLY
     END
   END
@@ -393,6 +440,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_marilith END
+      WRITE_BYTE 0x275 2 // Female
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -404,6 +452,7 @@ ACTION_IF FiendsOriginal = 0 BEGIN
     ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
       COPY_EXISTING "%file%.cre" override
         LPF make_marilith END
+        WRITE_BYTE 0x275 2 // Female
       BUT_ONLY
     END
   END
@@ -441,6 +490,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
     COPY_EXISTING ~%file%.cre~ ~override~
       LPF make_balor END
+      WRITE_BYTE 0x275 1 // Male
     BUT_ONLY_IF_IT_CHANGES
   END
 END
@@ -510,6 +560,7 @@ BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
     COPY_EXISTING "%file%.cre" override
       LPF make_shadow_fiend END
+      WRITE_BYTE 0x275 1 // Male
       LPF RR#MDCSC
         STR_VAR
           newscript = fl#shafi
@@ -540,6 +591,7 @@ BEGIN
           newlvl1 = 20
           newer = 100
       END
+      WRITE_BYTE 0x275 1 // Male
       LPF RR#MDCSC
         STR_VAR
           newscript = fl#shaf2
