@@ -35,7 +35,7 @@ STR_VAR                                                                         
 "script18"   = "RR#NOSCN"                                                         // 18th AI script name
 "script19"   = "RR#NOSCN"                                                         // 19th AI script name
 "script20"   = "RR#NOSCN"                                                         // 20th AI script name
-"skipfile01" = "RR#NOSKIP"                                                        // skip script patching for a designated file (note: skipfile01 is for summoned demons)
+"skipfile01" = "RR#NOSKIP"                                                        // skip script patching for a designated file
 "skipfile02" = "RR#NOSKIP"                                                        // skip script patching for a designated file
 "skipfile03" = "RR#NOSKIP"                                                        // skip script patching for a designated file
 "skipfile04" = "RR#NOSKIP"                                                        // skip script patching for a designated file
@@ -52,12 +52,6 @@ READ_ASCII  0x250 ~aicls~                                                       
 READ_ASCII  0x258 ~airac~                                                          // old race script
 READ_ASCII  0x260 ~aigen~                                                          // old general script
 READ_ASCII  0x268 ~aidef~                                                          // old default script
-
-READ_BYTE   0x275 "gender"                                                         // set gender to SUMMONED_DEMON
-
-PATCH_IF (("%gender%" = "9") AND ("%SOURCE_RES%" STRING_EQUAL_CASE "%skipfile01%" = 0)) BEGIN  // if the gender of non-summoned Fiends is SUMMONED_DEMON
-  WRITE_BYTE  0x275 "1"                                                            // set gender to Male 
-END
 
 PATCH_FOR_EACH ~skipfile~ IN ~%skipfile01%~ ~%skipfile02%~ ~%skipfile03%~ ~%skipfile04%~ ~%skipfile05%~ ~%skipfile06%~ BEGIN
   PATCH_IF ("%SOURCE_RES%" STRING_EQUAL_CASE EVALUATE_BUFFER ~%skipfile%~) BEGIN   // if file is supposed to be skipped
