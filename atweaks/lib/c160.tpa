@@ -1929,6 +1929,19 @@ BEGIN
   END
 END
 
+// Fix XP for RIFTCR group
+ACTION_FOR_EACH file IN
+                riftcr01
+                riftcr02
+                riftcr03
+BEGIN
+  ACTION_IF FILE_EXISTS_IN_GAME "%file%.cre" BEGIN
+    COPY_EXISTING "%file%.cre" override
+      WRITE_LONG 0x14 0
+    BUT_ONLY
+  END
+END
+
 COPY "atweaks/spl/base.spl" "override/fl#zomse.spl" //Aura
   READ_LONG 0x64 ao
   FOR (i = 0; i < SHORT_AT 0x68; ++i) BEGIN
