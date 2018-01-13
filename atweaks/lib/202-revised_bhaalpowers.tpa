@@ -15,6 +15,7 @@ COPY    ~aTweaks/VVC/RR#BPDW.VVC~   ~override~                                  
 // Healing Touch (formerly Cure Light Wounds)
 COPY ~aTweaks/SPL/SPIN101.SPL~ ~override~                                         // Cure Light Wounds Bhaalpower
   SAY NAME1 @242 SAY NAME2 @242                                                   // change name to Healing Touch
+  SAY 0x50 @248
 COPY ~aTweaks/EFF/RR#BP1G.EFF~ ~override~                                         // Healing Touch immunity effect (for constructs, undead, extraplanars etc.)
 
 
@@ -22,6 +23,7 @@ COPY ~aTweaks/EFF/RR#BP1G.EFF~ ~override~                                       
 // Drain Life (formerly Larloch's Minor Drain)
 COPY ~aTweaks/SPL/SPIN104.SPL~ ~override~                                         // Larloch's Minor Drain Bhaalpower
   SAY NAME1 @243 SAY NAME2 @243                                                   // change name to Drain Life
+  SAY 0x50 @249
 COPY ~aTweaks/SPL/RR#BP1EA.SPL~ ~override~                                        // Drain Life secondary spell (heals the original caster)
 COPY ~aTweaks/EFF/RR#BP1E.EFF~ ~override~                                         // Drain Life immunity effect (for constructs, undead, extraplanars etc.)
 
@@ -41,6 +43,7 @@ END
 
 COPY ~aTweaks/SPL/SPIN102.SPL~ ~override~                                         // Slow Poison Bhaalpower
  SAY NAME1 @244 SAY NAME2 @244                                                    // change name to Cure Affliction
+ SAY 0x50 @250
  PATCH_IF VARIABLE_IS_SET fl#Disease AND IS_AN_INT fl#Disease BEGIN               // Remove the fl#Disease sectype whenever we would cure disease
    READ_LONG  0x64 ao
    READ_LONG  0x6a eo
@@ -73,6 +76,7 @@ COPY ~aTweaks/EFF/RR#BP2G.EFF~ ~override~                                       
 // Cause Affliction (formerly Horror)
 COPY ~aTweaks/SPL/SPIN105.SPL~ ~override~                                         // Horror Bhaalpower
  SAY NAME1 @245 SAY NAME2 @245                                                    // change name to Cause Affliction
+ SAY 0x50 @251
 
 COPY ~aTweaks/EFF/RR#BP2E.EFF~ ~override~                                         // Cause Affliction immunity effect (for constructs, undead, extraplanars etc.)
      ~aTweaks/SPL/RR#BP2EA.SPL~ ~override~                                        // Cause Affliction secondary spell (-2 disease penalty to STR and CON)
@@ -90,6 +94,7 @@ BEGIN
     COPY_EXISTING ~%file%.spl~ ~override~
       PATCH_IF (%SOURCE_SIZE% > 0x71) THEN BEGIN
         SAY NAME1 @246 SAY NAME2 @246                                                     // change name to Divine Might
+        SAY 0x50 @252
         WRITE_LONG  0x34 1                                                                // set spell level to 1 (prevents scripting issues)
         WRITE_ASCII 0x3a ~RR#BP3G~ #8                                                     // assign a new spellbook icon
         READ_LONG   0x64 "abil_off"
@@ -107,6 +112,7 @@ END
 // Divine Wrath (formerly Vampiric Touch)
 COPY ~aTweaks/SPL/SPIN106.SPL~ ~override~                                         // Vampiric Touch Bhaalpower
   SAY NAME1 @247 SAY NAME2 @247                                                   // change name to Divine Wrath
+  SAY 0x50 @253
 
 COPY ~aTweaks/EFF/RR#BP3E.EFF~ ~override~                                         // Divine Wrath pushback immunity effect (for large creatures)
      ~aTweaks/SPL/RR#BP3EA.SPL~ ~override~                                        // Divine Wrath secondary spell (pushback, knockdown and panic)
