@@ -315,3 +315,48 @@ EXTEND_BOTTOM dplayer3.bcs "atweaks/baf/mscrl2.baf"
 
 //EXTEND_BOTTOM ~dplayer3.bcs~  ~aTweaks/BAF/RR#MSCRL.BAF~                           // extend the party script for Player1
 //EXTEND_BOTTOM ~dplayer2.bcs~  ~aTweaks/BAF/RR#MSCRL.BAF~                           // extend the party script for other party members
+
+/////                                                  \\\\\
+///// other mod scrolls                                \\\\\
+/////                                                  \\\\\
+
+/* 
+A Wild Cam appears! It uses "Make Wisp's Code Look Ugly"! It's Super Effective!
+
+Basically, if any mod can push their new spells into the cd_mod_scrolls array in the form
+
+  "scroll item file", "level", "name string reference" => "spell file name"
+
+then this code can pick it up and add them dynamically to the existing scribing
+dialogue. See 115-compat_iwdification.tpa to see how I do it for IWDification.
+*/
+
+INCLUDE ~atweaks/lib/tob2soa.tph~
+ACTION_CLEAR_ARRAY cd_mod_scrolls
+
+ACTION_IF MOD_IS_INSTALLED ~iwdification/setup-iwdification.tp2~ ~30~ BEGIN INCLUDE ~atweaks/lib/115-compat_iwdification.tpa~ END  
+// other mods can go here
+
+<<<<<<<<./inlined/cd_mod_scrolls.d
+EXTEND_BOTTOM ~fl#SCRL~ %info_1% #1
+  IF ~HaveSpellRES("%spell%")~ THEN REPLY #%info_2% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpellRES("%spell%") GiveItemCreate("%info_0%",Myself,1,1,1)~ EXIT
+END 
+>>>>>>>>
+
+ACTION_PHP_EACH cd_mod_scrolls AS info => spell BEGIN
+  
+  ACTION_IF info_1 = 1 BEGIN OUTER_SET gold =   50 END
+  ACTION_IF info_1 = 2 BEGIN OUTER_SET gold =  100 END
+  ACTION_IF info_1 = 3 BEGIN OUTER_SET gold =  150 END
+  ACTION_IF info_1 = 4 BEGIN OUTER_SET gold =  250 END
+  ACTION_IF info_1 = 5 BEGIN OUTER_SET gold =  500 END
+  ACTION_IF info_1 = 6 BEGIN OUTER_SET gold = 1000 END
+  ACTION_IF info_1 = 7 BEGIN OUTER_SET gold = 1500 END
+  ACTION_IF info_1 = 8 BEGIN OUTER_SET gold = 2500 END
+  ACTION_IF info_1 = 9 BEGIN OUTER_SET gold = 5000 END
+  
+  OUTER_SET info_1 += 2
+  
+  COMPILE ~./inlined/cd_mod_scrolls.d~ EVAL
+  
+END  
