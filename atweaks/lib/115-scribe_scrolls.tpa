@@ -249,13 +249,13 @@ COMPILE ~aTweaks/BAF/fl#SCRL.BAF~                                               
 
 COPY "atweaks/eff/fl#gscrl.eff" override                                           //Give ability eff
   WRITE_ASCII 0x30 fl#mscrl
-  
+
 COPY "atweaks/spl/fl#nscrl.spl" override                                           //Protection from fl#gscrl
   LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = "-1" END
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 timing = 9 STR_VAR resource = fl#gscrl END
-     
+
 COPY "atweaks/eff/fl#sscrl.eff" override                                           //Display string eff
-  SAY 0x1c @8270 
+  SAY 0x1c @8270
                                                                     //Gained Special Ability: Scribe Scrolls
 COPY "atweaks/spl/fl#gscrl.spl" override
   PATCH_FOR_EACH resref IN fl#gscrl fl#sscrl BEGIN
@@ -269,7 +269,7 @@ OUTER_SPRINT $clabtable(0) clabma01
 OUTER_SET clabcount = 1
 
 COPY_EXISTING kitlist.2da override
-  READ_2DA_ENTRIES_NOW r2en_kitlist 9 
+  READ_2DA_ENTRIES_NOW r2en_kitlist 9
   FOR (i=1;i<r2en_kitlist;++i) BEGIN
     READ_2DA_ENTRY_FORMER r2en_kitlist i 8 class
     PATCH_IF IS_AN_INT class AND class = 1 BEGIN
@@ -320,7 +320,7 @@ EXTEND_BOTTOM dplayer3.bcs "atweaks/baf/mscrl2.baf"
 ///// other mod scrolls                                \\\\\
 /////                                                  \\\\\
 
-/* 
+/*
 A Wild Cam appears! It uses "Make Wisp's Code Look Ugly"! It's Super Effective!
 
 Basically, if any mod can push their new spells into the cd_mod_scrolls array in the form
@@ -334,17 +334,19 @@ dialogue. See 115-compat_iwdification.tpa to see how I do it for IWDification.
 INCLUDE ~atweaks/lib/tob2soa.tph~
 ACTION_CLEAR_ARRAY cd_mod_scrolls
 
-ACTION_IF MOD_IS_INSTALLED ~iwdification/setup-iwdification.tp2~ ~30~ BEGIN INCLUDE ~atweaks/lib/115-compat_iwdification.tpa~ END  
+ACTION_IF MOD_IS_INSTALLED ~iwdification.tp2~ ~30~ BEGIN
+  INCLUDE ~atweaks/lib/115-compat_iwdification.tpa~
+END
 // other mods can go here
 
-<<<<<<<<./inlined/cd_mod_scrolls.d
+<<<<<<<<.../atweaks/inlined/cd_mod_scrolls.d
 EXTEND_BOTTOM ~fl#SCRL~ %info_1% #1
   IF ~HaveSpellRES("%spell%")~ THEN REPLY #%info_2% DO ~TakePartyGold(%gold%) DestroyGold(%gold%) RemoveSpellRES("%spell%") GiveItemCreate("%info_0%",Myself,1,1,1)~ EXIT
-END 
+END
 >>>>>>>>
 
 ACTION_PHP_EACH cd_mod_scrolls AS info => spell BEGIN
-  
+
   ACTION_IF info_1 = 1 BEGIN OUTER_SET gold =   50 END
   ACTION_IF info_1 = 2 BEGIN OUTER_SET gold =  100 END
   ACTION_IF info_1 = 3 BEGIN OUTER_SET gold =  150 END
@@ -354,9 +356,9 @@ ACTION_PHP_EACH cd_mod_scrolls AS info => spell BEGIN
   ACTION_IF info_1 = 7 BEGIN OUTER_SET gold = 1500 END
   ACTION_IF info_1 = 8 BEGIN OUTER_SET gold = 2500 END
   ACTION_IF info_1 = 9 BEGIN OUTER_SET gold = 5000 END
-  
+
   OUTER_SET info_1 += 2
-  
-  COMPILE ~./inlined/cd_mod_scrolls.d~ EVAL
-  
-END  
+
+  COMPILE ~.../atweaks/inlined/cd_mod_scrolls.d~ EVAL
+
+END
