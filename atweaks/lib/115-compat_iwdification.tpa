@@ -1,63 +1,17 @@
-  ACTION_CLEAR_ARRAY cd_iwdification_spells
-  ACTION_DEFINE_ASSOCIATIVE_ARRAY cd_iwdification_spells BEGIN
-    126 => 1
-	204 => 2
-	216 => 2
-	225 => 2
-	327 => 3
-	328 => 3
-	422 => 4
-	426 => 4
-	427 => 4
-	428 => 4
-	428 => 4
-	430 => 4
-	431 => 4
-	432 => 4
-	524 => 5
-	525 => 5
-	526 => 5
-	528 => 5
-	533 => 5
-	610 => 6
-	626 => 6
-	627 => 6
-	628 => 6
-	629 => 6
-	630 => 6
-	631 => 6
-	632 => 6
-	706 => 7
-	709 => 7
-	724 => 7
-	725 => 7
-	726 => 7
-	801 => 8
-	802 => 8
-	804 => 8
-	901 => 9 
-  END
-  
-  ACTION_PHP_EACH cd_iwdification_spells AS scroll => level BEGIN 
-  
-    ACTION_IF FILE_EXISTS_IN_GAME ~cdia%scroll%.itm~ BEGIN
-	  
-	  COPY_EXISTING ~cdia%scroll%.itm~ ~override~
-	    READ_LONG 0x0c name // strref of name
-		READ_LONG  0x6a fx_off
-		READ_SHORT 0x70 fx_num
-		FOR (offset = fx_off ; offset < SOURCE_SIZE ; offset = offset + 0x30) BEGIN
-		  READ_SHORT (offset) opcode
-		  PATCH_IF ((opcode > 145) AND (opcode < 149)) BEGIN // ops 146, 147, 148
-		    READ_ASCII (offset + 0x14) resource
-			PATCH_IF ("%resource%" STRING_COMPARE_REGEXP ~^[Ss][Pp][Ww][Ii][1-9][0-9][0-9]$~ = 0) BEGIN
-			  DEFINE_ASSOCIATIVE_ARRAY cd_mod_scrolls BEGIN "cdia%scroll%", "%level%", "%name%" => "%resource%" END
-			  SET offset = SOURCE_SIZE
-			END
-		  END
-		END
-        BUT_ONLY
-
+COPY_EXISTING_REGEXP GLOB ~^cdia[1-9][0-4][0-9]\.itm$~ ~override~
+  READ_LONG 0x0c name // strref of name
+  READ_LONG  0x6a fx_off
+  READ_SHORT 0x70 fx_num
+  FOR (offset = fx_off ; offset < SOURCE_SIZE ; offset = offset + 0x30) BEGIN
+    READ_SHORT (offset) opcode
+    PATCH_IF opcode = 147 BEGIN // learn spell opcode
+      READ_ASCII (offset + 0x14) spell
+      PATCH_IF ("%spell%" STRING_COMPARE_REGEXP ~[Ss][Pp][Ww][Ii][1-9][0-4][0-9]~ = 0) BEGIN
+        READ_ASCII 0x3e level (1)
+        DEFINE_ASSOCIATIVE_ARRAY cd_mod_scrolls BEGIN "%SOURCE_RES%", "%level%", "%name%" => "%spell%" END
+        SET offset = SOURCE_SIZE // kill loop
+      END
     END
-
   END
+  BUT_ONLY
+  
