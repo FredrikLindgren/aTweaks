@@ -183,3 +183,12 @@ BEGIN
     BUT_ONLY_IF_IT_CHANGES
   END
 END
+
+// added by Cam for 4.54
+// as noted by Luke on Github, changing spin105 from Horror to Cause Affliction means all of those fear protection batches should no longer be blocking spin105
+// just remove explicit protection/removal from everywhere we find it, let normal poison/disease/blind/deaf/feeblemind immunity apply
+COPY_EXISTING_REGEXP GLOB ~^.+\.cre~ ~override~
+                          ~^.+\.itm~ ~override~
+                          ~^.+\.spl~ ~override~
+  LPF DELETE_EFFECT STR_VAR match_resource = spin105 END
+  BUT_ONLY
