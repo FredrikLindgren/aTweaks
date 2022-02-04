@@ -337,7 +337,13 @@ ACTION_CLEAR_ARRAY cd_mod_scrolls
 // each of these includes should add to the array cd_mod_scrolls with
 // scroll item, spell level, strref of the spell name => spell resource
 // e.g. cdia126, 1, 1234 => spwi126 for iwdifications's expeditious retreat
-ACTION_IF MOD_IS_INSTALLED ~iwdification/setup-iwdification.tp2~ ~30~ BEGIN INCLUDE ~atweaks/lib/115-compat_iwdification.tpa~ END  
+ACTION_IF ((MOD_IS_INSTALLED ~iwdification/setup-iwdification.tp2~ ~30~) OR   // arcane spells from IWDification
+           (MOD_IS_INSTALLED ~stratagems/setup-stratagems.tp2~ ~1500~)) BEGIN // or via SCS
+           
+  INCLUDE ~atweaks/lib/115-compat_iwdification.tpa~ 
+
+END  
+
 // other mods can go here
 
 <<<<<<<<./inlined/cd_mod_scrolls.d
