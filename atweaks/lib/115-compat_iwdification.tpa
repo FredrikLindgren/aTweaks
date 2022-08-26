@@ -1,0 +1,17 @@
+COPY_EXISTING_REGEXP GLOB ~^cdia[1-9][0-4][0-9]\.itm$~ ~override~
+  READ_LONG 0x0c name // strref of name
+  READ_LONG  0x6a fx_off
+  READ_SHORT 0x70 fx_num
+  FOR (offset = fx_off ; offset < SOURCE_SIZE ; offset = offset + 0x30) BEGIN
+    READ_SHORT (offset) opcode
+    PATCH_IF opcode = 147 BEGIN // learn spell opcode
+      READ_ASCII (offset + 0x14) spell
+      PATCH_IF ("%spell%" STRING_COMPARE_REGEXP ~[Ss][Pp][Ww][Ii][1-9][0-4][0-9]~ = 0) BEGIN
+        READ_ASCII 0x3e level (1)
+        DEFINE_ASSOCIATIVE_ARRAY cd_mod_scrolls BEGIN "%SOURCE_RES%", "%level%", "%name%" => "%spell%" END
+        SET offset = SOURCE_SIZE // kill loop
+      END
+    END
+  END
+  BUT_ONLY
+  

@@ -1,4 +1,14 @@
-
+// added by Cam for 4.54
+// as noted by Luke on Github, changing spin105 from Horror to Cause Affliction means all of those fear protection batches should no longer be blocking spin105
+// just remove explicit protection/removal from everywhere we find it, let normal poison/disease/blind/deaf/feeblemind immunity apply
+COPY_EXISTING_REGEXP GLOB ~^.+\.cre~ ~override~
+                          ~^.+\.itm~ ~override~
+                          ~^.+\.spl~ ~override~
+  PATCH_FOR_EACH op IN 206 318 321 324 BEGIN                            
+    LPF DELETE_EFFECT INT_VAR silent = 1 match_opcode = op STR_VAR match_resource = spin105 END
+  END
+  BUT_ONLY
+  
 COPY    ~aTweaks/BAM/RR#BP1E.BAM~   ~override~                                     // Drain Life icon
 COPY    ~aTweaks/BAM/RR#BP1G.BAM~   ~override~                                     // Healing Touch icon
 COPY    ~aTweaks/BAM/RR#BP2E.BAM~   ~override~                                     // Cause Affliction icon
